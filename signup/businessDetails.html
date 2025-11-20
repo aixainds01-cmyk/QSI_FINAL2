@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tell Us About Your Business</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f3f4f6;
+    }
+
+    .form-container {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .form-section {
+      border: 1px solid #e5e7eb;
+      border-radius: 0.75rem;
+      padding: 2.5rem;
+      background-color: white;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05),
+        0 2px 4px -2px rgb(0 0 0 / 0.05);
+    }
+
+    .input-field,
+    .select-field {
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      padding: 0.625rem 0.875rem;
+      transition: all 0.2s ease;
+      width: 100%;
+      font-size: 0.875rem;
+    }
+
+    .input-field:focus,
+    .select-field:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.2);
+      outline: none;
+    }
+
+    /* Style for read-only fields */
+    .input-field:read-only,
+    .select-field:disabled {
+      background-color: #eef2ff;
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+
+    /* Make the disabled select look like the readonly input */
+    .select-field-readonly {
+      pointer-events: none;
+      background-color: #eef2ff;
+    }
+
+    .btn {
+      padding: 0.75rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      width: 35%;
+      font-size: 0.875rem;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      display: flex;
+      cursor: pointer;
+    }
+
+    .btn:disabled {
+      background-color: #a5b4fc;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #4f46e5;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #4338ca;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .file-upload-label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      border: 2px dashed #d1d5db;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    }
+
+    .file-upload-label:hover {
+      background-color: #f9fafb;
+      border-color: #4f46e5;
+    }
+
+    .logo-preview-img {
+      max-height: 100px;
+      max-width: 200px;
+      margin: 0 auto 0.75rem;
+      border-radius: 0.375rem;
+      border: 1px solid #e5e7eb;
+    }
+    
+    /* --- NEW MESSAGE BOX STYLES --- */
+    .message-box-error {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+    .message-box-success {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="form-container">
+    <div class="form-section">
+      <div class="text-left mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">
+          Tell us about your business
+        </h2>
+        <p class="text-sm text-gray-500 mt-1">
+          This helps us personalize your experience
+        </p>
+      </div>
+
+      <form id="business-form" class="space-y-6" novalidate>
+        <!-- ... (all form fields from businessName to businessLogo remain unchanged) ... -->
+        
+        <div>
+          <label for="businessName" class="block text-sm font-semibold text-gray-700 mb-1">
+            1. Business Name<span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="businessName" name="businessName" class="input-field"
+            placeholder="If you're a freelancer, add your personal name" required />
+        </div>
+        <div>
+          <label for="teamSize" class="block text-sm font-semibold text-gray-700 mb-2">
+            2. Team Size<span class="text-red-500">*</span>
+          </label>
+          <select id="teamSize" name="teamSize" class="select-field" required>
+            <option value="">Select Team Size</option>
+            <option value="1">Just Me (1)</option>
+            <option value="5">2-5 members</option>
+            <option value="10">6-10 members</option>
+            <option value="11">11+ members</option>
+          </select>
+        </div>
+
+        <!-- =========== EMAIL FIELD (Will be auto-filled) =========== -->
+        <div>
+          <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">
+            3. Business Email<span class="text-red-500">*</span>
+          </label>
+          <input type="email" id="email" name="email" class="input-field" placeholder="you@company.com" required readonly />
+        </div>
+
+        <!-- =========== PHONE FIELD (Will be auto-filled if available) =========== -->
+        <div>
+          <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1">
+            4. Phone Number<span class="text-red-500">*</span>
+          </label>
+          <div class="flex items-center gap-2">
+            <select id="dialCode" name="dialCode" class="select-field" style="width: auto;" required>
+              <option value="+91">IN (+91)</option>
+              <option value="+44">UK (+44)</option>
+              <option value="+65">SG (+65)</option>
+              <option value="+1">US (+1)</option>
+            </select>
+            <input type="tel" id="phone" name="phone" class="input-field" placeholder="98765 43210"
+              pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" required />
+          </div>
+        </div>
+
+        <div>
+          <label for="website" class="block text-sm font-semibold text-gray-700 mb-1">
+            5. Website
+          </label>
+          <input type="url" id="website" name="website" class="input-field" placeholder="Your Work Website" />
+        </div>
+        <div>
+          <label for="gst" class="block text-sm font-semibold text-gray-700 mb-1">
+            6. GST Number (Optional)
+          </label>
+          <input type="text" id="gst" name="gst" class="input-field" placeholder="GST Number" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            7. Business Address<span class="text-red-500">*</span>
+          </label>
+          <div class="space-y-4">
+            <input type="text" id="street" name="street" class="input-field" placeholder="Street / Building / Area"
+              required />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input type="text" id="city" name="city" class="input-field" placeholder="City" required />
+              <input type="text" id="state" name="state" class="input-field" placeholder="State" required />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input type="text" id="pincode" name="pincode" class="input-field" placeholder="Pincode" required />
+              <select id="country" name="country" class="select-field" required aria-label="Country">
+                <option value="">Select Country</option>
+                <option value="India">India</option>
+                <option value="UK">UK</option>
+                <option value="Singapore">Singapore</option>
+                <option value="US">US </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label for="currency" class="block text-sm font-semibold text-gray-700 mb-2">
+            8. Currency<span class="text-red-500">*</span>
+          </label>
+          <select id="currency" name="currency" class="select-field" required>
+            <option value="">Select Currency</option>
+            <option value="INR">Indian Rupee (INR, ₹)</option>
+            <option value="USD">US Dollar (USD, $)</option>
+            <option value="EUR">Euro (EUR, €)</option>
+            <option value="GBP">British Pound Sterling (GBP, £)</option>
+          </select>
+        </div>
+        <div>
+          <label for="usage" class="block text-sm font-semibold text-gray-700 mb-1">
+            9. What do you want to use this for?<span class="text-red-500">*</span>
+          </label>
+          <select id="usage" name="usage" class="select-field" required>
+            <option value="">Select...</option>
+            <option value="invoicing">Invoicing & Payments</option>
+            <option value="expense">Expense Management</option>
+            <option value="leads">Lead Management</option>
+            <option value="all">All of the above</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            10. Business Logo
+          </label>
+          <div class="mt-1">
+            <input type="file" id="businessLogo" name="businessLogo" class="hidden"
+              accept="image/png, image/jpeg, image/gif" />
+            <label for="businessLogo" id="logo-upload-label" class="file-upload-label">
+              <div id="logo-prompt" class="flex flex-col items-center justify-center text-center">
+                <svg class="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"
+                  aria-hidden="true">
+                  <path
+                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <span class="mt-2 block text-sm font-medium text-indigo-600">
+                  Add Business Logo
+                </span>
+              </div>
+              <div id="logo-preview-container" class="hidden text-center"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- =========== NEW: MESSAGE BOX (Replaces alert) =========== -->
+        <div id="message-box" class="hidden p-4 rounded-md mt-4 text-sm font-medium">
+          <p id="message-text"></p>
+        </div>
+
+        <div>
+          <button type="submit" id="submit-btn" class="btn btn-primary mt-4">
+            Save & Continue
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const businessForm = document.getElementById("business-form");
+      const submitBtn = document.getElementById("submit-btn");
+      let logoBase64 = null;
+      const businessLogoInput = document.getElementById("businessLogo");
+      const logoUploadLabel = document.getElementById("logo-upload-label");
+      const logoPrompt = document.getElementById("logo-prompt");
+      const logoPreviewContainer = document.getElementById("logo-preview-container");
+
+      // === START: NEW MESSAGE BOX LOGIC ===
+      const messageBox = document.getElementById('message-box');
+      const messageText = document.getElementById('message-text');
+
+      /**
+       * Displays a message to the user.
+       * @param {string} message The message to display.
+       * @param {boolean} [isError=false] True if this is an error message, false for success.
+       */
+      function showMessage(message, isError = false) {
+        messageText.textContent = message;
+
+        if (isError) {
+          messageBox.classList.remove('message-box-success', 'hidden');
+          messageBox.classList.add('message-box-error');
+        } else {
+          messageBox.classList.remove('message-box-error', 'hidden');
+          messageBox.classList.add('message-box-success');
+        }
+
+        // Hide message after 5 seconds
+        setTimeout(() => {
+          messageBox.classList.add('hidden');
+        }, 5000);
+      }
+      // === END: NEW MESSAGE BOX LOGIC ===
+
+      // === START: LOGIC TO GET DATA FROM LOCALSTORAGE ===
+      const emailInput = document.getElementById('email');
+      const dialCodeInput = document.getElementById('dialCode');
+      const phoneInput = document.getElementById('phone');
+
+      // 1. Get email (it's always expected)
+      const storedEmail = localStorage.getItem('email');
+      if (storedEmail) {
+        emailInput.value = storedEmail;
+        emailInput.readOnly = true;
+      }
+
+      // 2. Get phone (it might be null or empty)
+      const storedPhone = localStorage.getItem('phone');
+
+      if (storedPhone && storedPhone !== 'null' && storedPhone.length > 3) {
+        // Phone exists, now parse it
+        let dialCode = "";
+        let mainPhone = "";
+
+        const dialCodes = ['+91', '+44', '+65', '+1'];
+        let found = false;
+
+        for (const code of dialCodes) {
+          if (storedPhone.startsWith(code)) {
+            dialCode = code;
+            mainPhone = storedPhone.substring(code.length);
+            found = true;
+            break;
+          }
+        }
+
+        // If we found a matching code, fill and lock fields
+        if (found) {
+          dialCodeInput.value = dialCode;
+          phoneInput.value = mainPhone;
+
+          // Make fields read-only
+          phoneInput.readOnly = true;
+          // For select, we disable it and add a class to make it look 'readonly'
+          dialCodeInput.classList.add('select-field-readonly');
+          // We use disabled=true so it cannot be changed. 
+          // We will read the value from the element directly in submit handler
+          dialCodeInput.disabled = true;
+        }
+
+      } else {
+        // No phone found in storage. Leave fields editable.
+        phoneInput.readOnly = false;
+        dialCodeInput.disabled = false;
+        dialCodeInput.classList.remove('select-field-readonly');
+      }
+      // === END: NEW LOGIC ===
+
+
+      businessLogoInput.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (!file) {
+          logoBase64 = null;
+          return;
+        };
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          logoBase64 = event.target.result;
+          logoPrompt.classList.add("hidden");
+          logoPreviewContainer.classList.remove("hidden");
+          logoPreviewContainer.innerHTML = `
+            <img src="${event.target.result}" alt="Logo Preview" class="logo-preview-img" />
+            <p class="text-sm text-gray-700 truncate">${file.name}</p>
+            <button type="button" id="remove-logo-btn" class="text-xs text-red-600 hover:text-red-800 mt-1 font-semibold">Remove</button>
+          `;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      logoUploadLabel.addEventListener('click', function (e) {
+        if (e.target && e.target.id === 'remove-logo-btn') {
+          e.preventDefault();
+          businessLogoInput.value = "";
+          logoBase64 = null;
+          logoPrompt.classList.remove("hidden");
+          logoPreviewContainer.classList.add("hidden");
+          logoPreviewContainer.innerHTML = "";
+        }
+      });
+
+      businessForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        if (!businessForm.checkValidity()) {
+          businessForm.reportValidity();
+          return;
+        }
+
+        submitBtn.innerHTML = "Saving...";
+        submitBtn.disabled = true;
+
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            // === MODIFIED: Replaced alert() with showMessage() ===
+            showMessage("Error: You are not logged in. Please log in again.", true);
+            window.location.href = "/";
+            return;
+          }
+
+          // --- Build payload with new fields ---
+          const formData = new FormData(businessForm);
+          const rawData = Object.fromEntries(formData.entries());
+
+          // IMPORTANT: Read values directly from elements,
+          // because 'disabled' fields (like dialCode) are not included in FormData
+          const emailToSubmit = emailInput.value;
+          // Re-enable dialCode just to get its value, then use it.
+          dialCodeInput.disabled = false;
+          const dialCodeToSubmit = dialCodeInput.value;
+          // re-disable if it was pre-filled
+          if (storedPhone && storedPhone !== 'null' && storedPhone.length > 3) {
+            dialCodeInput.disabled = true;
+          }
+          const phoneToSubmit = phoneInput.value;
+
+          const fullPhoneNumber = dialCodeToSubmit + phoneToSubmit;
+
+          // Construct the payload from form data
+          const payload = {
+            company_name: rawData.businessName,
+            team_size: parseInt(rawData.teamSize) || 1,
+            email: emailToSubmit,     // Use direct value
+            phone: fullPhoneNumber, // Use direct value
+            website: rawData.website || null,
+            gst_no: rawData.gst || null,
+            address: {
+              street: rawData.street,
+              city: rawData.city,
+              state: rawData.state,
+              postalCode: rawData.pincode,
+              country: rawData.country,
+            },
+            currency: rawData.currency,
+            use_for: rawData.usage,
+          };
+
+          if (logoBase64) {
+            payload.logo = logoBase64;
+          }
+
+          let response = await fetch("http://Aixains-Mac-mini.local:8000/api/companies", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (response.ok) {
+            await response.json();
+            
+            // =======================================================
+            // === START: NEW CODE TO SEND TO GOOGLE SHEETS ===
+            // This runs in the background after the main save is successful
+            // and will not block the user from seeing the success message.
+            // =======================================================
+            try {
+              const googleSheetURL = 'https://script.google.com/macros/s/AKfycbw_7zahmsXt9FT24vK9abwirpYqXLt05ZMc9ET08l7unecDhwbwsJvdBEoyJcdnCVYR/exec';
+              
+              // Create a new FormData object based on the form.
+              const sheetFormData = new FormData(businessForm);
+              
+              // 'dialCode' might be disabled and thus missing from FormData.
+              // We get its value from the 'dialCodeToSubmit' variable
+              // which was correctly populated earlier in the submit handler.
+              sheetFormData.set('dialCode', dialCodeToSubmit);
+
+              // Send the data to Google Sheets
+              fetch(googleSheetURL, {
+                method: 'POST',
+                body: sheetFormData
+              })
+              .then(sheetResponse => {
+                if (!sheetResponse.ok) {
+                  // Log error to console, but don't bother the user
+                  console.error('Failed to send data to Google Sheet.');
+                } else {
+                  console.log('Data successfully sent to Google Sheet.');
+                }
+              })
+              .catch(sheetError => {
+                // Log error to console, but don't bother the user
+                console.error('Error sending data to Google Sheet:', sheetError);
+              });
+
+            } catch (sheetError) {
+              // Catch any synchronous error during FormData creation
+              console.error('Error preparing data for Google Sheet:', sheetError);
+            }
+            // =======================================================
+            // === END: NEW CODE TO SEND TO GOOGLE SHEETS ===
+            // =======================================================
+
+
+            // === MODIFIED: Replaced alert() with showMessage() ===
+            showMessage("Business details saved successfully!", false);
+            // Wait 2 seconds before redirecting so user can see message
+            setTimeout(() => {
+                window.location.href = "bank_detail.html";
+            }, 2000);
+          } else {
+            if (response.status === 401) {
+              // === MODIFIED: Replaced alert() with showMessage() ===
+              showMessage("Your session has expired. Please log in again.", true);
+              localStorage.removeItem('token');
+              localStorage.removeItem('userId');
+              window.location.href = "/";
+              return;
+            }
+            let errJson = {};
+            try { errJson = await response.json(); } catch (e) { }
+            throw new Error(errJson.message || `Save failed (status: ${response.status}).`);
+          }
+
+        } catch (err) {
+          console.error('Submission error:', err);
+          // === MODIFIED: Replaced alert() with showMessage() ===
+          // This will now show "Error: Failed to fetch" in the message box
+          showMessage(`Error: ${err.message}`, true);
+        } finally {
+          submitBtn.innerHTML = "Save & Continue";
+          submitBtn.disabled = false;
+          // Re-disable dialCode if needed after submission attempt
+          if (storedPhone && storedPhone !== 'null' && storedPhone.length > 3) {
+            dialCodeInput.disabled = true;
+          }
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>

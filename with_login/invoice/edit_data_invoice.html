@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Invoice System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .form-container {
+            max-width: 960px;
+            margin: 2rem auto;
+        }
+
+        .form-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            background-color: white;
+        }
+
+        .input-field {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            font-size: 0.875rem;
+        }
+
+        .input-field:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+
+        .btn {
+            padding: 0.625rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .btn-small {
+            padding: .25rem .5rem;
+            font-size: .75rem;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-primary:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-link {
+            color: #4f46e5;
+            font-weight: 500;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        .item-table-header {
+            background-color: #4338ca;
+            color: white;
+        }
+
+        .item-row {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        /* A4 Preview Styles */
+        .invoice-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            max-width: 210mm;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 2rem auto;
+            box-sizing: border-box;
+            /* Flexbox for bottom alignment */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background-color: #e6f7f0;
+            color: #0b875b;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            border: 2px solid #0b875b;
+        }
+
+        .logo-preview-container {
+            border: 2px dashed #cbd5e0;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            width: 200px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-preview-container img {
+            max-width: 150px;
+            max-height: 70px;
+            object-fit: contain;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+
+        .totals table {
+            width: 100%;
+        }
+
+        .total-row td {
+            font-size: 1.25rem;
+            font-weight: 700;
+            padding-top: 1rem;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* --- ALIGNMENT FIXES --- */
+        .pdf-preview-content {
+            flex-grow: 1;
+            /* Pushes footer down */
+        }
+
+        .pdf-preview-footer {
+            margin-top: auto;
+            /* Sticks to bottom */
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .pdf-footer-left {
+            flex-basis: 60%;
+            padding-right: 2rem;
+        }
+
+        .pdf-footer-right {
+            text-align: right;
+        }
+
+        .signature-area {
+            display: inline-block;
+            text-align: center;
+        }
+
+        .signature-area .signature-space {
+            height: 4rem;
+            /* Space for a physical signature */
+        }
+
+        .signature-area .signature-line {
+            border-top: 1px solid #374151;
+            width: 220px;
+            padding-top: 0.5rem;
+        }
+
+        /* --- END ALIGNMENT FIXES --- */
+
+        /* Fixed bottom button container */
+        .bottom-button-container {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 1rem 0;
+            border-top: 2px solid #e5e7eb;
+            margin-top: 2rem;
+            z-index: 10;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .invoice-container {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding: 40px;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            max-width: 800px;
+            margin: 2rem auto;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .logo-container img {
+            max-width: 150px;
+            max-height: 70px;
+            object-fit: contain;
+        }
+
+        .invoice-details {
+            text-align: right;
+        }
+
+        .invoice-details h1 {
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .invoice-details p {
+            margin: 0;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .address-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .address-section h2 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .address-section p {
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .items-table thead {
+            border-bottom: 2px solid #d1d5db;
+        }
+
+        .items-table th {
+            text-align: left;
+            padding: 8px 4px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+
+        .items-table th:nth-child(2),
+        .items-table th:nth-child(3),
+        .items-table th:nth-child(4) {
+            text-align: right;
+        }
+
+        .items-table tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .items-table td {
+            padding: 12px 4px;
+            font-size: 14px;
+        }
+
+        .items-table td:nth-child(2),
+        .items-table td:nth-child(3),
+        .items-table td:nth-child(4) {
+            text-align: right;
+        }
+
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        .totals-table {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .totals-table div {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .totals-table .total-amount {
+            font-weight: bold;
+            font-size: 16px;
+            color: #111827;
+            border-top: 2px solid #d1d5db;
+            margin-top: 8px;
+            padding-top: 12px;
+        }
+
+        .separator {
+            border-top: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+            display: none;
+            /* Hidden by default, can be enabled if needed */
+        }
+
+        .invoice-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .notes-terms {
+            max-width: 60%;
+        }
+
+        .signature-section {
+            text-align: center;
+            width: 200px;
+        }
+
+        .signature-image-space {
+            height: 60px;
+            margin-bottom: 8px;
+        }
+
+        .signature-image-space img {
+            max-height: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+
+        .signature-line {
+            border-top: 1px solid #6b7280;
+            padding-top: 4px;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .invoice-container {
+                width: 210mm !important;
+                min-height: 297mm !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always;
+            }
+
+            .action-buttons {
+                display: none !important;
+            }
+
+            .status {
+                margin-top: 1.2rem !important;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .invoice-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 1rem;
+            }
+        }
+        @media (max-width: 768px) {
+  #main-content {
+    margin-top: 64px; /* height of the fixed header */
+  }
+}
+    </style>
+</head>
+
+<body>
+    <div class="flex">
+       <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+  <div class="flex items-center space-x-3">
+    <button id="menu-toggle" class="text-white focus:outline-none">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+    <span class="text-xl font-bold">QSI</span>
+  </div>
+</header>
+
+
+<!-- ✅ BACKDROP for mobile -->
+<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+<!-- ✅ SIDEBAR -->
+<aside id="sidebar"
+  class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">   <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class=" mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="../dashboard_with_login.html"
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-chart-pie mr-3"></i>Dashboard
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn"
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon"
+                            class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="../quotation/home_quotation.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="../saleorder/home_sales_order.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales
+                            Order</a>
+                        <a href="home_invoice.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                            <a href="../credit_note.html"
+                    class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                    </div>
+                    <div>
+                        <button id="purchases-dropdown-btn"
+                            class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                            <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
+                            <i id="purchases-dropdown-icon"
+                                class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                        </button>
+                        <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                            <a href="../parchase/vendor/vendors_leads.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors
+                                Leads</a>
+                            <a href="../parchase/vendors&suppliers/vendors_suppliers.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors
+                                & Suppliers</a>
+                            <a href="../parchase/purchases&expenses/purchases_expenses_home.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchases
+                                & Expenses</a>
+                            <a href="../parchase/parchase_order/home_purchase_orders.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase
+                                Orders</a>
+                            <a href="../parchase/payout receipts/home_payout_receipts.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout
+                                Receipts</a>
+                            <a href="../parchase/payout receipts/home_payout_receipts.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit
+                                Notes</a>
+                        </div>
+                    </div>
+                </div>
+                <a href="../manage-clients.html"
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Manage Clients
+                </a>
+                <a href="../settings.html"
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+            </nav>
+        </aside>
+
+        <div id="main-content" class="flex-1 overflow-y-auto">
+            <div class="w-full max-w-5xl mx-auto p-6">
+                <div id="create-invoice-page">
+                    <main class="form-container">
+                        <form id="invoice-form">
+                            <div class="flex justify-between items-center mb-6">
+                                <h1 class="text-3xl font-bold text-gray-800">Edit Invoice</h1>
+                                <div class="flex items-center space-x-2">
+                                    <button id="update-btn" type="submit" class="btn btn-primary hidden">
+  Update
+</button>
+<span id="save-btn-loading" class="hidden">Updating...</span>
+                                </div>
+                            </div>
+
+                            <div id="alert-container"></div>
+
+                            <div class="form-section space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div class="grid grid-cols-3 gap-2 items-center mb-2">
+    <label for="invoice-no" class="text-gray-600 text-sm">Invoice
+        No.</label>
+    <input type="text" id="invoice-no" class="input-field col-span-2 bg-gray-100"
+        placeholder="Will be generated" readonly />
+</div>
+
+                                        <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                            <label for="invoice-date" class="text-gray-600 text-sm">Invoice Date</label>
+                                            <input type="date" id="invoice-date" class="input-field col-span-2"
+                                                readonly />
+
+                                            <label for="due-date" class="text-gray-600 text-sm mt-2 block">Due
+                                                Date</label>
+                                            <input type="date" id="due-date" class="input-field col-span-2" required />
+
+                                        </div>
+                                    </div>
+                                    <div id="logo-uploader"
+                                        class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50 relative">
+                                        <div id="logo-preview-container" class="hidden absolute inset-0 p-2">
+                                            <img id="logo-preview" src="" alt="Business Logo Preview"
+                                                class="object-contain w-full h-full" />
+                                        </div>
+                                        <div id="logo-placeholder">
+                                            <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                            <span class="text-indigo-600 font-semibold">Add Business Logo</span>
+                                        </div>
+                                        <input type="file" id="logo-input"
+                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            accept="image/png, image/jpeg" />
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="border rounded-lg p-4 space-y-2">
+                                        <h3 class="font-semibold text-gray-700">
+                                            From <span class="text-gray-400 text-sm">(Your Details)</span>
+                                        </h3>
+                                        <div>
+                                            <label for="businessName" class="text-sm font-medium text-gray-600">Business
+                                                Name</label>
+                                            <input type="text" id="businessName" class="input-field" required
+                                                readonly />
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label for="business_city"
+                                                    class="text-sm font-medium text-gray-600">City</label>
+                                                <input type="text" id="business_city" class="input-field" required
+                                                    readonly />
+                                            </div>
+                                            <div>
+                                                <label for="business_country"
+                                                    class="text-sm font-medium text-gray-600">Country</label>
+                                                <input type="text" id="business_country" class="input-field" required
+                                                    readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-700 mb-2">
+                                            Billed To <span class="text-gray-400 text-sm">(Client's Details)</span>
+                                        </h3>
+
+                                        <select id="billed-to-select" class="input-field w-full mb-2" required>
+                                            <option value="">Select Client</option>
+                                        </select>
+
+                                        <button type="button" id="add-new-client-btn"
+                                            class="w-full text-center text-indigo-600 font-semibold py-2 border-2 border-dashed rounded-lg hover:bg-indigo-50 text-sm">
+                                            + Add New Client
+                                        </button>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-span-2 p-4 rounded-lg border shadow-sm">
+                                    <div
+                                        class="item-table-header grid grid-cols-12 gap-2 p-3 rounded-t-lg text-sm border-b">
+                                        <h4 class="col-span-4 font-semibold">Item</h4>
+                                        <h4 class="col-span-2 font-semibold text-center">Quantity</h4>
+                                        <h4 class="col-span-2 font-semibold text-center">Rate</h4>
+                                        <h4 class="col-span-3 font-semibold text-right">Amount</h4>
+                                        <h4 class="col-span-1 text-center">--</h4>
+                                    </div>
+
+                                    <div id="items-container" class="space-y-2 py-2"></div>
+
+                                    <div class="pt-2">
+                                        <button type="button" id="add-item-btn" class="btn-link">
+                                            <i class="fas fa-plus mr-1"></i> Add New Line
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="w-full flex justify-end mt-4">
+                                    <div class="w-80 p-4 rounded-lg border bg-white shadow-sm space-y-3">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">Subtotal</span>
+                                            <span class="font-semibold text-gray-800" id="sub_total">₹0.00</span>
+                                        </div>
+
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600 flex items-center">
+                                                Tax (
+                                                <input type="number" id="tax-percentage" min="0" max="100"
+                                                    class="w-16 mx-1 border rounded text-right text-sm px-2 py-1"
+                                                    value="0" placeholder="0" />%)
+                                            </span>
+                                            <span class="font-semibold text-gray-800" id="tax">₹0.00</span>
+                                        </div>
+
+                                        <div
+                                            class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
+                                            <span class="font-bold text-lg text-gray-800">Total (INR)</span>
+                                            <span class="font-bold text-lg text-gray-800" id="total">₹0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col md:flex-row gap-6 mt-6">
+                                    <div class="flex-1 space-y-4">
+                                        <div class="w-full overflow-x-auto">
+                                            <div class="flex flex-nowrap gap-2 mb-4 whitespace-nowrap">
+                                                <button type="button"
+                                                    class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                                    data-target="terms">+ Terms & Conditions</button>
+                                                <button type="button"
+                                                    class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                                    data-target="notes">+ Notes</button>
+                                                <button type="button"
+                                                    class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                                    data-target="signature-box">+ Authorised Signatory</button>
+                                            </div>
+                                        </div>
+
+                                        <div id="terms" class="hidden mt-2">
+                                            <label class="block text-sm font-medium text-gray-700">Terms &
+                                                Conditions</label>
+                                            <textarea id="terms-input"
+                                                class="w-full border rounded p-2 mt-1">THANK YOU!</textarea>
+                                        </div>
+                                        <div id="notes" class="hidden mt-2">
+                                            <label class="block text-sm font-medium text-gray-700">Notes</label>
+                                            <textarea id="notes-input"
+                                                class="w-full border rounded p-2 mt-1">Thanks For Business With Us</textarea>
+                                        </div>
+                                        <div id="signature-box" class="hidden mt-2">
+                                            <div class="flex items-center gap-4 mb-3 border-b pb-3">
+                                                <label class="flex items-center gap-2 cursor-pointer">
+                                                    <input type="radio" name="signatory_type" value="text"
+                                                        class="form-radio" checked>
+                                                    <span class="text-sm font-medium">Enter Name</span>
+                                                </label>
+                                                <label class="flex items-center gap-2 cursor-pointer">
+                                                    <input type="radio" name="signatory_type" value="image"
+                                                        class="form-radio">
+                                                    <span class="text-sm font-medium">Upload Signature</span>
+                                                </label>
+                                            </div>
+
+                                            <div id="signatory-text-container" class="space-y-2">
+                                                <select id="signatory-select" class="input-field">
+                                                    <option value="">Select Signatory</option>
+                                                    <option value="add_new">-- Add New Signatory --</option>
+                                                </select>
+                                                <div id="add-signatory-container"
+                                                    class="hidden flex gap-2 items-center">
+                                                    <input id="new-signatory-input" class="input-field flex-grow"
+                                                        placeholder="Enter New Signatory Name">
+                                                    <button type="button" id="save-signatory-btn"
+                                                        class="btn btn-primary btn-small">Save</button>
+                                                    <button type="button" id="cancel-add-signatory-btn"
+                                                        class="btn btn-secondary btn-small">Cancel</button>
+                                                </div>
+                                            </div>
+
+                                            <div id="signatory-image-container" class="hidden space-y-2">
+                                                <input type="file" id="signatory-image-input" class="input-field"
+                                                    accept="image/png, image/jpeg">
+                                                <div id="signatory-image-preview"
+                                                    class="mt-2 border border-dashed rounded-lg p-2 h-24 flex items-center justify-center bg-gray-50 text-gray-400">
+                                                    <span>Signature Preview</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </main>
+                </div>
+
+                <div id="preview-invoice-page" class="hidden">
+                    <div class="invoice-container">
+                        <header class="invoice-header">
+                            <div class="logo-container">
+                                <img id="businessLogoPreview" src="" alt="Business Logo" />
+                                <span id="preview-business-name" class="font-bold text-lg"></span>
+                            </div>
+                            <div class="invoice-details">
+                                <h1 class="text-4xl font-bold text-gray-800 uppercase">Invoice</h1>
+                                <p><strong>Invoice No:</strong> <span id="preview-inv-no"></span></p>
+                                <p><strong>Date:</strong> <span id="preview-inv-date"></span></p>
+                                <p><strong>Due Date:</strong> <span id="preview-due-date"></span></p>
+                            </div>
+                        </header>
+
+                        <section class="address-section">
+                            <div class="from-address">
+                                <h2 class="font-semibold text-gray-600">From:</h2>
+                                <p id="preview-from-details" class="text-gray-800"></p>
+                            </div>
+                            <div class="to-address">
+                                <h2 class="font-semibold text-gray-600">To:</h2>
+                                <p id="preview-to-details" class="text-gray-800"></p>
+                            </div>
+                        </section>
+
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Rate</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-items-tbody">
+                            </tbody>
+                        </table>
+
+                        <section class="totals-section">
+                            <div class="totals-table">
+                                <div>
+                                    <span>Sub Total</span>
+                                    <span id="preview-subtotal"></span>
+                                </div>
+                                <div>
+                                    <span>Tax (<span id="preview-tax-rate"></span>%)</span>
+                                    <span id="preview-tax"></span>
+                                </div>
+                                <div class="total-amount">
+                                    <span>Total Amount</span>
+                                    <span id="preview-total"></span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="separator"></div>
+
+                        <footer class="invoice-footer">
+                            <div class="notes-terms">
+                                <div id="preview-notes-block" class="hidden">
+                                    <h3 class="font-semibold mb-1">Notes</h3>
+                                    <p id="preview-notes" class="text-sm text-gray-700 whitespace-pre-wrap"></p>
+                                </div>
+                                <div id="preview-terms-block" class="hidden mt-4">
+                                    <h3 class="font-semibold mb-1">Terms and Conditions</h3>
+                                    <p id="preview-terms" class="text-sm text-gray-700 whitespace-pre-wrap"></p>
+                                </div>
+                            </div>
+                            <div id="preview-signature-area" class="signature-section hidden">
+                                <div class="signature-image-space">
+                                </div>
+                                <div class="signature-line">
+                                    Authorized Signitary
+                                </div>
+                                <p id="preview-signatory-name" class="font-semibold"></p>
+                            </div>
+                        </footer>
+                    </div>
+
+                    <div class="bottom-button-container">
+                        <div class="action-buttons">
+                            <button id="edit-btn" class="btn btn-secondary">Edit</button>
+                            <button id="download-pdf-btn" class="btn btn-primary">Download as PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="client-modal"
+        class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
+        <div id="client-modal-backdrop" class="absolute inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm"></div>
+        <div id="client-modal-panel" class="relative w-full max-w-2xl mx-4">
+            <div class="bg-white rounded-lg p-6 shadow-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">Create New Client</h2>
+                    <button id="client-modal-close" class="text-gray-500 hover:text-gray-800"><i
+                            class="fas fa-times fa-lg"></i></button>
+                </div>
+                <form id="client-form" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-600">Business
+                                Name*</label>
+                            <input name="client_name" type="text" required class="input-field mt-1"
+                                placeholder="Business Name (Required)">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">Client
+                                Industry</label>
+                            <select name="client_industry" class="input-field mt-1">
+                                <option value="">-Select an Industry-</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Retail">Retail</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">Client Type</label>
+                            <select name="client_type" class="input-field mt-1">
+                                <option value="customer">Customer</option>
+                                <option value="supplier">Supplier</option>
+                                <option value="partner">Partner</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">Select
+                                Country*</label>
+                            <select name="country" required class="input-field mt-1">
+                                <option>India</option>
+                                <option>United States</option>
+                                <option>United Kingdom</option>
+                                <option>Canada</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">State /
+                                Province</label>
+                            <select name="state" class="input-field mt-1">
+                                <option>Select State / Province</option>
+                                <option>California</option>
+                                <option>New York</option>
+                                <option>Tamil Nadu</option>
+                                <option>Ontario</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">City/Town</label>
+                            <input name="city" type="text" class="input-field mt-1" placeholder="City/Town Name">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">Postal Code / Zip
+                                Code</label>
+                            <input name="pincode" type="text" class="input-field mt-1"
+                                placeholder="Postal Code / Zip Code">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">GSTIN (Optional)</label>
+                        <input name="gstin" type="text" class="input-field mt-1" placeholder="12AABCU9603R1ZV">
+                    </div>
+                    <div class="border-t pt-4 flex justify-end space-x-3">
+                        <button type="button" id="client-modal-cancel" class="btn-secondary btn">Cancel</button>
+                        <button type="submit" class="btn-primary btn">Save Client</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
+    const CLIENT_API_URL = `${API_BASE_URL}/clients`;
+    const COMPANY_API_URL = `${API_BASE_URL}/companies`;
+    const INVOICE_API_URL = `${API_BASE_URL}/invoic`;
+    const SIGNATORY_STORAGE_KEY = 'qsi_saved_signatories';
+    const SIGNATURE_IMAGE_STORAGE_KEY = 'qsi_saved_signature_image';
+    let COMPANY_ID = null;
+
+    const invoiceForm = document.getElementById("invoice-form");
+    const itemsContainer = document.getElementById("items-container");
+    const addItemBtn = document.getElementById("add-item-btn");
+    const taxPercentageInput = document.getElementById("tax-percentage");
+    const billedToSelect = document.getElementById("billed-to-select");
+    const saveContinueBtn = document.getElementById("save-continue-btn");
+    const saveBtnLoading = document.getElementById("save-btn-loading");
+    const previewPage = document.getElementById("preview-invoice-page");
+    const createPage = document.getElementById("create-invoice-page");
+    const editBtn = document.getElementById("edit-btn");
+    const downloadPdfBtn = document.getElementById("download-pdf-btn");
+    const alertContainer = document.getElementById("alert-container");
+    const updateBtn = document.getElementById("update-btn");
+
+    // --- Detect quotation ID from URL ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const INVOICE_ID = urlParams.get("id"); // null if new quotation
+const menuToggle = document.getElementById("menu-toggle");
+const sidebar = document.getElementById("sidebar");
+const menuBackdrop = document.getElementById("menu-backdrop");
+
+if (menuToggle && sidebar && menuBackdrop) {
+  menuToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("-translate-x-full");
+    menuBackdrop.classList.toggle("hidden");
+  });
+
+  menuBackdrop.addEventListener("click", () => {
+    sidebar.classList.add("-translate-x-full");
+    menuBackdrop.classList.add("hidden");
+  });
+}
+
+    // === Utility ===
+    function setLoading(isLoading) {
+        if (saveContinueBtn) saveContinueBtn.disabled = isLoading;
+        if (saveBtnLoading) saveBtnLoading.classList.toggle("hidden", !isLoading);
+    }
+
+    function showAlert(message, type = "success", duration = 5000) {
+        if (!alertContainer) return;
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.textContent = message;
+        alertContainer.innerHTML = '';
+        alertContainer.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), duration);
+    }
+
+    function getAuthHeaders() {
+        const token = localStorage.getItem("token");
+        return token ? { 'Authorization': `Bearer ${token}` } : null;
+    }
+
+    async function safeFetch(url, opts = {}) {
+        const headers = Object.assign({}, opts.headers || {});
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) {
+            alert("Authentication token not found. Please log in.");
+            window.location.href = '/login.html';
+            throw new Error("Authentication token not found.");
+        }
+        Object.assign(headers, authHeaders);
+        if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
+            headers["Content-Type"] = "application/json";
+        }
+        try {
+            const res = await fetch(url, { ...opts, headers });
+            const text = await res.text();
+            let data;
+            try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+            if (!res.ok) {
+                if (res.status === 401) {
+                    alert("Session expired. Please log in again.");
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                    throw new Error("Session expired");
+                }
+                throw new Error(data?.message || res.statusText || "Request failed");
+            }
+            return data;
+        } catch (err) {
+            console.error(err);
+            throw err;
+        }
+    }
+
+    // === Load Company Details ===
+    async function loadCompany() {
+        try {
+            const companies = await safeFetch(COMPANY_API_URL, { method: "GET" });
+            if (Array.isArray(companies) && companies.length > 0) {
+                const company = companies[0];
+                COMPANY_ID = company._id || company.id || null;
+                const bn = document.getElementById("businessName");
+                const bc = document.getElementById("business_city");
+                const bco = document.getElementById("business_country");
+                if (bn) bn.value = company.company_name || "";
+                if (bc) bc.value = company.address?.city || "";
+                if (bco) bco.value = company.address?.country || "";
+                if (company.logo) {
+                    document.getElementById("businessLogoPreview").src = company.logo;
+                    document.getElementById("logo-preview").src = company.logo;
+                    document.getElementById("logo-preview-container").classList.remove("hidden");
+                    document.getElementById("logo-placeholder").classList.add("hidden");
+                }
+            } else {
+                showAlert("No company found. Please create a company.", "error");
+            }
+        } catch {
+            showAlert("Could not load company details.", "error");
+        }
+    }
+
+    // === Load Clients ===
+    async function loadClients(selectedClientId = null) {
+        console.log("Attempting to load clients...");
+        
+        try {
+            const response = await safeFetch(CLIENT_API_URL, { method: "GET" });
+            
+            console.log("Raw API response:", response);
+
+            if (!billedToSelect) {
+                console.warn("Billed-to select element not found.");
+                return;
+            }
+
+            billedToSelect.innerHTML = '<option value="">Select Client</option>';
+
+            let clientsArray = [];
+            
+            if (Array.isArray(response)) {
+                clientsArray = response;
+            } else if (response && Array.isArray(response.data)) {
+                clientsArray = response.data;
+            } else if (response && Array.isArray(response.clients)) {
+                clientsArray = response.clients;
+            } else if (response && Array.isArray(response.results)) {
+                clientsArray = response.results;
+            } else if (response && response.payload && Array.isArray(response.payload.clients)) {
+                clientsArray = response.payload.clients;
+            }
+            
+            console.log(`Found ${clientsArray.length} clients to populate.`);
+
+            (clientsArray || []).forEach((client) => {
+                if (!client) return;
+                const opt = document.createElement("option");
+                opt.value = client._id || client.id || "";
+                opt.textContent = client.client_name?.trim() || client.name?.trim() || "Unnamed Client";
+                billedToSelect.appendChild(opt);
+            });
+
+            if (selectedClientId) {
+                console.log(`Attempting to select existing client: ${selectedClientId}`);
+                billedToSelect.value = selectedClientId;
+
+                if (!billedToSelect.value && selectedClientId) {
+                    console.warn(`Could not find client ${selectedClientId} in the list. Adding it as 'Unknown'.`);
+                    const missingOpt = document.createElement("option");
+                    missingOpt.value = selectedClientId;
+                    missingOpt.textContent = `Unknown Client (${selectedClientId})`;
+                    billedToSelect.appendChild(missingOpt);
+                    billedToSelect.value = selectedClientId;
+                }
+            }
+        } catch (err) {
+            console.error("--- FULL ERROR LOADING CLIENTS ---", err);
+            showAlert("Could not load clients. Check console for details.", "error");
+        }
+    }
+
+
+    // === START: NEW FUNCTION TO POPULATE FORM FOR EDITING ===
+    /**
+     * Takes the quotation object fetched from the API and fills the form fields.
+     * This function does NOT fetch data, it only populates.
+     */
+    function populateFormForEdit(invoice) {
+    if (!invoice) {
+        showAlert("Failed to populate form: No invoice data.", "error");
+        return;
+    }
+
+    // --- Quotation Number (Readonly) ---
+    const invNoInput = document.getElementById("invoice-no");
+    if (invNoInput) {
+        invNoInput.value = invoice.invoice_no || invoice._id || "N/A";
+        invNoInput.setAttribute("readonly", true);
+    }
+// --- Due Date ---
+const dueDateInput = document.getElementById("due-date");
+if (dueDateInput) {
+    dueDateInput.value = invoice.due_date || "";
+}
+
+    // --- Quotation Date (Readonly) ---
+    const dateInput = document.getElementById("invoice-date");
+    if (dateInput) {
+        dateInput.value = invoice.date || "";
+        dateInput.setAttribute("readonly", true);
+    }
+
+    // --- Client Dropdown ---
+    if (billedToSelect) {
+        billedToSelect.innerHTML = "";
+
+        const opt = document.createElement("option");
+        opt.value = invoice.to?._id || invoice.to_client_id || "";
+        opt.textContent = invoice.to?.client_name?.trim() || "Unnamed Client";
+        opt.selected = true;
+        billedToSelect.appendChild(opt);
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select Client";
+        billedToSelect.insertBefore(placeholder, billedToSelect.firstChild);
+    }
+
+    // --- Tax Percentage ---
+    if (taxPercentageInput) taxPercentageInput.value = invoice.tax_percentage || 0;
+
+    // --- Items ---
+    itemsContainer.innerHTML = "";
+    if (Array.isArray(invoice.items) && invoice.items.length > 0) {
+        invoice.items.forEach(item => {
+            const row = createItemRow();
+            row.querySelector(".item-name").value = item.item_name || "";
+            row.querySelector(".quantity").value = item.quantity || 0;
+            row.querySelector(".rate").value = item.rate || 0;
+            row.querySelector(".description").value = item.description || "";
+            updateRowAmount(row);
+        });
+    } else {
+        createItemRow();
+    }
+
+    // --- Terms, Notes ---
+    document.querySelector("#terms textarea").value =
+        invoice.terms_and_condition || "THANK YOU!";
+    document.querySelector("#notes textarea").value =
+        invoice.notes || "Thanks For Business With Us";
+
+    // --- Show Signatory if Available ---
+    const signatorySelect = document.getElementById("signatory-select");
+    const signatoryPreview = document.getElementById("signatory-image-preview");
+
+    if (signatorySelect && invoice.signatory) {
+        signatorySelect.value = invoice.signatory;
+    }
+
+    if (invoice.signatory_image) {
+        localStorage.setItem(SIGNATURE_IMAGE_STORAGE_KEY, invoice.signatory_image);
+        if (signatoryPreview) {
+            signatoryPreview.src = invoice.signatory_image;
+            signatoryPreview.classList.remove("hidden");
+        }
+    }
+
+    // --- Re-enable Save Button if user changes anything ---
+    if (saveContinueBtn) {
+        saveContinueBtn.disabled = false;
+        invoiceForm.querySelectorAll("input, textarea, select").forEach(el => {
+            el.addEventListener("input", () => {
+                saveContinueBtn.disabled = false;
+            });
+        });
+    }
+
+    updateTotals();
+}
+
+
+
+    // === END: NEW FUNCTION ===
+
+    // === Item Row Logic ===
+    function createItemRow() {
+        const row = document.createElement("div");
+        row.className = "item-row space-y-2 p-2 border rounded";
+        row.innerHTML = `
+            <div class="grid grid-cols-12 gap-2 items-center">
+                <input class="col-span-4 item-name input-field" placeholder="Item Name" required>
+                <input type="number" class="col-span-2 quantity input-field text-right" placeholder="0" min="0" required>
+                <input type="text" class="col-span-2 rate input-field text-right" placeholder="0" required>
+                <span class="col-span-3 amount text-right">₹0.00</span>
+                <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <textarea class="description input-field col-span-12" rows="2" placeholder="Item description"></textarea>
+        `;
+        const qtyEl = row.querySelector(".quantity");
+        const rateEl = row.querySelector(".rate");
+        const deleteBtn = row.querySelector(".delete-item-btn");
+        const onChange = () => updateRowAmount(row);
+        qtyEl.addEventListener("input", onChange);
+        rateEl.addEventListener("input", onChange);
+        deleteBtn.addEventListener("click", () => { row.remove(); updateTotals(); });
+        itemsContainer.appendChild(row);
+        return row;
+    }
+
+    function updateRowAmount(row) {
+        const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+        const rate = parseFloat(row.querySelector(".rate").value) || 0;
+        const amt = qty * rate;
+        row.querySelector(".amount").textContent = `₹${amt.toFixed(2)}`;
+        updateTotals();
+    }
+
+    function updateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll(".item-row").forEach(row => {
+            const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+            const rate = parseFloat(row.querySelector(".rate").value) || 0;
+            subtotal += qty * rate;
+        });
+        const taxP = parseFloat(taxPercentageInput.value) || 0;
+        const tax = subtotal * (taxP / 100);
+        const total = subtotal + tax;
+        document.getElementById("sub_total").textContent = `₹${subtotal.toFixed(2)}`;
+        document.getElementById("tax").textContent = `₹${tax.toFixed(2)}`;
+        document.getElementById("total").textContent = `₹${total.toFixed(2)}`;
+    }
+
+    // === Data Collection ===
+    function collectInvoiceData() {
+        const items = [...document.querySelectorAll(".item-row")].map(row => {
+            const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+            const rate = parseFloat(row.querySelector(".rate").value) || 0;
+            return {
+                item_name: row.querySelector(".item-name").value.trim(),
+                description: row.querySelector(".description").value.trim(),
+                quantity: qty, rate: rate,
+                amount: +(qty * rate).toFixed(2),
+            };
+        });
+        const subTotal = items.reduce((s, it) => s + it.amount, 0);
+        const taxP = parseFloat(taxPercentageInput.value) || 0;
+        const tax = +(subTotal * (taxP / 100));
+        const total = +(subTotal + tax);
+        return {
+            date: document.getElementById("invoice-date").value || new Date().toISOString().slice(0, 10),
+            due_date: document.getElementById("due-date")?.value || "",
+            items, sub_total: +subTotal.toFixed(2), tax: +tax.toFixed(2),
+            total: +total.toFixed(2), tax_percentage: taxP,
+            from_company_id: COMPANY_ID,
+            to_client_id: billedToSelect.value || "",
+            terms_and_condition: document.querySelector("#terms textarea").value.trim(),
+            notes: document.querySelector("#notes textarea").value.trim(),
+        };
+    }
+
+    // === Submit Quotation (Always PATCH) ===
+  async function submitInvoice(data) {
+    let endpoint = INVOICE_API_URL;
+    let method = "POST";
+
+    if (INVOICE_ID) {
+        endpoint = `${INVOICE_API_URL}/${INVOICE_ID}`;
+        method = "PUT"; // ✅ PUT for updating
+    }
+
+    const result = await safeFetch(endpoint, {
+        method,
+        body: JSON.stringify(data),
+    });
+    return result;
+}
+
+
+    invoiceForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+        setLoading(true);
+        const data = collectInvoiceData();
+        await submitInvoice(data);
+
+        showAlert("Invoice updated successfully!", "success");
+
+        // ✅ Redirect back to quotation list page
+        setTimeout(() => {
+            window.location.href = "home_invoice.html"; // Change to your actual list page
+        }, 1000);
+
+    } catch (err) {
+        console.error(err);
+        showAlert("Error updating invoice: " + err.message, "error");
+    } finally {
+        setLoading(false);
+    }
+});
+
+
+    // === Sidebar Toggle Fix ===
+    const dropdownBtn = document.getElementById("documents-dropdown-btn");
+    const dropdownContent = document.getElementById("documents-dropdown-content");
+    const dropdownIcon = document.getElementById("dropdown-icon");
+    dropdownBtn?.addEventListener("click", () => {
+        dropdownContent?.classList.toggle("hidden");
+        dropdownIcon?.classList.toggle("rotate-180");
+    });
+    const purchasesDropdownBtn = document.getElementById('purchases-dropdown-btn');
+    purchasesDropdownBtn?.addEventListener('click', () => {
+        document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
+        document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
+    });
+
+    addItemBtn?.addEventListener("click", createItemRow);
+    taxPercentageInput?.addEventListener("input", updateTotals);
+
+    // === START: RESTRUCTURED `init` FUNCTION ===
+    /**
+     * This is the main function that runs on page load.
+     * It checks if we are editing or creating a new quotation
+     * and calls the appropriate functions.
+     */
+    (async function init() {
+        try {
+            await loadCompany(); // Load company details first, for both modes
+
+            if (INVOICE_ID) {
+                // --- EDIT MODE ---
+                showAlert("Loading existing invoice...", "info", 2000);
+                
+                // Step 1: Get quotation data
+                const invoice = await safeFetch(`${INVOICE_API_URL}/${INVOICE_ID}`, { method: "GET" });
+                if (!invoice) {
+                    throw new Error("Invoice not found.");
+                }
+
+                // Step 2: Load all clients AND pre-select the one from the quotation
+                await loadClients(invoice.to_client_id);
+
+                // Step 3: Fill the entire form with the fetched quotation data
+                populateFormForEdit(invoice);
+                // ✅ Show the Update button in edit mode
+if (updateBtn) updateBtn.classList.remove("hidden");
+if (saveContinueBtn) saveContinueBtn.classList.add("hidden");
+
+            
+            } else {
+                // --- CREATE NEW MODE ---
+                
+                // Step 1: Load all clients (no pre-selection)
+                await loadClients();
+
+                // Step 2: Set defaults for a new quotation
+                const dateInput = document.getElementById("invoice-date");
+                if (dateInput) dateInput.value = new Date().toISOString().slice(0, 10);
+                
+                const invNoInput = document.getElementById("invoice-no");
+                if (invNoInput) invNoInput.value = "Will be generated";
+
+                // Step 3: Add one blank item row to start
+                createItemRow();
+            }
+        } catch (err) {
+            console.error("Initialization failed:", err);
+            showAlert(`Error loading page: ${err.message}`, "error");
+            if (!INVOICE_ID) { // Fallback for create mode if something failed
+                createItemRow();
+            }
+        }
+    })();
+    // === END: RESTRUCTURED `init` FUNCTION ===
+
+});
+</script>
+</body>
+
+</html>

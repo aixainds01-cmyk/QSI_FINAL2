@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Create Invoice (Local Only) — Signature Enabled</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .form-container,
+        .details-container {
+            max-width: 960px;
+            margin: 2rem auto;
+        }
+
+        #invoice-preview-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 0; /* Changed for wrapper */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .form-section {
+            border: 1px solid #e5e7eb;
+            border-radius: .5rem;
+            padding: 1.5rem;
+            background: white;
+        }
+
+        .input-field {
+            border: 1px solid #d1d5db;
+            border-radius: .375rem;
+            padding: .5rem .75rem;
+            width: 100%;
+            font-size: .875rem;
+            transition: .15s;
+        }
+
+        .input-field:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, .12);
+            outline: none;
+        }
+
+        .btn {
+            padding: .625rem 1rem;
+            border-radius: .375rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .btn-link {
+            color: #4f46e5;
+            font-weight: 500;
+        }
+
+        .btn-small {
+            padding: .25rem .5rem;
+            font-size: .75rem;
+        }
+
+        .item-table-header {
+            background: #4c1d95;
+            color: #fff;
+        }
+
+        .item-row {
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: .5rem;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden
+            }
+
+            #invoice-preview-container,
+            #invoice-preview-container * {
+                visibility: visible
+            }
+
+            #invoice-preview-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+                border-radius: 0
+            }
+
+            .no-print {
+                display: none !important
+            }
+        }
+
+        .border-red-500 {
+            border-color: #f43f5e !important;
+        }
+
+        .ring-2 {
+            box-shadow: 0 0 0 4px rgba(244, 63, 94, .08) !important;
+        }
+
+        .avoid-page-break {
+            page-break-inside: avoid;
+        }
+
+        .invoice-pdf-wrapper {
+            width: 100%;
+            padding: 2.5rem;
+            box-sizing: border-box;
+            min-height: 10.5in;
+            position: relative;
+        }
+
+        /* Signature styles */
+        .invoice-signature-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+            margin-top: 18px;
+            min-height: 56px;
+        }
+
+        .signature-display {
+            font-family: 'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', Georgia, serif;
+            font-size: 28px;
+            color: #111827;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+
+        .signature-display.italic {
+            font-style: italic;
+        }
+        .signature-display.bold {
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 64px; /* height of the fixed header */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="flex">
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none"><i class="fas fa-bars text-2xl"></i></button>
+                <span class="text-xl font-bold">QSI</span>
+            </div>
+        </header>
+
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+        <aside id="sidebar" class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">QSI</div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="dashboard_without_login.html" class="sidebar-link active flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-500"><i class="fas fa-home mr-3 icon"></i><span class="text">Dashboard</span></a>
+                <div>
+                    <button id="documents-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="quotation_without_login.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="salesorder_withoutlogin.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="invoice_without_login.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <div id="main-content" class="flex-1 overflow-y-auto">
+            <main id="create-view" class="form-container">
+                <form id="invoice-form">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800">Create Invoice</h1>
+                        <button type="submit" class="btn btn-primary">Save & Continue</button>
+                    </div>
+
+                    <div class="form-section space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                    <label for="invoice-no" class="text-gray-600 text-sm">Invoice No.</label>
+                                    <input type="text" id="invoice-no" class="input-field col-span-2" value="INV-0001" required>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                    <label for="invoice-date" class="text-gray-600 text-sm">Invoice Date</label>
+                                    <input type="date" id="invoice-date" class="input-field col-span-2">
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                    <label for="due-date" class="text-gray-600 text-sm">Due Date</label>
+                                    <input type="date" id="due-date" class="input-field col-span-2">
+                                </div>
+                            </div>
+                            <div id="logo-uploader" class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50 relative">
+                                <div id="logo-preview-container" class="hidden absolute inset-0 p-2"><img id="logo-preview" src="" class="object-contain w-full h-full" alt="logo preview"></div>
+                                <div id="logo-placeholder"><i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-indigo-600 font-semibold">Add Business Logo</p>
+                                </div>
+                                <input type="file" id="logo-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/png, image/jpeg">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="border rounded-lg p-4 space-y-2">
+                                <h3 class="font-semibold text-gray-700">From</h3>
+                                <input type="text" id="from-name" class="input-field" placeholder="Business Name" required>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="from-city" class="input-field" placeholder="City">
+                                    <input type="text" id="from-country" class="input-field" placeholder="Country">
+                                </div>
+                            </div>
+
+                            <div class="border rounded-lg p-4 space-y-2">
+                                <h3 class="font-semibold text-gray-700">Billed To</h3>
+                                <input type="text" id="to-name" class="input-field" placeholder="Client's Business Name" required>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="to-city" class="input-field" placeholder="Client's City">
+                                    <input type="text" id="to-country" class="input-field" placeholder="Client's Country">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="item-table-header grid grid-cols-12 gap-4 p-3 rounded-t-lg text-sm">
+                                <h4 class="col-span-5 font-semibold">Item</h4>
+                                <h4 class="col-span-2 font-semibold text-right">Quantity</h4>
+                                <h4 class="col-span-2 font-semibold text-right">Rate</h4>
+                                <h4 class="col-span-3 font-semibold text-right">Amount</h4>
+                            </div>
+                            <div id="items-container" class="space-y-2 py-2"></div>
+                            <button type="button" id="add-item-btn" class="btn-link text-sm font-semibold"><i class="fas fa-plus mr-1"></i>Add New Line</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start pt-4 border-t">
+                            <div class="md:col-start-2 w-full space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Subtotal</span>
+                                    <span class="font-semibold text-gray-800" id="subtotal">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">Tax (<input type="number" id="tax-percentage" value="0" class="input-field w-16 mx-1 text-right p-1 h-7">%)</span>
+                                    <span class="font-semibold text-gray-800" id="total-tax">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
+                                    <span class="font-bold text-lg text-gray-800">Total (INR)</span>
+                                    <span class="font-bold text-lg text-gray-800" id="grand-total">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 pt-4 border-t">
+                            <button type="button" class="toggle-section-btn btn-small btn btn-secondary" data-target="terms-section"><i class="fas fa-plus fa-xs mr-1"></i>Add Terms & Conditions</button>
+                            <button type="button" class="toggle-section-btn btn-small btn btn-secondary" data-target="notes-section"><i class="fas fa-plus fa-xs mr-1"></i>Add Notes</button>
+                            <button id="add-signature-btn" type="button" class="btn-small btn btn-secondary"><i class="fas fa-plus fa-xs mr-1"></i>Add Signature</button>
+                        </div>
+
+                        <div id="terms-section" class="hidden space-y-2">
+                            <label for="terms-input" class="text-sm font-semibold text-gray-700">Terms & Conditions</label>
+                            <textarea id="terms-input" class="input-field" rows="3">Payment due within 15 days.</textarea>
+                        </div>
+                        <div id="notes-section" class="hidden space-y-2">
+                            <label for="notes-input" class="text-sm font-semibold text-gray-700">Notes</label>
+                            <textarea id="notes-input" class="input-field" rows="3">Thank you for your business!</textarea>
+                        </div>
+                    </div>
+                </form>
+            </main>
+
+            <main id="bank-view" class="details-container hidden">
+                <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center pb-4 border-b">
+                        <h1 class="text-xl font-bold text-gray-800"><i class="fas fa-university mr-3 text-gray-500"></i>Bank And UPI Details</h1>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                        <div class="border p-6 rounded-lg">
+                            <h2 class="font-semibold text-lg text-gray-800 mb-4">Bank Account Details</h2>
+                            <div id="bank-details-display" class="text-sm text-gray-600 space-y-2">
+                                <p>No bank account added yet.</p>
+                            </div>
+                            <button id="add-bank-account-btn" class="mt-4 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 text-sm transition duration-200"><i class="fas fa-plus mr-2"></i>Add Bank Account</button>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-lg border">
+                            <div class="flex items-center mb-4"><i class="fas fa-qrcode text-2xl text-gray-700 mr-3"></i>
+                                <h3 class="font-semibold text-gray-800">UPI Details</h3>
+                            </div>
+                            <label for="upi-id" class="text-sm font-medium text-gray-600">UPI ID</label>
+                            <input type="text" id="upi-id" class="input-field mt-1" placeholder="your-upi@bank">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end space-x-4">
+                    <button type="button" id="back-to-create-btn" class="px-6 py-2 rounded-lg text-gray-700 bg-gray-200 hover:bg-gray-300 font-semibold transition">Back</button>
+                    <button type="button" id="continue-to-preview-btn" class="px-6 py-2 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 font-semibold transition">Continue to Preview</button>
+                </div>
+            </main>
+
+            <main id="pdf-view" class="hidden">
+                <div class="p-6 text-center bg-white border-b no-print">
+                    <h1 class="text-2xl font-bold text-gray-800">Invoice Preview</h1>
+                    <p class="text-sm text-gray-500">Review your invoice below. You can download or print it.</p>
+                </div>
+                <div id="invoice-preview-container"></div>
+                <footer class="p-4 bg-white border-t sticky bottom-0 z-10 no-print">
+                    <div class="max-w-4xl mx-auto flex justify-end gap-x-4">
+                        <button id="back-to-bank-btn" class="px-6 py-2 rounded-lg text-gray-700 bg-gray-200 hover:bg-gray-300 font-semibold transition"><i class="fas fa-arrow-left mr-2"></i>Back</button>
+                        <button id="print-btn" class="px-6 py-2 rounded-lg text-indigo-600 bg-indigo-100 hover:bg-indigo-200 font-semibold transition"><i class="fas fa-print mr-2"></i>Print</button>
+                        <button id="download-pdf-btn" class="px-6 py-2 rounded-lg text-white bg-green-600 hover:bg-green-700 font-semibold transition"><i class="fas fa-file-pdf mr-2"></i>Download PDF</button>
+                    </div>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <div id="bank-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Add Bank Account</h2>
+            <form id="bank-form" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-gray-600">Bank Name</label><input name="bankName" type="text" required class="input-field mt-1"></div>
+                    <div><label class="block text-sm text-gray-600">Account Holder</label><input name="holderName" type="text" required class="input-field mt-1"></div>
+                    <div><label class="block text-sm text-gray-600">Account Number</label><input name="accountNo" type="text" required class="input-field mt-1"></div>
+                    <div><label class="block text-sm text-gray-600">IFSC Code</label><input name="ifsc" type="text" required class="input-field mt-1"></div>
+                </div>
+                <div class="border-t pt-4 flex justify-end space-x-3"><button type="button" id="bank-modal-cancel" class="btn-secondary btn">Cancel</button><button type="submit" class="btn-primary btn">Save Account</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="signature-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-900">Add Signature</h2>
+                <button id="signature-modal-close" class="text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-4">
+                <input id="signature-input" type="text" placeholder="Type your signature here" class="input-field w-full" />
+                <select id="signature-font" class="input-field w-full">
+                    <option value="italic">Italic</option>
+                    <option value="bold">Bold</option>
+                    <option value="script">Script</option>
+                </select>
+            </div>
+            <div class="flex justify-end mt-6 space-x-2">
+                <button id="signature-cancel" class="btn btn-secondary">Cancel</button>
+                <button id="signature-save" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formatCurrency = (v) => `₹${Number(v||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+        const escapeHtml = (s) => s==null?'':String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]);
+        
+        const createView = document.getElementById('create-view');
+        const bankView = document.getElementById('bank-view');
+        const pdfView = document.getElementById('pdf-view');
+        const itemsContainer = document.getElementById('items-container');
+        let invoiceData = {};
+
+        // Sidebar & Dropdown
+        document.getElementById('menu-toggle')?.addEventListener('click', () => {
+            document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
+            document.getElementById('menu-backdrop')?.classList.toggle('hidden');
+        });
+        document.getElementById('menu-backdrop')?.addEventListener('click', () => {
+            document.getElementById('sidebar')?.classList.add('-translate-x-full');
+            document.getElementById('menu-backdrop')?.classList.add('hidden');
+        });
+        document.getElementById('documents-dropdown-btn')?.addEventListener('click', function() {
+            document.getElementById('documents-dropdown-content')?.classList.toggle('hidden');
+            document.getElementById('dropdown-icon')?.classList.toggle('rotate-180');
+        });
+
+        const showView = (name) => {
+            [createView, bankView, pdfView].forEach(v => v.classList.add('hidden'));
+            document.getElementById(`${name}-view`)?.classList.remove('hidden');
+        };
+
+        const updateTotals = () => {
+            let subtotal = 0;
+            itemsContainer.querySelectorAll('.item-row').forEach(row => {
+                const q = parseFloat(row.querySelector('.quantity').value) || 0;
+                const r = parseFloat(row.querySelector('.rate').value) || 0;
+                const amt = q * r;
+                row.querySelector('.amount').textContent = formatCurrency(amt);
+                subtotal += amt;
+            });
+            const tax = parseFloat(document.getElementById('tax-percentage').value) || 0;
+            const t = subtotal * (tax / 100);
+            document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('total-tax').textContent = formatCurrency(t);
+            document.getElementById('grand-total').textContent = formatCurrency(subtotal + t);
+        };
+
+        const createItemRow = (def = {}) => {
+            const row = document.createElement('div');
+            row.className = 'item-row grid grid-cols-12 gap-4 items-start';
+            row.innerHTML = `
+                <div class="col-span-full md:col-span-5">
+                    <input type="text" class="item-name input-field font-semibold" placeholder="Item Name" value="${escapeHtml(def.name||'')}">
+                    <textarea placeholder="Add Description" rows="1" class="description input-field w-full text-sm mt-1">${escapeHtml(def.desc||'')}</textarea>
+                </div>
+                <input type="number" class="quantity input-field text-right col-span-4 md:col-span-2" value="${def.qty||1}" min="0">
+                <input type="number" class="rate input-field text-right col-span-4 md:col-span-2" value="${def.rate||0}" min="0">
+                <div class="col-span-4 md:col-span-3 flex items-center justify-end gap-x-3 h-full">
+                    <span class="amount font-semibold text-gray-800">₹0.00</span>
+                    <button type="button" class="remove-item-btn text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                </div>`;
+            itemsContainer.appendChild(row);
+            updateTotals();
+        };
+        
+        document.getElementById('add-item-btn').addEventListener('click', () => createItemRow());
+        itemsContainer.addEventListener('input', updateTotals);
+        document.getElementById('tax-percentage').addEventListener('input', updateTotals);
+        itemsContainer.addEventListener('click', e => {
+            if (e.target.closest('.remove-item-btn')) {
+                e.target.closest('.item-row').remove();
+                updateTotals();
+            }
+        });
+
+        document.getElementById('logo-input').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                invoiceData.logo = ev.target.result;
+                document.getElementById('logo-preview').src = invoiceData.logo;
+                document.getElementById('logo-preview-container').classList.remove('hidden');
+                document.getElementById('logo-placeholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.querySelectorAll('.toggle-section-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = document.getElementById(btn.dataset.target);
+                const icon = btn.querySelector('i');
+                const isHidden = section.classList.toggle('hidden');
+                icon.classList.toggle('fa-plus', isHidden);
+                icon.classList.toggle('fa-minus', !isHidden);
+            });
+        });
+
+        document.getElementById('invoice-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            let isValid = true;
+            document.querySelectorAll('#invoice-form [required]').forEach(el => {
+                el.classList.remove('border-red-500');
+                if (!el.value.trim()) {
+                    el.classList.add('border-red-500');
+                    isValid = false;
+                }
+            });
+            if (!isValid) {
+                alert('Please fill all required fields.');
+                return;
+            }
+
+            const items = Array.from(itemsContainer.querySelectorAll('.item-row')).map(row => ({
+                name: row.querySelector('.item-name').value.trim(),
+                desc: row.querySelector('.description').value,
+                qty: parseFloat(row.querySelector('.quantity').value) || 0,
+                rate: parseFloat(row.querySelector('.rate').value) || 0,
+                amount: (parseFloat(row.querySelector('.quantity').value) || 0) * (parseFloat(row.querySelector('.rate').value) || 0),
+            }));
+            const subtotal = items.reduce((s, i) => s + i.amount, 0);
+            const tax_percentage = parseFloat(document.getElementById('tax-percentage').value) || 0;
+            const tax = subtotal * (tax_percentage / 100);
+
+            invoiceData = {
+                ...invoiceData,
+                invoiceNo: document.getElementById('invoice-no').value.trim(),
+                invoiceDate: document.getElementById('invoice-date').value,
+                dueDate: document.getElementById('due-date').value,
+                fromName: document.getElementById('from-name').value.trim(),
+                fromAddress: `${document.getElementById('from-city').value}, ${document.getElementById('from-country').value}`,
+                toName: document.getElementById('to-name').value.trim(),
+                toAddress: `${document.getElementById('to-city').value}, ${document.getElementById('to-country').value}`,
+                items, subtotal, tax_percentage, tax, total: subtotal + tax,
+                terms: document.getElementById('terms-input').value,
+                notes: document.getElementById('notes-input').value,
+            };
+            showView('bank');
+        });
+
+        const bankModal = document.getElementById('bank-modal');
+        document.getElementById('add-bank-account-btn')?.addEventListener('click', () => bankModal.classList.remove('hidden'));
+        document.getElementById('bank-modal-cancel')?.addEventListener('click', () => bankModal.classList.add('hidden'));
+        document.getElementById('bank-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            invoiceData.bankDetails = Object.fromEntries(new FormData(e.target).entries());
+            document.getElementById('bank-details-display').innerHTML = `<p><strong>Bank:</strong> ${escapeHtml(invoiceData.bankDetails.bankName)}</p><p><strong>A/C No:</strong> ${escapeHtml(invoiceData.bankDetails.accountNo)}</p>`;
+            bankModal.classList.add('hidden');
+            e.target.reset();
+        });
+
+        const sigModal = document.getElementById('signature-modal');
+        document.getElementById('add-signature-btn')?.addEventListener('click', () => {
+            document.getElementById('signature-input').value = invoiceData.signature || '';
+            document.getElementById('signature-font').value = invoiceData.signatureFont || 'italic';
+            sigModal.classList.remove('hidden'); sigModal.classList.add('flex');
+        });
+        document.getElementById('signature-modal-close')?.addEventListener('click', () => sigModal.classList.add('hidden'));
+        document.getElementById('signature-cancel')?.addEventListener('click', () => sigModal.classList.add('hidden'));
+        document.getElementById('signature-save')?.addEventListener('click', () => {
+            invoiceData.signature = document.getElementById('signature-input').value.trim();
+            invoiceData.signatureFont = document.getElementById('signature-font').value;
+            sigModal.classList.add('hidden');
+        });
+        
+        // ✅ FIXED: Added navigation for Bank and PDF views
+        document.getElementById('back-to-create-btn')?.addEventListener('click', () => showView('create'));
+        document.getElementById('continue-to-preview-btn')?.addEventListener('click', () => {
+            invoiceData.upiId = document.getElementById('upi-id').value.trim();
+            generatePreview();
+            showView('pdf');
+        });
+        document.getElementById('back-to-bank-btn')?.addEventListener('click', () => showView('bank'));
+        document.getElementById('print-btn')?.addEventListener('click', () => window.print());
+        document.getElementById('download-pdf-btn')?.addEventListener('click', () => {
+            const element = document.getElementById('invoice-preview-container');
+            html2pdf().set({
+                margin: 0.5, filename: `${invoiceData.invoiceNo || 'invoice'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            }).from(element.innerHTML).save();
+        });
+
+        // ✅ ADDED: Function to generate the final invoice preview
+        const generatePreview = () => {
+            const itemsHtml = invoiceData.items.map(item => `<tr class="border-b"><td class="py-2 pr-2"><p class="font-semibold">${escapeHtml(item.name)}</p><p class="text-xs text-gray-600">${escapeHtml(item.desc)}</p></td><td class="py-2 text-right">${item.qty}</td><td class="py-2 text-right">${formatCurrency(item.rate)}</td><td class="py-2 text-right font-semibold">${formatCurrency(item.amount)}</td></tr>`).join('');
+            const upiQrHtml = invoiceData.upiId ? `<div><h4 class="font-semibold text-sm">Scan to Pay</h4><img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=upi://pay?pa=${encodeURIComponent(invoiceData.upiId)}&pn=Payment" alt="UPI QR Code" class="mt-1"><p class="text-xs text-gray-600">${escapeHtml(invoiceData.upiId)}</p></div>` : '';
+            document.getElementById('invoice-preview-container').innerHTML = `<div class="invoice-pdf-wrapper">
+                <header class="flex justify-between items-start pb-4 border-b">${invoiceData.logo ? `<img src="${invoiceData.logo}" alt="logo" class="max-h-20">` : `<div><h1 class="text-3xl font-bold">${escapeHtml(invoiceData.fromName)}</h1><p class="text-sm text-gray-600">${escapeHtml(invoiceData.fromAddress)}</p></div>`}<div class="text-right"><h2 class="text-3xl font-bold uppercase">Invoice</h2></div></header>
+                <section class="grid grid-cols-2 gap-4 my-6"><div class="text-sm"><h3 class="font-semibold text-gray-700">Billed To:</h3><p class="font-bold">${escapeHtml(invoiceData.toName)}</p><p class="text-gray-600">${escapeHtml(invoiceData.toAddress)}</p></div><div class="text-sm text-right"><p><span class="font-semibold">Invoice No:</span> ${escapeHtml(invoiceData.invoiceNo)}</p><p><span class="font-semibold">Invoice Date:</span> ${invoiceData.invoiceDate}</p><p><span class="font-semibold">Due Date:</span> ${invoiceData.dueDate}</p></div></section>
+                <section><table class="w-full text-sm"><thead><tr class="bg-gray-100"><th class="text-left font-semibold p-2">Item</th><th class="text-right font-semibold p-2">Qty</th><th class="text-right font-semibold p-2">Rate</th><th class="text-right font-semibold p-2">Amount</th></tr></thead><tbody>${itemsHtml}</tbody></table></section>
+                <section class="flex justify-end mt-4"><div class="w-full max-w-xs space-y-2 text-sm"><div class="flex justify-between"><span>Subtotal</span><span>${formatCurrency(invoiceData.subtotal)}</span></div><div class="flex justify-between"><span>Tax (${invoiceData.tax_percentage}%)</span><span>${formatCurrency(invoiceData.tax)}</span></div><div class="flex justify-between font-bold text-lg border-t pt-2 mt-2"><span>Total (INR)</span><span>${formatCurrency(invoiceData.total)}</span></div></div></section>
+                <footer class="absolute bottom-8 right-8 left-8 text-xs"><div class="flex justify-between items-end">${invoiceData.terms ? `<div class="max-w-md"><h4 class="font-semibold">Terms</h4><p class="text-gray-600">${escapeHtml(invoiceData.terms)}</p></div>`: '<div></div>'}<div class="text-right">${invoiceData.signature ? `<div class="invoice-signature-container"><div class="signature-display ${invoiceData.signatureFont||'italic'}">${escapeHtml(invoiceData.signature)}</div></div><p class="font-semibold mt-1">Authorised Signatory</p>` : ''}</div></div><div class="flex items-end justify-between mt-4 pt-4 border-t">${(invoiceData.bankDetails || invoiceData.upiId) ? `<div class="flex gap-x-6">${invoiceData.bankDetails ? `<div class="avoid-page-break"><h4 class="font-semibold text-sm">Bank Details</h4><p><strong>Bank:</strong> ${escapeHtml(invoiceData.bankDetails.bankName)}</p><p><strong>A/C No:</strong> ${escapeHtml(invoiceData.bankDetails.accountNo)}</p><p><strong>IFSC:</strong> ${escapeHtml(invoiceData.bankDetails.ifsc)}</p></div>` : ''}${upiQrHtml}</div>` : ''}</div></footer>
+            </div>`;
+        };
+
+        // Initial setup
+        document.getElementById('invoice-date').valueAsDate = new Date();
+        const due = new Date(); due.setDate(due.getDate() + 15);
+        document.getElementById('due-date').valueAsDate = due;
+        createItemRow();
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings - QSI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f9fafb;
+    }
+
+    .sidebar-link.active {
+      background: linear-gradient(90deg, #6366f1, #4f46e5);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.5rem 1rem; /* py-2 px-4 */
+      color: #000; /* text-black */
+      background-color: #f9fafb; /* bg-gray-50 */
+      border: 1px solid #d1d5db; /* border-gray-300 */
+      border-radius: 0.5rem; /* rounded-lg */
+      transition: all 0.2s ease-in-out;
+    }
+    .form-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12); /* approximate ring-indigo-500 */
+      border-color: transparent;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem; /* text-sm */
+      font-weight: 500; /* font-medium */
+      color: #4b5563; /* text-gray-600 */
+      margin-bottom: 0.25rem; /* mb-1 */
+    }
+
+    .card {
+      background-color: #ffffff; /* bg-white */
+      padding: 1.5rem; /* p-6 */
+      border-radius: 0.75rem; /* rounded-xl */
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
+      border: 1px solid #e5e7eb; /* border-gray-200 */
+      color: inherit;
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* Dark-mode helpers kept as classes (colors handled by utility classes in markup) */
+    .card.dark\:bg-gray-900 {
+      background-color: #111827;
+    }
+    .card.dark\:border-gray-700 {
+      border-color: #374151;
+    }
+    .card.dark\:text-gray-100 {
+      color: #f3f4f6;
+    }
+
+    .tab-active {
+      border-bottom-color: #6366f1; /* border-indigo-500 */
+      color: #4f46e5; /* text-indigo-600 */
+      font-weight: 600; /* font-semibold */
+    }
+
+    .tab-inactive {
+      border-bottom-color: transparent; /* border-transparent */
+      color: #6b7280; /* text-gray-500 */
+    }
+    .tab-inactive:hover {
+      color: #374151; /* hover:text-gray-700 */
+      border-bottom-color: #d1d5db; /* hover:border-gray-300 */
+    }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 4px;
+      bottom: 4px;
+      background: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: #4f46e5;
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(18px);
+    }
+
+    /* Toast */
+    #toast {
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+
+    /* Modal transitions */
+    .modal-overlay {
+      transition: opacity 0.3s;
+    }
+
+    .modal-panel {
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    /* Spinner */
+    .btn-spinner {
+      border-top-color: transparent;
+      border-right-color: transparent;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .sticky-header-tabs {
+      position: sticky;
+      top: -15px;
+      z-index: 20;
+      /* Ensures it stays on top of other content */
+      background-color: #030712;
+      /* Matches your dark background color */
+      padding-top: 2rem;
+      /* Adds some spacing above the header */
+    }
+
+    .input-standard {
+      width: 100%;
+      border-radius: 0.375rem; /* rounded-md */
+      border: 1px solid #000000; /* black border */
+      background-color: #ffffff; /* white background */
+      padding: 0.5rem 1rem; /* px-4 py-2 */
+      color: #000000; /* black text */
+      transition: all 0.2s ease-in-out;
+    }
+    .input-standard::placeholder {
+      color: #6b7280; /* placeholder: gray */
+    }
+    .input-standard:focus {
+      border-color: #000000; /* keep border black on focus */
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.06); /* subtle focus */
+      outline: none;
+    }
+
+    .select-standard {
+      width: 100%;
+      border-radius: 0.375rem; /* rounded-md */
+      border: 1px solid #000000; /* black border */
+      background-color: #ffffff; /* white background */
+      padding: 0.5rem 1rem;
+      color: #000000; /* black text */
+      transition: all 0.2s ease-in-out;
+    }
+    .select-standard:focus {
+      border-color: #000000;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+      outline: none;
+    }
+
+    /* Force inputs/selects/textarea inside cards (settings forms) to use white bg, black text and black border
+       This uses !important to override Tailwind utility classes already present in the markup. */
+    .card input[type="text"],
+    .card input[type="email"],
+    .card input[type="tel"],
+    .card input[type="url"],
+    .card input[type="password"],
+    .card input[type="number"],
+    .card input[type="file"],
+    .card select,
+    .card textarea,
+    .card .input-standard,
+    .card .select-standard {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      border: 1px solid #000000 !important;
+    }
+
+    .card input::placeholder,
+    .card textarea::placeholder {
+      color: #6b7280 !important;
+    }
+
+    /* Make main card headings black (but avoid overriding danger/red headings)
+       Targets typical headings used: h2.text-xl.font-semibold and h3.text-md.font-semibold
+       Uses :not([class*="text-red"]) to skip headings already styled as red. */
+    .card h2.text-xl.font-semibold:not([class*="text-red"]) {
+      color: #000000 !important;
+    }
+    .card h3.text-md.font-semibold:not([class*="text-red"]) {
+      color: #000000 !important;
+    }
+    .card h3.font-medium:not([class*="text-red"]) {
+      color: #000000 !important;
+    }
+
+    .dropdown-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
+    }
+
+    .dropdown-content.open {
+      max-height: 200px;
+      /* A height large enough for your links */
+      opacity: 1;
+    }
+    @media (max-width: 768px) {
+  #main-content {
+    margin-top: 64px; /* height of the fixed header */
+  }
+}
+  </style>
+</head>
+
+<body class="dark:bg-gray-950 dark:text-gray-100">
+  <div class="flex">
+    <!-- Left Sidebar Navigation -->
+    <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+  <div class="flex items-center space-x-3">
+    <button id="menu-toggle" class="text-white focus:outline-none">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+    <span class="text-xl font-bold">QSI</span>
+  </div>
+</header>
+
+
+<!-- ✅ BACKDROP for mobile -->
+<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+<!-- ✅ SIDEBAR -->
+<aside id="sidebar"
+  class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+      <div class="p-6 text-2xl font-bold border-b border-gray-700">
+          <i class=" mr-2 text-indigo-400"></i> QSI
+      </div>
+      <nav class="flex-1 p-4 space-y-2">
+          <a href="dashboard_with_login.html"
+              class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+              <i class="fas fa-chart-pie mr-3"></i>Dashboard
+          </a>
+          <div>
+              <button id="documents-dropdown-btn"
+                  class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                  <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                  <i id="dropdown-icon"
+                      class="fas fa-chevron-down transform transition-transform duration-200"></i>
+              </button>
+              <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 dropdown-content">
+                  <a href="quotation/home_quotation.html"
+                      class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                  <a href="saleorder/home_sales_order.html"
+                      class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales
+                      Order</a>
+                  <a href="invoice/home_invoice.html"
+                      class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                      <a href="credit_note.html"
+                    class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+              </div>
+              <div>
+                  <button id="purchases-dropdown-btn"
+                      class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                      <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
+                      <i id="purchases-dropdown-icon"
+                          class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                  </button>
+                  <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 dropdown-content">
+                      <a href="parchase/vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
+                        <a href="parchase/vendors&suppliers/vendors_suppliers.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors & Suppliers</a>
+                        <a href="parchase/purchases&expenses/purchases_expenses_home.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchases & Expenses</a>
+                        <a href="parchase/parchase_order/home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
+                      <a href="parchase/payout receipts/home_payout_receipts.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout Receipts</a>
+                      <a href="parchase/debit notes/home_debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
+                      </div>
+              </div>
+          </div>
+          <a href="manage-clients.html"
+              class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+              <i class="fas fa-users mr-3"></i>Manage Clients
+          </a>
+          <a href="settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+              <i class="fas fa-cog mr-3"></i>Settings
+          </a>
+      </nav>
+  </aside>
+
+    <main class="flex-1 p-8">
+      <div class="sticky-header-tabs">
+        <header class="mb-4" id="settings-header">
+          <h1 class="text-3xl font-bold">Settings</h1>
+          <p class="text-gray-500 dark:text-gray-400">
+            Manage your account and preferences.
+          </p>
+        </header>
+
+        <div class="mb-8" id="tabs-container">
+          <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="-mb-px flex space-x-8">
+              <button data-tab="profile" class="tab-button py-4 px-1 border-b-2 text-sm tab-active">
+                Profile
+              </button>
+              <button data-tab="business_details" class="tab-button py-4 px-1 border-b-2 text-sm tab-inactive">
+                Business Details
+              </button>
+              <button data-tab="bank_details" class="tab-button py-4 px-1 border-b-2 text-sm tab-inactive">
+  Bank Details
+</button>
+              <button data-tab="notifications" class="tab-button py-4 px-1 border-b-2 text-sm tab-inactive">
+                Notifications
+              </button>
+              <button data-tab="security" class="tab-button py-4 px-1 border-b-2 text-sm tab-inactive">
+                Security
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-4xl mx-auto">
+        <section id="tab-content-profile" class="tab-content space-y-8">
+          <!-- Avatar removed per request -->
+          <div class="card">
+            <h2 class="text-xl font-semibold border-b pb-4 mb-6">
+              Personal Information
+            </h2>
+            <form id="profile-form" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="fullName" class="form-label">Username</label>
+                  <input type="text" id="fullName"
+                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out" />
+                </div>
+                <div>
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" id="email"
+                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out disabled:opacity-50" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="personal_country" class="form-label">Country</label>
+                  <select id="personal_country"
+                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"></select>
+                </div>
+                <div>
+                  <label for="phone" class="form-label">Phone</label>
+                  <input type="tel" id="phone"
+                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out" />
+                </div>
+              </div>
+
+              <div class="flex justify-end pt-4">
+                <button type="submit" id="save-profile-btn"
+                  class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md w-36 flex items-center justify-center">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="tab-content-business_details" class="tab-content hidden space-y-8">
+          <div class="card">
+            <h2 class="text-xl font-semibold border-b border-gray-700 pb-4 mb-6">
+              <span style="color: #000;">Business Information</span>
+            </h2>
+            <form id="business-form" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="businessName" class="form-label">Business Name <span class="text-red-500"></span></label>
+                    <input type="text" id="businessName" name="businessName"
+                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-black placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                    placeholder="e.g., Your Company LLC" required />
+                    <!-- Logo upload / preview -->
+                    <div class="mt-4 flex items-center space-x-4">
+                      <img id="business-logo-preview" src="https://placehold.co/80x80/ffffff/000000?text=Logo" alt="Logo preview" class="h-20 w-20 rounded object-contain border border-gray-200 bg-white" />
+                      <div>
+                        <label class="form-label block">Company Logo</label>
+                        <input type="file" id="logo" name="logo" accept="image/*" class="mt-1" />
+                        <p class="text-xs text-gray-500 mt-2">PNG, JPG. Recommended 300x300.</p>
+                      </div>
+                    </div>
+                  </div>
+                <div>
+                  <label for="teamSize" class="form-label">Team Size <span class="text-red-500"></span></label>
+                  <select id="teamSize" name="teamSize"
+                    class="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-2 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                    required>
+                    <option value="">Select Team Size</option>
+                    <option value="1">Just Me (1)</option>
+                    <option value="2">2-5 members</option>
+                    <option value="6">6-10 members</option>
+                    <option value="11">11+ members</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="website" class="form-label">Website</label>
+                <input type="url" id="website" name="website"
+                  class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                  placeholder="https://www.your-website.com" />
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="business_phone" class="form-label">Phone Number <span class="text-red-500"></span></label>
+                  <input type="tel" id="business_phone" name="business_phone"
+                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                    placeholder="Include country code" required />
+                </div>
+                <div>
+                  <label for="business_email" class="form-label">Business Email <span
+                      class="text-red-500"></span></label>
+                  <input type="email" id="business_email" name="business_email"
+                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                    placeholder="contact@your-company.com" required />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="gst" class="form-label">GST Number (Optional)</label>
+                  <input type="text" id="gst" name="gst"
+                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                    placeholder="GST Number" />
+                </div>
+                <div>
+                  <label for="currency" class="form-label">Currency <span class="text-red-500"></span></label>
+                  <select id="currency" name="currency"
+                    class="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-2 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                    required>
+                    <option value="">Select Currency</option>
+                    <option value="INR">Indian Rupee (INR, ₹)</option>
+                    <option value="USD">US Dollar (USD, $)</option>
+                    <option value="EUR">Euro (EUR, €)</option>
+                    <option value="GBP">British Pound (GBP, £)</option>
+                    <option value="JPY">Japanese Yen (JPY, ¥)</option>
+                    <option value="AUD">Australian Dollar (AUD, A$)</option>
+                    <option value="CAD">Canadian Dollar (CAD, C$)</option>
+                    <option value="CHF">Swiss Franc (CHF, Fr)</option>
+                    <option value="CNY">Chinese Yuan (CNY, ¥)</option>
+                    <option value="AED">UAE Dirham (AED, د.إ)</option>
+                    <option value="SGD">Singapore Dollar (SGD, S$)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="pt-4 border-t border-gray-700">
+                <h3 class="text-md font-semibold text-gray-200">
+                  Business Address
+                </h3>
+                <div class="mt-4 space-y-6">
+                  <div>
+                    <label for="street" class="form-label">Street Address <span class="text-red-500"></span></label>
+                    <input type="text" id="street" name="street"
+                      class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                      required />
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label for="city" class="form-label">City <span class="text-red-500"></span></label>
+                      <input type="text" id="city" name="city"
+                        class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                        required />
+                    </div>
+                    <div>
+                      <label for="state" class="form-label">State / Province <span class="text-red-500"></span></label>
+                      <input type="text" id="state" name="state"
+                        class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                        required />
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label for="pincode" class="form-label">Pincode <span class="text-red-500"></span></label>
+                      <input type="text" id="pincode" name="pincode"
+                        class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                        required />
+                    </div>
+                    <div>
+                      <label for="business_country" class="form-label">Country <span
+                          class="text-red-500"></span></label>
+                      <select id="business_country" name="country"
+                        class="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-2 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
+                        required></select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end pt-4">
+                <button type="submit" id="submit-btn"
+                  class="bg-indigo-600 text-white font-bold py-5 rounded-lg hover:bg-indigo-700 transition shadow-md w-48 flex items-center justify-center p-4">
+                  Update Details
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+<section id="tab-content-bank_details" class="tab-content hidden space-y-8">
+  <!-- Bank Accounts List -->
+  <div class="card">
+    <div class="flex justify-between items-center border-b pb-4 mb-6">
+      <h2 class="text-xl font-semibold" style="color: #000;">Bank Accounts</h2>
+      <button id="add-bank-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition shadow-md">
+        <i class="fas fa-plus mr-2"></i>Add Bank Account
+      </button>
+    </div>
+
+    <!-- Banks List Container -->
+    <div id="banks-list-container" class="space-y-4">
+      <!-- Bank cards will be dynamically inserted here -->
+      <div class="text-center py-8 text-gray-500">
+        <i class="fas fa-university text-4xl mb-2"></i>
+        <p>No bank accounts added yet.</p>
+      </div>
+    </div>
+  </div>
+</section>
+        <section id="tab-content-notifications" class="tab-content hidden space-y-8">
+          <div class="card">
+            <h2 class="text-xl font-semibold border-b pb-4 mb-6">
+              Notifications
+            </h2>
+            <div class="space-y-6 divide-y divide-gray-200 dark:divide-gray-700">
+              <div class="flex items-center justify-between pt-6">
+                <div>
+                  <h3 class="font-medium">Email Notifications</h3>
+                  <p class="text-sm text-gray-500">
+                    Receive emails about your account activity.
+                  </p>
+                </div>
+                <label class="switch"><input type="checkbox" id="email-notifications-toggle" /><span
+                    class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between pt-6">
+                <div>
+                  <h3 class="font-medium">New Order Alerts</h3>
+                  <p class="text-sm text-gray-500">
+                    Get notified when a new sales order is created.
+                  </p>
+                </div>
+                <label class="switch"><input type="checkbox" id="order-alerts-toggle" /><span
+                    class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between pt-6">
+                <div>
+                  <h3 class="font-medium">Weekly Summary</h3>
+                  <p class="text-sm text-gray-500">
+                    Receive a weekly summary of sales activities.
+                  </p>
+                </div>
+                <label class="switch"><input type="checkbox" id="weekly-summary-toggle" /><span
+                    class="slider"></span></label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-content-security" class="tab-content hidden space-y-8">
+          <div class="card">
+            <h2 class="text-xl font-semibold border-b pb-4 mb-6">
+              Change Password
+            </h2>
+            <form id="password-form" class="space-y-6">
+              <div>
+                <label for="currentPassword" class="form-label">Current Password</label>
+                <div class="flex items-center gap-4">
+                  <div class="relative w-full">
+                    <input type="password" id="currentPassword"
+                      class="w-full rounded-xl border border-gray-500 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 px-4 py-3 shadow-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition duration-200 ease-in-out"
+                      required autocomplete="current-password" />
+                    <button type="button" id="togglePasswordBtn"
+                      class="absolute top-1/2 right-4 -translate-y-1/2 text-gray-400 hover:text-gray-200">
+                      <i id="togglePasswordIcon" class="fas fa-eye-slash"></i>
+                    </button>
+                  </div>
+                  <button type="button" id="verify-password-btn"
+                    class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition shadow-md w-36 flex items-center justify-center">
+                    Verify
+                  </button>
+                </div>
+              </div>
+
+              <div id="new-password-container" class="hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                  <div>
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <input type="password" id="newPassword"
+                      class="w-full rounded-xl border border-gray-500 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 px-4 py-3 shadow-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition duration-200 ease-in-out"
+                      required autocomplete="new-password" />
+                  </div>
+                  <div>
+                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirmPassword"
+                      class="w-full rounded-xl border border-gray-500 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 px-4 py-3 shadow-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition duration-200 ease-in-out"
+                      required autocomplete="new-password" />
+                  </div>
+                </div>
+                <div class="flex justify-end pt-4">
+                  <button type="submit" id="update-password-btn"
+                    class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md w-40 flex items-center justify-center">
+                    Update Password
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="card border-red-200 bg-red-50 dark:bg-red-900/30 p-5 rounded-xl">
+            <h2 class="text-xl font-semibold text-red-800 dark:text-red-400 mb-4">
+              Danger Zone
+            </h2>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-medium text-red-700 dark:text-red-300">
+                  Delete Account
+                </h3>
+                <p class="text-sm text-red-600 dark:text-red-400">
+                  Your account will be deactivated and permanently deleted
+                  after 30 days.
+                </p>
+              </div>
+              <button id="delete-account-btn"
+                class="bg-red-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-red-700 transition">
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast"
+    class="fixed bottom-5 right-5 bg-gray-900 text-white py-3 px-6 rounded-lg shadow-lg opacity-0 transform translate-y-2">
+    <p id="toast-message"></p>
+  </div>
+
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+    <div id="delete-modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 modal-overlay"></div>
+    <div id="delete-modal-panel"
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md transform scale-95 modal-panel mx-4 opacity-0">
+      <div class="text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+          <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+        </div>
+        <h3 class="text-lg leading-6 font-medium mt-5">Delete Account</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+          Are you sure? Your account will be scheduled for permanent deletion
+          in 30 days. You will be logged out immediately.
+        </p>
+      </div>
+      <div class="mt-6 grid grid-cols-2 gap-3">
+        <button id="confirm-delete-btn" class="w-full py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+          Delete
+        </button>
+        <button id="cancel-delete-btn"
+          class="w-full py-2 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+<div id="bank-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+  <div id="bank-modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 modal-overlay"></div>
+  <div id="bank-modal-panel" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-2xl transform scale-95 modal-panel mx-4 opacity-0 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold" id="bank-modal-title">Add Bank Account</h3>
+      <button id="close-bank-modal" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <form id="bank-form" class="space-y-4">
+      <input type="hidden" id="bank-id" />
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="bank_name" class="form-label">Bank Name <span class="text-red-500">*</span></label>
+          <input type="text" id="bank_name" class="input-standard" placeholder="e.g., State Bank of India" required />
+        </div>
+
+        <div>
+          <label for="account_holder" class="form-label">Account Holder Name <span class="text-red-500">*</span></label>
+          <input type="text" id="account_holder" class="input-standard" placeholder="Full name as per bank" required />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="account_number" class="form-label">Account Number <span class="text-red-500">*</span></label>
+          <input type="text" id="account_number" class="input-standard" placeholder="Enter account number" required />
+        </div>
+
+        <div>
+          <label for="ifsc_code" class="form-label">IFSC Code <span class="text-red-500">*</span></label>
+          <input type="text" id="ifsc_code" class="input-standard" placeholder="e.g., SBIN0001234" required />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="branch_name" class="form-label">Branch Name</label>
+          <input type="text" id="branch_name" class="input-standard" placeholder="Branch location" />
+        </div>
+
+        <div>
+          <label for="account_type" class="form-label">Account Type</label>
+          <select id="account_type" class="select-standard">
+            <option value="">Select Type</option>
+            <option value="Savings">Savings</option>
+            <option value="Current">Current</option>
+            <option value="Business">Business</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="upi_id" class="form-label">UPI ID</label>
+        <input type="text" id="upi_id" class="input-standard" placeholder="e.g., yourname@paytm" />
+        <p class="text-xs text-gray-500 mt-1">Used for generating QR codes on invoices</p>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t">
+        <button type="button" id="cancel-bank-btn" class="py-2 px-6 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600">
+          Cancel
+        </button>
+        <button type="submit" id="save-bank-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md w-36 flex items-center justify-center">
+          Save Bank
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Bank Confirmation Modal -->
+<div id="delete-bank-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+  <div id="delete-bank-modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 modal-overlay"></div>
+  <div id="delete-bank-modal-panel" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md transform scale-95 modal-panel mx-4 opacity-0">
+    <div class="text-center">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+        <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+      </div>
+      <h3 class="text-lg leading-6 font-medium mt-5">Delete Bank Account</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+        Are you sure you want to delete this bank account? This action cannot be undone.
+      </p>
+    </div>
+    <div class="mt-6 grid grid-cols-2 gap-3">
+      <button id="confirm-delete-bank-btn" class="w-full py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+        Delete
+      </button>
+      <button id="cancel-delete-bank-btn" class="w-full py-2 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    
+      // =================================================
+      // SECTION 1: GLOBAL VARIABLES & DATA
+      // =================================================
+      let companyId = null;
+      const countries = [
+        { code: "IN", name: "India" },
+        { code: "US", name: "United States of America (USA)" },
+        { code: "GB", name: "United Kingdom" },
+        { code: "CA", name: "Canada" },
+        { code: "AU", name: "Australia" },
+        { code: "DE", name: "Germany" },
+        { code: "FR", name: "France" },
+        { code: "JP", name: "Japan" },
+        { code: "CN", name: "China" },
+        { code: "AE", name: "United Arab Emirates" },
+        { code: "SG", name: "Singapore" },
+        { code: "BR", name: "Brazil" },
+        { code: "CH", name: "Switzerland" },
+        { code: "NZ", name: "New Zealand" },
+      ];
+
+      // =================================================
+      // SECTION 2: ELEMENT SELECTORS
+      // =================================================
+      const getEl = (id) => document.getElementById(id);
+
+  // Profile
+  const fullNameInput = getEl("fullName");
+  const emailInput = getEl("email");
+  const phoneInput = getEl("phone");
+  const avatarPreview = getEl("avatar-preview"); // may be null now that avatar removed
+  const profileForm = getEl("profile-form");
+  const saveProfileBtn = getEl("save-profile-btn");
+
+  // Business
+  const businessForm = getEl("business-form");
+  const submitBtn = getEl("submit-btn");
+  const personalCountrySelect = getEl("personal_country");
+  const businessCountrySelect = getEl("business_country");
+  const logoInput = getEl("logo");
+  const businessLogoPreview = getEl("business-logo-preview");
+  let businessLogoBase64 = null;
+
+      // Password
+      const currentPasswordInput = getEl("currentPassword");
+      const verifyPasswordBtn = getEl("verify-password-btn");
+      const newPasswordContainer = getEl("new-password-container");
+      const updatePasswordBtn = getEl("update-password-btn");
+      const togglePasswordBtn = getEl("togglePasswordBtn");
+      const togglePasswordIcon = getEl("togglePasswordIcon");
+      const passwordForm = getEl("password-form");
+
+      // Notifications
+      const emailNotificationsToggle = getEl("email-notifications-toggle");
+      const orderAlertsToggle = getEl("order-alerts-toggle");
+      const weeklySummaryToggle = getEl("weekly-summary-toggle");
+
+      // Add this array right after the weeklySummaryToggle definition
+      const notificationToggles = [
+        emailNotificationsToggle,
+        orderAlertsToggle,
+        weeklySummaryToggle,
+      ];
+
+      // Delete modal
+      const deleteAccountBtn = getEl("delete-account-btn");
+      const deleteModal = getEl("delete-modal");
+      const deleteModalOverlay = getEl("delete-modal-overlay");
+      const deleteModalPanel = getEl("delete-modal-panel");
+      const confirmDeleteBtn = getEl("confirm-delete-btn");
+      const cancelDeleteBtn = getEl("cancel-delete-btn");
+
+      // Tabs
+      const tabButtons = document.querySelectorAll(".tab-button");
+      const tabContents = document.querySelectorAll(".tab-content");
+      const tabsContainer = document.getElementById("tabs-container");
+
+      // =================================================
+      // SECTION 3: HELPER FUNCTIONS
+      // =================================================
+
+      const menuToggle = document.getElementById("menu-toggle");
+const sidebar = document.getElementById("sidebar");
+const menuBackdrop = document.getElementById("menu-backdrop");
+
+if (menuToggle && sidebar && menuBackdrop) {
+  menuToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("-translate-x-full");
+    menuBackdrop.classList.toggle("hidden");
+  });
+
+  menuBackdrop.addEventListener("click", () => {
+    sidebar.classList.add("-translate-x-full");
+    menuBackdrop.classList.add("hidden");
+  });
+}
+      function showToast(message) {
+        const toast = getEl("toast");
+        const toastMessage = getEl("toast-message");
+        toastMessage.textContent = message;
+        toast.classList.remove("opacity-0", "translate-y-2");
+        toast.classList.add("opacity-100", "translate-y-0");
+        setTimeout(() => {
+          toast.classList.remove("opacity-100", "translate-y-0");
+          toast.classList.add("opacity-0", "translate-y-2");
+        }, 3000);
+      }
+
+      // The FIXED function that shows the spinner
+      function setButtonLoading(button, isLoading, originalText = null) {
+        if (isLoading) {
+          // First, save the button's original text if we haven't already
+          if (!button.dataset.originalText) {
+            button.dataset.originalText = button.innerHTML;
+          }
+          // Now, show the spinner and disable the button
+          button.innerHTML = `<div class="w-5 h-5 border-2 border-white rounded-full btn-spinner mx-auto"></div>`;
+          button.disabled = true;
+        } else {
+          // Restore the original text and re-enable the button
+          button.innerHTML = originalText || button.dataset.originalText;
+          button.disabled = false;
+        }
+      }
+
+      function populateCountryDropdowns() {
+        [personalCountrySelect, businessCountrySelect].forEach((selectEl) => {
+          if (selectEl) {
+            selectEl.innerHTML = '<option value="">Select Country</option>';
+            countries.forEach((country) => {
+              const option = document.createElement("option");
+              option.value = country.code;
+              option.textContent = country.name;
+              selectEl.appendChild(option);
+            });
+          }
+        });
+      }
+
+      // =================================================
+      // SECTION 4: DATA LOADING
+      // =================================================
+      // Replace your existing loadSettings function with this corrected one
+
+      async function loadSettings() {
+        try {
+          const userId = localStorage.getItem("userId");
+          const token = localStorage.getItem("token"); // 1. Get the token
+
+          if (!userId || !token) {
+            // 2. Check for both
+            window.location.href = "/login.html";
+            return;
+          }
+
+          const response = await fetch(
+            `http://Aixains-Mac-mini.local:8000/api/register/${userId}`,
+            {
+              // 3. Add the headers object with the Authorization token
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch user data.");
+          }
+          const userData = await response.json();
+          const user = Array.isArray(userData) ? userData[0] : userData;
+
+          if (!user) {
+            throw new Error("Received empty user data.");
+          }
+
+          fullNameInput.value = user.username || "";
+          emailInput.value = user.email || "";
+          phoneInput.value = user.phone || "";
+
+          // Set the country if it exists on the user profile
+          if (user.country) {
+            const country = countries.find((c) => c.name === user.country);
+            if (country) {
+              personalCountrySelect.value = country.code;
+            }
+          }
+        } catch (err) {
+          console.error("Error loading settings:", err);
+          showToast(err.message || "Could not load profile settings."); // Show a toast on error
+        }
+      }
+
+      async function loadBusinessDetails() {
+        try {
+          const token = localStorage.getItem("token");
+
+          if (!token) {
+            console.log("No token found, skipping business details load.");
+            return;
+          }
+
+          const response = await fetch(`http://Aixains-Mac-mini.local:8000/api/companies`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            if (response.status === 404) {
+              console.log("No business details found for this user yet.");
+              return;
+            }
+            throw new Error("Could not fetch business details.");
+          }
+
+          const companies = await response.json();
+
+          if (companies.length > 0) {
+            const data = companies[0];
+            companyId = data._id;
+
+            getEl("businessName").value = data.company_name || "";
+            getEl("website").value = data.website || "";
+            getEl("business_phone").value = data.phone || "";
+            getEl("business_email").value = data.email || "";
+            getEl("gst").value = data.gst_no || "";
+            getEl("currency").value = data.currency || "";
+            // If a logo URL/base64 exists on backend, show preview and store
+            if (data.logo && businessLogoPreview) {
+              businessLogoPreview.src = data.logo;
+              businessLogoBase64 = data.logo;
+            }
+
+            // FIX: Add logic to select the correct range for team size
+            const teamSize = data.team_size;
+            const teamSizeSelect = getEl("teamSize");
+
+            const teamSizeNum = parseInt(teamSize, 10);
+
+            if (teamSizeNum >= 11) {
+              teamSizeSelect.value = "11";
+            } else if (teamSizeNum >= 6) {
+              teamSizeSelect.value = "6";
+            } else if (teamSizeNum >= 2) {
+              teamSizeSelect.value = "2";
+            } else if (teamSizeNum === 1) {
+              teamSizeSelect.value = "1";
+            }
+
+            if (data.address) {
+              getEl("street").value = data.address.street || "";
+              getEl("city").value = data.address.city || "";
+              getEl("state").value = data.address.state || "";
+              getEl("pincode").value = data.address.postalCode || "";
+              const country = countries.find(
+                (c) => c.name === data.address.country
+              );
+              if (country) {
+                getEl("business_country").value = country.code;
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load business details:", error);
+          showToast(error.message);
+        }
+      }
+      // =================================================
+      // SECTION 5: REUSABLE BUSINESS UPDATE
+      // =================================================
+      async function handleBusinessUpdate(showSuccessToast = true) {
+        const userId = localStorage.getItem("userId"); // Get the user ID
+        if (!companyId || !userId) {
+          throw new Error(
+            "Cannot update: Company or User details not loaded."
+          );
+        }
+
+        // (Your code for gathering the payload remains the same)
+        // ...
+
+        // **THE FIX:** The update URL must include the companyId AND the userId for authorization
+        const response = await fetch(
+          `http://Aixains-Mac-mini.local:8000/api/companies/${companyId}?user_id=${userId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.message || "Business update failed");
+        }
+
+        if (showSuccessToast) {
+          showToast("Business details updated successfully!");
+        }
+      }
+      // =================================================
+      // SECTION 6: EVENT LISTENERS
+      // =================================================
+
+      // Tabs
+      tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const tab = button.dataset.tab;
+          tabButtons.forEach((btn) =>
+            btn.classList.replace("tab-active", "tab-inactive")
+          );
+          button.classList.replace("tab-inactive", "tab-active");
+          tabContents.forEach((content) => {
+            content.id === `tab-content-${tab}`
+              ? content.classList.remove("hidden")
+              : content.classList.add("hidden");
+          });
+          if (tab === "business_details") {
+            tabsContainer.classList.add("sticky-tabs");
+          } else {
+            tabsContainer.classList.remove("sticky-tabs");
+          }
+        });
+      });
+
+      // Avatar upload (with localStorage save/restore)
+      // Avatar elements were removed from the DOM; guard any usage.
+      const avatarUploadEl = getEl("avatar-upload");
+      const changePicBtn = getEl("change-pic-btn");
+      if (changePicBtn && avatarUploadEl && avatarPreview) {
+        changePicBtn.addEventListener("click", () => avatarUploadEl.click());
+        avatarUploadEl.addEventListener("change", function () {
+          if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const base64Image = e.target.result;
+              avatarPreview.src = base64Image;
+              const userId = localStorage.getItem("userId");
+              if (userId) {
+                localStorage.setItem(`avatar_${userId}`, base64Image);
+              }
+              showToast("Avatar updated successfully.");
+            };
+            reader.readAsDataURL(this.files[0]);
+          }
+        });
+      }
+
+      // Business logo upload: read to base64 and preview, include in payload as `logo` field
+      if (logoInput) {
+        logoInput.addEventListener("change", function () {
+          if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const base64Image = e.target.result;
+              businessLogoBase64 = base64Image;
+              if (businessLogoPreview) businessLogoPreview.src = base64Image;
+              showToast("Logo updated locally.");
+            };
+            reader.readAsDataURL(this.files[0]);
+          }
+        });
+      }
+
+      // Password verification & update
+      verifyPasswordBtn.addEventListener("click", async () => {
+        const currentPassword = currentPasswordInput.value;
+        const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("token"); // <-- 1. Get the token
+
+        if (!currentPassword || !userId) {
+          showToast("Please enter your current password.");
+          return;
+        }
+        // Check for the token as well
+        if (!token) {
+          showToast("Authentication error. Please log in again.");
+          return;
+        }
+
+        setButtonLoading(verifyPasswordBtn, true);
+        try {
+          const verifyResponse = await fetch(
+            `http://Aixains-Mac-mini.local:8000/api/register/${userId}`,
+            {
+              method: "POST",
+              // 2. Add the headers object with Content-Type AND Authorization
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`, // <-- THE FIX IS HERE
+              },
+              body: JSON.stringify({ password: currentPassword }),
+            }
+          );
+          if (verifyResponse.ok) {
+            const result = await verifyResponse.json();
+            showToast(result.message || "Password verified successfully.");
+            currentPasswordInput.disabled = true;
+            verifyPasswordBtn.classList.add("hidden");
+            newPasswordContainer.classList.remove("hidden");
+          } else {
+            const result = await verifyResponse.json();
+            throw new Error(result.message || "Incorrect password.");
+          }
+        } catch (err) {
+          showToast(err.message || "Verification failed.");
+        } finally {
+          setButtonLoading(verifyPasswordBtn, false);
+        }
+      });
+
+      togglePasswordBtn.addEventListener("click", () => {
+        const isPassword = currentPasswordInput.type === "password";
+        currentPasswordInput.type = isPassword ? "text" : "password";
+        togglePasswordIcon.classList.toggle("fa-eye");
+        togglePasswordIcon.classList.toggle("fa-eye-slash");
+      });
+
+      passwordForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const newPassword = getEl("newPassword").value;
+        const confirmPassword = getEl("confirmPassword").value;
+        if (newPassword !== confirmPassword) {
+          showToast("New passwords do not match.");
+          return;
+        }
+        setButtonLoading(updatePasswordBtn, true);
+        try {
+          const userId = localStorage.getItem("userId");
+          const token = localStorage.getItem("token"); // 1. Get the token
+
+          if (!userId || !token) {
+            // 2. Check for both
+            throw new Error("No user ID found, please log in again.");
+          }
+
+          const payload = { password: newPassword };
+
+          const updateResponse = await fetch(
+            `http://Aixains-Mac-mini.local:8000/api/register/${userId}`,
+            {
+              method: "PATCH", // ✅ FIX: Use PATCH as allowed by the backend
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`, // ✅ FIX: Add the authorization header
+              },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          if (!updateResponse.ok) {
+            const errData = await updateResponse.json();
+            throw new Error(errData.message || "Password update failed.");
+          }
+          showToast("Password updated successfully!");
+          passwordForm.reset();
+          currentPasswordInput.disabled = false;
+          newPasswordContainer.classList.add("hidden");
+          verifyPasswordBtn.classList.remove("hidden");
+        } catch (err) {
+          console.error("Error updating password:", err);
+          showToast(err.message || "Could not update password.");
+        } finally {
+          setButtonLoading(updatePasswordBtn, false);
+        }
+      });
+      profileForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setButtonLoading(saveProfileBtn, true);
+
+        try {
+          const userId = localStorage.getItem("userId");
+          const token = localStorage.getItem("token"); // <-- 1. GET THE TOKEN
+
+          if (!userId || !token) {
+            // <-- Check for the token too
+            throw new Error("User not authenticated. Please log in again.");
+          }
+
+          // PART 1: Update normal profile details
+          const profilePayload = {
+            username: fullNameInput.value,
+            email: emailInput.value,
+            phone: phoneInput.value,
+          };
+
+          const profileResponse = await fetch(
+            `http://Aixains-Mac-mini.local:8000/api/register/${userId}`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`, // <-- 2. ADD AUTHORIZATION HEADER HERE
+              },
+              body: JSON.stringify(profilePayload),
+            }
+          );
+
+          if (!profileResponse.ok) {
+            // More specific error message
+            const errData = await profileResponse.json();
+            throw new Error(
+              errData.message || "Could not update profile details."
+            );
+          }
+
+          // PART 2: Update the country and business details using the business API
+          if (companyId) {
+            const countryName =
+              countries.find((c) => c.code === personalCountrySelect.value)
+                ?.name || "";
+            const businessPayload = {
+              // This just ensures all business data is saved, not just country
+              company_name: getEl("businessName").value,
+              team_size: getEl("teamSize").value,
+              website: getEl("website").value,
+              phone: getEl("business_phone").value,
+              email: getEl("business_email").value,
+              gst_no: getEl("gst").value,
+              currency: getEl("currency").value,
+              address: {
+                street: getEl("street").value,
+                city: getEl("city").value,
+                state: getEl("state").value,
+                postalCode: getEl("pincode").value,
+                country: countryName, // This specifically updates the country
+              },
+            };
+
+            const companyResponse = await fetch(
+              `http://Aixains-Mac-mini.local:8000/api/companies/${companyId}?user_id=${userId}`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`, // <-- 3. ADD AUTHORIZATION HEADER HERE TOO
+                },
+                body: JSON.stringify(businessPayload),
+              }
+            );
+            if (!companyResponse.ok) {
+              const errData = await companyResponse.json();
+              throw new Error(
+                errData.message || "Could not update business details."
+              );
+            }
+          }
+
+          showToast("Profile updated successfully!");
+          // Reload the page after 1 second to show the saved data
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } catch (err) {
+          console.error("Error saving profile:", err);
+          showToast(err.message); // Show the specific error from the backend
+          setButtonLoading(saveProfileBtn, false); // Stop loading ONLY on error
+        }
+      });
+
+      // Replace your existing 3 notification event listeners with this
+      notificationToggles.forEach((toggle) => {
+        if (toggle) {
+          toggle.addEventListener("change", (event) => {
+            const isEnabled = event.target.checked;
+            const toggleId = event.target.id;
+
+            // Save the current state (true or false) to localStorage
+            localStorage.setItem(toggleId, isEnabled);
+
+            // Determine the feature name for the toast message
+            let featureName = "";
+            if (toggleId === "email-notifications-toggle") {
+              featureName = "Email notifications";
+            } else if (toggleId === "order-alerts-toggle") {
+              featureName = "Order alerts";
+            } else if (toggleId === "weekly-summary-toggle") {
+              featureName = "Weekly summary";
+            }
+
+            showToast(
+              `${featureName} ${isEnabled ? "enabled" : "disabled"}.`
+            );
+          });
+        }
+      });
+
+      function loadNotificationSettings() {
+        notificationToggles.forEach((toggle) => {
+          if (toggle) {
+            // Get the saved state from localStorage (it will be a string 'true' or 'false')
+            const savedState = localStorage.getItem(toggle.id);
+
+            // Set the toggle's 'checked' property based on the saved state
+            // Defaults to false (unchecked) if no setting is found
+            toggle.checked = savedState === "true";
+          }
+        });
+      }
+
+      // Delete modal
+      function openDeleteModal() {
+        deleteModal.classList.remove("hidden");
+        deleteModal.classList.add("flex");
+        setTimeout(() => {
+          deleteModalOverlay.classList.replace("opacity-0", "opacity-50");
+          deleteModalPanel.classList.replace("scale-95", "scale-100");
+          deleteModalPanel.classList.replace("opacity-0", "opacity-100");
+        }, 10);
+      }
+      function closeDeleteModal() {
+        deleteModalOverlay.classList.replace("opacity-50", "opacity-0");
+        deleteModalPanel.classList.replace("scale-100", "scale-95");
+        deleteModalPanel.classList.replace("opacity-100", "opacity-0");
+        setTimeout(() => {
+          deleteModal.classList.add("hidden");
+          deleteModal.classList.remove("flex");
+        }, 300);
+      }
+      deleteAccountBtn.addEventListener("click", openDeleteModal);
+      cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+      deleteModalOverlay.addEventListener("click", closeDeleteModal);
+
+      // ======================================================
+      // === 🚨 Account Deletion Scheduling Logic 🚨 ===
+      // ======================================================
+      async function scheduleAccountDeletion() {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          showToast("Action failed: User not found. Please log in again.");
+          return;
+        }
+
+        const originalButtonText = confirmDeleteBtn.innerHTML;
+        setButtonLoading(confirmDeleteBtn, true);
+
+        try {
+          const response = await fetch(
+            `http://Aixains-Mac-mini.local:8000/api/register/schedule-deletion/${userId}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.message || "Failed to schedule account deletion."
+            );
+          }
+
+          closeDeleteModal();
+          showToast("Account scheduled for deletion in 30 days.");
+
+          // Log the user out and redirect after a delay
+          setTimeout(() => {
+            localStorage.clear(); // Clear user ID, tokens, etc.
+            window.location.href = "/login.html"; // Or your login page
+          }, 3000);
+        } catch (error) {
+          showToast(error.message);
+          setButtonLoading(confirmDeleteBtn, false, originalButtonText);
+        }
+      }
+
+      confirmDeleteBtn.addEventListener("click", scheduleAccountDeletion);
+
+      // === COUNTRY SYNC ===
+      function syncCountries(source, target) {
+        if (target.value !== source.value) {
+          target.value = source.value;
+        }
+      }
+
+      // Keep them in sync when a user makes a change
+      personalCountrySelect.addEventListener("change", () => {
+        syncCountries(personalCountrySelect, businessCountrySelect);
+      });
+
+      businessCountrySelect.addEventListener("change", () => {
+        syncCountries(businessCountrySelect, personalCountrySelect);
+      });
+
+      // This function runs once after all data is loaded to sync the initial state
+      function initialCountrySync() {
+        // If the business dropdown has a value and the personal one doesn't, sync it.
+        if (businessCountrySelect.value && !personalCountrySelect.value) {
+          syncCountries(businessCountrySelect, personalCountrySelect);
+        }
+      }
+      // Keep them in sync when changed
+      personalCountrySelect.addEventListener("change", () => {
+        syncCountries(personalCountrySelect, businessCountrySelect);
+      });
+
+      businessCountrySelect.addEventListener("change", () => {
+        syncCountries(businessCountrySelect, personalCountrySelect);
+      });
+
+      // Initial sync after loading data
+      function initialCountrySync() {
+        if (!personalCountrySelect.value && businessCountrySelect.value) {
+          // If personal is empty, copy from business
+          syncCountries(businessCountrySelect, personalCountrySelect);
+        } else if (
+          personalCountrySelect.value &&
+          !businessCountrySelect.value
+        ) {
+          // If business is empty, copy from personal
+          syncCountries(personalCountrySelect, businessCountrySelect);
+        }
+      }
+
+      personalCountrySelect.addEventListener("change", () => {
+        syncCountries(personalCountrySelect, businessCountrySelect);
+      });
+
+      businessCountrySelect.addEventListener("change", () => {
+        syncCountries(businessCountrySelect, personalCountrySelect);
+      });
+
+      // Run once after data is loaded
+      function initialCountrySync() {
+        if (personalCountrySelect.value) {
+          syncCountries(personalCountrySelect, businessCountrySelect);
+        } else if (businessCountrySelect.value) {
+          syncCountries(businessCountrySelect, personalCountrySelect);
+        }
+      }
+
+      // Business form
+      businessForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setButtonLoading(submitBtn, true);
+        try {
+          const userId = localStorage.getItem("userId");
+          if (!companyId || !userId)
+            throw new Error(
+              "Cannot update: Details not loaded or user not logged in."
+            );
+
+          const countryName =
+            countries.find((c) => c.code === businessCountrySelect.value)
+              ?.name || "";
+          const businessPayload = {
+            company_name: getEl("businessName").value,
+            team_size: getEl("teamSize").value,
+            website: getEl("website").value,
+            phone: getEl("business_phone").value,
+            email: getEl("business_email").value,
+            gst_no: getEl("gst").value,
+            currency: getEl("currency").value,
+            // include logo if selected/read
+            logo: businessLogoBase64,
+            address: {
+              street: getEl("street").value,
+              city: getEl("city").value,
+              state: getEl("state").value,
+              postalCode: getEl("pincode").value,
+              country: countryName,
+            },
+          };
+
+          // ... inside businessForm.addEventListener
+          const token = localStorage.getItem("token"); // <-- 1. Get the token
+          if (!token) {
+            showToast("Authentication error. Please log in again.");
+            setButtonLoading(submitBtn, false);
+            return;
+          }
+
+          const response = await fetch(
+            `http://Aixains-Mac-mini.local:8000/api/companies/${companyId}?user_id=${userId}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`, // <-- 2. Add this line
+              },
+              body: JSON.stringify(businessPayload),
+            }
+          );
+
+          if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.message || "Business update failed");
+          }
+
+          showToast("Business details updated successfully!");
+          // THIS IS THE FIX: Reload the page after 1 second
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } catch (err) {
+          showToast(err.message);
+          setButtonLoading(submitBtn, false); // Stop loading ONLY on error
+        }
+      });
+      // Sidebar Dropdown
+      const documentsDropdownBtn = getEl("documents-dropdown-btn");
+      const documentsDropdownContent = getEl("documents-dropdown-content");
+      const documentsDropdownIcon = getEl("dropdown-icon");
+
+      if (documentsDropdownBtn && documentsDropdownContent && documentsDropdownIcon) {
+        documentsDropdownBtn.addEventListener("click", () => {
+          documentsDropdownContent.classList.toggle("open");
+          // rotate the chevron using Tailwind's rotate class
+          documentsDropdownIcon.classList.toggle("rotate-180");
+        });
+      }
+
+      const purchasesDropdownBtn = getEl("purchases-dropdown-btn");
+      const purchasesDropdownContent = getEl("purchases-dropdown-content");
+      const purchasesDropdownIcon = getEl("purchases-dropdown-icon");
+
+      if (purchasesDropdownBtn && purchasesDropdownContent && purchasesDropdownIcon) {
+        purchasesDropdownBtn.addEventListener("click", () => {
+          purchasesDropdownContent.classList.toggle("open");
+          purchasesDropdownIcon.classList.toggle("rotate-180");
+        });
+      }
+
+      // =================================================
+      // SECTION 7: INIT
+      // =================================================
+      async function initializePage() {
+        // restore avatar if saved
+        // Restore avatar for the specific logged-in user
+        const userId = localStorage.getItem("userId");
+        if (userId) {
+          const savedAvatar = localStorage.getItem(`avatar_${userId}`);
+          if (savedAvatar) {
+            avatarPreview.src = savedAvatar;
+          }
+        }
+
+        populateCountryDropdowns();
+        if (saveProfileBtn)
+          saveProfileBtn.dataset.originalText = saveProfileBtn.innerHTML;
+        if (updatePasswordBtn)
+          updatePasswordBtn.dataset.originalText =
+            updatePasswordBtn.innerHTML;
+        if (verifyPasswordBtn)
+          verifyPasswordBtn.dataset.originalText =
+            verifyPasswordBtn.innerHTML;
+        if (submitBtn) submitBtn.dataset.originalText = submitBtn.innerHTML;
+
+        // Wait for both loading functions to complete before continuing
+        await Promise.all([loadSettings(), loadBusinessDetails()]);
+
+        loadNotificationSettings();
+
+        // Now that the data is guaranteed to be loaded, sync the dropdowns
+        initialCountrySync();
+      }
+      initializePage();
+      
+// ADD THIS JAVASCRIPT CODE to your existing <script> section
+// Place it inside the DOMContentLoaded event listener
+
+// ===== BANK DETAILS MANAGEMENT =====
+const BANK_API_URL = 'http://Aixains-Mac-mini.local:8000/api/banks';
+let currentBankId = null;
+let bankToDelete = null;
+
+// Modal elements
+const bankModal = getEl('bank-modal');
+const bankModalOverlay = getEl('bank-modal-overlay');
+const bankModalPanel = getEl('bank-modal-panel');
+const bankModalTitle = getEl('bank-modal-title');
+const closeBankModalBtn = getEl('close-bank-modal');
+const addBankBtn = getEl('add-bank-btn');
+const cancelBankBtn = getEl('cancel-bank-btn');
+const bankForm = getEl('bank-form');
+const saveBankBtn = getEl('save-bank-btn');
+const banksListContainer = getEl('banks-list-container');
+
+// Delete modal
+const deleteBankModal = getEl('delete-bank-modal');
+const deleteBankModalOverlay = getEl('delete-bank-modal-overlay');
+const deleteBankModalPanel = getEl('delete-bank-modal-panel');
+const confirmDeleteBankBtn = getEl('confirm-delete-bank-btn');
+const cancelDeleteBankBtn = getEl('cancel-delete-bank-btn');
+
+// Open/Close Bank Modal
+function openBankModal(isEdit = false, bankData = null) {
+  currentBankId = bankData?._id || null;
+  bankModalTitle.textContent = isEdit ? 'Edit Bank Account' : 'Add Bank Account';
+  
+  if (isEdit && bankData) {
+    getEl('bank-id').value = bankData._id || '';
+    getEl('bank_name').value = bankData.bank_name || '';
+    getEl('account_holder').value = bankData.account_holder || '';
+    getEl('account_number').value = bankData.account_number || '';
+    getEl('ifsc_code').value = bankData.ifsc_code || '';
+    getEl('branch_name').value = bankData.branch_name || '';
+    getEl('account_type').value = bankData.account_type || '';
+    getEl('upi_id').value = bankData.upi_id || '';
+  } else {
+    bankForm.reset();
+  }
+  
+  bankModal.classList.remove('hidden');
+  bankModal.classList.add('flex');
+  setTimeout(() => {
+    bankModalOverlay.classList.replace('opacity-0', 'opacity-50');
+    bankModalPanel.classList.replace('scale-95', 'scale-100');
+    bankModalPanel.classList.replace('opacity-0', 'opacity-100');
+  }, 10);
+}
+
+function closeBankModal() {
+  bankModalOverlay.classList.replace('opacity-50', 'opacity-0');
+  bankModalPanel.classList.replace('scale-100', 'scale-95');
+  bankModalPanel.classList.replace('opacity-100', 'opacity-0');
+  setTimeout(() => {
+    bankModal.classList.add('hidden');
+    bankModal.classList.remove('flex');
+    bankForm.reset();
+    currentBankId = null;
+  }, 300);
+}
+
+// Open/Close Delete Modal
+function openDeleteBankModal(bankId) {
+  bankToDelete = bankId;
+  deleteBankModal.classList.remove('hidden');
+  deleteBankModal.classList.add('flex');
+  setTimeout(() => {
+    deleteBankModalOverlay.classList.replace('opacity-0', 'opacity-50');
+    deleteBankModalPanel.classList.replace('scale-95', 'scale-100');
+    deleteBankModalPanel.classList.replace('opacity-0', 'opacity-100');
+  }, 10);
+}
+
+function closeDeleteBankModal() {
+  deleteBankModalOverlay.classList.replace('opacity-50', 'opacity-0');
+  deleteBankModalPanel.classList.replace('scale-100', 'scale-95');
+  deleteBankModalPanel.classList.replace('opacity-100', 'opacity-0');
+  setTimeout(() => {
+    deleteBankModal.classList.add('hidden');
+    deleteBankModal.classList.remove('flex');
+    bankToDelete = null;
+  }, 300);
+}
+
+// Load banks
+async function loadBanks() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('No token, skipping bank load');
+      return;
+    }
+
+    const response = await fetch(BANK_API_URL, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        banksListContainer.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <i class="fas fa-university text-4xl mb-2"></i>
+            <p>No bank accounts added yet.</p>
+          </div>
+        `;
+        return;
+      }
+      throw new Error('Failed to load banks');
+    }
+
+    const banks = await response.json();
+    
+    if (!banks || banks.length === 0) {
+      banksListContainer.innerHTML = `
+        <div class="text-center py-8 text-gray-500">
+          <i class="fas fa-university text-4xl mb-2"></i>
+          <p>No bank accounts added yet.</p>
+        </div>
+      `;
+      return;
+    }
+
+    banksListContainer.innerHTML = banks.map(bank => `
+      <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fas fa-university text-indigo-600"></i>
+              <h3 class="font-semibold text-lg" style="color: #000;">${bank.bank_name || 'N/A'}</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <p><span class="text-gray-600">Account Holder:</span> <span class="font-medium" style="color: #000;">${bank.account_holder || 'N/A'}</span></p>
+              <p><span class="text-gray-600">Account Number:</span> <span class="font-medium" style="color: #000;">****${bank.account_number?.slice(-4) || 'N/A'}</span></p>
+              <p><span class="text-gray-600">IFSC Code:</span> <span class="font-medium" style="color: #000;">${bank.ifsc_code || 'N/A'}</span></p>
+              <p><span class="text-gray-600">Branch:</span> <span class="font-medium" style="color: #000;">${bank.branch_name || 'N/A'}</span></p>
+              ${bank.upi_id ? `<p><span class="text-gray-600">UPI ID:</span> <span class="font-medium" style="color: #000;">${bank.upi_id}</span></p>` : ''}
+              ${bank.account_type ? `<p><span class="text-gray-600">Type:</span> <span class="font-medium" style="color: #000;">${bank.account_type}</span></p>` : ''}
+            </div>
+          </div>
+          <div class="flex gap-2 ml-4">
+            <button class="edit-bank-btn text-indigo-600 hover:text-indigo-800 p-2" data-bank='${JSON.stringify(bank)}'>
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="delete-bank-btn text-red-600 hover:text-red-800 p-2" data-bank-id="${bank._id}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    // Attach event listeners to edit and delete buttons
+    document.querySelectorAll('.edit-bank-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const bankData = JSON.parse(e.currentTarget.dataset.bank);
+        openBankModal(true, bankData);
+      });
+    });
+
+    document.querySelectorAll('.delete-bank-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const bankId = e.currentTarget.dataset.bankId;
+        openDeleteBankModal(bankId);
+      });
+    });
+
+  } catch (error) {
+    console.error('Error loading banks:', error);
+    showToast('Failed to load bank accounts');
+  }
+}
+
+// Save bank (Create or Update)
+bankForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  setButtonLoading(saveBankBtn, true);
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Not authenticated');
+
+    const bankData = {
+      bank_name: getEl('bank_name').value.trim(),
+      account_holder: getEl('account_holder').value.trim(),
+      account_number: getEl('account_number').value.trim(),
+      ifsc_code: getEl('ifsc_code').value.trim().toUpperCase(),
+      branch_name: getEl('branch_name').value.trim(),
+      account_type: getEl('account_type').value,
+      upi_id: getEl('upi_id').value.trim()
+    };
+
+    const isEdit = !!currentBankId;
+    const url = isEdit ? `${BANK_API_URL}/${currentBankId}` : BANK_API_URL;
+    const method = isEdit ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(bankData)
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.message || 'Failed to save bank account');
+    }
+
+    showToast(isEdit ? 'Bank account updated successfully!' : 'Bank account added successfully!');
+    closeBankModal();
+    await loadBanks();
+  } catch (error) {
+    console.error('Error saving bank:', error);
+    showToast(error.message);
+  } finally {
+    setButtonLoading(saveBankBtn, false);
+  }
+});
+
+// Delete bank
+confirmDeleteBankBtn.addEventListener('click', async () => {
+  if (!bankToDelete) return;
+
+  setButtonLoading(confirmDeleteBankBtn, true);
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Not authenticated');
+
+    const response = await fetch(`${BANK_API_URL}/${bankToDelete}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.message || 'Failed to delete bank account');
+    }
+
+    showToast('Bank account deleted successfully!');
+    closeDeleteBankModal();
+    await loadBanks();
+  } catch (error) {
+    console.error('Error deleting bank:', error);
+    showToast(error.message);
+  } finally {
+    setButtonLoading(confirmDeleteBankBtn, false);
+  }
+});
+
+// Event Listeners
+addBankBtn.addEventListener('click', () => openBankModal(false));
+closeBankModalBtn.addEventListener('click', closeBankModal);
+cancelBankBtn.addEventListener('click', closeBankModal);
+bankModalOverlay.addEventListener('click', closeBankModal);
+
+cancelDeleteBankBtn.addEventListener('click', closeDeleteBankModal);
+deleteBankModalOverlay.addEventListener('click', closeDeleteBankModal);
+
+// Load banks when Bank Details tab is clicked
+tabButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const tab = button.dataset.tab;
+    if (tab === 'bank_details') {
+      loadBanks();
+    }
+  });
+});
+
+    });
+  </script>
+  
+</body>
+
+</html>

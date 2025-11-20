@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f9fafb;
+    }
+
+    .signup-container {
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .form-section {
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 2.5rem;
+      background-color: white;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+        0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    .input-field {
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      padding: 0.75rem 1rem;
+      transition: all 0.2s ease;
+      width: 100%;
+      font-size: 0.875rem;
+    }
+
+    .input-field:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+      outline: none;
+    }
+
+    .input-field.error {
+      border-color: #ef4444;
+    }
+
+    .btn {
+      padding: 0.75rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      width: 100%;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background-color: #4f46e5;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #4338ca;
+    }
+
+    .btn-primary:disabled {
+      background-color: #a5b4fc;
+      cursor: not-allowed;
+    }
+
+    .btn-link {
+      color: #4f46e5;
+      font-weight: 500;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="signup-container">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800 flex items-center justify-center">
+        <i class=" mr-3 text-indigo-500"></i>
+        FORNOW
+      </h1>
+    </div>
+
+    <div class="form-section">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Create an account</h2>
+        <p class="text-sm text-gray-500 mt-2">
+          Start your journey with us today.
+        </p>
+      </div>
+
+      <form id="signup-form" class="space-y-6">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+            Username
+          </label>
+          <input type="text" id="username" name="username" class="input-field" placeholder="Enter your username"
+            required />
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+            Email
+          </label>
+          <input type="email" id="email" name="email" class="input-field" placeholder="you@example.com" required />
+        </div>
+
+        <div>
+          <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+            Phone Number
+          </label>
+          <input type="tel" id="phone" name="phone" class="input-field" placeholder="Enter your phone number"
+            pattern="[0-9]{10}" required />
+          <p class="text-xs text-gray-500 mt-1">Enter 10-digit phone number</p>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
+          <input type="password" id="password" name="password" class="input-field" placeholder="••••••••" minlength="6"
+            required />
+        </div>
+
+        <div>
+          <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">
+            Confirm Password
+          </label>
+          <input type="password" id="confirm-password" name="confirm-password" class="input-field"
+            placeholder="••••••••" required />
+          <p id="password-error" class="text-red-500 text-xs mt-2 hidden">
+            Passwords do not match.
+          </p>
+        </div>
+
+        <div>
+          <button type="submit" id="submit-button" class="btn btn-primary mt-2">
+            Create Account
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="text-center mt-6">
+      <p class="text-sm text-gray-600">
+        Already have an account?
+        <a href="../index.html" class="btn-link font-semibold">
+          Login
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // CONFIG: Update to your backend base URL (match `index.html`)
+      // Examples:
+      // - 'http://localhost:5000'
+      // - 'http://192.168.1.8:5000'
+      // - 'https://api.yourcompany.com'
+      const API_BASE_URL = 'http://Aixains-Mac-mini.local:8000';
+
+      const signupForm = document.getElementById("signup-form");
+      const passwordInput = document.getElementById("password");
+      const confirmPasswordInput = document.getElementById("confirm-password");
+      const passwordError = document.getElementById("password-error");
+      const submitButton = document.getElementById("submit-button");
+
+      signupForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        // Reset errors
+        passwordInput.classList.remove("error");
+        confirmPasswordInput.classList.remove("error");
+        passwordError.classList.add("hidden");
+
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        // --- 1. VALIDATION ---
+        if (password !== confirmPassword) {
+          passwordError.classList.remove("hidden");
+          passwordInput.classList.add("error");
+          confirmPasswordInput.classList.add("error");
+          confirmPasswordInput.focus();
+          return; // Stop the function if passwords don't match
+        }
+
+        // Disable button to prevent multiple submissions
+        submitButton.disabled = true;
+        submitButton.textContent = 'Creating...';
+
+
+        // --- 2. GATHER FORM DATA ---
+        // The backend expects: username, password, email, phone
+        const formData = {
+          username: document.getElementById("username").value,
+          email: document.getElementById("email").value,
+          phone: document.getElementById("phone").value,
+          password: password,
+        };
+
+        // --- 3. SEND DATA TO API ---
+        fetch(`${API_BASE_URL}/api/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        })
+          .then(response => {
+            if (!response.ok) {
+              // If server returns an error (like 400, 409, 500)
+              // read the error message from the response body
+              return response.json().then(err => { throw new Error(err.message || 'Registration failed.') });
+            }
+            // If response is OK (like 200, 201)
+            return response.json();
+          })
+          .then(data => {
+            // --- 4. HANDLE SUCCESS ---
+            console.log("Success:", data);
+
+            // Store token if backend returns it (optional but recommended)
+            if (data.token || data.accessToken) {
+              try {
+                const token = data.token || data.accessToken;
+                localStorage.setItem('auth_token', token);
+                localStorage.setItem('auth_scheme', 'Bearer');
+                localStorage.setItem('token', token);
+              } catch (e) { /* ignore storage errors */ }
+            }
+
+            // *THE FIX:* Check if the server sent back the user's data and ID
+            if (data.user && data.user._id) {
+              // Save the unique user ID to the browser's local storage
+              localStorage.setItem('userId', data.user._id);
+
+              alert("Account created! Let's set up your business details.");
+              window.location.href = "businessDetails.html";
+            } else {
+              // If the ID is missing, we can't continue.
+              throw new Error("Registration was successful, but no user ID was returned.");
+            }
+          })
+          .catch((error) => {
+            // --- 5. HANDLE FAILURE ---
+            console.error("Error:", error);
+            // Display the error message from the server or a generic one
+            alert(`Error: ${error.message}`);
+            // Re-enable the button on failure
+            submitButton.disabled = false;
+            submitButton.textContent = 'Create Account';
+          });
+      });
+    });
+  </script>
+</body>
+
+</html>

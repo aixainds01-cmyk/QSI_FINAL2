@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quotation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .form-container {
+            max-width: 960px;
+            margin: 2rem auto;
+        }
+
+        .form-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            background-color: white;
+        }
+
+        .input-field {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            font-size: 0.875rem;
+        }
+
+        .input-field:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+
+        .btn {
+            padding: 0.625rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-primary:disabled {
+            background-color: #a5b4fc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-link {
+            color: #4f46e5;
+            font-weight: 500;
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .item-table-header {
+            background-color: #4c1d95;
+            color: white;
+        }
+
+        .item-row {
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+
+        #client-modal-panel {
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.2s ease-in-out;
+        }
+
+        #client-modal.show #client-modal-panel {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #quotation-display-content,
+            #quotation-display-content * {
+                visibility: visible;
+            }
+
+            #quotation-display-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* ensure the "glass" overlay blur works across browsers */
+        #client-modal-backdrop {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* animation target when modal becomes visible */
+        #client-modal.show #client-modal-panel {
+            transform: scale(1);
+            opacity: 1;
+        }
+@media (max-width: 768px) {
+  #main-content {
+    margin-top: 64px; /* height of the fixed header */
+  }
+}
+        /* small responsive tweaks */
+        @media (min-width: 640px) {
+            #client-modal-panel {
+                max-width: 680px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="flex">
+    <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+  <div class="flex items-center space-x-3">
+    <button id="menu-toggle" class="text-white focus:outline-none">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+    <span class="text-xl font-bold">QSI</span>
+  </div>
+</header>
+
+
+<!-- ✅ BACKDROP for mobile -->
+<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+<!-- ✅ SIDEBAR -->
+<aside id="sidebar"
+  class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class=" mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="dashboard_without_login.html"
+                    class="sidebar-link active flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-500 bg-indigo-600">
+                    <i class="fas fa-home mr-3 icon"></i><span class="text">Dashboard</span>
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn"
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon"
+                            class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="quotation_without_login.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="salesorder_withoutlogin.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales
+                            Order</a>
+                        <a href="invoice_without_login.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                    </div>
+                </div>
+                
+            </nav>
+        </aside>
+
+        <div class="flex-1 overflow-y-auto">
+            <main id="form-view" class="form-container">
+                <form id="quotation-form">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center space-x-2">
+                            <h1 class="text-3xl font-bold text-gray-800">Create Quotation</h1>
+                            
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            
+                            <button type="submit" id="save-btn" class="btn btn-primary">Save & Continue</button>
+                        </div>
+                    </div>
+                    <div class="form-section space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                    <label for="quotation-no" class="text-gray-600 text-sm">Quotation No.*</label>
+                                    <input type="text" id="quotation-no" class="input-field col-span-2"
+                                        value="QTN0001">
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                    <label for="quotation-date" class="text-gray-600 text-sm">Quotation Date</label>
+                                    <input type="date" id="quotation-date" class="input-field col-span-2">
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                    <label for="valid-till-date" class="text-gray-600 text-sm">Valid Till</label>
+                                    <input type="date" id="valid-till-date" class="input-field col-span-2">
+                                </div>
+                                <button type="button" class="btn-link text-sm"><i class="fas fa-plus mr-1"></i>Add More
+                                    Fields</button>
+                            </div>
+                            <div id="logo-uploader"
+                                class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50 relative">
+                                <div id="logo-preview-container" class="hidden absolute inset-0 p-2"><img
+                                        id="logo-preview" src="" class="object-contain w-full h-full"></div>
+                                <div id="logo-placeholder">
+                                    <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-indigo-600 font-semibold">Add Business Logo</p>
+                                    <p class="text-xs text-gray-500 mt-1">Recommended: 240px, 240px, PNG or JPEG</p>
+                                </div>
+                                <input type="file" id="logo-input"
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    accept="image/png, image/jpeg">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="border rounded-lg p-4 space-y-2">
+                                <h3 class="font-semibold text-gray-700">From <span class="text-gray-400 text-sm">(Your
+                                        Details)</span></h3>
+                                <input type="text" id="from-name" class="input-field" placeholder="Business Name">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="from-city" class="input-field" placeholder="City">
+                                    <input type="text" id="from-country" class="input-field" placeholder="Country">
+                                </div>
+                            </div>
+                            <div class="border rounded-lg p-4 space-y-2">
+                                    <h3 class="font-semibold text-gray-700">
+                                        Billed To <span class="text-gray-400 text-sm">(Client's Details)</span>
+                                    </h3>
+                                    <div>
+                                        <label for="clientName" class="text-sm font-medium text-gray-600">
+                                            Client Name
+                                        </label>
+                                        <input type="text" id="clientName" class="input-field"
+                                            placeholder="Client's Business Name" required />
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label for="client_city" class="text-sm font-medium text-gray-600">
+                                                City
+                                            </label>
+                                            <input type="text" id="client_city" class="input-field"
+                                                placeholder="Client's City" required />
+                                        </div>
+                                        <div>
+                                            <label for="client_country" class="text-sm font-medium text-gray-600">
+                                                Country
+                                            </label>
+                                            <input type="text" id="client_country" class="input-field"
+                                                placeholder="Client's Country" required />
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+
+                        <div>
+                            <div class="item-table-header grid grid-cols-12 gap-4 p-3 rounded-t-lg text-sm">
+                                <h4 class="col-span-5 font-semibold">Item</h4>
+                                <h4 class="col-span-2 font-semibold text-right">Quantity</h4>
+                                <h4 class="col-span-2 font-semibold text-right">Rate</h4>
+                                <h4 class="col-span-3 font-semibold text-right">Amount</h4>
+                            </div>
+                            <div id="items-container" class="space-y-2 py-2">
+                                <div class="item-row space-y-3">
+                                    <div class="grid grid-cols-12 gap-4 items-start">
+                                        <div class="col-span-5"><input type="text"
+                                                class="item-name input-field font-semibold"></div>
+                                        <div class="col-span-2"><input type="number"
+                                                class="quantity input-field text-right"></div>
+                                        <div class="col-span-2"><input type="number"
+                                                class="rate input-field text-right"></div>
+                                        <div class="col-span-3 flex items-start justify-end gap-x-3">
+                                            <span class="amount font-semibold text-gray-800 mt-2">₹5,500.00</span>
+                                            <button type="button"
+                                                class="remove-item-btn text-gray-400 hover:text-red-500 pt-1"><i
+                                                    class="fas fa-trash-alt"></i></button>
+                                        </div>
+                                    </div>
+                                    <div><textarea placeholder="Add Description" rows="1"
+                                            class="description input-field w-full text-sm" ></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <button type="button" id="add-item-btn" class="btn-link text-sm font-semibold"><i
+                                        class="fas fa-plus mr-1"></i>Add New Line</button>
+                                
+                            </div>
+                        </div>
+
+                       <div class="pt-4 border-t flex justify-end">
+  <div class="w-full md:w-1/3 space-y-2">
+    <div class="flex justify-between items-center">
+      <span class="text-gray-600">Subtotal</span>
+      <span class="font-semibold text-gray-800" id="subtotal">₹5,500.00</span>
+    </div>
+    <div class="flex justify-between items-center">
+      <span class="text-gray-600 flex items-center">
+        Tax (<input type="number" id="tax-percentage" value="10"
+          class="input-field w-16 mx-1 text-right p-1 h-7">%)
+      </span>
+      <span class="font-semibold text-gray-800" id="total-tax">₹550.00</span>
+    </div>
+    <div class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
+      <span class="font-bold text-lg text-gray-800">Total (INR)</span>
+      <span class="font-bold text-lg text-gray-800" id="grand-total">₹6,050.00</span>
+    </div>
+  </div>
+</div>
+
+
+                        <div class="flex flex-wrap gap-2 pt-4 border-t">
+                            <button type="button" class="toggle-section-btn btn-small btn btn-secondary"
+                                data-target="terms-section"><i class="fas fa-plus fa-xs mr-1"></i>Add Terms &
+                                Conditions</button>
+                            <button type="button" class="toggle-section-btn btn-small btn btn-secondary"
+                                data-target="notes-section"><i class="fas fa-plus fa-xs mr-1"></i>Add Notes</button>
+                            <button type="button" class="toggle-section-btn btn-small btn btn-secondary"
+                                data-target="signature-section"><i class="fas fa-plus fa-xs mr-1"></i>Add
+                                Signature</button>
+                            <!-- Hidden sections for Notes / Terms / Signature -->
+<div id="terms-section" class="hidden mt-4">
+  <label for="terms-input" class="block text-gray-700 text-sm font-medium mb-1">Terms & Conditions</label>
+  <textarea id="terms-input" rows="3" class="input-field w-full" placeholder="Enter terms and conditions..." value="thank you!"></textarea>
+</div>
+
+<div id="notes-section" class="hidden mt-4">
+  <label for="notes-input" class="block text-gray-700 text-sm font-medium mb-1">Notes</label>
+  <textarea id="notes-input" rows="3" class="input-field w-full" placeholder="Enter additional notes..." value="Thanks For Business With Us"></textarea>
+</div>
+
+<div id="signature-section" class="hidden mt-4">
+  <label for="signature-input" class="block text-gray-700 text-sm font-medium mb-1">Signature / Authorised Signatory</label>
+  <input type="text" id="signature-input" class="input-field w-full" placeholder="Enter name for signature" />
+</div>
+
+                        </div>
+
+                        
+                        
+                        
+
+
+                        
+                        
+                    </div>
+                </form>
+            </main>
+
+            <main id="display-view" class="p-6 md:p-10 hidden">
+  <div id="quotation-display-content" class="bg-white p-10 rounded-lg shadow-lg max-w-3xl mx-auto text-gray-800">
+
+    <!-- Header Section -->
+    <header class="flex justify-between items-start mb-6">
+      <div class="flex flex-col">
+        <img id="q-logo" src="" alt="Logo" class="w-24 mb-2">
+        <h2 id="q-company-name" class="text-base font-semibold"></h2>
+      </div>
+      <div class="text-right">
+        <h1 class="text-2xl font-bold tracking-wide mb-1">QUOTATION</h1>
+        <p class="text-sm"><span class="font-semibold">Quotation No:</span> <span id="q-no"></span></p>
+        <p class="text-sm"><span class="font-semibold">Date:</span> <span id="q-date"></span></p>
+        <p class="text-sm"><span class="font-semibold">Valid Till:</span> <span id="q-valid-till"></span></p>
+      </div>
+    </header>
+
+    <!-- From / To Section -->
+    <section class="grid grid-cols-2 gap-8 mb-6 text-sm">
+      <div>
+        <p class="font-semibold text-gray-700 mb-1">From:</p>
+        <p id="q-from-name" class="font-medium"></p>
+        <p id="q-from-address" class="text-gray-600 text-sm"></p>
+      </div>
+      <div>
+        <p class="font-semibold text-gray-700 mb-1">To:</p>
+        <p id="q-to-name" class="font-medium"></p>
+        <p id="q-to-address" class="text-gray-600 text-sm"></p>
+      </div>
+    </section>
+
+    <!-- Items Table -->
+    <section class="mb-6">
+      <table class="w-full border border-gray-300 text-sm">
+        <thead class="bg-gray-100 border-b border-gray-300">
+          <tr class="text-left">
+            <th class="py-2 px-3 border-r border-gray-300 w-[45%]">Item Name</th>
+            <th class="py-2 px-3 border-r border-gray-300 text-center w-[15%]">Quantity</th>
+            <th class="py-2 px-3 border-r border-gray-300 text-right w-[20%]">Rate</th>
+            <th class="py-2 px-3 text-right w-[20%]">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="items-display-container"></tbody>
+      </table>
+    </section>
+
+    <!-- Summary Section -->
+    <section class="flex justify-end mb-8">
+      <div class="w-64 text-sm space-y-1">
+        <div class="flex justify-between"><span>Sub Total:</span><span id="summary-subtotal" class="font-medium"></span></div>
+        <div class="flex justify-between"><span>Tax (<span id="tax-rate"></span>%):</span><span id="summary-tax" class="font-medium"></span></div>
+        <hr class="border-gray-300 my-1">
+        <div class="flex justify-between font-bold text-base"><span>Total Amount:</span><span id="summary-total"></span></div>
+      </div>
+    </section>
+
+    <!-- Notes and Terms -->
+    <section class="text-sm mb-8">
+      <p><span class="font-semibold">Notes:</span> <span id="q-notes"></span></p>
+      <p class="mt-2"><span class="font-semibold">Terms and Conditions:</span> <span id="q-terms"></span></p>
+    </section>
+
+    <!-- Signature -->
+    <section class="flex justify-end mt-12">
+      <div id="q-signature-block" class="text-right hidden">
+        <p class="font-semibold" id="q-signature-name"></p>
+        <p class="text-xs text-gray-600 mt-1">Authorised Signatory</p>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="p-6 bg-gray-50 border-t sticky bottom-0 z-10 no-print">
+    <div class="max-w-3xl mx-auto flex justify-end gap-x-4">
+      <button id="edit-btn" class="btn btn-secondary"><i class="fas fa-edit mr-2"></i>Edit</button>
+      <button id="download-pdf-btn"
+        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow"><i
+          class="fas fa-file-pdf mr-2"></i>Download as PDF</button>
+    </div>
+  </footer>
+</main>
+
+        </div>
+    </div>
+
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formView = document.getElementById('form-view');
+            const displayView = document.getElementById('display-view');
+            const quotationForm = document.getElementById('quotation-form');
+            const itemsContainer = document.getElementById('items-container');
+            const addItemBtn = document.getElementById('add-item-btn');
+            const logoInput = document.getElementById('logo-input');
+            const editBtn = document.getElementById('edit-btn');
+            const downloadPdfBtn = document.getElementById('download-pdf-btn');
+            const clientModal = document.getElementById('client-modal');
+            const addNewClientBtn = document.getElementById('add-new-client-btn');
+            const clientModalClose = document.getElementById('client-modal-close');
+            const clientModalCancel = document.getElementById('client-modal-cancel');
+            const clientForm = document.getElementById('client-form');
+            let logoDataUrl = 'https://placehold.co/200x100?text=Your+Logo';
+const menuToggle = document.getElementById("menu-toggle");
+const sidebar = document.getElementById("sidebar");
+const menuBackdrop = document.getElementById("menu-backdrop");
+
+if (menuToggle && sidebar && menuBackdrop) {
+  menuToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("-translate-x-full");
+    menuBackdrop.classList.toggle("hidden");
+  });
+
+  menuBackdrop.addEventListener("click", () => {
+    sidebar.classList.add("-translate-x-full");
+    menuBackdrop.classList.add("hidden");
+  });
+}
+            const setInitialDates = () => {
+                const today = new Date();
+                const todayString = today.toISOString().split('T')[0];
+                document.getElementById('quotation-date').value = todayString;
+
+                const validTill = new Date();
+                validTill.setDate(today.getDate() + 15);
+                document.getElementById('valid-till-date').value = validTill.toISOString().split('T')[0];
+            };
+
+            const formatCurrency = (value) => `₹${Number(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            const updateFormTotals = () => {
+                let subtotal = 0;
+                document.querySelectorAll('#items-container .item-row').forEach(row => {
+                    const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+                    const rate = parseFloat(row.querySelector('.rate').value) || 0;
+                    const amount = quantity * rate;
+                    row.querySelector('.amount').textContent = formatCurrency(amount);
+                    subtotal += amount;
+                });
+                const taxPercentage = parseFloat(document.getElementById('tax-percentage').value) || 0;
+                const totalTax = subtotal * (taxPercentage / 100);
+
+                document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+                document.getElementById('total-tax').textContent = formatCurrency(totalTax);
+                document.getElementById('grand-total').textContent = formatCurrency(subtotal + totalTax);
+            };
+
+            const createItemRow = () => {
+                const itemRow = document.createElement('div');
+                itemRow.className = 'item-row space-y-3';
+                itemRow.innerHTML = `
+                <div class="grid grid-cols-12 gap-4 items-start">
+                    <div class="col-span-5"><input type="text" class="item-name input-field font-semibold" placeholder="Item Name"></div>
+                    <div class="col-span-2"><input type="number" class="quantity input-field text-right" value="1"></div>
+                    <div class="col-span-2"><input type="number" class="rate input-field text-right" value="0"></div>
+                    <div class="col-span-3 flex items-start justify-end gap-x-3">
+                        <span class="amount font-semibold text-gray-800 mt-2">₹0.00</span>
+                        <button type="button" class="remove-item-btn text-gray-400 hover:text-red-500 pt-1"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <div><textarea placeholder="Add Description" rows="1" class="description input-field w-full text-sm"></textarea></div>
+               `;
+                itemsContainer.appendChild(itemRow);
+                updateFormTotals();
+            };
+
+            const showDisplayView = (data) => {
+  // Header info
+  document.getElementById('q-no').textContent = data.quotationNo;
+  document.getElementById('q-date').textContent = new Date(data.quotationDate).toLocaleDateString('en-GB');
+  document.getElementById('q-valid-till').textContent = data.validTillDate
+    ? new Date(data.validTillDate).toLocaleDateString('en-GB')
+    : 'N/A';
+
+  // Company logo + info
+  const logoEl = document.getElementById('q-logo');
+  logoEl.src = data.logo || 'https://placehold.co/200x100?text=Your+Logo';
+  document.getElementById('q-company-name').textContent = data.from.name || '';
+
+  // From / To
+  document.getElementById('q-from-name').textContent = data.from.name || '';
+  document.getElementById('q-from-address').textContent = data.from.address || '';
+  document.getElementById('q-to-name').textContent = data.to.name || '';
+  document.getElementById('q-to-address').textContent = data.to.address || '';
+
+  // Notes + Terms
+  document.getElementById('q-terms').textContent = data.terms || '';
+  document.getElementById('q-notes').textContent = data.notes || '';
+
+  // Items Table
+  const tbody = document.getElementById('items-display-container');
+  tbody.innerHTML = '';
+  let subtotal = 0;
+
+  data.items.forEach((item) => {
+    const quantity = parseFloat(item.quantity) || 0;
+    const rate = parseFloat(item.rate) || 0;
+    const amount = quantity * rate;
+    subtotal += amount;
+
+    const tr = document.createElement('tr');
+    tr.className = 'border-t border-gray-200';
+    tr.innerHTML = `
+      <td class="py-2 px-3 border-r border-gray-200">${item.name || ''}</td>
+      <td class="py-2 px-3 border-r border-gray-200 text-center">${quantity}</td>
+      <td class="py-2 px-3 border-r border-gray-200 text-right">${formatCurrency(rate)}</td>
+      <td class="py-2 px-3 text-right font-medium">${formatCurrency(amount)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Totals
+  const taxRate = parseFloat(data.taxPercentage) || 0;
+  const totalTax = subtotal * (taxRate / 100);
+  const grandTotal = subtotal + totalTax;
+
+  document.getElementById('tax-rate').textContent = taxRate.toFixed(2);
+  document.getElementById('summary-subtotal').textContent = formatCurrency(subtotal);
+  document.getElementById('summary-tax').textContent = formatCurrency(totalTax);
+  document.getElementById('summary-total').textContent = formatCurrency(grandTotal);
+
+  // Signature
+  const sigBlock = document.getElementById('q-signature-block');
+  const sigName = document.getElementById('q-signature-name');
+  if (data.signatureName) {
+    sigName.textContent = data.signatureName;
+    sigBlock.classList.remove('hidden');
+  } else {
+    sigName.textContent = '';
+    sigBlock.classList.add('hidden');
+  }
+
+  formView.classList.add('hidden');
+  displayView.classList.remove('hidden');
+};
+
+
+            setInitialDates();
+            addItemBtn.addEventListener('click', createItemRow);
+
+            itemsContainer.addEventListener('input', updateFormTotals);
+            document.getElementById('tax-percentage').addEventListener('input', updateFormTotals);
+
+            itemsContainer.addEventListener('click', (e) => {
+                if (e.target.closest('.remove-item-btn')) {
+                    e.target.closest('.item-row').remove();
+                    updateFormTotals();
+                }
+            });
+
+            logoInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        logoDataUrl = event.target.result;
+                        document.getElementById('logo-preview').src = logoDataUrl;
+                        document.getElementById('logo-preview-container').classList.remove('hidden');
+                        document.getElementById('logo-placeholder').classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            quotationForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    // --- VALIDATION START ---
+    const fromName = document.getElementById('from-name').value.trim();
+    const billedTo = document.getElementById('billed-to-select').value.trim();
+    const itemRows = document.querySelectorAll('#items-container .item-row');
+
+    let errorMessages = [];
+
+    if (!fromName) {
+        errorMessages.push("Please enter your Business Name (From section).");
+    }
+
+    if (!billedTo || billedTo === "Select Client/ Business from the list") {
+        errorMessages.push("Please select a Client in the 'Billed To' section.");
+    }
+
+    if (itemRows.length === 0) {
+        errorMessages.push("Please add at least one item.");
+    }
+
+    itemRows.forEach((row, index) => {
+        const itemName = row.querySelector('.item-name').value.trim();
+        const qty = parseFloat(row.querySelector('.quantity').value);
+        const rate = parseFloat(row.querySelector('.rate').value);
+        if (!itemName) {
+            errorMessages.push(`Item ${index + 1}: Please enter an Item Name.`);
+        }
+        if (isNaN(qty) || qty <= 0) {
+            errorMessages.push(`Item ${index + 1}: Quantity must be greater than 0.`);
+        }
+        if (isNaN(rate) || rate <= 0) {
+            errorMessages.push(`Item ${index + 1}: Rate must be greater than 0.`);
+        }
+    });
+
+    if (errorMessages.length > 0) {
+        alert(errorMessages.join("\n"));
+        return; // stop submission
+    }
+    // --- VALIDATION END ---
+
+    // collect items
+    const items = [];
+    document.querySelectorAll('#items-container .item-row').forEach(row => {
+        items.push({
+            name: row.querySelector('.item-name').value,
+            description: row.querySelector('.description').value,
+            quantity: row.querySelector('.quantity').value,
+            rate: row.querySelector('.rate').value,
+        });
+    });
+
+    const quotationData = {
+        quotationNo: document.getElementById('quotation-no').value,
+        quotationDate: document.getElementById('quotation-date').value,
+        validTillDate: document.getElementById('valid-till-date').value,
+        from: {
+            name: fromName,
+            address: `${document.getElementById('from-city').value}, ${document.getElementById('from-country').value}`
+        },
+        to: { name: billedTo },
+        items: items,
+        taxPercentage: document.getElementById('tax-percentage').value,
+        logo: logoDataUrl,
+        terms: document.getElementById('terms-input').value,
+        notes: document.getElementById('notes-input').value,
+        signatureName: document.getElementById('signature-input').value,
+    };
+
+    showDisplayView(quotationData);
+});
+
+
+            editBtn.addEventListener('click', () => {
+                displayView.classList.add('hidden');
+                formView.classList.remove('hidden');
+            });
+
+            downloadPdfBtn.addEventListener('click', () => {
+                const element = document.getElementById('quotation-display-content');
+                const quotationNo = document.getElementById('q-no').textContent;
+                const opt = { margin: 0.5, filename: `Quotation-${quotationNo}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+                html2pdf().from(element).set(opt).save();
+            });
+
+            document.querySelectorAll('.toggle-section-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.dataset.target;
+                    const section = document.getElementById(targetId);
+                    const icon = btn.querySelector('i');
+                    const originalText = btn.textContent.trim().replace(/^(Add|Remove)\s/, '');
+
+                    if (section.classList.toggle('hidden')) {
+                        icon.classList.remove('fa-minus');
+                        icon.classList.add('fa-plus');
+                        btn.innerHTML = `<i class="fas fa-plus fa-xs mr-1"></i>Add ${originalText}`;
+                    } else {
+                        icon.classList.remove('fa-plus');
+                        icon.classList.add('fa-minus');
+                        btn.innerHTML = `<i class="fas fa-minus fa-xs mr-1"></i>Remove ${originalText}`;
+                    }
+                });
+            });
+
+            document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
+                document.getElementById('documents-dropdown-content').classList.toggle('hidden');
+                document.getElementById('dropdown-icon').classList.toggle('rotate-180');
+            });
+         quotationForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  // --- VALIDATION START ---
+  const fromName = document.getElementById('from-name').value.trim();
+  const fromCity = document.getElementById('from-city').value.trim();
+  const fromCountry = document.getElementById('from-country').value.trim();
+
+  const clientName = document.getElementById('clientName').value.trim();
+  const clientCity = document.getElementById('client_city').value.trim();
+  const clientCountry = document.getElementById('client_country').value.trim();
+
+  const itemRows = document.querySelectorAll('#items-container .item-row');
+  let errorMessages = [];
+
+  if (!fromName) errorMessages.push("Please enter your Business Name (From section).");
+  if (!clientName) errorMessages.push("Please enter the Client Name.");
+  if (itemRows.length === 0) errorMessages.push("Please add at least one item.");
+
+  itemRows.forEach((row, index) => {
+    const itemName = row.querySelector('.item-name').value.trim();
+    const qty = parseFloat(row.querySelector('.quantity').value);
+    const rate = parseFloat(row.querySelector('.rate').value);
+    if (!itemName) errorMessages.push(`Item ${index + 1}: Please enter an Item Name.`);
+    if (isNaN(qty) || qty <= 0) errorMessages.push(`Item ${index + 1}: Quantity must be greater than 0.`);
+    if (isNaN(rate) || rate <= 0) errorMessages.push(`Item ${index + 1}: Rate must be greater than 0.`);
+  });
+
+  if (errorMessages.length > 0) {
+    alert(errorMessages.join("\n"));
+    return;
+  }
+  // --- VALIDATION END ---
+
+  // collect items
+  const items = [];
+  document.querySelectorAll('#items-container .item-row').forEach(row => {
+    items.push({
+      name: row.querySelector('.item-name').value,
+      description: row.querySelector('.description').value,
+      quantity: row.querySelector('.quantity').value,
+      rate: row.querySelector('.rate').value,
+    });
+  });
+
+  const quotationData = {
+    quotationNo: document.getElementById('quotation-no').value,
+    quotationDate: document.getElementById('quotation-date').value,
+    validTillDate: document.getElementById('valid-till-date').value,
+    from: {
+      name: fromName,
+      address: `${fromCity}, ${fromCountry}`
+    },
+    to: {
+      name: clientName,
+      address: `${clientCity}, ${clientCountry}`
+    },
+    items: items,
+    taxPercentage: document.getElementById('tax-percentage').value,
+    logo: logoDataUrl,
+    terms: document.getElementById('terms-input')?.value || '',
+    notes: document.getElementById('notes-input')?.value || '',
+    signatureName: document.getElementById('signature-input')?.value || '',
+  };
+
+  // ✅ show the PDF preview (display-view)
+  showDisplayView(quotationData);
+});
+   
+            // Client Modal Logic
+            (function () {
+                const modal = document.getElementById('client-modal');
+                const modalPanel = document.getElementById('client-modal-panel');
+                const billedToSelect = document.getElementById('billed-to-select');
+                let lastFocusedEl = null;
+
+                function openModal() {
+                    lastFocusedEl = document.activeElement;
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex', 'show');
+                    requestAnimationFrame(() => {
+                        modalPanel.style.transform = 'scale(1)';
+                        modalPanel.style.opacity = '1';
+                    });
+                    document.documentElement.style.overflow = 'hidden';
+                    const firstInput = modal.querySelector('input, select, textarea, button');
+                    if (firstInput) firstInput.focus();
+                    document.addEventListener('keydown', onKeyDown);
+                }
+
+                function closeModal() {
+                    modalPanel.style.transform = 'scale(0.95)';
+                    modalPanel.style.opacity = '0';
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                        document.documentElement.style.overflow = '';
+                    }, 230);
+                    if (lastFocusedEl) lastFocusedEl.focus();
+                    document.removeEventListener('keydown', onKeyDown);
+                }
+
+                function onKeyDown(e) {
+                    if (e.key === 'Escape') closeModal();
+                }
+
+                if (addNewClientBtn) addNewClientBtn.addEventListener('click', openModal);
+                clientModalClose.addEventListener('click', closeModal);
+                clientModalCancel.addEventListener('click', closeModal);
+
+                modal.addEventListener('click', (ev) => {
+                    if (ev.target === modal || ev.target.id === 'client-modal-backdrop') {
+                        closeModal();
+                    }
+                });
+
+                clientForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(clientForm);
+                    const businessName = formData.get('businessName')?.trim();
+                    if (!businessName) return;
+
+                    if (billedToSelect) {
+                        const opt = document.createElement('option');
+                        opt.textContent = businessName;
+                        opt.value = businessName;
+                        billedToSelect.appendChild(opt);
+                        billedToSelect.value = businessName;
+                    }
+                    closeModal();
+                });
+            })();
+            updateFormTotals();
+        });
+    </script>
+</body>
+
+</html>

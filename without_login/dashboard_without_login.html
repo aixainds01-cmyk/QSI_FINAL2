@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QSI Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .sidebar-link.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .sidebar-link.active .icon, .sidebar-link.active .text {
+            color: white;
+        }
+        .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        @media (max-width: 768px) {
+  #main-content {
+    margin-top: 64px; /* height of the fixed header */
+  }
+}
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex">
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+  <div class="flex items-center space-x-3">
+    <button id="menu-toggle" class="text-white focus:outline-none">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+    <span class="text-xl font-bold">QSI</span>
+  </div>
+  <div>
+                        <a id="login-btn" href="../index.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" aria-label="Login">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span class="font-medium text-sm">Login</span>
+                        </a>
+                    </div>
+</header>
+
+
+<!-- ✅ BACKDROP for mobile -->
+<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+<!-- ✅ SIDEBAR -->
+<aside id="sidebar"
+  class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class=" mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="dashboard_without_login.html" class="sidebar-link active flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-500">
+                    <i class="fas fa-home mr-3 icon"></i><span class="text">Dashboard</span>
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="quotation_without_login.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="salesorder_withoutlogin.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="invoice_without_login.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                    </div>
+                </div>
+                
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 min-h-screen flex flex-col">
+             <!-- Top Header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <h1 class="text-2xl font-semibold text-gray-800">Dashboard</h1>
+                <div class="flex items-center space-x-4">
+                    <!-- Date + Live Time (auto-updates, timezone Asia/Kolkata) -->
+                    <div class="text-right">
+                        <div id="current-date" class="text-sm text-gray-600 font-medium">Loading date…</div>
+                        <div id="current-time" class="text-sm text-gray-500">Loading time…</div>
+                    </div>
+
+                    
+
+                    <!-- LOGIN LINK (changed to anchor with href) -->
+                    <div>
+                        <a id="login-btn" href="../index.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300" aria-label="Login">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span class="font-medium text-sm">Login</span>
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <main class="p-8 flex-1">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Welcome to QSI!</h2>
+                    <p class="mt-2 text-gray-600">Your central hub for managing sales documents. Get started below.</p>
+                </div>
+
+                <!-- Action Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Create Quotation Card -->
+                    <a href="quotation_without_login.html" class="card block p-6 bg-white rounded-xl shadow-md border border-gray-200">
+                         <div class="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
+                            <i class="fas fa-file-alt text-2xl text-green-600"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Create Quotation</h2>
+                        <p class="mt-2 text-gray-500">Send price quotes and estimates to potential customers.</p>
+                    </a>
+                    <!-- Manage Sales Orders Card -->
+                    <a href="salesorder_withoutlogin.html" class="card block p-6 bg-white rounded-xl shadow-md border border-gray-200">
+                         <div class="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-full mb-4">
+                            <i class="fas fa-box-open text-2xl text-yellow-600"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Create Sales Orders</h2>
+                        <p class="mt-2 text-gray-500">Generate a professional Sales order for your clients quickly.</p>
+                    </a>
+                    <!-- Create New Invoice Card -->
+                    <a href="invoice_without_login.html" class="card block p-6 bg-white rounded-xl shadow-md border border-gray-200">
+                        <div class="flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-full mb-4">
+                             <i class="fas fa-plus-circle text-2xl text-indigo-600"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Create New Invoice</h2>
+                        <p class="mt-2 text-gray-500">Generate a professional invoice for your clients quickly and easily.</p>
+                    </a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // ✅ Mobile menu toggle and backdrop
+const menuToggle = document.getElementById("menu-toggle");
+const sidebar = document.getElementById("sidebar");
+const menuBackdrop = document.getElementById("menu-backdrop");
+
+if (menuToggle && sidebar && menuBackdrop) {
+  menuToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("-translate-x-full");
+    menuBackdrop.classList.toggle("hidden");
+  });
+
+  menuBackdrop.addEventListener("click", () => {
+    sidebar.classList.add("-translate-x-full");
+    menuBackdrop.classList.add("hidden");
+  });
+}
+        // Documents dropdown
+        document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
+            document.getElementById('documents-dropdown-content').classList.toggle('hidden');
+            document.getElementById('dropdown-icon').classList.toggle('rotate-180');
+        });
+
+        // Live date & time (updates every second). Uses Asia/Kolkata timezone.
+        function updateDateTime() {
+            const now = new Date();
+            // format date: e.g., Tuesday, 16 September 2025
+            const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' };
+
+            const dateStr = now.toLocaleDateString('en-GB', dateOptions);
+            const timeStr = now.toLocaleTimeString('en-GB', timeOptions);
+
+            const dateEl = document.getElementById('current-date');
+            const timeEl = document.getElementById('current-time');
+            if (dateEl) dateEl.textContent = dateStr;
+            if (timeEl) timeEl.textContent = timeStr;
+        }
+
+        // start immediately and update every second
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>

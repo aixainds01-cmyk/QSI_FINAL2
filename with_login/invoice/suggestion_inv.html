@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Suggested Invoices</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        @media (max-width: 768px) {
+  #main-content {
+    margin-top: 64px; /* height of the fixed header */
+  }
+}
+        /* Add any specific styles for suggestion cards if needed */
+    </style>
+</head>
+
+<body>
+    <div class="flex">
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+  <div class="flex items-center space-x-3">
+    <button id="menu-toggle" class="text-white focus:outline-none">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+    <span class="text-xl font-bold">QSI</span>
+  </div>
+</header>
+
+
+<!-- ✅ BACKDROP for mobile -->
+<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+<!-- ✅ SIDEBAR -->
+<aside id="sidebar"
+  class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg"><div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class=" mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="../dashboard_with_login.html"
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-chart-pie mr-3"></i>Dashboard
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn"
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon"
+                            class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="../quotation/home_quotation.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="../saleorder/home_sales_order.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales
+                            Order</a>
+                        <a href="home_invoice.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                            <a href="../credit_note.html"
+                    class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                    </div>
+                    <div>
+                        <button id="purchases-dropdown-btn"
+                            class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                            <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
+                            <i id="purchases-dropdown-icon"
+                                class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                        </button>
+                        <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                            <a href="../parchase/vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
+                            <a href="../parchase/vendors&suppliers/vendors_suppliers.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors & Suppliers</a>
+                            <a href="../parchase/purchases&expenses/purchases_expenses_home.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchases & Expenses</a>
+                            <a href="../parchase/parchase_order/home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
+                            <a href="../parchase/payout receipts/home_payout_receipts.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout Receipts</a>
+                            <a href="../parchase/debit notes/home_debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
+                        </div>
+                    </div>
+                </div>
+                <a href="../manage-clients.html"
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Manage Clients
+                </a>
+                <a href="../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+            </nav>
+        </aside>
+
+        <div class="flex-1 overflow-y-auto p-8">
+            <header class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">Invoice Action Center</h1>
+                    <a href="create_invoice.html"
+                        class="bg-pink-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-pink-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i> Create New Invoice
+                    </a>
+                </div>
+                <nav class="flex items-center space-x-6 border-b">
+                    <a href="home_invoice.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Overview</a>
+                    <a href="suggestion_inv.html" class="py-2 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600">Suggested Invoice</a>
+                </nav>
+            </header>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">Actionable Suggestions</h2>
+                    <div class="flex items-center space-x-2">
+                        <button class="px-3 py-1.5 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-md">All</button>
+                        <button class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">Overdue</button>
+                        <button class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">Due Soon</button>
+                        <button class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">Partial Payments</button>
+                    </div>
+                </div>
+
+                <div id="suggestion-container" class="space-y-4">
+                    <p class="text-gray-500">Loading suggestions...</p>
+
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Sidebar dropdown logic (Copied from your code) ---
+            const dropdownBtn = document.getElementById('documents-dropdown-btn');
+            const dropdownContent = document.getElementById('documents-dropdown-content');
+            const dropdownIcon = document.getElementById('dropdown-icon');
+
+            // Auto-open the sales docs dropdown since we are on a child page
+            if (dropdownContent) dropdownContent.classList.remove('hidden');
+            if (dropdownIcon) dropdownIcon.classList.add('rotate-180');
+
+            if (dropdownBtn) {
+              dropdownBtn.addEventListener('click', () => {
+                dropdownContent.classList.toggle('hidden');
+                dropdownIcon.classList.toggle('rotate-180');
+              });
+            }
+            const purchasesBtn = document.getElementById('purchases-dropdown-btn');
+             if (purchasesBtn) {
+               purchasesBtn.addEventListener('click', () => {
+                 document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
+                 document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
+                });
+             }
+
+
+            // --- Elements & API Config ---
+            const container = document.getElementById('suggestion-container');
+            const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
+            const INVOICE_API_URL = `${API_BASE_URL}/invoic`; // GET: /api/invoice
+
+            // -----------------------------------------------------------------
+            // --- 1. AUTHENTICATION & API FUNCTIONS (Copied from your code) ---
+            // -----------------------------------------------------------------
+const menuToggle = document.getElementById("menu-toggle");
+const sidebar = document.getElementById("sidebar");
+const menuBackdrop = document.getElementById("menu-backdrop");
+
+if (menuToggle && sidebar && menuBackdrop) {
+  menuToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("-translate-x-full");
+    menuBackdrop.classList.toggle("hidden");
+  });
+
+  menuBackdrop.addEventListener("click", () => {
+    sidebar.classList.add("-translate-x-full");
+    menuBackdrop.classList.add("hidden");
+  });
+}
+            function getAuthHeaders() {
+              const token = localStorage.getItem('token');
+              if (token) {
+                return { 'Authorization': `Bearer ${token}` };
+              }
+              return null;
+            }
+
+            async function fetchJsonAndParse(url, opts = {}) {
+              opts.headers = opts.headers || {};
+              const authHeaders = getAuthHeaders();
+              if (!authHeaders) {
+                alert("Authentication token not found. Please log in.");
+                window.location.href = '../index.html'; // Adjust login path if needed
+                throw new Error("Authentication token not found.");
+              }
+              opts.headers = { ...opts.headers, ...authHeaders };
+
+              if (opts.body && typeof opts.body === 'string' && !opts.headers['Content-Type']) {
+                opts.headers['Content-Type'] = 'application/json';
+              }
+
+              const response = await fetch(url, opts);
+
+              if (!response.ok) {
+                if (response.status === 401) {
+                  alert("Authentication error or session expired. Please log in again.");
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('userId');
+                  window.location.href = '../index.html';
+                  throw new Error("Session expired");
+                }
+                const errorText = await response.text().catch(() => response.statusText);
+                const error = new Error(`HTTP ${response.status}: ${errorText}`);
+                error.status = response.status;
+                throw error;
+              }
+
+              const contentType = response.headers.get('content-type') || '';
+              if (contentType.includes('application/json')) {
+                return response.json();
+              }
+              const text = await response.text();
+              try { return JSON.parse(text); } catch (e) { return text; }
+            }
+
+            // --- 2. SUGGESTION LOGIC (Adapted for Invoices) ---
+
+            /**
+             * Formats a number as INR currency.
+             */
+            const formatCurrency = (amount) => `₹${Number(amount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+             /**
+             * Calculates the difference in days between two dates. date2 - date1
+             */
+            function daysDifference(date1, date2) {
+                // Ensure dates are valid Date objects
+                const d1 = date1 instanceof Date ? date1 : new Date(date1);
+                const d2 = date2 instanceof Date ? date2 : new Date(date2);
+
+                // Set time to midnight to compare whole days
+                d1.setHours(0, 0, 0, 0);
+                d2.setHours(0, 0, 0, 0);
+
+                const diffTime = d2.getTime() - d1.getTime();
+                // Use Math.round for closer day count
+                return Math.round(diffTime / (1000 * 60 * 60 * 24));
+            }
+
+
+            /**
+             * Processes the raw invoice data and generates actionable suggestions.
+             * NOTE: Assumes API objects have `status`, `due_date`.
+             */
+            function generateSuggestions(invoices) {
+                const suggestions = [];
+                const today = new Date();
+
+                for (const invoice of invoices) {
+                    const status = (invoice.status || 'Draft').toLowerCase();
+                    const dueDate = invoice.due_date ? new Date(invoice.due_date) : null;
+
+                    // Skip if paid or no due date for relevant suggestions
+                    if (status === 'paid') continue;
+
+                    // Suggestion 1: Overdue Invoices
+                    if (dueDate && status !== 'draft' && dueDate < today) {
+                        const daysOverdue = daysDifference(dueDate, today);
+                        suggestions.push({
+                            type: 'overdue',
+                            icon: '❗️',
+                            title: 'Chase Overdue Invoice',
+                            suggestion: `This invoice is <strong>${daysOverdue} day(s) past due</strong>. Send a payment reminder.`,
+                            primaryAction: 'Send Reminder',
+                            invoice: invoice
+                        });
+                    }
+                    // Suggestion 2: Invoices Due Soon (e.g., within next 3 days)
+                    else if (dueDate && status !== 'draft' && dueDate >= today) {
+                         const daysUntilDue = daysDifference(today, dueDate);
+                         if (daysUntilDue <= 3) {
+                             suggestions.push({
+                                 type: 'due_soon',
+                                 icon: '🗓️',
+                                 title: 'Invoice Due Soon',
+                                 suggestion: `This invoice is <strong>due in ${daysUntilDue} day(s)</strong>. Consider sending a proactive reminder.`,
+                                 primaryAction: 'Send Proactive Reminder',
+                                 invoice: invoice
+                             });
+                         }
+                    }
+                    // Add other suggestions here (e.g., Draft invoices to send, Partial payments)
+                }
+                return suggestions;
+            }
+
+            /**
+             * Renders the suggestion cards to the DOM using Tailwind classes.
+             */
+            function renderSuggestions(suggestions) {
+                container.innerHTML = ''; // Clear loading message
+
+                if (suggestions.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500">No suggestions right now. You\'re all caught up!</p>';
+                    return;
+                }
+
+                // Define card styles based on type
+                const cardStyles = {
+                    overdue:  { border: 'border-red-500',   icon: '❗️', iconColor: 'text-red-600' },
+                    due_soon: { border: 'border-yellow-500', icon: '🗓️', iconColor: 'text-yellow-600' }
+                    // Add styles for other types like 'draft', 'partial'
+                };
+
+                // Loop through suggestions and build HTML
+                suggestions.forEach(s => {
+                    const style = cardStyles[s.type] || { border: 'border-gray-300', icon: '?', iconColor: 'text-gray-600' };
+                    const invoice = s.invoice;
+                    const invoiceNumber = invoice.invoice_no || 'N/A'; // Use invoice_no field
+
+                    const cardHTML = `
+                        <div class="flex bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden border-l-4 ${style.border}">
+                            <div class="text-2xl p-6 flex items-center justify-center bg-gray-50 ${style.iconColor}">${style.icon}</div>
+                            <div class="flex-grow p-5">
+                                <h3 class="text-lg font-semibold text-gray-800">${s.title}</h3>
+                                <div class="text-sm text-gray-600 leading-relaxed mt-1">
+                                    <strong>Invoice:</strong> ${invoiceNumber}<br>
+                                    <strong>Customer:</strong> ${invoice.to?.client_name || 'N/A'}<br>
+                                    <strong>Amount Due:</strong> ${formatCurrency(invoice.total)}
+                                </div>
+                                <div class="text-sm text-gray-900 mt-3">${s.suggestion}</div>
+                            </div>
+                            <div class="flex flex-col justify-center p-5 space-y-2">
+                                <button class="px-4 py-2 text-sm font-medium rounded-md text-center bg-purple-600 text-white hover:bg-purple-700 action-btn" data-id="${invoice._id}" data-type="${s.type}">${s.primaryAction}</button>
+                                <button class="px-4 py-2 text-sm font-medium rounded-md text-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 view-btn" data-id="${invoice._id}">View Invoice</button>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += cardHTML;
+                });
+
+                // Add event listeners for the new buttons
+                container.querySelectorAll('.action-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.dataset.id;
+                        const type = e.target.dataset.type;
+                        alert(`Action '${e.target.textContent}' clicked for Invoice ID: ${id}. Type: ${type}. (Implement action)`);
+                        // Example: Implement reminder sending logic or navigation
+                        // if (type === 'overdue' || type === 'due_soon') {
+                        //   sendReminder(id);
+                        // }
+                    });
+                });
+
+                container.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.dataset.id;
+                        // Redirect to the view/edit page for the invoice
+                         window.location.href = `view_data_invoice.html?id=${id}`;
+                    });
+                });
+            }
+
+            /**
+             * Main function to fetch data and run the process.
+             */
+            async function loadSuggestions() {
+                container.innerHTML = '<p class="text-gray-500">Loading suggestions...</p>'; // Show loading immediately
+                try {
+                    // Use the authenticated fetch wrapper
+                    const invoices = await fetchJsonAndParse(INVOICE_API_URL);
+                    if (!invoices) {
+                        container.innerHTML = '<p class="text-red-600">Error: Could not authenticate.</p>';
+                        return;
+                    }
+
+                    // 1. Process data to find suggestions
+                    const suggestions = generateSuggestions(Array.isArray(invoices) ? invoices : []);
+
+                    // 2. Render the suggestions to the page
+                    renderSuggestions(suggestions);
+
+                } catch (error) {
+                    console.error('Failed to load suggestions:', error);
+                    container.innerHTML =
+                        `<p class="text-red-600">Error: Could not load suggestions. ${error.message}</p>`;
+                }
+            }
+
+            // --- 3. Run the app ---
+            loadSuggestions();
+
+        });
+    </script>
+</body>
+
+</html>

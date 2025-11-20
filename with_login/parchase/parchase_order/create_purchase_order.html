@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Create Purchase Order (UI)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
+        .form-container { max-width: 980px; margin: 2rem auto; }
+        .form-section { border: 1px solid #e5e7eb; border-radius: .5rem; padding: 1.5rem; background: #fff; }
+        .input-field { border: 1px solid #d1d5db; border-radius: .375rem; padding: .5rem .75rem; width: 100%; font-size: .875rem; }
+        .input-field:focus { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,.12); outline: none; }
+        .btn { padding: .625rem 1rem; border-radius: .375rem; font-weight: 600; border: 1px solid transparent; }
+        .btn-primary { background: #4f46e5; color: #fff; }
+        .btn-secondary { background: #e5e7eb; color: #374151; border-color: #d1d5db; }
+        .item-table-header { background: #4c1d95; color: #fff; }
+        #display-view { background-color: #e5e7eb; }
+        #po-display-content { width: 210mm; min-height: 297mm; padding: 15mm; margin: 2rem auto; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.12); background: white; display:flex; flex-direction:column; }
+        @media print { body, #display-view { background-color: #fff; } body * { visibility: hidden; } #po-display-content, #po-display-content * { visibility: visible; } #po-display-content { position:absolute; left:0; top:0; width:100%; margin:0; box-shadow:none; padding:5mm; } .no-print { display:none !important; } }
+    </style>
+</head>
+
+<body>
+    <div class="flex">
+        <!-- Left Sidebar Navigation -->
+        <aside class="w-64 bg-gray-800 text-white h-screen sticky top-0 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class="mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="../../dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-chart-pie mr-3"></i>Dashboard
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="../../quotation/home_quotation.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="../../saleorder/home_sales_order.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="../../invoice/home_invoice.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                    </div>
+                </div>
+                <div>
+                    <button id="purchases-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 bg-gray-900 text-left">
+                        <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
+                        <i id="purchases-dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200 rotate-180"></i>
+                    </button>
+                    <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1">
+                        <a href="../vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
+                        <a href="../vendors&suppliers/vendors_suppliers.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors & Suppliers</a>
+                        <a href="../purchases&expenses/purchases_expenses_home.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchases & Expenses</a>
+                        <a href="home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 bg-gray-700 text-sm">Purchase Orders</a>
+                        <a href="../payout receipts/home_payout_receipts.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout Receipts</a>
+                        <a href="../debit notes/home_debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
+                    </div>
+                </div>
+                <a href="../../manage-clients.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Manage Clients
+                </a>
+                <a href="../../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+            </nav>
+        </aside>
+
+        <div class="flex-1 overflow-y-auto">
+            <main id="form-view" class="form-container">
+                <form id="po-form">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800">Purchase Order</h1>
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="btn btn-secondary">Save As Draft</button>
+                            <button type="submit" id="save-btn" class="btn btn-primary">Save & Continue</button>
+                        </div>
+                    </div>
+
+                    <div class="form-section space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-sm text-gray-600">PO No.*</label>
+                                <input id="po-no" class="input-field mt-1" value="PO-0001">
+                                <div class="mt-2 grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="text-sm text-gray-600">PO Date</label>
+                                        <input id="po-date" type="date" class="input-field mt-1">
+                                    </div>
+                                    <div>
+                                        <label class="text-sm text-gray-600">Expected Delivery</label>
+                                        <input id="expected-delivery" type="date" class="input-field mt-1">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="logo-uploader" class="border-2 border-dashed rounded-lg p-4 text-center relative">
+                                <div id="logo-preview-container" class="hidden absolute inset-0 p-2"><img id="logo-preview" src="" class="object-contain w-full h-full"></div>
+                                <div id="logo-placeholder">
+                                    <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-indigo-600 font-semibold">Add Business Logo</p>
+                                    <p class="text-xs text-gray-500">Recommended: 240×240 PNG/JPEG</p>
+                                </div>
+                                <input id="logo-input" type="file" accept="image/png,image/jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="border rounded-lg p-4 space-y-2">
+                                <h3 class="font-semibold">From (Your Business)</h3>
+                                <input id="from-name" class="input-field" placeholder="Business Name" value="Your Company Pvt Ltd">
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <input id="from-city" class="input-field" placeholder="City" value="City">
+                                    <input id="from-country" class="input-field" placeholder="Country" value="Country">
+                                </div>
+                            </div>
+
+                            <div class="border rounded-lg p-4">
+                                <h3 class="font-semibold">Supplier (Vendor)</h3>
+                                <select id="supplier-select" class="input-field w-full mb-2">
+                                    <option value="">Select Supplier</option>
+                                </select>
+                                <button type="button" id="add-new-supplier-btn" class="w-full text-indigo-600 py-2 border-2 border-dashed rounded text-sm"><i class="fas fa-plus mr-2"></i> Add New Supplier</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="item-table-header grid grid-cols-12 gap-4 p-3 rounded text-sm">
+                                <div class="col-span-5">Item / Description</div>
+                                <div class="col-span-2 text-right">Quantity</div>
+                                <div class="col-span-2 text-right">Rate</div>
+                                <div class="col-span-3 text-right">Amount</div>
+                            </div>
+                            
+
+                            <div id="items-container" class="space-y-2 py-2">
+                                <div class="item-row space-y-3">
+                                    <div class="grid grid-cols-12 gap-4 items-start">
+                                        <div class="col-span-5"><input class="item-name input-field" placeholder="Item name"></div>
+                                        <div class="col-span-2"><input type="number" class="quantity input-field text-right" value="1" min="0"></div>
+                                        <div class="col-span-2"><input type="number" class="rate input-field text-right" value="0" min="0"></div>
+                                        <div class="col-span-3 flex items-start justify-end gap-x-3">
+                                            <span class="amount font-semibold mt-2">₹0.00</span>
+                                            <button type="button" class="remove-item-btn text-gray-400 pt-1"><i class="fas fa-trash-alt"></i></button>
+                                        </div>
+                                    </div>
+                                    <div><textarea class="description input-field" rows="1" placeholder="Item description"></textarea></div>
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <button type="button" id="add-item-btn" class="btn-link text-sm"><i class="fas fa-plus mr-1"></i>Add New Line</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-8 pt-4 border-t">
+                            <div>
+                                <label class="text-sm font-medium">Attach Document</label>
+                                <input type="file" class="input-field mt-1">
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex justify-between"><span class="text-gray-600">Subtotal</span><span id="subtotal" class="font-semibold">₹0.00</span></div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Tax (<input id="tax-percentage" type="number" value="0" class="input-field w-16 mx-1 text-right p-1 h-7">%)</span>
+                                    <span id="total-tax" class="font-semibold">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between border-t-2 pt-2"><span class="font-bold">Total (INR)</span><span id="grand-total" class="font-bold">₹0.00</span></div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 pt-4 border-t">
+                            <button type="button" class="toggle-section-btn btn-small btn btn-secondary" data-target="terms-section"><i class="fas fa-plus mr-1"></i>Terms & Conditions</button>
+                            <button type="button" class="toggle-section-btn btn-small btn-secondary" data-target="notes-section"><i class="fas fa-plus mr-1"></i>Notes</button>
+                            <button type="button" class="toggle-section-btn btn-small btn btn-secondary" data-target="signatory-section"><i class="fas fa-plus mr-1"></i>Authorised Signatory</button>
+                        </div>
+
+                        <div id="terms-section" class="hidden mt-2"><textarea id="terms-input" class="input-field" rows="3" placeholder="Terms & Conditions">Payment due within 30 days of invoice.</textarea></div>
+                        <div id="notes-section" class="hidden mt-2"><textarea id="notes-input" class="input-field" rows="3" placeholder="Notes">Please deliver to the address mentioned in the purchase order.</textarea></div>
+
+                        <div id="signatory-section" class="hidden mt-2">
+                            <div class="flex items-center gap-4 mb-3 border-b pb-3">
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="signatory_type" value="text" class="form-radio" checked><span class="text-sm font-medium">Enter Name</span></label>
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="signatory_type" value="image" class="form-radio"><span class="text-sm font-medium">Upload Signature</span></label>
+                            </div>
+
+                            <div id="signatory-text-container" class="space-y-2">
+                                <select id="signatory-select" class="input-field">
+                                    <option value="">Select Signatory</option>
+                                    <option value="add_new">-- Add New Signatory --</option>
+                                </select>
+                                <div id="add-signatory-container" class="hidden flex gap-2 items-center">
+                                    <input id="new-signatory-input" class="input-field flex-grow" placeholder="Enter New Signatory Name">
+                                    <button type="button" id="save-signatory-btn" class="btn btn-primary btn-small">Save</button>
+                                    <button type="button" id="cancel-add-signatory-btn" class="btn btn-secondary btn-small">Cancel</button>
+                                </div>
+                            </div>
+
+                            <div id="signatory-image-container" class="hidden space-y-2">
+                                <input type="file" id="signatory-image-input" class="input-field" accept="image/png, image/jpeg">
+                                <div id="signatory-image-preview" class="mt-2 border border-dashed rounded-lg p-2 h-24 flex items-center justify-center bg-gray-50 text-gray-400">Signature Preview</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </main>
+
+            <main id="display-view" class="p-6 md:p-10 hidden">
+                <div id="po-display-content">
+                    <header class="flex justify-between items-start pb-6 border-b">
+                        <div>
+                            <h1 class="text-4xl font-bold text-gray-800">PURCHASE ORDER</h1>
+                            <div class="mt-4 text-sm text-gray-600">
+                                <p><strong>PO No:</strong> <span id="po-no-display"></span></p>
+                                <p><strong>PO Date:</strong> <span id="po-date-display"></span></p>
+                                <p><strong>Expected Delivery:</strong> <span id="expected-delivery-display"></span></p>
+                            </div>
+                        </div>
+                        <div id="po-logo" class="w-32 h-20 flex items-center justify-center"></div>
+                    </header>
+
+                    <section class="grid grid-cols-2 gap-8 my-8">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-semibold text-gray-600 mb-2">Purchase From</h3>
+                            <p id="po-from-name" class="font-bold text-gray-800"></p>
+                            <p id="po-from-address" class="text-sm text-gray-600"></p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-semibold text-gray-600 mb-2">Supplier</h3>
+                            <p id="po-to-name" class="font-bold text-gray-800"></p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <table class="w-full">
+                            <thead class="bg-purple-800 text-white">
+                                <tr>
+                                    <th class="py-2 px-3 text-left text-sm font-semibold w-6/12">Item</th>
+                                    <th class="py-2 px-3 text-right text-sm font-semibold">Quantity</th>
+                                    <th class="py-2 px-3 text-right text-sm font-semibold">Rate</th>
+                                    <th class="py-2 px-3 text-right text-sm font-semibold">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-table-body" class="divide-y divide-gray-200"></tbody>
+                            <tfoot class="border-t-2 border-gray-300">
+                                <tr>
+                                    <td colspan="2" class="py-2 px-3"></td>
+                                    <td class="py-2 px-3 text-right font-semibold text-gray-600">Subtotal</td>
+                                    <td id="summary-subtotal" class="py-2 px-3 text-right font-semibold text-gray-800"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="py-2 px-3"></td>
+                                    <td class="py-2 px-3 text-right font-semibold text-gray-600">Tax</td>
+                                    <td id="summary-tax" class="py-2 px-3 text-right font-semibold text-gray-800"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="py-2 px-3"></td>
+                                    <td class="py-2 px-3 text-right font-bold text-base text-gray-800">Total (INR)</td>
+                                    <td id="summary-total" class="py-2 px-3 text-right font-bold text-base text-gray-800"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </section>
+
+                    <section class="mt-auto pt-8 flex justify-between items-end">
+                        <div class="w-1/2 text-sm text-gray-600 pr-8">
+                            <div id="display-terms-section" class="hidden">
+                                <h3 class="font-semibold text-gray-800 mb-1">Terms & Conditions</h3>
+                                <p id="po-terms" class="whitespace-pre-wrap"></p>
+                            </div>
+                            <div id="display-notes-section" class="hidden mt-4">
+                                <h3 class="font-semibold text-gray-800 mb-1">Notes</h3>
+                                <p id="po-notes" class="whitespace-pre-wrap"></p>
+                            </div>
+                        </div>
+
+                        <div class="w-1/2 flex flex-col items-end">
+                            <div class="text-center">
+                                <div id="po-signatory" class="font-semibold text-gray-800"></div>
+                                <div class="border-t border-gray-400 w-48 pt-2 text-xs"><p>Authorised Signatory</p></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <footer class="p-6 bg-gray-50 border-t sticky bottom-0 z-10 no-print">
+                    <div class="max-w-4xl mx-auto flex justify-end gap-4">
+                        <button id="edit-btn" class="btn btn-secondary"><i class="fas fa-edit mr-2"></i>Edit</button>
+                        <button id="download-pdf-btn" class="bg-green-600 text-white py-2 px-4 rounded"><i class="fas fa-file-pdf mr-2"></i>Download as PDF</button>
+                    </div>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <!-- Supplier Modal (local-only, UI) -->
+    <div id="supplier-modal" class="fixed inset-0 hidden items-center justify-center z-50">
+        <div id="supplier-modal-backdrop" class="absolute inset-0 bg-[rgba(15,23,42,0.36)] backdrop-blur-md"></div>
+        <div id="supplier-modal-panel" class="relative w-full max-w-2xl mx-4 transform transition-all">
+            <div class="bg-white p-6 rounded shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Create New Supplier</h2>
+                    <button id="supplier-modal-close" class="text-gray-500"><i class="fas fa-times"></i></button>
+                </div>
+
+                <form id="supplier-form" class="space-y-4">
+                    <div>
+                        <label class="text-sm">Supplier Name</label>
+                        <input name="supplier_name" class="input-field mt-1" required>
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <input name="country" class="input-field" placeholder="Country">
+                        <input name="city" class="input-field" placeholder="City/Town">
+                        <input name="state" class="input-field" placeholder="State">
+                        <input name="pincode" class="input-field" placeholder="Pincode">
+                        <input name="gst_in" class="input-field" placeholder="GSTIN (Optional)">
+                    </div>
+
+                    <div class="flex justify-end gap-2 pt-4">
+                        <button type="button" id="supplier-modal-cancel" class="btn btn-secondary px-4">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4">Save Supplier</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
+            document.getElementById('documents-dropdown-content').classList.toggle('hidden');
+            document.getElementById('dropdown-icon').classList.toggle('rotate-180');
+        });
+        document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
+            document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
+            document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
+        });
+       
+        document.addEventListener('DOMContentLoaded', function () {
+            // Simple UI-only Purchase Order page. No backend calls.
+            const itemsContainer = document.getElementById('items-container');
+            const addItemBtn = document.getElementById('add-item-btn');
+            const supplierSelect = document.getElementById('supplier-select');
+            const addNewSupplierBtn = document.getElementById('add-new-supplier-btn');
+            const supplierModal = document.getElementById('supplier-modal');
+            const supplierForm = document.getElementById('supplier-form');
+            const supplierModalClose = document.getElementById('supplier-modal-close');
+            const supplierModalCancel = document.getElementById('supplier-modal-cancel');
+            const logoInput = document.getElementById('logo-input');
+            let logoDataUrl = null;
+
+            const formatCurrency = (v) => `₹${Number(v || 0).toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 })}`;
+
+            function createItemRow() {
+                const itemRow = document.createElement('div');
+                itemRow.className = 'item-row space-y-3';
+                itemRow.innerHTML = `
+                    <div class="grid grid-cols-12 gap-4 items-start">
+                        <div class="col-span-5"><input class="item-name input-field" placeholder="Item name"></div>
+                        <div class="col-span-2"><input type="number" class="quantity input-field text-right" value="1" min="0"></div>
+                        <div class="col-span-2"><input type="number" class="rate input-field text-right" value="0" min="0"></div>
+                        <div class="col-span-3 flex items-start justify-end gap-x-3">
+                            <span class="amount font-semibold mt-2">₹0.00</span>
+                            <button type="button" class="remove-item-btn text-gray-400 pt-1"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    <div><textarea class="description input-field" rows="1" placeholder="Item description"></textarea></div>
+                `;
+                itemsContainer.appendChild(itemRow);
+                updateTotals();
+            }
+
+            function updateTotals() {
+                let subtotal = 0;
+                document.querySelectorAll('#items-container .item-row').forEach(row => {
+                    const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+                    const rate = parseFloat(row.querySelector('.rate').value) || 0;
+                    const amount = qty * rate;
+                    row.querySelector('.amount').textContent = formatCurrency(amount);
+                    subtotal += amount;
+                });
+                const taxPct = parseFloat(document.getElementById('tax-percentage').value) || 0;
+                const tax = subtotal * (taxPct / 100);
+                document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+                document.getElementById('total-tax').textContent = formatCurrency(tax);
+                document.getElementById('grand-total').textContent = formatCurrency(subtotal + tax);
+            }
+
+            addItemBtn.addEventListener('click', createItemRow);
+            itemsContainer.addEventListener('click', (e) => { if (e.target.closest('.remove-item-btn')) { e.target.closest('.item-row').remove(); updateTotals(); } });
+            itemsContainer.addEventListener('input', updateTotals);
+            document.getElementById('tax-percentage').addEventListener('input', updateTotals);
+
+            // Logo upload preview
+            logoInput.addEventListener('change', (e) => {
+                const file = e.target.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    logoDataUrl = ev.target.result;
+                    document.getElementById('logo-preview').src = logoDataUrl;
+                    document.getElementById('logo-preview-container').classList.remove('hidden');
+                    document.getElementById('logo-placeholder').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Supplier modal (local-only)
+            function openSupplierModal() { supplierForm.reset(); supplierModal.classList.remove('hidden'); supplierModal.classList.add('flex'); document.documentElement.style.overflow = 'hidden'; }
+            function closeSupplierModal() { supplierModal.classList.remove('flex'); supplierModal.classList.add('hidden'); document.documentElement.style.overflow = ''; }
+            addNewSupplierBtn.addEventListener('click', openSupplierModal);
+            supplierModalClose.addEventListener('click', closeSupplierModal);
+            supplierModalCancel.addEventListener('click', closeSupplierModal);
+
+            supplierForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const fd = new FormData(supplierForm);
+                const name = fd.get('supplier_name').trim();
+                if (!name) return;
+                const opt = document.createElement('option'); opt.value = name; opt.textContent = name; opt.selected = true;
+                opt.dataset.payload = JSON.stringify(Object.fromEntries(fd.entries()));
+                supplierSelect.appendChild(opt);
+                closeSupplierModal();
+            });
+
+            // Toggle optional sections
+            document.querySelectorAll('.toggle-section-btn').forEach(btn => { btn.addEventListener('click', () => { const target = document.getElementById(btn.dataset.target); const icon = btn.querySelector('i'); target.classList.toggle('hidden'); icon.classList.toggle('fa-plus', target.classList.contains('hidden')); icon.classList.toggle('fa-minus', !target.classList.contains('hidden')); }); });
+
+            // Signatory management (local storage)
+            const SIGNATORY_KEY = 'po_saved_signatories';
+            function loadSignatories() {
+                const select = document.getElementById('signatory-select'); const saved = JSON.parse(localStorage.getItem(SIGNATORY_KEY)) || [];
+                while (select.options.length > 2) select.remove(1);
+                saved.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; select.insertBefore(o, select.options[select.options.length-1]); });
+            }
+            document.getElementById('save-signatory-btn').addEventListener('click', () => { const val = document.getElementById('new-signatory-input').value.trim(); if (!val) return; let arr = JSON.parse(localStorage.getItem(SIGNATORY_KEY)) || []; if (!arr.includes(val)) { arr.push(val); localStorage.setItem(SIGNATORY_KEY, JSON.stringify(arr)); } loadSignatories(); document.getElementById('signatory-select').value = val; document.getElementById('add-signatory-container').classList.add('hidden'); document.getElementById('new-signatory-input').value = ''; });
+            document.getElementById('cancel-add-signatory-btn').addEventListener('click', () => { document.getElementById('add-signatory-container').classList.add('hidden'); document.getElementById('new-signatory-input').value = ''; document.getElementById('signatory-select').value = ''; });
+            document.getElementById('signatory-select').addEventListener('change', (e) => { if (e.target.value === 'add_new') document.getElementById('add-signatory-container').classList.remove('hidden'); else document.getElementById('add-signatory-container').classList.add('hidden'); });
+            document.querySelectorAll('input[name="signatory_type"]').forEach(r => r.addEventListener('change', (e) => { const isText = e.target.value === 'text'; document.getElementById('signatory-text-container').classList.toggle('hidden', !isText); document.getElementById('signatory-image-container').classList.toggle('hidden', isText); }));
+            document.getElementById('signatory-image-input').addEventListener('change', (e) => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = (ev) => { localStorage.setItem('po_sign_image', ev.target.result); document.getElementById('signatory-image-preview').innerHTML = `<img src="${ev.target.result}" class="max-h-full max-w-full object-contain">`; }; r.readAsDataURL(file); });
+
+            // Form submission: build display data and show display view
+            document.getElementById('po-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Validate basic fields
+                const items = Array.from(document.querySelectorAll('#items-container .item-row')).map(row => ({
+                    item_name: row.querySelector('.item-name').value,
+                    description: row.querySelector('.description').value,
+                    quantity: Number(row.querySelector('.quantity').value || 0),
+                    rate: Number(row.querySelector('.rate').value || 0)
+                }));
+
+                if (items.length === 0 || items.some(it => !it.item_name.trim())) { alert('Please add at least one item with a name.'); return; }
+                if (!supplierSelect.value) { alert('Please select or add a supplier.'); return; }
+
+                // Build display
+                const subtotal = items.reduce((s, it) => s + (it.quantity * it.rate), 0);
+                const taxPct = Number(document.getElementById('tax-percentage').value) || 0;
+                const tax = subtotal * (taxPct/100);
+                const total = subtotal + tax;
+
+                document.getElementById('po-no-display').textContent = document.getElementById('po-no').value;
+                document.getElementById('po-date-display').textContent = document.getElementById('po-date').value;
+                document.getElementById('expected-delivery-display').textContent = document.getElementById('expected-delivery').value;
+                document.getElementById('po-from-name').textContent = document.getElementById('from-name').value;
+                document.getElementById('po-from-address').textContent = `${document.getElementById('from-city').value}, ${document.getElementById('from-country').value}`;
+                document.getElementById('po-to-name').textContent = supplierSelect.value;
+
+                const itemsBody = document.getElementById('items-table-body'); itemsBody.innerHTML = '';
+                items.forEach(it => {
+                    const row = itemsBody.insertRow();
+                    const qty = it.quantity || 0; const rate = it.rate || 0; const amt = qty*rate;
+                    row.innerHTML = `<td class="py-3 px-3 text-sm font-medium text-gray-800">${it.item_name}<br><small class="text-gray-500 font-normal">${it.description || ''}</small></td><td class="py-3 px-3 text-right text-gray-600">${qty}</td><td class="py-3 px-3 text-right text-gray-600">${formatCurrency(rate)}</td><td class="py-3 px-3 text-right font-semibold text-gray-800">${formatCurrency(amt)}</td>`;
+                });
+
+                document.getElementById('summary-subtotal').textContent = formatCurrency(subtotal);
+                document.getElementById('summary-tax').textContent = formatCurrency(tax);
+                document.getElementById('summary-total').textContent = formatCurrency(total);
+
+                if (logoDataUrl) document.getElementById('po-logo').innerHTML = `<img src="${logoDataUrl}" class="object-contain w-full h-full">`;
+                else document.getElementById('po-logo').innerHTML = '';
+
+                const terms = document.getElementById('terms-input').value.trim();
+                const notes = document.getElementById('notes-input').value.trim();
+                document.getElementById('po-terms').textContent = terms; document.getElementById('display-terms-section').classList.toggle('hidden', !terms);
+                document.getElementById('po-notes').textContent = notes; document.getElementById('display-notes-section').classList.toggle('hidden', !notes);
+
+                const signatoryType = document.querySelector('input[name="signatory_type']:checked').value;
+                const signCont = document.getElementById('po-signatory'); signCont.innerHTML = '';
+                if (signatoryType === 'text') { const s = document.getElementById('signatory-select').value; if (s && s !== 'add_new') signCont.textContent = s; }
+                else { const img = localStorage.getItem('po_sign_image'); if (img) signCont.innerHTML = `<img src="${img}" class="max-h-full mx-auto">`; }
+
+                // Toggle views
+                document.getElementById('form-view').classList.add('hidden');
+                document.getElementById('display-view').classList.remove('hidden');
+            });
+
+            document.getElementById('edit-btn').addEventListener('click', () => { document.getElementById('display-view').classList.add('hidden'); document.getElementById('form-view').classList.remove('hidden'); });
+
+            document.getElementById('download-pdf-btn').addEventListener('click', () => {
+                const el = document.getElementById('po-display-content');
+                const opt = { margin:10, filename: `PurchaseOrder-${document.getElementById('po-no').value || 'PO'}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
+                html2pdf().from(el).set(opt).save();
+            });
+
+            // Initialize
+            createItemRow(); loadSignatories();
+
+            function loadSignatories() { const sel = document.getElementById('signatory-select'); const saved = JSON.parse(localStorage.getItem('po_saved_signatories')||'[]'); while (sel.options.length>2) sel.remove(1); saved.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.insertBefore(o, sel.options[sel.options.length-1]); }); }
+        });
+    </script>
+</body>
+
+</html>
