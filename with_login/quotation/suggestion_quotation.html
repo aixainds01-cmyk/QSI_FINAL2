@@ -142,7 +142,7 @@
             <div id="session-banner" style="display:none; position:sticky; top:0; z-index:40; margin-bottom:12px;">
                 <div style="background:#fff7ed; border:1px solid #ffedd5; color:#92400e; padding:10px 14px; border-radius:8px; max-width:760px;">
                     <strong id="session-banner-text">Session expired. Please log in again.</strong>
-                    <a id="session-banner-login" href="/login.html" style="margin-left:12px; color:#4f46e5; font-weight:600;">Go to login</a>
+                    <a id="session-banner-login" href="../../index.html" style="margin-left:12px; color:#4f46e5; font-weight:600;">Go to login</a>
                 </div>
             </div>
 
@@ -245,7 +245,7 @@ if (menuToggle && sidebar && menuBackdrop) {
                 }
                 localStorage.removeItem('token');
                 localStorage.removeItem('userId');
-                setTimeout(() => { window.location.href = '/login.html'; }, 1200);
+                setTimeout(() => { window.location.href = '../../index.html'; }, 1200);
                 throw new Error('No auth token');
             }
             opts.headers = { ...opts.headers, ...authHeaders };
@@ -266,7 +266,7 @@ if (menuToggle && sidebar && menuBackdrop) {
                     }
                     localStorage.removeItem('token');
                     localStorage.removeItem('userId');
-                    setTimeout(() => { window.location.href = '/login.html'; }, 1800);
+                    setTimeout(() => { window.location.href = '../../index.html'; }, 1800);
                 }
                 const errorText = await response.text().catch(() => response.statusText);
                 const error = new Error(`HTTP ${response.status}: ${errorText}`);

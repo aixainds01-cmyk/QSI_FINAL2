@@ -1242,7 +1242,7 @@
                 // --- Handle Missing Token ---
                 if (!authHeaders) {
                     alert("Authentication token not found. Please log in.");
-                    window.location.href = '/login.html'; // Adjust login path
+                    window.location.href = '../../index.html'; // Adjust login path
                     throw new Error("Authentication token not found.");
                 }
                 Object.assign(headers, authHeaders);
@@ -1266,7 +1266,7 @@
                             alert("Session expired or invalid. Please log in again.");
                             localStorage.removeItem('token');
                             localStorage.removeItem('userId');
-                            window.location.href = '/login.html'; // Redirect to login
+                            window.location.href = '../../index.html'; // Redirect to login
                             throw new Error("Session expired");
                         }
                         // --- End Handle 401 ---
@@ -2044,7 +2044,7 @@
 
                 if (!authHeaders) {
                     alert("Authentication token not found. Please log in.");
-                    window.location.href = '/login.html';
+                    window.location.href = '../../index.html';
                     throw new Error("Authentication token not found.");
                 }
 
@@ -2061,7 +2061,7 @@
                         alert("Authentication error or session expired. Please log in again.");
                         localStorage.removeItem('token');
                         localStorage.removeItem('userId');
-                        window.location.href = '/login.html';
+                        window.location.href = '../../index.html';
                         throw new Error("Session expired");
                     }
                     const errorText = await response.text().catch(() => response.statusText);

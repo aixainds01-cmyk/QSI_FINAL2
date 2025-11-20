@@ -188,7 +188,7 @@ if (menuToggle && sidebar && menuBackdrop) {
               const authHeaders = getAuthHeaders();
               if (!authHeaders) {
                 alert("Authentication token not found. Please log in.");
-                window.location.href = '../index.html'; // Adjust login path if needed
+                window.location.href = '../../index.html'; // Adjust login path if needed
                 throw new Error("Authentication token not found.");
               }
               opts.headers = { ...opts.headers, ...authHeaders };
@@ -204,7 +204,7 @@ if (menuToggle && sidebar && menuBackdrop) {
                   alert("Authentication error or session expired. Please log in again.");
                   localStorage.removeItem('token');
                   localStorage.removeItem('userId');
-                  window.location.href = '../index.html';
+                  window.location.href = '../../index.html';
                   throw new Error("Session expired");
                 }
                 const errorText = await response.text().catch(() => response.statusText);

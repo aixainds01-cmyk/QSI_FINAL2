@@ -267,7 +267,7 @@ const DELETED_API_URL = `http://Aixains-Mac-mini.local:8000/api/deleted/${DOC_TY
                 const authHeaders = getAuthHeaders(); 
                 if (!authHeaders) {
                     alert("Authentication token not found. Please log in.");
-                    window.location.href = '../index.html';
+                    window.location.href = '../../index.html';
                     throw new Error("Authentication token not found.");
                 }
                 opts.headers = { ...opts.headers, ...getAuthHeaders() };

@@ -281,6 +281,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // ===== TOKEN AUTHENTICATION CHECK ON PAGE LOAD =====
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please log in to access this page');
+                window.location.href = '../../login.html';
+                return;
+            }
+
             // Mobile menu toggle
             const menuToggle = document.getElementById("menu-toggle");
             const sidebar = document.getElementById("sidebar");
@@ -318,7 +326,7 @@
                 const token = localStorage.getItem('token');
                 if (!token) {
                     alert('Please log in to continue');
-                    window.location.href = '../../login.html';
+                    window.location.href = '../../index.html';
                     return null;
                 }
                 return {
@@ -367,7 +375,7 @@
                 try {
                     console.log('Sending vendor data:', vendorData);
                     console.log('To URL:', VENDORS_API_URL);
-                    
+
                     const response = await fetch(VENDORS_API_URL, {
                         method: 'POST',
                         headers: headers,
@@ -375,19 +383,19 @@
                     });
 
                     console.log('Response status:', response.status);
-                    
+
                     // Try to get response text first
                     const responseText = await response.text();
                     console.log('Response text:', responseText);
-                    
+
                     if (!response.ok) {
                         if (response.status === 401) {
                             alert('Session expired. Please log in again.');
                             localStorage.removeItem('token');
-                            window.location.href = '../../login.html';
+                            window.location.href = '../../index.html';
                             return;
                         }
-                        
+
                         // Try to parse as JSON
                         let errorData = {};
                         try {
@@ -395,7 +403,7 @@
                         } catch (e) {
                             console.error('Could not parse error response as JSON');
                         }
-                        
+
                         const errorMsg = errorData.message || responseText || `HTTP ${response.status}`;
                         throw new Error(errorMsg);
                     }
@@ -408,7 +416,7 @@
 
                 } catch (error) {
                     console.error('Error adding vendor:', error);
-                    
+
                     // Show user-friendly error message with more details
                     const errorMsg = error.message || 'Unable to connect to server. Please check your connection and try again.';
                     alert(`Error adding vendor lead:\n\n${errorMsg}\n\nCheck the browser console for more details.`);
