@@ -117,13 +117,8 @@
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .alert {
@@ -155,7 +150,6 @@
             padding: 20mm;
             margin: 2rem auto;
             box-sizing: border-box;
-            /* Flexbox for bottom alignment */
             display: flex;
             flex-direction: column;
         }
@@ -198,22 +192,6 @@
             object-fit: contain;
         }
 
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem 2rem;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .address-section {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
         .totals table {
             width: 100%;
         }
@@ -234,48 +212,19 @@
             border-top: 1px solid #e2e8f0;
         }
 
-        /* --- ALIGNMENT FIXES --- */
-        .pdf-preview-content {
-            flex-grow: 1;
-            /* Pushes footer down */
+        /* Fixed bottom button container */
+        .bottom-button-container {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 1rem 0;
+            border-top: 2px solid #e5e7eb;
+            margin-top: 2rem;
+            z-index: 10;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        .pdf-preview-footer {
-            margin-top: auto;
-            /* Sticks to bottom */
-            padding-top: 1.5rem;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .pdf-footer-left {
-            flex-basis: 60%;
-            padding-right: 2rem;
-        }
-
-        .pdf-footer-right {
-            text-align: right;
-        }
-
-        .signature-area {
-            display: inline-block;
-            text-align: center;
-        }
-
-        .signature-area .signature-space {
-            height: 4rem;
-            /* Space for a physical signature */
-        }
-
-        .signature-area .signature-line {
-            border-top: 1px solid #374151;
-            width: 220px;
-            padding-top: 0.5rem;
-        }
-
-        .sales-order-container {
+        .invoice-container {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             padding: 40px;
             background-color: white;
@@ -285,7 +234,7 @@
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
 
-        .sales-order-header {
+        .invoice-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -298,16 +247,16 @@
             object-fit: contain;
         }
 
-        .sales-order-details {
+        .invoice-details {
             text-align: right;
         }
 
-        .sales-order-details h1 {
+        .invoice-details h1 {
             color: #374151;
             margin-bottom: 8px;
         }
 
-        .sales-order-details p {
+        .invoice-details p {
             margin: 0;
             font-size: 14px;
             color: #4b5563;
@@ -402,10 +351,9 @@
             border-top: 1px solid #e5e7eb;
             margin-bottom: 20px;
             display: none;
-            /* Hidden by default, can be enabled if needed */
         }
 
-        .sales-order-footer {
+        .invoice-footer {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -440,20 +388,6 @@
             margin-bottom: 4px;
         }
 
-        /* --- END ALIGNMENT FIXES --- */
-
-        /* Fixed bottom button container */
-        .bottom-button-container {
-            position: sticky;
-            bottom: 0;
-            background: white;
-            padding: 1rem 0;
-            border-top: 2px solid #e5e7eb;
-            margin-top: 2rem;
-            z-index: 10;
-            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
-        }
-
         @media print {
             body {
                 -webkit-print-color-adjust: exact;
@@ -471,10 +405,6 @@
             .action-buttons {
                 display: none !important;
             }
-
-            .status {
-                margin-top: 1.2rem !important;
-            }
         }
 
         @media (max-width: 767px) {
@@ -488,7 +418,6 @@
         @media (max-width: 768px) {
             #main-content {
                 margin-top: 64px;
-                /* height of the fixed header */
             }
         }
     </style>
@@ -496,9 +425,7 @@
 
 <body>
     <div class="flex">
-        <!-- Left Sidebar Navigation -->
-        <header
-            class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
             <div class="flex items-center space-x-3">
                 <button id="menu-toggle" class="text-white focus:outline-none">
                     <i class="fas fa-bars text-2xl"></i>
@@ -507,74 +434,46 @@
             </div>
         </header>
 
-
-        <!-- ✅ BACKDROP for mobile -->
         <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
 
-        <!-- ✅ SIDEBAR -->
-        <aside id="sidebar"
-            class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+        <aside id="sidebar" class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
             <div class="p-6 text-2xl font-bold border-b border-gray-700">
                 <i class=" mr-2 text-indigo-400"></i> QSI
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <a href="../dashboard_with_login.html"
-                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <a href="../dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-chart-pie mr-3"></i>Dashboard
                 </a>
                 <div>
-                    <button id="documents-dropdown-btn"
-                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                    <button id="documents-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
                         <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
-                        <i id="dropdown-icon"
-                            class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
                     </button>
                     <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
-                        <a href="../quotation/home_quotation.html"
-                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
-                        <a href="home_sales_order.html"
-                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales
-                            Order</a>
-                        <a href="../invoice/home_invoice.html"
-                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
-                            <a href="../credit_note.html"
-                    class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                        <a href="../quotation/home_quotation.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="home_sales_order.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="../invoice/home_invoice.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="../credit_note.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
                     </div>
                     <div>
-                        <button id="purchases-dropdown-btn"
-                            class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <button id="purchases-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
                             <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
-                            <i id="purchases-dropdown-icon"
-                                class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                            <i id="purchases-dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
                         </button>
                         <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
-                            <a href="../parchase/vendor/vendors_leads.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors
-                                Leads</a>
-                            <a href="../parchase/vendors&suppliers/vendors_suppliers.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors
-                                & Suppliers</a>
-                            <a href="../parchase/purchases&expenses/purchases_expenses_home.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchases
-                                & Expenses</a>
-                            <a href="../parchase/parchase_order/home_purchase_orders.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase
-                                Orders</a>
-                            <a href="../parchase/payout receipts/home_payout_receipts.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout
-                                Receipts</a>
-                            <a href="../parchase/payout receipts/home_payout_receipts.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit
-                                Notes</a>
+                            <a href="../parchase/vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
+                            <a href="../parchase/vendors&suppliers/vendors_suppliers.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors & Suppliers</a>
+                            <a href="../parchase/purchases&expenses/purchases_expenses_home.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchases & Expenses</a>
+                            <a href="../parchase/parchase_order/home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
+                            <a href="../parchase/payout receipts/home_payout_receipts.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout Receipts</a>
+                            <a href="../parchase/payout receipts/home_payout_receipts.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
                         </div>
                     </div>
                 </div>
-                <a href="../manage-clients.html"
-                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <a href="../manage-clients.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-users mr-3"></i>Manage Clients
                 </a>
-                <a href="../settings.html"
-                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <a href="../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-cog mr-3"></i>Settings
                 </a>
             </nav>
@@ -588,8 +487,7 @@
                             <div class="flex justify-between items-center mb-6">
                                 <h1 class="text-3xl font-bold text-gray-800">Create Sales Order</h1>
                                 <div class="flex items-center space-x-2">
-                                    <button type="button" id="save-continue-btn"
-                                        class="btn btn-primary flex items-center">
+                                    <button type="button" id="save-continue-btn" class="btn btn-primary flex items-center">
                                         Save & Continue
                                         <span id="save-btn-loading" class="loading hidden ml-2"></span>
                                     </button>
@@ -602,32 +500,29 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <div class="grid grid-cols-3 gap-2 items-center mb-2">
-                                            <label for="sales-order-time" class="text-gray-600 text-sm">Sales Order
-                                                Time</label>
-                                            <input type="text" id="sales-order-time" class="input-field col-span-2"
-                                                readonly />
+                                            <label for="sales-order-prefix" class="text-gray-600 text-sm">Prefix in SO no.</label>
+                                            <input type="text" id="sales-order-prefix" class="input-field col-span-2" value="SO" />
                                         </div>
 
+                                        
+
                                         <div class="grid grid-cols-3 gap-2 items-center mb-2">
-                                            <label for="sales-order-date" class="text-gray-600 text-sm">Sales Order
-                                                Date</label>
-                                            <input type="date" id="sales-order-date" class="input-field col-span-2"
-                                                readonly />
+                                            <label for="sales-order-date" class="text-gray-600 text-sm">SO Date</label>
+                                            <input type="date" id="sales-order-date" class="input-field col-span-2" readonly />
+
+                                            <label for="delivery-date" class="text-gray-600 text-sm mt-2 block">Delivery Date</label>
+                                            <input type="date" id="delivery-date" class="input-field col-span-2" required />
                                         </div>
                                     </div>
-                                    <div id="logo-uploader"
-                                        class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50 relative">
+                                    <div id="logo-uploader" class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50 relative">
                                         <div id="logo-preview-container" class="hidden absolute inset-0 p-2">
-                                            <img id="logo-preview" src="" alt="Business Logo Preview"
-                                                class="object-contain w-full h-full" />
+                                            <img id="logo-preview" src="" alt="Business Logo Preview" class="object-contain w-full h-full" />
                                         </div>
                                         <div id="logo-placeholder">
                                             <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
                                             <span class="text-indigo-600 font-semibold">Add Business Logo</span>
                                         </div>
-                                        <input type="file" id="logo-input"
-                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                            accept="image/png, image/jpeg" />
+                                        <input type="file" id="logo-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/png, image/jpeg" />
                                     </div>
                                 </div>
 
@@ -637,24 +532,18 @@
                                             From <span class="text-gray-400 text-sm">(Your Details)</span>
                                         </h3>
                                         <div>
-                                            <label for="businessName" class="text-sm font-medium text-gray-600">Business
-                                                Name</label>
-                                            <input type="text" id="businessName" class="input-field" required
-                                                readonly />
+                                            <label for="businessName" class="text-sm font-medium text-gray-600">Business Name</label>
+                                            <input type="text" id="businessName" class="input-field" required readonly />
                                         </div>
 
                                         <div class="grid grid-cols-2 gap-2">
                                             <div>
-                                                <label for="business_city"
-                                                    class="text-sm font-medium text-gray-600">City</label>
-                                                <input type="text" id="business_city" class="input-field" required
-                                                    readonly />
+                                                <label for="business_city" class="text-sm font-medium text-gray-600">City</label>
+                                                <input type="text" id="business_city" class="input-field" required readonly />
                                             </div>
                                             <div>
-                                                <label for="business_country"
-                                                    class="text-sm font-medium text-gray-600">Country</label>
-                                                <input type="text" id="business_country" class="input-field" required
-                                                    readonly />
+                                                <label for="business_country" class="text-sm font-medium text-gray-600">Country</label>
+                                                <input type="text" id="business_country" class="input-field" required readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -668,18 +557,14 @@
                                             <option value="">Select Client</option>
                                         </select>
 
-                                        <button type="button" id="add-new-client-btn"
-                                            class="w-full text-center text-indigo-600 font-semibold py-2 border-2 border-dashed rounded-lg hover:bg-indigo-50 text-sm">
+                                        <button type="button" id="add-new-client-btn" class="w-full text-center text-indigo-600 font-semibold py-2 border-2 border-dashed rounded-lg hover:bg-indigo-50 text-sm">
                                             + Add New Client
                                         </button>
                                     </div>
                                 </div>
 
-
-
                                 <div class="col-span-2 p-4 rounded-lg border shadow-sm">
-                                    <div
-                                        class="item-table-header grid grid-cols-12 gap-2 p-3 rounded-t-lg text-sm border-b">
+                                    <div class="item-table-header grid grid-cols-12 gap-2 p-3 rounded-t-lg text-sm border-b">
                                         <h4 class="col-span-4 font-semibold">Item</h4>
                                         <h4 class="col-span-2 font-semibold text-center">Quantity</h4>
                                         <h4 class="col-span-2 font-semibold text-center">Rate</h4>
@@ -706,19 +591,15 @@
                                         <div class="flex justify-between items-center">
                                             <span class="text-gray-600 flex items-center">
                                                 Tax (
-                                                <input type="number" id="tax-percentage" min="0" max="100"
-                                                    class="w-16 mx-1 border rounded text-right text-sm px-2 py-1"
-                                                    value="0" placeholder="0" />%)
+                                                <input type="number" id="tax-percentage" min="0" max="100" class="w-16 mx-1 border rounded text-right text-sm px-2 py-1" value="0" placeholder="0" />%)
                                             </span>
                                             <span class="font-semibold text-gray-800" id="tax">₹0.00</span>
                                         </div>
-<!-- NEW: Round Off Row -->
-        <div class="flex justify-between items-center">
-            <span class="text-gray-600">Round Off</span>
-            <span class="font-semibold text-gray-800" id="round_off">₹0.00</span>
-        </div>
-                                        <div
-                                            class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">Round Off</span>
+                                            <span class="font-semibold text-gray-800" id="round_off">₹0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
                                             <span class="font-bold text-lg text-gray-800">Total (INR)</span>
                                             <span class="font-bold text-lg text-gray-800" id="total">₹0.00</span>
                                         </div>
@@ -728,40 +609,30 @@
                                 <div class="flex flex-col md:flex-row gap-6 mt-6">
                                     <div class="flex-1 space-y-4">
                                         <div class="w-full overflow-x-auto">
+                                            
                                             <div class="flex flex-nowrap gap-2 mb-4 whitespace-nowrap">
-                                                <button type="button"
-                                                    class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
-                                                    data-target="terms">+ Terms & Conditions</button>
-                                                <button type="button"
-                                                    class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
-                                                    data-target="notes">+ Notes</button>
-                                                <button type="button"
-                                                    class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
-                                                    data-target="signature-box">+ Authorised Signatory</button>
+                                                <button type="button" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="terms">+ Terms & Conditions</button>
+                                                <button type="button" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="notes">+ Notes</button>
+                                                <button type="button" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="signature-box">+ Authorised Signatory</button>
                                             </div>
                                         </div>
 
                                         <div id="terms" class="hidden mt-2">
-                                            <label class="block text-sm font-medium text-gray-700">Terms &
-                                                Conditions</label>
-                                            <textarea id="terms-input"
-                                                class="w-full border rounded p-2 mt-1">THANK YOU!</textarea>
+                                            <label class="block text-sm font-medium text-gray-700">Terms & Conditions</label>
+                                            <textarea id="terms-input" class="w-full border rounded p-2 mt-1">THANK YOU!</textarea>
                                         </div>
                                         <div id="notes" class="hidden mt-2">
                                             <label class="block text-sm font-medium text-gray-700">Notes</label>
-                                            <textarea id="notes-input"
-                                                class="w-full border rounded p-2 mt-1">Thanks For Business With Us</textarea>
+                                            <textarea id="notes-input" class="w-full border rounded p-2 mt-1">Thanks For Business With Us</textarea>
                                         </div>
                                         <div id="signature-box" class="hidden mt-2">
                                             <div class="flex items-center gap-4 mb-3 border-b pb-3">
                                                 <label class="flex items-center gap-2 cursor-pointer">
-                                                    <input type="radio" name="signatory_type" value="text"
-                                                        class="form-radio" checked>
+                                                    <input type="radio" name="signatory_type" value="text" class="form-radio" checked>
                                                     <span class="text-sm font-medium">Enter Name</span>
                                                 </label>
                                                 <label class="flex items-center gap-2 cursor-pointer">
-                                                    <input type="radio" name="signatory_type" value="image"
-                                                        class="form-radio">
+                                                    <input type="radio" name="signatory_type" value="image" class="form-radio">
                                                     <span class="text-sm font-medium">Upload Signature</span>
                                                 </label>
                                             </div>
@@ -771,22 +642,16 @@
                                                     <option value="">Select Signatory</option>
                                                     <option value="add_new">-- Add New Signatory --</option>
                                                 </select>
-                                                <div id="add-signatory-container"
-                                                    class="hidden flex gap-2 items-center">
-                                                    <input id="new-signatory-input" class="input-field flex-grow"
-                                                        placeholder="Enter New Signatory Name">
-                                                    <button type="button" id="save-signatory-btn"
-                                                        class="btn btn-primary btn-small">Save</button>
-                                                    <button type="button" id="cancel-add-signatory-btn"
-                                                        class="btn btn-secondary btn-small">Cancel</button>
+                                                <div id="add-signatory-container" class="hidden flex gap-2 items-center">
+                                                    <input id="new-signatory-input" class="input-field flex-grow" placeholder="Enter New Signatory Name">
+                                                    <button type="button" id="save-signatory-btn" class="btn btn-primary btn-small">Save</button>
+                                                    <button type="button" id="cancel-add-signatory-btn" class="btn btn-secondary btn-small">Cancel</button>
                                                 </div>
                                             </div>
 
                                             <div id="signatory-image-container" class="hidden space-y-2">
-                                                <input type="file" id="signatory-image-input" class="input-field"
-                                                    accept="image/png, image/jpeg">
-                                                <div id="signatory-image-preview"
-                                                    class="mt-2 border border-dashed rounded-lg p-2 h-24 flex items-center justify-center bg-gray-50 text-gray-400">
+                                                <input type="file" id="signatory-image-input" class="input-field" accept="image/png, image/jpeg">
+                                                <div id="signatory-image-preview" class="mt-2 border border-dashed rounded-lg p-2 h-24 flex items-center justify-center bg-gray-50 text-gray-400">
                                                     <span>Signature Preview</span>
                                                 </div>
                                             </div>
@@ -799,16 +664,17 @@
                 </div>
 
                 <div id="preview-sales-order-page" class="hidden">
-                    <div class="sales-order-container">
-                        <header class="sales-order-header">
+                    <div class="invoice-container">
+                        <header class="invoice-header">
                             <div class="logo-container">
                                 <img id="businessLogoPreview" src="" alt="Business Logo" />
                                 <span id="preview-business-name" class="font-bold text-lg"></span>
                             </div>
-                            <div class="sales-order-details">
+                            <div class="invoice-details">
                                 <h1 class="text-4xl font-bold text-gray-800 uppercase">Sales Order</h1>
-                                <p><strong>Sales No:</strong> <span id="preview-so-no"></span></p>
+                                <p><strong>SO No:</strong> <span id="preview-so-no"></span></p>
                                 <p><strong>Date:</strong> <span id="preview-so-date"></span></p>
+                                <p><strong>Delivery Date:</strong> <span id="preview-delivery-date"></span></p>
                             </div>
                         </header>
 
@@ -846,11 +712,10 @@
                                     <span>Tax (<span id="preview-tax-rate"></span>%)</span>
                                     <span id="preview-tax"></span>
                                 </div>
-                                 <!-- NEW: Round Off Row -->
-        <div>
-            <span>Round Off</span>
-            <span id="preview-round-off"></span>
-        </div>
+                                <div>
+                                    <span>Round Off</span>
+                                    <span id="preview-round-off"></span>
+                                </div>
                                 <div class="total-amount">
                                     <span>Total Amount</span>
                                     <span id="preview-total"></span>
@@ -860,8 +725,10 @@
 
                         <div class="separator"></div>
 
-                        <footer class="sales-order-footer">
+                        <footer class="invoice-footer">
                             <div class="notes-terms">
+                                
+
                                 <div id="preview-notes-block" class="hidden">
                                     <h3 class="font-semibold mb-1">Notes</h3>
                                     <p id="preview-notes" class="text-sm text-gray-700 whitespace-pre-wrap"></p>
@@ -872,8 +739,7 @@
                                 </div>
                             </div>
                             <div id="preview-signature-area" class="signature-section hidden">
-                                <div class="signature-image-space">
-                                </div>
+                                <div class="signature-image-space"></div>
                                 <div class="signature-line">
                                     Authorized Signitary
                                 </div>
@@ -892,27 +758,23 @@
             </div>
         </div>
     </div>
-    <div id="client-modal"
-        class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
+
+    <div id="client-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
         <div id="client-modal-backdrop" class="absolute inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm"></div>
         <div id="client-modal-panel" class="relative w-full max-w-2xl mx-4">
             <div class="bg-white rounded-lg p-6 shadow-2xl">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-xl font-semibold text-gray-900">Create New Client</h2>
-                    <button id="client-modal-close" class="text-gray-500 hover:text-gray-800"><i
-                            class="fas fa-times fa-lg"></i></button>
+                    <button id="client-modal-close" class="text-gray-500 hover:text-gray-800"><i class="fas fa-times fa-lg"></i></button>
                 </div>
                 <form id="client-form" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm text-gray-600">Business
-                                Name*</label>
-                            <input name="client_name" type="text" required class="input-field mt-1"
-                                placeholder="Business Name (Required)">
+                            <label class="block text-sm text-gray-600">Business Name*</label>
+                            <input name="client_name" type="text" required class="input-field mt-1" placeholder="Business Name (Required)">
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-600">Client
-                                Industry</label>
+                            <label class="block text-sm text-gray-600">Client Industry</label>
                             <select name="client_industry" class="input-field mt-1">
                                 <option value="">-Select an Industry-</option>
                                 <option value="Technology">Technology</option>
@@ -930,8 +792,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-600">Select
-                                Country*</label>
+                            <label class="block text-sm text-gray-600">Select Country*</label>
                             <select name="country" required class="input-field mt-1">
                                 <option>India</option>
                                 <option>United States</option>
@@ -940,8 +801,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-600">State /
-                                Province</label>
+                            <label class="block text-sm text-gray-600">State / Province</label>
                             <select name="state" class="input-field mt-1">
                                 <option>Select State / Province</option>
                                 <option>California</option>
@@ -955,10 +815,8 @@
                             <input name="city" type="text" class="input-field mt-1" placeholder="City/Town Name">
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-600">Postal Code / Zip
-                                Code</label>
-                            <input name="pincode" type="text" class="input-field mt-1"
-                                placeholder="Postal Code / Zip Code">
+                            <label class="block text-sm text-gray-600">Postal Code / Zip Code</label>
+                            <input name="pincode" type="text" class="input-field mt-1" placeholder="Postal Code / Zip Code">
                         </div>
                     </div>
                     <div>
@@ -973,6 +831,27 @@
             </div>
         </div>
     </div>
+
+    <div id="prefix-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm"></div>
+        <div class="relative w-full max-w-md mx-4">
+            <div class="bg-white rounded-lg p-6 shadow-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">Change Prefix?</h2>
+                    <button id="prefix-modal-close" class="text-gray-500 hover:text-gray-800">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <div class="mb-6">
+                    <p class="text-gray-700 mb-2">You're changing the Sales Order prefix from <strong id="old-prefix-text"></strong> to <strong id="new-prefix-text"></strong>.</p>
+                    <p class="text-gray-600 text-sm">Do you want to apply this change?</p>
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button id="prefix-once-btn" class="btn btn-secondary">Once</button>
+                    <button id="prefix-always-btn" class="btn btn-primary">Always</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -981,10 +860,17 @@
             const CLIENT_API_URL = `${API_BASE_URL}/clients`;
             const COMPANY_API_URL = `${API_BASE_URL}/companies`;
             const SALES_ORDER_API_URL = `${API_BASE_URL}/sales-order`;
-            const QUOTATION_API_URL = `${API_BASE_URL}/quotation`;
+            // const BANK_API_URL = `${API_BASE_URL}/banks`; // Removed Bank API
             const SIGNATORY_STORAGE_KEY = 'qsi_saved_signatories';
             const SIGNATURE_IMAGE_STORAGE_KEY = 'qsi_saved_signature_image';
+            const PREFIX_STORAGE_KEY = 'qsi_sales_order_prefix';
+            const PREFIX_COUNTERS_KEY = 'qsi_sales_order_prefix_counters';
             let COMPANY_ID = null;
+
+            // Prefix management variables
+            let originalPrefix = 'SO';
+            let currentPrefix = 'SO';
+            let prefixChangeMode = null;
 
             const salesOrderForm = document.getElementById("sales-order-form");
             const itemsContainer = document.getElementById("items-container");
@@ -997,7 +883,6 @@
             const logoPlaceholder = document.getElementById("logo-placeholder");
             const businessLogoPreview = document.getElementById("businessLogoPreview");
             const saveBtnLoading = document.getElementById("save-btn-loading");
-            const saveBtn = document.getElementById("save-btn");
             const saveContinueBtn = document.getElementById("save-continue-btn");
             const previewPage = document.getElementById("preview-sales-order-page");
             const createPage = document.getElementById("create-sales-order-page");
@@ -1007,6 +892,15 @@
             const menuToggle = document.getElementById("menu-toggle");
             const sidebar = document.getElementById("sidebar");
             const menuBackdrop = document.getElementById("menu-backdrop");
+            const prefixInput = document.getElementById("sales-order-prefix");
+
+            // Prefix modal elements
+            const prefixModal = document.getElementById("prefix-modal");
+            const prefixModalClose = document.getElementById("prefix-modal-close");
+            const prefixOnceBtn = document.getElementById("prefix-once-btn");
+            const prefixAlwaysBtn = document.getElementById("prefix-always-btn");
+            const oldPrefixText = document.getElementById("old-prefix-text");
+            const newPrefixText = document.getElementById("new-prefix-text");
 
             if (menuToggle && sidebar && menuBackdrop) {
                 menuToggle.addEventListener("click", () => {
@@ -1019,8 +913,107 @@
                     menuBackdrop.classList.add("hidden");
                 });
             }
+
+            // ===== PREFIX MANAGEMENT FUNCTIONS =====
+
+            function loadSavedPrefix() {
+                const savedPrefix = localStorage.getItem(PREFIX_STORAGE_KEY);
+                if (savedPrefix) {
+                    originalPrefix = savedPrefix;
+                    currentPrefix = savedPrefix;
+                    if (prefixInput) {
+                        prefixInput.value = savedPrefix;
+                    }
+                }
+            }
+
+            function getPrefixCounters() {
+                const stored = localStorage.getItem(PREFIX_COUNTERS_KEY);
+                return stored ? JSON.parse(stored) : {};
+            }
+
+            function setPrefixCounter(prefix, count) {
+                const counters = getPrefixCounters();
+                counters[prefix] = count;
+                localStorage.setItem(PREFIX_COUNTERS_KEY, JSON.stringify(counters));
+            }
+
+            function getNextSalesOrderNumber(prefix) {
+                const counters = getPrefixCounters();
+                const currentCount = counters[prefix] || 0;
+                const nextCount = currentCount + 1;
+                setPrefixCounter(prefix, nextCount);
+                return `${prefix}${String(nextCount).padStart(4, '0')}`;
+            }
+
+            function openPrefixModal(oldPrefix, newPrefix) {
+                if (oldPrefixText) oldPrefixText.textContent = oldPrefix;
+                if (newPrefixText) newPrefixText.textContent = newPrefix;
+                prefixModal?.classList.remove('hidden');
+            }
+
+            function closePrefixModal() {
+                prefixModal?.classList.add('hidden');
+            }
+
+            function handlePrefixChange(mode) {
+                const newPrefix = prefixInput.value.trim().toUpperCase();
+
+                if (mode === 'always') {
+                    localStorage.setItem(PREFIX_STORAGE_KEY, newPrefix);
+                    originalPrefix = newPrefix;
+                    showAlert(`Prefix changed to "${newPrefix}" for all future sales orders.`, 'success', 3000);
+                } else if (mode === 'once') {
+                    showAlert(`Using prefix "${newPrefix}" for this sales order only.`, 'success', 3000);
+                }
+
+                currentPrefix = newPrefix;
+                prefixChangeMode = mode;
+                closePrefixModal();
+            }
+
+            if (prefixInput) {
+                prefixInput.addEventListener('blur', function () {
+                    const newValue = this.value.trim().toUpperCase();
+                    this.value = newValue;
+
+                    if (newValue && newValue !== originalPrefix && newValue !== currentPrefix) {
+                        openPrefixModal(originalPrefix, newValue);
+                    }
+                });
+
+                prefixInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.blur();
+                    }
+                });
+            }
+
+            prefixModalClose?.addEventListener('click', () => {
+                prefixInput.value = currentPrefix;
+                closePrefixModal();
+            });
+
+            prefixOnceBtn?.addEventListener('click', () => {
+                handlePrefixChange('once');
+            });
+
+            prefixAlwaysBtn?.addEventListener('click', () => {
+                handlePrefixChange('always');
+            });
+
+            prefixModal?.addEventListener('click', (e) => {
+                if (e.target === prefixModal) {
+                    prefixInput.value = currentPrefix;
+                    closePrefixModal();
+                }
+            });
+
+            // ===== END PREFIX MANAGEMENT =====
+
             function setLoading(isLoading) {
-                if (saveContinueBtn) { // Use the correct button variable
+                if (saveContinueBtn) {
                     saveContinueBtn.disabled = isLoading;
                 }
                 if (saveBtnLoading) {
@@ -1033,19 +1026,18 @@
                 const alertDiv = document.createElement("div");
                 alertDiv.className = `alert alert-${type}`;
                 alertDiv.textContent = message;
-                alertContainer.innerHTML = ''; // Clear previous alerts
+                alertContainer.innerHTML = '';
                 alertContainer.appendChild(alertDiv);
                 setTimeout(() => {
                     alertDiv.remove();
                 }, duration);
             }
 
-            /* Persist token so reloads keep auth */
             function setAuthToken(token, scheme = "Bearer") {
                 try {
                     localStorage.setItem("auth_token", token);
                     localStorage.setItem("auth_scheme", scheme);
-                } catch (e) { /* ignore storage errors */ }
+                } catch (e) { }
                 window.__AUTH_TOKEN = token;
                 window.__AUTH_SCHEME = scheme;
             }
@@ -1053,12 +1045,11 @@
                 try {
                     localStorage.removeItem("auth_token");
                     localStorage.removeItem("auth_scheme");
-                } catch (e) { /* ignore */ }
+                } catch (e) { }
                 window.__AUTH_TOKEN = null;
                 window.__AUTH_SCHEME = null;
             }
 
-            /* Read token from memory OR localStorage; default scheme = Bearer */
             function getAuthHeaders() {
                 const token = localStorage.getItem("token");
                 if (token) {
@@ -1066,19 +1057,16 @@
                 } return null;
             }
 
-            /* Robust fetch wrapper that attaches auth headers and surfaces 401 clearly */
             async function safeFetch(url, opts = {}) {
                 const headers = Object.assign({}, opts.headers || {});
-                const authHeaders = getAuthHeaders(); // Reads 'token', returns null if missing
+                const authHeaders = getAuthHeaders();
 
-                // --- Handle Missing Token ---
                 if (!authHeaders) {
                     alert("Authentication token not found. Please log in.");
-                    window.location.href = '/login.html'; // Adjust login path
+                    window.location.href = '/login.html';
                     throw new Error("Authentication token not found.");
                 }
                 Object.assign(headers, authHeaders);
-                // --- End Handle Missing Token ---
 
                 if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
                     headers["Content-Type"] = "application/json";
@@ -1093,15 +1081,13 @@
                     try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
 
                     if (!res.ok) {
-                        // --- Handle 401 Unauthorized ---
                         if (res.status === 401) {
                             alert("Session expired or invalid. Please log in again.");
                             localStorage.removeItem('token');
                             localStorage.removeItem('userId');
-                            window.location.href = '/login.html'; // Redirect to login
+                            window.location.href = '/login.html';
                             throw new Error("Session expired");
                         }
-                        // --- End Handle 401 ---
                         const errMsg = (data && data.message) || (typeof data === "string" ? data : res.statusText) || "Request failed";
                         const error = new Error(errMsg);
                         error.status = res.status;
@@ -1111,7 +1097,6 @@
 
                     return data;
                 } catch (err) {
-                    // rethrow so caller can handle and show alerts
                     if (err.message !== 'Authentication token not found' && err.message !== 'Session expired') {
                         throw err;
                     }
@@ -1144,15 +1129,12 @@
                 }
             }
 
-
-            /* loadCompany: same behavior as before but clearer on 401 */
             async function loadCompany() {
                 try {
                     const companies = await safeFetch(COMPANY_API_URL, { method: "GET" });
                     if (Array.isArray(companies) && companies.length > 0) {
                         const company = companies[0];
                         COMPANY_ID = company._id || company.id || null;
-                        // ... (rest of loadCompany is fine) ...
                         const bn = document.getElementById("businessName");
                         const bc = document.getElementById("business_city");
                         const bco = document.getElementById("business_country");
@@ -1178,7 +1160,6 @@
                     }
                 }
             }
-            /* loadClients: handles 401 explicitly so user knows to authenticate */
             async function loadClients() {
                 try {
                     const clients = await safeFetch(CLIENT_API_URL, { method: "GET" });
@@ -1200,21 +1181,20 @@
                 }
             }
 
-
             function createItemRow() {
                 const row = document.createElement("div");
                 row.className = "item-row space-y-2 p-2 border rounded";
                 row.innerHTML = `
-                    <div class="grid grid-cols-12 gap-2 items-center">
-                        <input class="col-span-4 item-name input-field" placeholder="Item Name" required>
-                        <input type="number" class="col-span-2 quantity input-field text-right"  placeholder="0" min="0" required>
-                        <input type="text" class="col-span-2 rate input-field text-right"  placeholder="0" required>
-                        <span class="col-span-3 amount text-right">₹0.00</span>
-                        <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                    <textarea class="description input-field col-span-12" rows="2" placeholder="Item description"></textarea>
+                            <div class="grid grid-cols-12 gap-2 items-center">
+                                <input class="col-span-4 item-name input-field" placeholder="Item Name" required>
+                                <input type="number" class="col-span-2 quantity input-field text-right"  placeholder="0" min="0" required>
+                                <input type="text" class="col-span-2 rate input-field text-right"  placeholder="0" required>
+                                <span class="col-span-3 amount text-right">₹0.00</span>
+                                <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <textarea class="description input-field col-span-12" rows="2" placeholder="Item description"></textarea>
                 `;
 
                 const qtyEl = row.querySelector(".quantity");
@@ -1244,92 +1224,93 @@
                 } catch (e) { console.error(e); }
             }
 
-            // ============================================
-// 1. UPDATE THE updateTotals() FUNCTION
-// ============================================
-function updateTotals() {
-    let subtotal = 0;
-    document.querySelectorAll(".item-row").forEach((row) => {
-        const qty = parseFloat(row.querySelector(".quantity").value) || 0;
-        const rate = parseFloat(row.querySelector(".rate").value) || 0;
-        subtotal += qty * rate;
-    });
+            function updateTotals() {
+                let subtotal = 0;
+                document.querySelectorAll(".item-row").forEach((row) => {
+                    const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+                    const rate = parseFloat(row.querySelector(".rate").value) || 0;
+                    subtotal += qty * rate;
+                });
 
-    const taxP = parseFloat(taxPercentageInput?.value) || 0;
-    const tax = subtotal * (taxP / 100);
-    const totalBeforeRound = subtotal + tax;
-    
-    // Calculate round off
-    const totalRounded = Math.round(totalBeforeRound);
-    const roundOff = totalRounded - totalBeforeRound;
+                const taxP = parseFloat(taxPercentageInput?.value) || 0;
+                const tax = subtotal * (taxP / 100);
+                const totalBeforeRound = subtotal + tax;
 
-    const sEl = document.getElementById("sub_total");
-    const taxEl = document.getElementById("tax");
-    const roundOffEl = document.getElementById("round_off");
-    const totalEl = document.getElementById("total");
-    
-    if (sEl) sEl.textContent = `₹${subtotal.toFixed(2)}`;
-    if (taxEl) taxEl.textContent = `₹${tax.toFixed(2)}`;
-    if (roundOffEl) roundOffEl.textContent = `₹${roundOff.toFixed(2)}`;
-    if (totalEl) totalEl.textContent = `₹${totalRounded}`; // Whole number
-}
+                // Calculate round off
+                const totalRounded = Math.round(totalBeforeRound);
+                const roundOff = totalRounded - totalBeforeRound;
 
-// ============================================
-// 2. UPDATE THE collectSalesOrderData() FUNCTION
-// ============================================
-function collectSalesOrderData() {
-    const items = [...document.querySelectorAll(".item-row")].map((row) => {
-        const qty = parseFloat(row.querySelector(".quantity").value) || 0;
-        const rate = parseFloat(row.querySelector(".rate").value) || 0;
-        return {
-            item_name: (row.querySelector(".item-name").value || "").trim(),
-            description: (row.querySelector(".description").value || "").trim(),
-            quantity: qty,
-            rate: rate,
-            amount: +(qty * rate).toFixed(2),
-        };
-    });
+                const sEl = document.getElementById("sub_total");
+                const taxEl = document.getElementById("tax");
+                const roundOffEl = document.getElementById("round_off");
+                const totalEl = document.getElementById("total");
 
-    const subTotal = items.reduce((s, it) => s + it.amount, 0);
-    const taxP = parseFloat(taxPercentageInput?.value) || 0;
-    const tax = +(subTotal * (taxP / 100));
-    const totalBeforeRound = +(subTotal + tax);
-    const totalRounded = Math.round(totalBeforeRound);
-    const roundOff = totalRounded - totalBeforeRound;
-    
-    const signatoryType = document.querySelector('input[name="signatory_type"]:checked').value;
-    let signatoryName = null;
-    let signatoryImage = null;
+                if (sEl) sEl.textContent = `₹${subtotal.toFixed(2)}`;
+                if (taxEl) taxEl.textContent = `₹${tax.toFixed(2)}`;
+                if (roundOffEl) roundOffEl.textContent = `₹${roundOff.toFixed(2)}`;
+                if (totalEl) totalEl.textContent = `₹${totalRounded.toFixed(0)}`; 
+            }
 
-    if (signatoryType === 'text') {
-        const selectEl = document.getElementById('signatory-select');
-        if (selectEl && selectEl.value && selectEl.value !== 'add_new') {
-            signatoryName = selectEl.value;
-        }
-    } else {
-        signatoryImage = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
-    }
+            function collectSalesOrderData() {
+                const items = [...document.querySelectorAll(".item-row")].map((row) => {
+                    const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+                    const rate = parseFloat(row.querySelector(".rate").value) || 0;
+                    return {
+                        item_name: (row.querySelector(".item-name").value || "").trim(),
+                        description: (row.querySelector(".description").value || "").trim(),
+                        quantity: qty,
+                        rate: rate,
+                        amount: +(qty * rate).toFixed(2),
+                    };
+                });
 
-    return {
-        sales_date: document.getElementById("sales-order-date")?.value || new Date().toISOString().slice(0, 10),
-        items,
-        sub_total: +subTotal.toFixed(2),
-        tax: +tax.toFixed(2),
-        round_off: +roundOff.toFixed(2), // NEW FIELD
-        total: totalRounded, // Whole number
-        tax_percentage: taxP,
-        from_company_id: COMPANY_ID,
-        to_client_id: billedToSelect?.value || "",
-        terms_and_condition: (document.querySelector("#terms textarea")?.value || "").trim(),
-        notes: (document.querySelector("#notes textarea")?.value || "").trim(),
-        signatory: signatoryName,
-        signatory_image: signatoryImage,
-    };
-}
+                const subTotal = items.reduce((s, it) => s + it.amount, 0);
+                const taxP = parseFloat(taxPercentageInput?.value) || 0;
+                const tax = +(subTotal * (taxP / 100));
+                const totalBeforeRound = +(subTotal + tax);
+                const totalRounded = Math.round(totalBeforeRound);
+                const roundOff = totalRounded - totalBeforeRound;
+
+                const signatoryType = document.querySelector('input[name="signatory_type"]:checked').value;
+                let signatoryName = null;
+                let signatoryImage = null;
+
+                if (signatoryType === 'text') {
+                    const selectEl = document.getElementById('signatory-select');
+                    if (selectEl && selectEl.value && selectEl.value !== 'add_new') {
+                        signatoryName = selectEl.value;
+                    }
+                } else {
+                    signatoryImage = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
+                }
+
+                // ✅ Logic to grab prefix immediately if typed
+                const prefixInputVal = document.getElementById("sales-order-prefix").value.trim().toUpperCase();
+                const finalPrefix = prefixInputVal || currentPrefix;
+                const soNumber = getNextSalesOrderNumber(finalPrefix);
+
+                return {
+                    prefix: finalPrefix,
+                    sales_order_number: soNumber,
+                    sales_order_date: document.getElementById("sales-order-date")?.value || new Date().toISOString().slice(0, 10),
+                    delivery_date: document.getElementById("delivery-date")?.value || "",
+                    items,
+                    sub_total: +subTotal.toFixed(2),
+                    tax: +tax.toFixed(2),
+                    round_off: +roundOff.toFixed(2),
+                    total: totalRounded,
+                    tax_percentage: taxP,
+                    from_company_id: COMPANY_ID,
+                    to_client_id: billedToSelect?.value || "",
+                    terms_and_condition: (document.querySelector("#terms textarea")?.value || "").trim(),
+                    notes: (document.querySelector("#notes textarea")?.value || "").trim(),
+                    signatory: signatoryName,
+                    signatory_image: signatoryImage,
+                };
+            }
 
             async function submitSalesOrder(data) {
                 try {
-                    // Use the corrected constant
                     const result = await safeFetch(SALES_ORDER_API_URL, {
                         method: "POST",
                         body: JSON.stringify(data),
@@ -1337,98 +1318,108 @@ function collectSalesOrderData() {
                     return result;
                 } catch (err) {
                     throw err;
-                    S
                 }
-            }
-            function validateSalesOrderForm() {
-                // --- 1️⃣ Client validation ---
-                if (!billedToSelect?.value) {
-                    showAlert("Please select a client before saving.", "error", 4000);
-                    return false;
-                }
-
-                // --- 2️⃣ Item validation ---
-                const rows = document.querySelectorAll(".item-row");
-                if (rows.length === 0) {
-                    showAlert("Please add at least one item.", "error", 4000);
-                    return false;
-                }
-
-                for (const row of rows) {
-                    const name = row.querySelector(".item-name")?.value.trim();
-                    const qtyStr = row.querySelector(".quantity")?.value.trim();
-                    const rateStr = row.querySelector(".rate")?.value.trim();
-
-                    if (!name) {
-                        showAlert("Item name cannot be empty.", "error", 4000);
-                        row.querySelector(".item-name").focus();
-                        return false;
-                    }
-
-                    // --- Quantity validation ---
-                    if (qtyStr === "" || isNaN(qtyStr) || Number(qtyStr) <= 0) {
-                        showAlert("Invalid format: Quantity must be a positive number.", "error", 4000);
-                        row.querySelector(".quantity").focus();
-                        return false;
-                    }
-
-                    // --- Rate validation ---
-                    if (rateStr === "" || isNaN(rateStr) || Number(rateStr) < 0) {
-                        showAlert("Invalid format: Rate must be a valid number.", "error", 4000);
-                        row.querySelector(".rate").focus();
-                        return false;
-                    }
-                }
-
-                return true;
             }
 
             salesOrderForm?.addEventListener("submit", async (e) => {
                 e.preventDefault();
-                if (!validateSalesOrderForm()) {
-                    return; // stop submit
+
+                // Validation
+                const rows = document.querySelectorAll('.item-row');
+                const messages = [];
+                let isValid = true;
+                let firstInvalidEl = null;
+                document.querySelectorAll('.error-text').forEach(el => el.remove());
+
+                if (!billedToSelect?.value) {
+                    messages.push("⚠️ Please select a client before saving.");
+                    isValid = false;
                 }
+                if (!rows.length) {
+                    messages.push("⚠️ Please add at least one item.");
+                    isValid = false;
+                }
+                rows.forEach((row, index) => {
+                    const nameEl = row.querySelector('.item-name');
+                    const qtyEl = row.querySelector('.quantity');
+                    const rateEl = row.querySelector('.rate');
+                    const nameVal = nameEl?.value.trim() || '';
+                    const qtyVal = qtyEl?.value.trim() || '';
+                    const rateVal = rateEl?.value.trim() || '';
+
+                    const addInlineError = (el, msg) => {
+                        if (!el) return;
+                        const small = document.createElement('small');
+                        small.className = 'error-text text-red-500 text-xs block mt-1';
+                        small.textContent = msg;
+                        el.insertAdjacentElement('afterend', small);
+                    };
+
+                    if (!nameVal) {
+                        addInlineError(nameEl, "Required");
+                        messages.push(`Item ${index + 1}: Missing item name.`);
+                        if (!firstInvalidEl) firstInvalidEl = nameEl;
+                        isValid = false;
+                    }
+                    if (!qtyVal) {
+                        addInlineError(qtyEl, "Required");
+                        messages.push(`Item ${index + 1}: Missing quantity.`);
+                        if (!firstInvalidEl) firstInvalidEl = qtyEl;
+                        isValid = false;
+                    } else if (!/^\d+(\.\d+)?$/.test(qtyVal)) {
+                        addInlineError(qtyEl, "Invalid format");
+                        messages.push(`Item ${index + 1}: Invalid quantity format.`);
+                        if (!firstInvalidEl) firstInvalidEl = qtyEl;
+                        isValid = false;
+                    }
+                    if (!rateVal) {
+                        addInlineError(rateEl, "Required");
+                        messages.push(`Item ${index + 1}: Missing rate.`);
+                        if (!firstInvalidEl) firstInvalidEl = rateEl;
+                        isValid = false;
+                    } else if (!/^\d+(\.\d+)?$/.test(rateVal)) {
+                        addInlineError(rateEl, "Invalid format");
+                        messages.push(`Item ${index + 1}: Invalid rate format.`);
+                        if (!firstInvalidEl) firstInvalidEl = rateEl;
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    showAlert(messages.join("\n"), "error", 6000);
+                    if (firstInvalidEl) firstInvalidEl.focus();
+                    return;
+                }
+
                 try {
                     setLoading(true);
                     const dataFromForm = collectSalesOrderData();
-
-                    // --- CAPTURE THE SERVER RESPONSE ---
                     const serverResponse = await submitSalesOrder(dataFromForm);
 
-                    // The server response (result) contains the saved 'document'
-                    const savedDoc = serverResponse.document;
+                    let savedDoc = serverResponse.document;
                     if (!savedDoc) {
-                        // Fallback if 'document' wrapper isn't present
-                        if (serverResponse.sales_no) {
+                        if (serverResponse.sales_order_number) {
                             savedDoc = serverResponse;
                         } else {
                             throw new Error("Server did not return a saved document.");
                         }
                     }
 
-                    // --- Populate Preview USING 'savedDoc' ---
-                    // Use the real S/O number from the backend
-                    document.getElementById("preview-so-no").textContent = savedDoc.sales_no || "N/A";
-                    document.getElementById("preview-so-date").textContent = new Date(savedDoc.sales_date).toLocaleDateString('en-GB');
+                    // Populate Preview
+                    document.getElementById("preview-so-no").textContent = savedDoc.sales_order_number || "N/A";
+                    document.getElementById("preview-so-date").textContent = new Date(savedDoc.sales_order_date).toLocaleDateString('en-GB');
+                    document.getElementById("preview-delivery-date").textContent = new Date(savedDoc.delivery_date).toLocaleDateString('en-GB');
 
-                    // The 'from' and 'to' objects are now nested inside the savedDoc
-                    // --- ADDRESSES ---
-
-                    // Format the "From" address block
                     const fromAddress = [
                         savedDoc.from?.company_name || '',
                         `${savedDoc.from?.address?.street || ''},${savedDoc.from?.address?.city || ''}, ${savedDoc.from?.address?.state || ''} ${savedDoc.from?.address?.postalCode || ''}`
-                    ].filter(line => line.trim() !== '').join('\n'); // Join non-empty lines with a newline
-
+                    ].filter(line => line.trim() !== '').join('\n');
                     document.getElementById("preview-from-details").textContent = fromAddress;
 
-
-                    // Format the "To" address block
                     const toAddress = [
                         savedDoc.to?.client_name || '',
                         `${savedDoc.to?.address?.city || ''}, ${savedDoc.to?.address?.state || ''} ${savedDoc.to?.address?.pincode || ''}`
-                    ].filter(line => line.trim() !== '').join('\n'); // Join non-empty lines with a newline
-
+                    ].filter(line => line.trim() !== '').join('\n');
                     document.getElementById("preview-to-details").textContent = toAddress;
 
                     const tbody = document.getElementById("preview-items-tbody");
@@ -1437,39 +1428,30 @@ function collectSalesOrderData() {
                         (savedDoc.items || []).forEach((item) => {
                             const tr = document.createElement("tr");
                             tr.innerHTML = `
-                <td>${escapeHtml(item.item_name)}</td>
-                <td class="text-center">${item.quantity}</td>
-                <td class="text-right">₹${item.rate.toFixed(2)}</td>
-                <td class="text-right">₹${item.amount.toFixed(2)}</td>
-           `;
+                            <td>${escapeHtml(item.item_name)}</td>
+                            <td class="text-center">${item.quantity}</td>
+                            <td class="text-right">₹${item.rate.toFixed(2)}</td>
+                            <td class="text-right">₹${item.amount.toFixed(2)}</td>
+                    `;
                             tbody.appendChild(tr);
                         });
                     }
 
-                    // ... inside your function that populates the preview ...
-
-                    // --- TOTALS ---
                     document.getElementById("preview-subtotal").textContent = `₹${savedDoc.sub_total.toFixed(2)}`;
                     document.getElementById("preview-tax-rate").textContent = savedDoc.tax_percentage;
                     document.getElementById("preview-tax").textContent = `₹${savedDoc.tax.toFixed(2)}`;
-                    // NEW: Round Off
-document.getElementById("preview-round-off").textContent = `₹${(savedDoc.round_off || 0).toFixed(2)}`;
-// Total as whole number
-document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc.total)}`;
+                    document.getElementById("preview-round-off").textContent = `₹${(savedDoc.round_off || 0).toFixed(2)}`;
+                    document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc.total)}`;
 
-                    // --- NOTES & TERMS ---
                     document.getElementById("preview-terms").textContent = savedDoc.terms_and_condition;
                     document.getElementById("preview-terms-block")?.classList.toggle("hidden", !savedDoc.terms_and_condition);
-
                     document.getElementById("preview-notes").textContent = savedDoc.notes;
                     document.getElementById("preview-notes-block")?.classList.toggle("hidden", !savedDoc.notes);
 
-                    // --- SIGNATURE AREA ---
                     const previewSignatureArea = document.getElementById("preview-signature-area");
                     const signatureImageSpace = previewSignatureArea.querySelector(".signature-image-space");
                     const previewSignatoryName = document.getElementById("preview-signatory-name");
 
-                    // Clear previous values
                     signatureImageSpace.innerHTML = '';
                     previewSignatoryName.textContent = '';
                     previewSignatureArea.classList.add("hidden");
@@ -1487,11 +1469,19 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
                         previewSignatureArea.classList.remove("hidden");
                     }
 
-
                     createPage?.classList.add("hidden");
                     previewPage?.classList.remove("hidden");
 
                     showAlert("Sales Order saved successfully.", "success", 4000);
+
+                    if (prefixChangeMode === 'once') {
+                        currentPrefix = originalPrefix;
+                        if (prefixInput) {
+                            prefixInput.value = originalPrefix;
+                        }
+                        prefixChangeMode = null;
+                    }
+
                 } catch (err) {
                     console.error("Save error:", err);
                     const msg = err?.message || "Failed to save sales order";
@@ -1520,7 +1510,6 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
                     const pdf = new jsPDF("p", "mm", "a4");
                     const imgData = canvas.toDataURL("image/png");
                     const pageWidth = pdf.internal.pageSize.getWidth();
-                    const pageHeight = pdf.internal.pageSize.getHeight();
                     const imgProps = pdf.getImageProperties(imgData);
                     const pdfWidth = pageWidth;
                     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
@@ -1528,7 +1517,7 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
                     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
                     let clientName = document.getElementById("preview-to-details")?.textContent || "Client";
                     clientName = clientName.replace(/[^a-zA-Z0-9-_ ]/g, "").replace(/\s+/g, "_");
-                    const filename = `${clientName}-Sales.pdf`;
+                    const filename = `${clientName}-SalesOrder.pdf`;
                     pdf.save(filename);
 
                     if (actionButtons) actionButtons.style.display = "block";
@@ -1544,20 +1533,13 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
             const clientModalCancel = document.getElementById("client-modal-cancel");
             const clientForm = document.getElementById("client-form");
 
-            function openClientModal() {
-                clientModal?.classList.remove("hidden");
-            }
-            function closeClientModal() {
-                clientModal?.classList.add("hidden");
-                clientForm?.reset();
-            }
+            function openClientModal() { clientModal?.classList.remove("hidden"); }
+            function closeClientModal() { clientModal?.classList.add("hidden"); clientForm?.reset(); }
 
             addNewClientBtn?.addEventListener("click", openClientModal);
             clientModalClose?.addEventListener("click", closeClientModal);
             clientModalCancel?.addEventListener("click", closeClientModal);
-            clientModal?.addEventListener("click", (e) => {
-                if (e.target === clientModal) closeClientModal();
-            });
+            clientModal?.addEventListener("click", (e) => { if (e.target === clientModal) closeClientModal(); });
 
             clientForm?.addEventListener("submit", async (e) => {
                 e.preventDefault();
@@ -1603,7 +1585,7 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
                 }
             });
 
-            // --- Signatory Management Listeners ---
+            // Signatory Listeners
             const signatoryTypeRadios = document.querySelectorAll('input[name="signatory_type"]');
             const signatoryTextContainer = document.getElementById('signatory-text-container');
             const signatoryImageContainer = document.getElementById('signatory-image-container');
@@ -1646,7 +1628,7 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
             cancelSignatoryBtn.addEventListener('click', () => {
                 addSignatoryContainer.classList.add('hidden');
                 newSignatoryInput.value = '';
-                signatorySelect.value = ''; // Reset dropdown
+                signatorySelect.value = '';
             });
 
             saveSignatoryBtn.addEventListener('click', () => {
@@ -1696,21 +1678,26 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
             (function init() {
                 const dateInput = document.getElementById("sales-order-date");
                 if (dateInput) dateInput.value = new Date().toISOString().slice(0, 10);
+                const deliveryInput = document.getElementById("delivery-date");
+                if (deliveryInput) {
+                    const due = new Date();
+                    due.setDate(due.getDate() + 30);
+                    deliveryInput.value = due.toISOString().slice(0, 10);
+                }
 
                 const timeInput = document.getElementById("sales-order-time");
                 if (timeInput) timeInput.value = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
                 createItemRow();
-
                 loadCompany();
                 loadClients();
                 loadSignatories();
                 loadSignatureImage();
+                loadSavedPrefix();
             })();
 
             if (saveContinueBtn) {
                 saveContinueBtn.addEventListener("click", async () => {
-                    // simulate form submit
                     salesOrderForm?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
                 });
             }
@@ -1726,250 +1713,6 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
             }
         })();
     </script>
-    <script>
-        // Add this script to your create_salesorder.html file
-        // Place it after your existing DOM elements are loaded
-
-        document.addEventListener('DOMContentLoaded', function () {
-
-            // Check if we're coming from a quotation conversion
-            const urlParams = new URLSearchParams(window.location.search);
-            const fromQuotation = urlParams.get('from_quotation');
-
-            if (fromQuotation === 'true') {
-                const quotationData = sessionStorage.getItem('quotationToConvert');
-
-                if (quotationData) {
-                    try {
-                        const data = JSON.parse(quotationData);
-                        populateSalesOrderFromQuotation(data);
-
-                        // Clear the session storage after use
-                        sessionStorage.removeItem('quotationToConvert');
-
-                    } catch (error) {
-                        console.error('Error parsing quotation data:', error);
-                        alert('Failed to load quotation data');
-                    }
-                }
-            }
-        });
-
-        function populateSalesOrderFromQuotation(quotation) {
-  console.log('Starting to populate sales order from quotation:', quotation);
-  
-  // Populate client information - Wait for clients to load first
-  if (quotation.to_client_id || (quotation.to && quotation.to._id)) {
-    const clientId = quotation.to_client_id || quotation.to._id;
-    console.log('Setting client ID:', clientId);
-    
-    const clientSelect = document.getElementById('billed-to-select');
-    if (clientSelect) {
-      // Wait a bit for the client options to be loaded
-      const setClient = () => {
-        // Try to find the option with this client ID
-        const options = Array.from(clientSelect.options);
-        const matchingOption = options.find(opt => opt.value === clientId);
-        
-        if (matchingOption) {
-          clientSelect.value = clientId;
-          console.log('Client selected successfully:', clientId);
-        } else {
-          console.warn('Client not found in dropdown. Available options:', 
-                       options.map(o => o.value));
-          
-          // If client not in dropdown, try to add it
-          if (quotation.to) {
-            const newOption = document.createElement('option');
-            newOption.value = clientId;
-            newOption.textContent = quotation.to.client_name || 'Imported Client';
-            clientSelect.appendChild(newOption);
-            clientSelect.value = clientId;
-            console.log('Added and selected new client option');
-          }
-        }
-      };
-      
-      // Try immediately and also after a delay
-      setClient();
-      setTimeout(setClient, 100);
-    }
-  }
-  
-  // Clear existing items first
-  const itemsContainer = document.getElementById('items-container');
-  if (itemsContainer) {
-    itemsContainer.innerHTML = '';
-    console.log('Cleared existing items');
-  }
-  
-  // Populate items/line items
-  if (quotation.items && Array.isArray(quotation.items)) {
-    console.log('Adding items:', quotation.items.length);
-    quotation.items.forEach((item, index) => {
-      console.log(`Adding item ${index}:`, item);
-      
-      // Add new item row using your existing function
-      if (window.SO_createItemRow) {
-        window.SO_createItemRow();
-      }
-      
-      // Small delay to ensure DOM is updated
-      setTimeout(() => {
-        populateItemRow(index, item);
-      }, 50 * (index + 1));
-    });
-  }
-  
-  // Populate tax percentage and totals directly from backend
-  setTimeout(() => {
-    const taxPercentageField = document.getElementById('tax-percentage');
-    if (taxPercentageField && quotation.tax_percentage !== undefined) {
-      taxPercentageField.value = quotation.tax_percentage;
-      console.log('Set tax percentage:', quotation.tax_percentage);
-    }
-    
-    // Set totals directly from backend data
-    // Set totals directly from backend data
-const subTotalEl = document.getElementById('sub_total');
-const taxEl = document.getElementById('tax');
-const roundOffEl = document.getElementById('round_off');
-const totalEl = document.getElementById('total');
-
-if (subTotalEl && quotation.sub_total !== undefined) {
-  subTotalEl.textContent = `₹${parseFloat(quotation.sub_total).toFixed(2)}`;
-  console.log('Set subtotal from backend:', quotation.sub_total);
-}
-
-if (taxEl && quotation.tax !== undefined) {
-  taxEl.textContent = `₹${parseFloat(quotation.tax).toFixed(2)}`;
-  console.log('Set tax from backend:', quotation.tax);
-}
-
-// NEW: Handle round off
-if (roundOffEl && quotation.round_off !== undefined) {
-  roundOffEl.textContent = `₹${parseFloat(quotation.round_off).toFixed(2)}`;
-  console.log('Set round off from backend:', quotation.round_off);
-}
-
-if (totalEl && quotation.total !== undefined) {
-  totalEl.textContent = `₹${Math.round(quotation.total)}`; // Whole number
-  console.log('Set total from backend:', quotation.total);
-}
-    
-    // Copy over additional fields
-    copyAdditionalFields(quotation);
-    
-    // Show a success message
-    showNotification('Quotation data loaded successfully', 'success');
-  }, quotation.items ? quotation.items.length * 100 : 500);
-}
-
-        function populateItemRow(rowIndex, item) {
-            // Adjust these selectors based on your actual HTML structure
-            const row = document.querySelector(`[data-row-index="${rowIndex}"]`) ||
-                document.querySelectorAll('.item-row')[rowIndex];
-
-            if (!row) return;
-
-            // Item name/description
-            const itemNameField = row.querySelector('[name="item_name"]') ||
-                row.querySelector('.item-name');
-            if (itemNameField) {
-                itemNameField.value = item.item_name || item.name || '';
-            }
-
-            // Quantity
-            const quantityField = row.querySelector('[name="quantity"]') ||
-                row.querySelector('.quantity');
-            if (quantityField) {
-                quantityField.value = item.quantity || 1;
-            }
-
-            // Rate/Price
-            const rateField = row.querySelector('[name="rate"]') ||
-                row.querySelector('.rate');
-            if (rateField) {
-                rateField.value = item.rate || item.price || 0;
-            }
-
-            // Tax percentage
-            const taxField = row.querySelector('[name="tax"]') ||
-                row.querySelector('.tax-percentage');
-            if (taxField) {
-                taxField.value = item.tax || item.tax_percentage || 0;
-            }
-
-            // Unit (if applicable)
-            const unitField = row.querySelector('[name="unit"]') ||
-                row.querySelector('.unit');
-            if (unitField && item.unit) {
-                unitField.value = item.unit;
-            }
-
-            // Trigger calculations if you have them
-            const changeEvent = new Event('change', { bubbles: true });
-            [quantityField, rateField, taxField].forEach(field => {
-                if (field) field.dispatchEvent(changeEvent);
-            });
-        }
-
-        function copyAdditionalFields(quotation) {
-            // Copy notes/remarks
-            const notesField = document.getElementById('notes') ||
-                document.getElementById('remarks');
-            if (notesField && quotation.notes) {
-                notesField.value = quotation.notes;
-            }
-
-            // Copy terms and conditions
-            const termsField = document.getElementById('terms');
-            if (termsField && quotation.terms) {
-                termsField.value = quotation.terms;
-            }
-
-            // Copy discount if applicable
-            const discountField = document.getElementById('discount');
-            if (discountField && quotation.discount) {
-                discountField.value = quotation.discount;
-            }
-
-            // Add a reference to the original quotation
-            const referenceField = document.getElementById('reference') ||
-                document.getElementById('quotation-reference');
-            if (referenceField && quotation.quotation_no) {
-                referenceField.value = `Converted from QUO-${quotation.quotation_no}`;
-            }
-        }
-
-        function showNotification(message, type = 'info') {
-            // Create a simple notification
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-500' :
-                    type === 'error' ? 'bg-red-500' :
-                        'bg-blue-500'
-                } text-white`;
-            notification.textContent = message;
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Helper function - adjust based on your implementation
-        function addNewItemRow() {
-            // This should match your existing function for adding item rows
-            const addButton = document.getElementById('add-item-btn') ||
-                document.querySelector('.add-item-button');
-            if (addButton) {
-                addButton.click();
-            }
-        }
-    </script>
-
-
 </body>
 
 </html>
