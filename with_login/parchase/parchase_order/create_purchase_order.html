@@ -19,6 +19,22 @@
         .btn-primary { background: #4f46e5; color: #fff; }
         .btn-secondary { background: #e5e7eb; color: #374151; border-color: #d1d5db; }
         .item-table-header { background: #4c1d95; color: #fff; }
+        .toggle-section-btn {
+        transition: all 0.2s ease;
+    }
+    
+    .toggle-section-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .toggle-section-btn i {
+        transition: transform 0.2s ease;
+    }
+    
+    .toggle-section-btn:hover i {
+        transform: scale(1.1);
+    }
         #display-view { background-color: #e5e7eb; }
         #po-display-content { width: 210mm; min-height: 297mm; padding: 15mm; margin: 2rem auto; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.12); background: white; display:flex; flex-direction:column; }
         @media print { body, #display-view { background-color: #fff; } body * { visibility: hidden; } #po-display-content, #po-display-content * { visibility: visible; } #po-display-content { position:absolute; left:0; top:0; width:100%; margin:0; box-shadow:none; padding:5mm; } .no-print { display:none !important; } }
@@ -332,187 +348,489 @@
     </div>
 
     <script>
-        document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
-            document.getElementById('documents-dropdown-content').classList.toggle('hidden');
-            document.getElementById('dropdown-icon').classList.toggle('rotate-180');
-        });
-        document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
-            document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
-            document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
-        });
-       
-        document.addEventListener('DOMContentLoaded', function () {
-            // Simple UI-only Purchase Order page. No backend calls.
-            const itemsContainer = document.getElementById('items-container');
-            const addItemBtn = document.getElementById('add-item-btn');
-            const supplierSelect = document.getElementById('supplier-select');
-            const addNewSupplierBtn = document.getElementById('add-new-supplier-btn');
-            const supplierModal = document.getElementById('supplier-modal');
-            const supplierForm = document.getElementById('supplier-form');
-            const supplierModalClose = document.getElementById('supplier-modal-close');
-            const supplierModalCancel = document.getElementById('supplier-modal-cancel');
-            const logoInput = document.getElementById('logo-input');
-            let logoDataUrl = null;
+    document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
+        document.getElementById('documents-dropdown-content').classList.toggle('hidden');
+        document.getElementById('dropdown-icon').classList.toggle('rotate-180');
+    });
+    document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
+        document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
+        document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
+    });
+   
+    document.addEventListener('DOMContentLoaded', function () {
+        // ===== AUTHENTICATION CHECK =====
+        const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
+        
+        function getAuthHeaders() {
+            const token = localStorage.getItem("token");
+            if (token) {
+                return {'Authorization': `Bearer ${token}`};
+            }
+            return null;
+        }
 
-            const formatCurrency = (v) => `₹${Number(v || 0).toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 })}`;
+        function checkAuthentication() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("⚠️ Authentication token is missing! Please log in.");
+                window.location.href = '/login.html';
+                return false;
+            }
+            return true;
+        }
 
-            function createItemRow() {
-                const itemRow = document.createElement('div');
-                itemRow.className = 'item-row space-y-3';
-                itemRow.innerHTML = `
-                    <div class="grid grid-cols-12 gap-4 items-start">
-                        <div class="col-span-5"><input class="item-name input-field" placeholder="Item name"></div>
-                        <div class="col-span-2"><input type="number" class="quantity input-field text-right" value="1" min="0"></div>
-                        <div class="col-span-2"><input type="number" class="rate input-field text-right" value="0" min="0"></div>
-                        <div class="col-span-3 flex items-start justify-end gap-x-3">
-                            <span class="amount font-semibold mt-2">₹0.00</span>
-                            <button type="button" class="remove-item-btn text-gray-400 pt-1"><i class="fas fa-trash-alt"></i></button>
-                        </div>
+        // Check auth before proceeding
+        if (!checkAuthentication()) {
+            return;
+        }
+
+        async function safeFetch(url, opts = {}) {
+            const headers = Object.assign({}, opts.headers || {});
+            const authHeaders = getAuthHeaders();
+
+            if (!authHeaders) {
+                alert("Authentication token not found. Please log in.");
+                window.location.href = '/login.html';
+                throw new Error("Authentication token not found.");
+            }
+            Object.assign(headers, authHeaders);
+
+            if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
+                headers["Content-Type"] = "application/json";
+            }
+
+            const finalOpts = Object.assign({}, opts, { headers });
+
+            try {
+                const res = await fetch(url, finalOpts);
+                const text = await res.text();
+                let data;
+                try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        alert("Session expired or invalid. Please log in again.");
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userId');
+                        window.location.href = '/login.html';
+                        throw new Error("Session expired");
+                    }
+                    const errMsg = (data && data.message) || (typeof data === "string" ? data : res.statusText) || "Request failed";
+                    const error = new Error(errMsg);
+                    error.status = res.status;
+                    error.data = data;
+                    throw error;
+                }
+
+                return data;
+            } catch (err) {
+                if (err.message !== 'Authentication token not found' && err.message !== 'Session expired') {
+                    throw err;
+                }
+                throw new Error("Authentication required");
+            }
+        }
+
+        // ===== LOAD VENDORS FROM BACKEND =====
+        async function loadVendors() {
+            try {
+                const vendors = await safeFetch(`${API_BASE_URL}/clients`, {
+                    method: 'GET'
+                });
+                
+                // Filter only suppliers
+                const suppliers = vendors.filter(v => v.client_type === 'supplier' || v.client_type === 'vendor');
+                
+                const supplierSelect = document.getElementById('supplier-select');
+                supplierSelect.innerHTML = '<option value="">Select Supplier</option>';
+                
+                suppliers.forEach(vendor => {
+                    const option = document.createElement('option');
+                    option.value = vendor._id || vendor.id;
+                    option.textContent = vendor.client_name || vendor.name;
+                    option.dataset.vendorData = JSON.stringify(vendor);
+                    supplierSelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error('Error loading vendors:', err);
+                alert('Could not load vendors. You can still add new suppliers manually.');
+            }
+        }
+        // ===== END LOAD VENDORS =====
+
+        // ===== END AUTHENTICATION =====
+
+        const itemsContainer = document.getElementById('items-container');
+        const addItemBtn = document.getElementById('add-item-btn');
+        const supplierSelect = document.getElementById('supplier-select');
+        const addNewSupplierBtn = document.getElementById('add-new-supplier-btn');
+        const supplierModal = document.getElementById('supplier-modal');
+        const supplierForm = document.getElementById('supplier-form');
+        const supplierModalClose = document.getElementById('supplier-modal-close');
+        const supplierModalCancel = document.getElementById('supplier-modal-cancel');
+        const logoInput = document.getElementById('logo-input');
+        let logoDataUrl = null;
+
+        const formatCurrency = (v) => `₹${Number(v || 0).toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 })}`;
+
+        function createItemRow() {
+            const itemRow = document.createElement('div');
+            itemRow.className = 'item-row space-y-3';
+            itemRow.innerHTML = `
+                <div class="grid grid-cols-12 gap-4 items-start">
+                    <div class="col-span-5"><input class="item-name input-field" placeholder="Item name"></div>
+                    <div class="col-span-2"><input type="number" class="quantity input-field text-right" value="1" min="0"></div>
+                    <div class="col-span-2"><input type="number" class="rate input-field text-right" value="0" min="0"></div>
+                    <div class="col-span-3 flex items-start justify-end gap-x-3">
+                        <span class="amount font-semibold mt-2">₹0.00</span>
+                        <button type="button" class="remove-item-btn text-gray-400 pt-1"><i class="fas fa-trash-alt"></i></button>
                     </div>
-                    <div><textarea class="description input-field" rows="1" placeholder="Item description"></textarea></div>
-                `;
-                itemsContainer.appendChild(itemRow);
-                updateTotals();
-            }
+                </div>
+                <div><textarea class="description input-field" rows="1" placeholder="Item description"></textarea></div>
+            `;
+            itemsContainer.appendChild(itemRow);
+            updateTotals();
+        }
 
-            function updateTotals() {
-                let subtotal = 0;
-                document.querySelectorAll('#items-container .item-row').forEach(row => {
-                    const qty = parseFloat(row.querySelector('.quantity').value) || 0;
-                    const rate = parseFloat(row.querySelector('.rate').value) || 0;
-                    const amount = qty * rate;
-                    row.querySelector('.amount').textContent = formatCurrency(amount);
-                    subtotal += amount;
-                });
-                const taxPct = parseFloat(document.getElementById('tax-percentage').value) || 0;
-                const tax = subtotal * (taxPct / 100);
-                document.getElementById('subtotal').textContent = formatCurrency(subtotal);
-                document.getElementById('total-tax').textContent = formatCurrency(tax);
-                document.getElementById('grand-total').textContent = formatCurrency(subtotal + tax);
-            }
-
-            addItemBtn.addEventListener('click', createItemRow);
-            itemsContainer.addEventListener('click', (e) => { if (e.target.closest('.remove-item-btn')) { e.target.closest('.item-row').remove(); updateTotals(); } });
-            itemsContainer.addEventListener('input', updateTotals);
-            document.getElementById('tax-percentage').addEventListener('input', updateTotals);
-
-            // Logo upload preview
-            logoInput.addEventListener('change', (e) => {
-                const file = e.target.files[0]; if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    logoDataUrl = ev.target.result;
-                    document.getElementById('logo-preview').src = logoDataUrl;
-                    document.getElementById('logo-preview-container').classList.remove('hidden');
-                    document.getElementById('logo-placeholder').classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
+        function updateTotals() {
+            let subtotal = 0;
+            document.querySelectorAll('#items-container .item-row').forEach(row => {
+                const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+                const rate = parseFloat(row.querySelector('.rate').value) || 0;
+                const amount = qty * rate;
+                row.querySelector('.amount').textContent = formatCurrency(amount);
+                subtotal += amount;
             });
+            const taxPct = parseFloat(document.getElementById('tax-percentage').value) || 0;
+            const tax = subtotal * (taxPct / 100);
+            document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('total-tax').textContent = formatCurrency(tax);
+            document.getElementById('grand-total').textContent = formatCurrency(subtotal + tax);
+        }
 
-            // Supplier modal (local-only)
-            function openSupplierModal() { supplierForm.reset(); supplierModal.classList.remove('hidden'); supplierModal.classList.add('flex'); document.documentElement.style.overflow = 'hidden'; }
-            function closeSupplierModal() { supplierModal.classList.remove('flex'); supplierModal.classList.add('hidden'); document.documentElement.style.overflow = ''; }
-            addNewSupplierBtn.addEventListener('click', openSupplierModal);
-            supplierModalClose.addEventListener('click', closeSupplierModal);
-            supplierModalCancel.addEventListener('click', closeSupplierModal);
-
-            supplierForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const fd = new FormData(supplierForm);
-                const name = fd.get('supplier_name').trim();
-                if (!name) return;
-                const opt = document.createElement('option'); opt.value = name; opt.textContent = name; opt.selected = true;
-                opt.dataset.payload = JSON.stringify(Object.fromEntries(fd.entries()));
-                supplierSelect.appendChild(opt);
-                closeSupplierModal();
-            });
-
-            // Toggle optional sections
-            document.querySelectorAll('.toggle-section-btn').forEach(btn => { btn.addEventListener('click', () => { const target = document.getElementById(btn.dataset.target); const icon = btn.querySelector('i'); target.classList.toggle('hidden'); icon.classList.toggle('fa-plus', target.classList.contains('hidden')); icon.classList.toggle('fa-minus', !target.classList.contains('hidden')); }); });
-
-            // Signatory management (local storage)
-            const SIGNATORY_KEY = 'po_saved_signatories';
-            function loadSignatories() {
-                const select = document.getElementById('signatory-select'); const saved = JSON.parse(localStorage.getItem(SIGNATORY_KEY)) || [];
-                while (select.options.length > 2) select.remove(1);
-                saved.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; select.insertBefore(o, select.options[select.options.length-1]); });
-            }
-            document.getElementById('save-signatory-btn').addEventListener('click', () => { const val = document.getElementById('new-signatory-input').value.trim(); if (!val) return; let arr = JSON.parse(localStorage.getItem(SIGNATORY_KEY)) || []; if (!arr.includes(val)) { arr.push(val); localStorage.setItem(SIGNATORY_KEY, JSON.stringify(arr)); } loadSignatories(); document.getElementById('signatory-select').value = val; document.getElementById('add-signatory-container').classList.add('hidden'); document.getElementById('new-signatory-input').value = ''; });
-            document.getElementById('cancel-add-signatory-btn').addEventListener('click', () => { document.getElementById('add-signatory-container').classList.add('hidden'); document.getElementById('new-signatory-input').value = ''; document.getElementById('signatory-select').value = ''; });
-            document.getElementById('signatory-select').addEventListener('change', (e) => { if (e.target.value === 'add_new') document.getElementById('add-signatory-container').classList.remove('hidden'); else document.getElementById('add-signatory-container').classList.add('hidden'); });
-            document.querySelectorAll('input[name="signatory_type"]').forEach(r => r.addEventListener('change', (e) => { const isText = e.target.value === 'text'; document.getElementById('signatory-text-container').classList.toggle('hidden', !isText); document.getElementById('signatory-image-container').classList.toggle('hidden', isText); }));
-            document.getElementById('signatory-image-input').addEventListener('change', (e) => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = (ev) => { localStorage.setItem('po_sign_image', ev.target.result); document.getElementById('signatory-image-preview').innerHTML = `<img src="${ev.target.result}" class="max-h-full max-w-full object-contain">`; }; r.readAsDataURL(file); });
-
-            // Form submission: build display data and show display view
-            document.getElementById('po-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                // Validate basic fields
-                const items = Array.from(document.querySelectorAll('#items-container .item-row')).map(row => ({
-                    item_name: row.querySelector('.item-name').value,
-                    description: row.querySelector('.description').value,
-                    quantity: Number(row.querySelector('.quantity').value || 0),
-                    rate: Number(row.querySelector('.rate').value || 0)
-                }));
-
-                if (items.length === 0 || items.some(it => !it.item_name.trim())) { alert('Please add at least one item with a name.'); return; }
-                if (!supplierSelect.value) { alert('Please select or add a supplier.'); return; }
-
-                // Build display
-                const subtotal = items.reduce((s, it) => s + (it.quantity * it.rate), 0);
-                const taxPct = Number(document.getElementById('tax-percentage').value) || 0;
-                const tax = subtotal * (taxPct/100);
-                const total = subtotal + tax;
-
-                document.getElementById('po-no-display').textContent = document.getElementById('po-no').value;
-                document.getElementById('po-date-display').textContent = document.getElementById('po-date').value;
-                document.getElementById('expected-delivery-display').textContent = document.getElementById('expected-delivery').value;
-                document.getElementById('po-from-name').textContent = document.getElementById('from-name').value;
-                document.getElementById('po-from-address').textContent = `${document.getElementById('from-city').value}, ${document.getElementById('from-country').value}`;
-                document.getElementById('po-to-name').textContent = supplierSelect.value;
-
-                const itemsBody = document.getElementById('items-table-body'); itemsBody.innerHTML = '';
-                items.forEach(it => {
-                    const row = itemsBody.insertRow();
-                    const qty = it.quantity || 0; const rate = it.rate || 0; const amt = qty*rate;
-                    row.innerHTML = `<td class="py-3 px-3 text-sm font-medium text-gray-800">${it.item_name}<br><small class="text-gray-500 font-normal">${it.description || ''}</small></td><td class="py-3 px-3 text-right text-gray-600">${qty}</td><td class="py-3 px-3 text-right text-gray-600">${formatCurrency(rate)}</td><td class="py-3 px-3 text-right font-semibold text-gray-800">${formatCurrency(amt)}</td>`;
-                });
-
-                document.getElementById('summary-subtotal').textContent = formatCurrency(subtotal);
-                document.getElementById('summary-tax').textContent = formatCurrency(tax);
-                document.getElementById('summary-total').textContent = formatCurrency(total);
-
-                if (logoDataUrl) document.getElementById('po-logo').innerHTML = `<img src="${logoDataUrl}" class="object-contain w-full h-full">`;
-                else document.getElementById('po-logo').innerHTML = '';
-
-                const terms = document.getElementById('terms-input').value.trim();
-                const notes = document.getElementById('notes-input').value.trim();
-                document.getElementById('po-terms').textContent = terms; document.getElementById('display-terms-section').classList.toggle('hidden', !terms);
-                document.getElementById('po-notes').textContent = notes; document.getElementById('display-notes-section').classList.toggle('hidden', !notes);
-
-                const signatoryType = document.querySelector('input[name="signatory_type']:checked').value;
-                const signCont = document.getElementById('po-signatory'); signCont.innerHTML = '';
-                if (signatoryType === 'text') { const s = document.getElementById('signatory-select').value; if (s && s !== 'add_new') signCont.textContent = s; }
-                else { const img = localStorage.getItem('po_sign_image'); if (img) signCont.innerHTML = `<img src="${img}" class="max-h-full mx-auto">`; }
-
-                // Toggle views
-                document.getElementById('form-view').classList.add('hidden');
-                document.getElementById('display-view').classList.remove('hidden');
-            });
-
-            document.getElementById('edit-btn').addEventListener('click', () => { document.getElementById('display-view').classList.add('hidden'); document.getElementById('form-view').classList.remove('hidden'); });
-
-            document.getElementById('download-pdf-btn').addEventListener('click', () => {
-                const el = document.getElementById('po-display-content');
-                const opt = { margin:10, filename: `PurchaseOrder-${document.getElementById('po-no').value || 'PO'}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
-                html2pdf().from(el).set(opt).save();
-            });
-
-            // Initialize
-            createItemRow(); loadSignatories();
-
-            function loadSignatories() { const sel = document.getElementById('signatory-select'); const saved = JSON.parse(localStorage.getItem('po_saved_signatories')||'[]'); while (sel.options.length>2) sel.remove(1); saved.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.insertBefore(o, sel.options[sel.options.length-1]); }); }
+        addItemBtn.addEventListener('click', createItemRow);
+        itemsContainer.addEventListener('click', (e) => { 
+            if (e.target.closest('.remove-item-btn')) { 
+                e.target.closest('.item-row').remove(); 
+                updateTotals(); 
+            } 
         });
-    </script>
+        itemsContainer.addEventListener('input', updateTotals);
+        document.getElementById('tax-percentage').addEventListener('input', updateTotals);
+
+        // Logo upload preview
+        logoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0]; 
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                logoDataUrl = ev.target.result;
+                document.getElementById('logo-preview').src = logoDataUrl;
+                document.getElementById('logo-preview-container').classList.remove('hidden');
+                document.getElementById('logo-placeholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Supplier modal
+        function openSupplierModal() { 
+            supplierForm.reset(); 
+            supplierModal.classList.remove('hidden'); 
+            supplierModal.classList.add('flex'); 
+            document.documentElement.style.overflow = 'hidden'; 
+        }
+        function closeSupplierModal() { 
+            supplierModal.classList.remove('flex'); 
+            supplierModal.classList.add('hidden'); 
+            document.documentElement.style.overflow = ''; 
+        }
+        addNewSupplierBtn.addEventListener('click', openSupplierModal);
+        supplierModalClose.addEventListener('click', closeSupplierModal);
+        supplierModalCancel.addEventListener('click', closeSupplierModal);
+
+        supplierForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fd = new FormData(supplierForm);
+            const name = fd.get('supplier_name').trim();
+            if (!name) {
+                alert('Supplier name is required');
+                return;
+            }
+            
+            // Prepare vendor data for backend
+            const vendorData = {
+                client_name: name,
+                client_type: 'supplier',
+                address: {
+                    country: fd.get('country') || '',
+                    city: fd.get('city') || '',
+                    state: fd.get('state') || '',
+                    pincode: fd.get('pincode') || ''
+                },
+                gst_in: fd.get('gst_in') || ''
+            };
+            
+            try {
+                // Save to backend
+                const response = await safeFetch(`${API_BASE_URL}/clients`, {
+                    method: 'POST',
+                    body: JSON.stringify(vendorData)
+                });
+                
+                // Add to dropdown
+                const opt = document.createElement('option');
+                opt.value = response.client._id || response.client.id;
+                opt.textContent = response.client.client_name;
+                opt.selected = true;
+                opt.dataset.vendorData = JSON.stringify(response.client);
+                supplierSelect.appendChild(opt);
+                
+                closeSupplierModal();
+                alert('✅ Supplier added successfully!');
+            } catch (err) {
+                console.error('Error saving supplier:', err);
+                alert(`❌ Error: ${err.message || 'Failed to save supplier'}`);
+            }
+        });
+
+        // Toggle optional sections with icon animation
+        document.querySelectorAll('.toggle-section-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = document.getElementById(btn.dataset.target);
+                const icon = btn.querySelector('i');
+                const isHidden = target.classList.contains('hidden');
+                
+                // Toggle visibility
+                target.classList.toggle('hidden');
+                
+                // Update icon and button style
+                if (isHidden) {
+                    // Section is now visible, change + to -
+                    icon.classList.remove('fa-plus');
+                    icon.classList.add('fa-minus');
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('btn-primary');
+                } else {
+                    // Section is now hidden, change - to +
+                    icon.classList.remove('fa-minus');
+                    icon.classList.add('fa-plus');
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-secondary');
+                }
+            });
+        });
+
+        // Signatory management (local storage)
+        const SIGNATORY_KEY = 'po_saved_signatories';
+        
+        function loadSignatories() {
+            const select = document.getElementById('signatory-select'); 
+            const saved = JSON.parse(localStorage.getItem(SIGNATORY_KEY)) || [];
+            while (select.options.length > 2) select.remove(1);
+            saved.forEach(s => { 
+                const o = document.createElement('option'); 
+                o.value = s; 
+                o.textContent = s; 
+                select.insertBefore(o, select.options[select.options.length-1]); 
+            });
+        }
+        
+        document.getElementById('save-signatory-btn').addEventListener('click', () => { 
+            const val = document.getElementById('new-signatory-input').value.trim(); 
+            if (!val) return; 
+            let arr = JSON.parse(localStorage.getItem(SIGNATORY_KEY)) || []; 
+            if (!arr.includes(val)) { 
+                arr.push(val); 
+                localStorage.setItem(SIGNATORY_KEY, JSON.stringify(arr)); 
+            } 
+            loadSignatories(); 
+            document.getElementById('signatory-select').value = val; 
+            document.getElementById('add-signatory-container').classList.add('hidden'); 
+            document.getElementById('new-signatory-input').value = ''; 
+        });
+        
+        document.getElementById('cancel-add-signatory-btn').addEventListener('click', () => { 
+            document.getElementById('add-signatory-container').classList.add('hidden'); 
+            document.getElementById('new-signatory-input').value = ''; 
+            document.getElementById('signatory-select').value = ''; 
+        });
+        
+        document.getElementById('signatory-select').addEventListener('change', (e) => { 
+            if (e.target.value === 'add_new') 
+                document.getElementById('add-signatory-container').classList.remove('hidden'); 
+            else 
+                document.getElementById('add-signatory-container').classList.add('hidden'); 
+        });
+        
+        document.querySelectorAll('input[name="signatory_type"]').forEach(r => r.addEventListener('change', (e) => { 
+            const isText = e.target.value === 'text'; 
+            document.getElementById('signatory-text-container').classList.toggle('hidden', !isText); 
+            document.getElementById('signatory-image-container').classList.toggle('hidden', isText); 
+        }));
+        
+        document.getElementById('signatory-image-input').addEventListener('change', (e) => { 
+            const file = e.target.files[0]; 
+            if (!file) return; 
+            const r = new FileReader(); 
+            r.onload = (ev) => { 
+                localStorage.setItem('po_sign_image', ev.target.result); 
+                document.getElementById('signatory-image-preview').innerHTML = `<img src="${ev.target.result}" class="max-h-full max-w-full object-contain">`; 
+            }; 
+            r.readAsDataURL(file); 
+        });
+
+        function buildDisplayView(data) {
+            document.getElementById('po-no-display').textContent = data.po_no;
+            document.getElementById('po-date-display').textContent = data.po_date;
+            document.getElementById('expected-delivery-display').textContent = data.expected_delivery || 'N/A';
+            document.getElementById('po-from-name').textContent = data.from_name;
+            document.getElementById('po-from-address').textContent = `${data.from_city}, ${data.from_country}`;
+            document.getElementById('po-to-name').textContent = data.supplier_name;
+
+            const itemsBody = document.getElementById('items-table-body'); 
+            itemsBody.innerHTML = '';
+            data.items.forEach(it => {
+                const row = itemsBody.insertRow();
+                const qty = it.quantity || 0; 
+                const rate = it.rate || 0; 
+                const amt = qty*rate;
+                row.innerHTML = `<td class="py-3 px-3 text-sm font-medium text-gray-800">${it.item_name}<br><small class="text-gray-500 font-normal">${it.description || ''}</small></td><td class="py-3 px-3 text-right text-gray-600">${qty}</td><td class="py-3 px-3 text-right text-gray-600">${formatCurrency(rate)}</td><td class="py-3 px-3 text-right font-semibold text-gray-800">${formatCurrency(amt)}</td>`;
+            });
+
+            document.getElementById('summary-subtotal').textContent = formatCurrency(data.sub_total);
+            document.getElementById('summary-tax').textContent = formatCurrency(data.tax);
+            document.getElementById('summary-total').textContent = formatCurrency(data.total);
+
+            if (data.logo) document.getElementById('po-logo').innerHTML = `<img src="${data.logo}" class="object-contain w-full h-full">`;
+            else document.getElementById('po-logo').innerHTML = '';
+
+            document.getElementById('po-terms').textContent = data.terms_and_condition; 
+            document.getElementById('display-terms-section').classList.toggle('hidden', !data.terms_and_condition);
+            document.getElementById('po-notes').textContent = data.notes; 
+            document.getElementById('display-notes-section').classList.toggle('hidden', !data.notes);
+
+            const signCont = document.getElementById('po-signatory'); 
+            signCont.innerHTML = '';
+            if (data.signatory) signCont.textContent = data.signatory;
+            else if (data.signatory_image) signCont.innerHTML = `<img src="${data.signatory_image}" class="max-h-20 mx-auto">`;
+
+            // Toggle views
+            document.getElementById('form-view').classList.add('hidden');
+            document.getElementById('display-view').classList.remove('hidden');
+        }
+
+        // Form submission: save to backend
+        document.getElementById('po-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validate basic fields
+            const items = Array.from(document.querySelectorAll('#items-container .item-row')).map(row => ({
+                item_name: row.querySelector('.item-name').value.trim(),
+                description: row.querySelector('.description').value.trim(),
+                quantity: Number(row.querySelector('.quantity').value || 0),
+                rate: Number(row.querySelector('.rate').value || 0),
+                amount: Number(row.querySelector('.quantity').value || 0) * Number(row.querySelector('.rate').value || 0)
+            }));
+
+            if (items.length === 0 || items.some(it => !it.item_name)) { 
+                alert('Please add at least one item with a name.'); 
+                return; 
+            }
+            if (!supplierSelect.value) { 
+                alert('Please select or add a supplier.'); 
+                return; 
+            }
+
+            // Get supplier data
+            const selectedOption = supplierSelect.options[supplierSelect.selectedIndex];
+            const supplierData = selectedOption.dataset.vendorData ? JSON.parse(selectedOption.dataset.vendorData) : null;
+
+            // Calculate totals
+            const subtotal = items.reduce((s, it) => s + (it.quantity * it.rate), 0);
+            const taxPct = Number(document.getElementById('tax-percentage').value) || 0;
+            const tax = subtotal * (taxPct/100);
+            const total = subtotal + tax;
+
+            // Get signatory data
+            const signatoryType = document.querySelector('input[name="signatory_type"]:checked').value;
+            let signatoryName = null;
+            let signatoryImage = null;
+            
+            if (signatoryType === 'text') {
+                const s = document.getElementById('signatory-select').value;
+                if (s && s !== 'add_new') signatoryName = s;
+            } else {
+                signatoryImage = localStorage.getItem('po_sign_image');
+            }
+
+            // Prepare data for backend
+            const poData = {
+                po_no: document.getElementById('po-no').value,
+                po_date: document.getElementById('po-date').value,
+                expected_delivery: document.getElementById('expected-delivery').value,
+                from_name: document.getElementById('from-name').value,
+                from_city: document.getElementById('from-city').value,
+                from_country: document.getElementById('from-country').value,
+                supplier_id: supplierSelect.value,
+                supplier_name: selectedOption.textContent,
+                supplier_data: supplierData,
+                items: items,
+                sub_total: subtotal,
+                tax_percentage: taxPct,
+                tax: tax,
+                total: total,
+                terms_and_condition: document.getElementById('terms-input').value.trim(),
+                notes: document.getElementById('notes-input').value.trim(),
+                signatory: signatoryName,
+                signatory_image: signatoryImage,
+                logo: logoDataUrl
+            };
+
+            try {
+                // Save to backend
+                const response = await safeFetch(`${API_BASE_URL}/purchase-orders`, {
+                    method: 'POST',
+                    body: JSON.stringify(poData)
+                });
+
+                console.log('Purchase Order saved:', response);
+                alert('✅ Purchase Order saved successfully!');
+
+                // Now build display with saved data
+                buildDisplayView(response.purchase_order || poData);
+
+            } catch (err) {
+                console.error('Save error:', err);
+                alert(`❌ Error: ${err.message || 'Failed to save purchase order'}`);
+            }
+        });
+
+        document.getElementById('edit-btn').addEventListener('click', () => { 
+            document.getElementById('display-view').classList.add('hidden'); 
+            document.getElementById('form-view').classList.remove('hidden'); 
+        });
+
+        document.getElementById('download-pdf-btn').addEventListener('click', () => {
+            const el = document.getElementById('po-display-content');
+            const opt = { 
+                margin: 10, 
+                filename: `PurchaseOrder-${document.getElementById('po-no').value || 'PO'}.pdf`, 
+                image: {type:'jpeg', quality:0.98}, 
+                html2canvas: {scale:2, useCORS:true}, 
+                jsPDF: {unit:'mm', format:'a4', orientation:'portrait'} 
+            };
+            html2pdf().from(el).set(opt).save();
+        });
+
+        // Initialize
+        const dateInput = document.getElementById('po-date');
+        if (dateInput) dateInput.value = new Date().toISOString().slice(0, 10);
+        
+        createItemRow(); 
+        loadSignatories();
+        loadVendors();
+    });
+</script>
 </body>
 
 </html>
