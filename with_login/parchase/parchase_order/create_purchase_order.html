@@ -360,6 +360,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         // ===== AUTHENTICATION CHECK =====
         const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
+        let COMPANY_ID = null;
         
         function getAuthHeaders() {
             const token = localStorage.getItem("token");
@@ -431,26 +432,68 @@
             }
         }
 
-        // ===== LOAD VENDORS FROM BACKEND =====
-        async function loadVendors() {
+        // ===== LOAD BUSINESS DETAILS FROM COMPANIES API =====
+        async function loadCompanyDetails() {
             try {
-                const vendors = await safeFetch(`${API_BASE_URL}/clients`, {
+                const companies = await safeFetch(`${API_BASE_URL}/companies`, {
                     method: 'GET'
                 });
                 
-                // Filter only suppliers
-                const suppliers = vendors.filter(v => v.client_type === 'supplier' || v.client_type === 'vendor');
+                if (Array.isArray(companies) && companies.length > 0) {
+                    const company = companies[0];
+                    COMPANY_ID = company._id || company.id || null;
+                    
+                    // Populate business details
+                    const fromNameInput = document.getElementById('from-name');
+                    const fromCityInput = document.getElementById('from-city');
+                    const fromCountryInput = document.getElementById('from-country');
+                    
+                    if (fromNameInput) fromNameInput.value = company.company_name || '';
+                    if (fromCityInput) fromCityInput.value = company.address?.city || '';
+                    if (fromCountryInput) fromCountryInput.value = company.address?.country || '';
+                    
+                    // Set logo if available
+                    if (company.logo) {
+                        logoDataUrl = company.logo;
+                        document.getElementById('logo-preview').src = company.logo;
+                        document.getElementById('logo-preview-container').classList.remove('hidden');
+                        document.getElementById('logo-placeholder').classList.add('hidden');
+                    }
+                    
+                    console.log('Company details loaded:', company.company_name);
+                } else {
+                    console.warn("No company found.");
+                    alert("⚠️ No company details found. Please set up your company profile first.");
+                }
+            } catch (err) {
+                console.error('Error loading company details:', err);
+                alert('Could not load company details. Please check your connection.');
+            }
+        }
+        // ===== END LOAD COMPANY DETAILS =====
+
+        // ===== LOAD VENDORS FROM BACKEND =====
+        async function loadVendors() {
+            try {
+                const vendors = await safeFetch(`${API_BASE_URL}/vend`, {
+                    method: 'GET'
+                });
                 
                 const supplierSelect = document.getElementById('supplier-select');
                 supplierSelect.innerHTML = '<option value="">Select Supplier</option>';
                 
-                suppliers.forEach(vendor => {
-                    const option = document.createElement('option');
-                    option.value = vendor._id || vendor.id;
-                    option.textContent = vendor.client_name || vendor.name;
-                    option.dataset.vendorData = JSON.stringify(vendor);
-                    supplierSelect.appendChild(option);
-                });
+                if (Array.isArray(vendors) && vendors.length > 0) {
+                    vendors.forEach(vendor => {
+                        const option = document.createElement('option');
+                        option.value = vendor._id || vendor.id;
+                        option.textContent = vendor.vendor_name || vendor.name;
+                        option.dataset.vendorData = JSON.stringify(vendor);
+                        supplierSelect.appendChild(option);
+                    });
+                    console.log(`Loaded ${vendors.length} vendors`);
+                } else {
+                    console.warn('No vendors found');
+                }
             } catch (err) {
                 console.error('Error loading vendors:', err);
                 alert('Could not load vendors. You can still add new suppliers manually.');
@@ -557,32 +600,29 @@
                 return;
             }
             
-            // Prepare vendor data for backend
+            // Prepare vendor data for backend (using vend endpoint structure)
             const vendorData = {
-                client_name: name,
-                client_type: 'supplier',
-                address: {
-                    country: fd.get('country') || '',
-                    city: fd.get('city') || '',
-                    state: fd.get('state') || '',
-                    pincode: fd.get('pincode') || ''
-                },
+                vendor_name: name,
+                country: fd.get('country') || '',
+                city: fd.get('city') || '',
+                state: fd.get('state') || '',
+                pincode: fd.get('pincode') || '',
                 gst_in: fd.get('gst_in') || ''
             };
             
             try {
-                // Save to backend
-                const response = await safeFetch(`${API_BASE_URL}/clients`, {
+                // Save to backend using vend endpoint
+                const response = await safeFetch(`${API_BASE_URL}/vend`, {
                     method: 'POST',
                     body: JSON.stringify(vendorData)
                 });
                 
                 // Add to dropdown
                 const opt = document.createElement('option');
-                opt.value = response.client._id || response.client.id;
-                opt.textContent = response.client.client_name;
+                opt.value = response.vendor._id || response.vendor.id || response._id;
+                opt.textContent = response.vendor.vendor_name || response.vendor_name;
                 opt.selected = true;
-                opt.dataset.vendorData = JSON.stringify(response.client);
+                opt.dataset.vendorData = JSON.stringify(response.vendor || response);
                 supplierSelect.appendChild(opt);
                 
                 closeSupplierModal();
@@ -768,6 +808,7 @@
                 po_no: document.getElementById('po-no').value,
                 po_date: document.getElementById('po-date').value,
                 expected_delivery: document.getElementById('expected-delivery').value,
+                from_company_id: COMPANY_ID,
                 from_name: document.getElementById('from-name').value,
                 from_city: document.getElementById('from-city').value,
                 from_country: document.getElementById('from-country').value,
@@ -828,7 +869,8 @@
         
         createItemRow(); 
         loadSignatories();
-        loadVendors();
+        loadCompanyDetails(); // Load company details first
+        loadVendors(); // Then load vendors
     });
 </script>
 </body>
