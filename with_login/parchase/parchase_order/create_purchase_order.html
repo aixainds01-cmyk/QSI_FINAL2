@@ -1,55 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Create Purchase Order (UI)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Purchase Order - QSI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
-        .form-container { max-width: 980px; margin: 2rem auto; }
-        .form-section { border: 1px solid #e5e7eb; border-radius: .5rem; padding: 1.5rem; background: #fff; }
-        .input-field { border: 1px solid #d1d5db; border-radius: .375rem; padding: .5rem .75rem; width: 100%; font-size: .875rem; }
-        .input-field:focus { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,.12); outline: none; }
-        .btn { padding: .625rem 1rem; border-radius: .375rem; font-weight: 600; border: 1px solid transparent; }
-        .btn-primary { background: #4f46e5; color: #fff; }
-        .btn-secondary { background: #e5e7eb; color: #374151; border-color: #d1d5db; }
-        .item-table-header { background: #4c1d95; color: #fff; }
-        .toggle-section-btn {
-        transition: all 0.2s ease;
-    }
-    
-    .toggle-section-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .toggle-section-btn i {
-        transition: transform 0.2s ease;
-    }
-    
-    .toggle-section-btn:hover i {
-        transform: scale(1.1);
-    }
-        #display-view { background-color: #e5e7eb; }
-        #po-display-content { width: 210mm; min-height: 297mm; padding: 15mm; margin: 2rem auto; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.12); background: white; display:flex; flex-direction:column; }
-        @media print { body, #display-view { background-color: #fff; } body * { visibility: hidden; } #po-display-content, #po-display-content * { visibility: visible; } #po-display-content { position:absolute; left:0; top:0; width:100%; margin:0; box-shadow:none; padding:5mm; } .no-print { display:none !important; } }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .form-container {
+            max-width: 960px;
+            margin: 2rem auto;
+        }
+
+        .form-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            background-color: white;
+        }
+
+        .input-field {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            font-size: 0.875rem;
+        }
+
+        .input-field:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+            outline: none;
+        }
+
+        .btn {
+            padding: 0.625rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .btn-small {
+            padding: .25rem .5rem;
+            font-size: .75rem;
+        }
+
+        .btn-primary {
+            background-color: #7c3aed;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #6d28d9;
+        }
+
+        .btn-primary:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-link {
+            color: #7c3aed;
+            font-weight: 500;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        .item-table-header {
+            background-color: #6d28d9;
+            color: white;
+        }
+
+        .item-row {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #7c3aed;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 64px;
+            }
+        }
     </style>
 </head>
-
 <body>
-    <div class="flex">
-        <!-- Left Sidebar Navigation -->
-        <aside class="w-64 bg-gray-800 text-white h-screen sticky top-0 flex flex-col shadow-lg">
+    <div class="flex min-h-screen">
+        <!-- Mobile Header -->
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <span class="text-xl font-bold">QSI</span>
+            </div>
+        </header>
+
+        <!-- Backdrop -->
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
             <div class="p-6 text-2xl font-bold border-b border-gray-700">
-                <i class="mr-2 text-indigo-400"></i> QSI
+                <i class="mr-2 text-purple-400"></i> QSI
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <a href="../../dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <a href="../dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-chart-pie mr-3"></i>Dashboard
                 </a>
                 <div>
@@ -58,821 +198,713 @@
                         <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
                     </button>
                     <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
-                        <a href="../../quotation/home_quotation.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
-                        <a href="../../saleorder/home_sales_order.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
-                        <a href="../../invoice/home_invoice.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="home_quotation.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="../invoice/home_invoice.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="../invoice/home_invoice.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
                     </div>
                 </div>
                 <div>
-                    <button id="purchases-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 bg-gray-900 text-left">
+                    <button id="purchases-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
                         <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
-                        <i id="purchases-dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200 rotate-180"></i>
+                        <i id="purchases-dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
                     </button>
-                    <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1">
-                        <a href="../vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
-                        <a href="../vendors&suppliers/vendors_suppliers.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors & Suppliers</a>
-                        <a href="../purchases&expenses/purchases_expenses_home.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchases & Expenses</a>
-                        <a href="home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 bg-gray-700 text-sm">Purchase Orders</a>
-                        <a href="../payout receipts/home_payout_receipts.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout Receipts</a>
-                        <a href="../debit notes/home_debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
+                    <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="../parchase/parchase_order/home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
                     </div>
                 </div>
-                <a href="../../manage-clients.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
-                    <i class="fas fa-users mr-3"></i>Manage Clients
-                </a>
-                <a href="../../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <a href="../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-cog mr-3"></i>Settings
                 </a>
             </nav>
         </aside>
 
-        <div class="flex-1 overflow-y-auto">
-            <main id="form-view" class="form-container">
-                <form id="po-form">
-                    <div class="flex justify-between items-center mb-6">
-                        <h1 class="text-3xl font-bold text-gray-800">Purchase Order</h1>
-                        <div class="flex items-center gap-2">
-                            <button type="button" class="btn btn-secondary">Save As Draft</button>
-                            <button type="submit" id="save-btn" class="btn btn-primary">Save & Continue</button>
+        <!-- Main Content -->
+        <div id="main-content" class="flex-1 overflow-y-auto">
+            <div class="w-full max-w-5xl mx-auto p-6">
+                <main class="form-container">
+                    <form id="po-form">
+                        <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-3xl font-bold text-gray-800">Create Purchase Order</h1>
+                            <button type="submit" class="btn btn-primary flex items-center">
+                                <i class="fas fa-save mr-2"></i> Save Purchase Order
+                                <span id="save-btn-loading" class="loading hidden ml-2"></span>
+                            </button>
                         </div>
-                    </div>
 
-                    <div class="form-section space-y-6">
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="text-sm text-gray-600">PO No.*</label>
-                                <input id="po-no" class="input-field mt-1" value="PO-0001">
-                                <div class="mt-2 grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="text-sm text-gray-600">PO Date</label>
-                                        <input id="po-date" type="date" class="input-field mt-1">
+                        <div id="alert-container"></div>
+
+                        <div class="form-section space-y-6">
+                            <!-- PO Number and Dates -->
+                           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                        <label for="po-prefix" class="text-gray-600 text-sm">Prefix in PO no.</label>
+                                        <input type="text" id="po-prefix" class="input-field col-span-2" value="PO" maxlength="10" />
                                     </div>
-                                    <div>
-                                        <label class="text-sm text-gray-600">Expected Delivery</label>
-                                        <input id="expected-delivery" type="date" class="input-field mt-1">
+                                    <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                        <label for="po-date" class="text-gray-600 text-sm">PO Date</label>
+                                        <input type="date" id="po-date" class="input-field col-span-2" required />
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2 items-center">
+                                        <label for="expected-delivery" class="text-gray-600 text-sm">Expected Delivery</label>
+                                        <input type="date" id="expected-delivery" class="input-field col-span-2" />
                                     </div>
                                 </div>
-                            </div>
-
-                            <div id="logo-uploader" class="border-2 border-dashed rounded-lg p-4 text-center relative">
-                                <div id="logo-preview-container" class="hidden absolute inset-0 p-2"><img id="logo-preview" src="" class="object-contain w-full h-full"></div>
-                                <div id="logo-placeholder">
-                                    <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
-                                    <p class="text-indigo-600 font-semibold">Add Business Logo</p>
-                                    <p class="text-xs text-gray-500">Recommended: 240×240 PNG/JPEG</p>
-                                </div>
-                                <input id="logo-input" type="file" accept="image/png,image/jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                            </div>
-                        </div>
-
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div class="border rounded-lg p-4 space-y-2">
-                                <h3 class="font-semibold">From (Your Business)</h3>
-                                <input id="from-name" class="input-field" placeholder="Business Name" value="Your Company Pvt Ltd">
-                                <div class="grid grid-cols-2 gap-2 mt-2">
-                                    <input id="from-city" class="input-field" placeholder="City" value="City">
-                                    <input id="from-country" class="input-field" placeholder="Country" value="Country">
+                                <div id="logo-uploader" class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50 relative">
+                                    <div id="logo-preview-container" class="hidden absolute inset-0 p-2">
+                                        <img id="logo-preview" src="" alt="Business Logo Preview" class="object-contain w-full h-full" />
+                                    </div>
+                                    <div id="logo-placeholder">
+                                        <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                        <span class="text-purple-600 font-semibold">Add Business Logo</span>
+                                    </div>
+                                    <input type="file" id="logo-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/png, image/jpeg" />
                                 </div>
                             </div>
 
-                            <div class="border rounded-lg p-4">
-                                <h3 class="font-semibold">Supplier (Vendor)</h3>
-                                <select id="supplier-select" class="input-field w-full mb-2">
-                                    <option value="">Select Supplier</option>
-                                </select>
-                                <button type="button" id="add-new-supplier-btn" class="w-full text-indigo-600 py-2 border-2 border-dashed rounded text-sm"><i class="fas fa-plus mr-2"></i> Add New Supplier</button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="item-table-header grid grid-cols-12 gap-4 p-3 rounded text-sm">
-                                <div class="col-span-5">Item / Description</div>
-                                <div class="col-span-2 text-right">Quantity</div>
-                                <div class="col-span-2 text-right">Rate</div>
-                                <div class="col-span-3 text-right">Amount</div>
-                            </div>
-                            
-
-                            <div id="items-container" class="space-y-2 py-2">
-                                <div class="item-row space-y-3">
-                                    <div class="grid grid-cols-12 gap-4 items-start">
-                                        <div class="col-span-5"><input class="item-name input-field" placeholder="Item name"></div>
-                                        <div class="col-span-2"><input type="number" class="quantity input-field text-right" value="1" min="0"></div>
-                                        <div class="col-span-2"><input type="number" class="rate input-field text-right" value="0" min="0"></div>
-                                        <div class="col-span-3 flex items-start justify-end gap-x-3">
-                                            <span class="amount font-semibold mt-2">₹0.00</span>
-                                            <button type="button" class="remove-item-btn text-gray-400 pt-1"><i class="fas fa-trash-alt"></i></button>
+                            <!-- Business and Vendor Details -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="border rounded-lg p-4 space-y-2">
+                                    <h3 class="font-semibold text-gray-700">
+                                        From <span class="text-gray-400 text-sm">(Your Business)</span>
+                                    </h3>
+                                    <div>
+                                        <label for="businessName" class="text-sm font-medium text-gray-600">Business Name</label>
+                                        <input type="text" id="businessName" class="input-field" required readonly />
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label for="business_city" class="text-sm font-medium text-gray-600">City</label>
+                                            <input type="text" id="business_city" class="input-field" required readonly />
+                                        </div>
+                                        <div>
+                                            <label for="business_country" class="text-sm font-medium text-gray-600">Country</label>
+                                            <input type="text" id="business_country" class="input-field" required readonly />
                                         </div>
                                     </div>
-                                    <div><textarea class="description input-field" rows="1" placeholder="Item description"></textarea></div>
+                                </div>
+
+                                <div class="border rounded-lg p-4">
+                                    <h3 class="font-semibold text-gray-700 mb-2">
+                                        Vendor <span class="text-gray-400 text-sm">(Supplier Details)</span>
+                                    </h3>
+                                    <select id="vendor-select" class="input-field w-full mb-2" required>
+                                        <option value="">Select Vendor</option>
+                                    </select>
+                                    <button type="button" id="add-new-vendor-btn" class="w-full text-center text-purple-600 font-semibold py-2 border-2 border-dashed rounded-lg hover:bg-purple-50 text-sm">
+                                        + Add New Vendor
+                                    </button>
                                 </div>
                             </div>
 
-                            <div class="pt-2">
-                                <button type="button" id="add-item-btn" class="btn-link text-sm"><i class="fas fa-plus mr-1"></i>Add New Line</button>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-8 pt-4 border-t">
-                            <div>
-                                <label class="text-sm font-medium">Attach Document</label>
-                                <input type="file" class="input-field mt-1">
-                            </div>
-
-                            <div class="space-y-2">
-                                <div class="flex justify-between"><span class="text-gray-600">Subtotal</span><span id="subtotal" class="font-semibold">₹0.00</span></div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Tax (<input id="tax-percentage" type="number" value="0" class="input-field w-16 mx-1 text-right p-1 h-7">%)</span>
-                                    <span id="total-tax" class="font-semibold">₹0.00</span>
+                            <!-- Items Section -->
+                            <div class="col-span-2 p-4 rounded-lg border shadow-sm">
+                                <div class="item-table-header grid grid-cols-12 gap-2 p-3 rounded-t-lg text-sm border-b">
+                                    <h4 class="col-span-4 font-semibold">Item</h4>
+                                    <h4 class="col-span-2 font-semibold text-center">Quantity</h4>
+                                    <h4 class="col-span-2 font-semibold text-center">Rate</h4>
+                                    <h4 class="col-span-3 font-semibold text-right">Amount</h4>
+                                    <h4 class="col-span-1 text-center">--</h4>
                                 </div>
-                                <div class="flex justify-between border-t-2 pt-2"><span class="font-bold">Total (INR)</span><span id="grand-total" class="font-bold">₹0.00</span></div>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2 pt-4 border-t">
-                            <button type="button" class="toggle-section-btn btn-small btn btn-secondary" data-target="terms-section"><i class="fas fa-plus mr-1"></i>Terms & Conditions</button>
-                            <button type="button" class="toggle-section-btn btn-small btn-secondary" data-target="notes-section"><i class="fas fa-plus mr-1"></i>Notes</button>
-                            <button type="button" class="toggle-section-btn btn-small btn btn-secondary" data-target="signatory-section"><i class="fas fa-plus mr-1"></i>Authorised Signatory</button>
-                        </div>
-
-                        <div id="terms-section" class="hidden mt-2"><textarea id="terms-input" class="input-field" rows="3" placeholder="Terms & Conditions">Payment due within 30 days of invoice.</textarea></div>
-                        <div id="notes-section" class="hidden mt-2"><textarea id="notes-input" class="input-field" rows="3" placeholder="Notes">Please deliver to the address mentioned in the purchase order.</textarea></div>
-
-                        <div id="signatory-section" class="hidden mt-2">
-                            <div class="flex items-center gap-4 mb-3 border-b pb-3">
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="signatory_type" value="text" class="form-radio" checked><span class="text-sm font-medium">Enter Name</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="signatory_type" value="image" class="form-radio"><span class="text-sm font-medium">Upload Signature</span></label>
-                            </div>
-
-                            <div id="signatory-text-container" class="space-y-2">
-                                <select id="signatory-select" class="input-field">
-                                    <option value="">Select Signatory</option>
-                                    <option value="add_new">-- Add New Signatory --</option>
-                                </select>
-                                <div id="add-signatory-container" class="hidden flex gap-2 items-center">
-                                    <input id="new-signatory-input" class="input-field flex-grow" placeholder="Enter New Signatory Name">
-                                    <button type="button" id="save-signatory-btn" class="btn btn-primary btn-small">Save</button>
-                                    <button type="button" id="cancel-add-signatory-btn" class="btn btn-secondary btn-small">Cancel</button>
+                                <div id="items-container" class="space-y-2 py-2"></div>
+                                <div class="pt-2">
+                                    <button type="button" id="add-item-btn" class="btn-link">
+                                        <i class="fas fa-plus mr-1"></i> Add New Line
+                                    </button>
                                 </div>
                             </div>
 
-                            <div id="signatory-image-container" class="hidden space-y-2">
-                                <input type="file" id="signatory-image-input" class="input-field" accept="image/png, image/jpeg">
-                                <div id="signatory-image-preview" class="mt-2 border border-dashed rounded-lg p-2 h-24 flex items-center justify-center bg-gray-50 text-gray-400">Signature Preview</div>
+                            <!-- Totals -->
+                            <div class="w-full flex justify-end mt-4">
+                                <div class="w-80 p-4 rounded-lg border bg-white shadow-sm space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Subtotal</span>
+                                        <span class="font-semibold text-gray-800" id="subtotal-display">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600 flex items-center">
+                                            Tax (<input type="number" id="tax-percentage" min="0" max="100" class="w-16 mx-1 border rounded text-right text-sm px-2 py-1" value="0" />%)
+                                        </span>
+                                        <span class="font-semibold text-gray-800" id="tax-display">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Round Off</span>
+                                        <span class="font-semibold text-gray-800" id="round-off-display">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
+                                        <span class="font-bold text-lg text-gray-800">Total (INR)</span>
+                                        <span class="font-bold text-lg text-purple-600" id="total-display">₹0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Terms and Notes -->
+                            <div class="flex flex-col gap-4">
+                                <div class="w-full overflow-x-auto">
+                                    <div class="flex flex-nowrap gap-2 mb-4 whitespace-nowrap">
+                                        <button type="button" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="terms">+ Terms & Conditions</button>
+                                        <button type="button" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="notes">+ Notes</button>
+                                    </div>
+                                </div>
+                                <div id="terms" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Terms & Conditions</label>
+                                    <textarea id="terms-input" class="w-full border rounded p-2" rows="3">Payment due within 30 days</textarea>
+                                </div>
+                                <div id="notes" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                                    <textarea id="notes-input" class="w-full border rounded p-2" rows="3">Thank you for your business</textarea>
+                                </div>
                             </div>
                         </div>
-
-                    </div>
-                </form>
-            </main>
-
-            <main id="display-view" class="p-6 md:p-10 hidden">
-                <div id="po-display-content">
-                    <header class="flex justify-between items-start pb-6 border-b">
-                        <div>
-                            <h1 class="text-4xl font-bold text-gray-800">PURCHASE ORDER</h1>
-                            <div class="mt-4 text-sm text-gray-600">
-                                <p><strong>PO No:</strong> <span id="po-no-display"></span></p>
-                                <p><strong>PO Date:</strong> <span id="po-date-display"></span></p>
-                                <p><strong>Expected Delivery:</strong> <span id="expected-delivery-display"></span></p>
-                            </div>
-                        </div>
-                        <div id="po-logo" class="w-32 h-20 flex items-center justify-center"></div>
-                    </header>
-
-                    <section class="grid grid-cols-2 gap-8 my-8">
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h3 class="text-sm font-semibold text-gray-600 mb-2">Purchase From</h3>
-                            <p id="po-from-name" class="font-bold text-gray-800"></p>
-                            <p id="po-from-address" class="text-sm text-gray-600"></p>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h3 class="text-sm font-semibold text-gray-600 mb-2">Supplier</h3>
-                            <p id="po-to-name" class="font-bold text-gray-800"></p>
-                        </div>
-                    </section>
-
-                    <section>
-                        <table class="w-full">
-                            <thead class="bg-purple-800 text-white">
-                                <tr>
-                                    <th class="py-2 px-3 text-left text-sm font-semibold w-6/12">Item</th>
-                                    <th class="py-2 px-3 text-right text-sm font-semibold">Quantity</th>
-                                    <th class="py-2 px-3 text-right text-sm font-semibold">Rate</th>
-                                    <th class="py-2 px-3 text-right text-sm font-semibold">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody id="items-table-body" class="divide-y divide-gray-200"></tbody>
-                            <tfoot class="border-t-2 border-gray-300">
-                                <tr>
-                                    <td colspan="2" class="py-2 px-3"></td>
-                                    <td class="py-2 px-3 text-right font-semibold text-gray-600">Subtotal</td>
-                                    <td id="summary-subtotal" class="py-2 px-3 text-right font-semibold text-gray-800"></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="py-2 px-3"></td>
-                                    <td class="py-2 px-3 text-right font-semibold text-gray-600">Tax</td>
-                                    <td id="summary-tax" class="py-2 px-3 text-right font-semibold text-gray-800"></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="py-2 px-3"></td>
-                                    <td class="py-2 px-3 text-right font-bold text-base text-gray-800">Total (INR)</td>
-                                    <td id="summary-total" class="py-2 px-3 text-right font-bold text-base text-gray-800"></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </section>
-
-                    <section class="mt-auto pt-8 flex justify-between items-end">
-                        <div class="w-1/2 text-sm text-gray-600 pr-8">
-                            <div id="display-terms-section" class="hidden">
-                                <h3 class="font-semibold text-gray-800 mb-1">Terms & Conditions</h3>
-                                <p id="po-terms" class="whitespace-pre-wrap"></p>
-                            </div>
-                            <div id="display-notes-section" class="hidden mt-4">
-                                <h3 class="font-semibold text-gray-800 mb-1">Notes</h3>
-                                <p id="po-notes" class="whitespace-pre-wrap"></p>
-                            </div>
-                        </div>
-
-                        <div class="w-1/2 flex flex-col items-end">
-                            <div class="text-center">
-                                <div id="po-signatory" class="font-semibold text-gray-800"></div>
-                                <div class="border-t border-gray-400 w-48 pt-2 text-xs"><p>Authorised Signatory</p></div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                <footer class="p-6 bg-gray-50 border-t sticky bottom-0 z-10 no-print">
-                    <div class="max-w-4xl mx-auto flex justify-end gap-4">
-                        <button id="edit-btn" class="btn btn-secondary"><i class="fas fa-edit mr-2"></i>Edit</button>
-                        <button id="download-pdf-btn" class="bg-green-600 text-white py-2 px-4 rounded"><i class="fas fa-file-pdf mr-2"></i>Download as PDF</button>
-                    </div>
-                </footer>
-            </main>
-        </div>
-    </div>
-
-    <!-- Supplier Modal (local-only, UI) -->
-    <div id="supplier-modal" class="fixed inset-0 hidden items-center justify-center z-50">
-        <div id="supplier-modal-backdrop" class="absolute inset-0 bg-[rgba(15,23,42,0.36)] backdrop-blur-md"></div>
-        <div id="supplier-modal-panel" class="relative w-full max-w-2xl mx-4 transform transition-all">
-            <div class="bg-white p-6 rounded shadow-2xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold">Create New Supplier</h2>
-                    <button id="supplier-modal-close" class="text-gray-500"><i class="fas fa-times"></i></button>
-                </div>
-
-                <form id="supplier-form" class="space-y-4">
-                    <div>
-                        <label class="text-sm">Supplier Name</label>
-                        <input name="supplier_name" class="input-field mt-1" required>
-                    </div>
-
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <input name="country" class="input-field" placeholder="Country">
-                        <input name="city" class="input-field" placeholder="City/Town">
-                        <input name="state" class="input-field" placeholder="State">
-                        <input name="pincode" class="input-field" placeholder="Pincode">
-                        <input name="gst_in" class="input-field" placeholder="GSTIN (Optional)">
-                    </div>
-
-                    <div class="flex justify-end gap-2 pt-4">
-                        <button type="button" id="supplier-modal-cancel" class="btn btn-secondary px-4">Cancel</button>
-                        <button type="submit" class="btn btn-primary px-4">Save Supplier</button>
-                    </div>
-                </form>
+                    </form>
+                </main>
             </div>
         </div>
     </div>
 
+    <!-- Prefix Modal -->
+    <div id="prefix-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">
+                <i class="fas fa-question-circle text-purple-600 mr-2"></i>
+                Change Prefix?
+            </h3>
+            <p class="text-gray-600 mb-4">
+                You're changing the prefix from <strong id="old-prefix-text"></strong> to <strong id="new-prefix-text"></strong>.
+            </p>
+            <div class="flex justify-end space-x-3">
+                <button id="prefix-cancel-btn" class="btn btn-secondary">Cancel</button>
+                <button id="prefix-once-btn" class="btn btn-primary">Once</button>
+                <button id="prefix-always-btn" class="btn btn-primary">Always</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor Modal -->
+    <div id="vendor-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Create New Vendor</h2>
+            <form id="vendor-form" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600">Vendor Name*</label>
+                        <input name="vendor_name" type="text" required class="input-field mt-1" placeholder="Vendor Name">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Country*</label>
+                        <select name="country" required class="input-field mt-1">
+                            <option>India</option>
+                            <option>United States</option>
+                            <option>United Kingdom</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">State</label>
+                        <input name="state" type="text" class="input-field mt-1" placeholder="State">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">City</label>
+                        <input name="city" type="text" class="input-field mt-1" placeholder="City">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="vendor-modal-cancel" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Vendor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-    document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
-        document.getElementById('documents-dropdown-content').classList.toggle('hidden');
-        document.getElementById('dropdown-icon').classList.toggle('rotate-180');
-    });
-    document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
-        document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
-        document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
-    });
-   
-    document.addEventListener('DOMContentLoaded', function () {
-        // ===== AUTHENTICATION CHECK =====
-        const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
-        let COMPANY_ID = null;
-        
-        function getAuthHeaders() {
-            const token = localStorage.getItem("token");
-            if (token) {
-                return {'Authorization': `Bearer ${token}`};
-            }
-            return null;
-        }
+        const API_BASE_URL = 'http://Aixains-Mac-mini.local:8000/api';
+const PREFIX_STORAGE_KEY = 'qsi_po_prefix';
+const PREFIX_COUNTERS_KEY = 'qsi_po_prefix_counters';
 
-        function checkAuthentication() {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                alert("⚠️ Authentication token is missing! Please log in.");
-                window.location.href = '/login.html';
-                return false;
-            }
-            return true;
-        }
+let originalPrefix = 'PO';
+let currentPrefix = 'PO';
+let prefixChangeMode = null;
+let itemCounter = 0;
+let COMPANY_ID = null;
 
-        // Check auth before proceeding
-        if (!checkAuthentication()) {
+// ========== AUTH HELPERS ==========
+// ========== AUTH HELPERS ==========
+function getAuthHeaders() {
+    const token = localStorage.getItem('token');
+    return token ? { 'Authorization': `Bearer ${token}` } : null;
+}
+
+async function fetchAPI(url, options = {}) {
+    const authHeaders = getAuthHeaders();
+    if (!authHeaders) {
+        alert("Authentication token not found. Please log in.");
+        window.location.href = '../../index.html';
+        throw new Error("Authentication required");
+    }
+    
+    // Initialize headers object
+    options.headers = { ...options.headers, ...authHeaders };
+    
+    // Add Content-Type for JSON requests
+    if (options.body && typeof options.body === 'string') {
+        options.headers['Content-Type'] = 'application/json';
+    }
+    
+    const response = await fetch(url, options);
+    
+    if (response.status === 401) {
+        alert("Session expired. Please log in again.");
+        localStorage.removeItem('token');
+        window.location.href = '../../index.html';
+        throw new Error("Session expired");
+    }
+    
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `HTTP ${response.status}`);
+    }
+    
+    return response.json();
+}
+
+// ========== UI HELPERS ==========
+function showAlert(message, type = 'success', duration = 5000) {
+    const alertContainer = document.getElementById('alert-container');
+    if (!alertContainer) return;
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.textContent = message;
+    alertContainer.innerHTML = '';
+    alertContainer.appendChild(alertDiv);
+    setTimeout(() => alertDiv.remove(), duration);
+}
+
+function setLoading(isLoading) {
+    const saveBtn = document.querySelector('#po-form button[type="submit"]');
+    const loadingSpinner = document.getElementById('save-btn-loading');
+    if (saveBtn) saveBtn.disabled = isLoading;
+    if (loadingSpinner) loadingSpinner.classList.toggle('hidden', !isLoading);
+}
+
+// ========== PREFIX MANAGEMENT ==========
+function loadSavedPrefix() {
+    const savedPrefix = localStorage.getItem(PREFIX_STORAGE_KEY);
+    if (savedPrefix) {
+        originalPrefix = savedPrefix;
+        currentPrefix = savedPrefix;
+        document.getElementById('po-prefix').value = savedPrefix;
+    }
+}
+
+function getPrefixCounters() {
+    const stored = localStorage.getItem(PREFIX_COUNTERS_KEY);
+    return stored ? JSON.parse(stored) : {};
+}
+
+function setPrefixCounter(prefix, count) {
+    const counters = getPrefixCounters();
+    counters[prefix] = count;
+    localStorage.setItem(PREFIX_COUNTERS_KEY, JSON.stringify(counters));
+}
+
+function getNextPONumber(prefix) {
+    const counters = getPrefixCounters();
+    const currentCount = counters[prefix] || 0;
+    const nextCount = currentCount + 1;
+    setPrefixCounter(prefix, nextCount);
+    return `${prefix}${String(nextCount).padStart(4, '0')}`;
+}
+
+function openPrefixModal(oldPrefix, newPrefix) {
+    document.getElementById('old-prefix-text').textContent = oldPrefix;
+    document.getElementById('new-prefix-text').textContent = newPrefix;
+    document.getElementById('prefix-modal').classList.add('active');
+}
+
+function closePrefixModal() {
+    document.getElementById('prefix-modal').classList.remove('active');
+}
+
+function handlePrefixChange(mode) {
+    const newPrefix = document.getElementById('po-prefix').value.trim().toUpperCase();
+    
+    if (mode === 'always') {
+        localStorage.setItem(PREFIX_STORAGE_KEY, newPrefix);
+        originalPrefix = newPrefix;
+        showAlert(`Prefix changed to "${newPrefix}" for all future purchase orders.`, 'success', 3000);
+    } else if (mode === 'once') {
+        showAlert(`Using prefix "${newPrefix}" for this purchase order only.`, 'success', 3000);
+    }
+    
+    currentPrefix = newPrefix;
+    prefixChangeMode = mode;
+    closePrefixModal();
+}
+
+// ========== COMPANY MANAGEMENT ==========
+async function loadCompany() {
+    try {
+        const companies = await fetchAPI(`${API_BASE_URL}/companies`);
+        if (Array.isArray(companies) && companies.length > 0) {
+            const company = companies[0];
+            COMPANY_ID = company._id || company.id || null;
+            
+            const bn = document.getElementById('businessName');
+            const bc = document.getElementById('business_city');
+            const bco = document.getElementById('business_country');
+            
+            if (bn) bn.value = company.company_name || '';
+            if (bc) bc.value = company.address?.city || '';
+            if (bco) bco.value = company.address?.country || '';
+
+            // Load logo if exists
+            if (company.logo) {
+                const logoPreview = document.getElementById('logo-preview');
+                const logoPreviewContainer = document.getElementById('logo-preview-container');
+                const logoPlaceholder = document.getElementById('logo-placeholder');
+                
+                if (logoPreview) logoPreview.src = company.logo;
+                if (logoPreviewContainer) logoPreviewContainer.classList.remove('hidden');
+                if (logoPlaceholder) logoPlaceholder.classList.add('hidden');
+            }
+        }
+    } catch (err) {
+        console.error('Error loading company:', err);
+        showAlert('Could not load company details', 'error');
+    }
+}
+// ========== LOGO MANAGEMENT ==========
+function setupLogoUpload() {
+    const logoInput = document.getElementById('logo-input');
+    const logoPreview = document.getElementById('logo-preview');
+    const logoPreviewContainer = document.getElementById('logo-preview-container');
+    const logoPlaceholder = document.getElementById('logo-placeholder');
+
+    if (!logoInput) return;
+
+    logoInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.match('image/png') && !file.type.match('image/jpeg')) {
+            showAlert('Please upload only PNG or JPEG images', 'error');
             return;
         }
 
-        async function safeFetch(url, opts = {}) {
-            const headers = Object.assign({}, opts.headers || {});
-            const authHeaders = getAuthHeaders();
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const dataUrl = event.target.result;
+            
+            // Display preview
+            if (logoPreview) logoPreview.src = dataUrl;
+            if (logoPreviewContainer) logoPreviewContainer.classList.remove('hidden');
+            if (logoPlaceholder) logoPlaceholder.classList.add('hidden');
 
-            if (!authHeaders) {
-                alert("Authentication token not found. Please log in.");
-                window.location.href = '/login.html';
-                throw new Error("Authentication token not found.");
-            }
-            Object.assign(headers, authHeaders);
-
-            if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
-                headers["Content-Type"] = "application/json";
-            }
-
-            const finalOpts = Object.assign({}, opts, { headers });
-
-            try {
-                const res = await fetch(url, finalOpts);
-                const text = await res.text();
-                let data;
-                try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
-
-                if (!res.ok) {
-                    if (res.status === 401) {
-                        alert("Session expired or invalid. Please log in again.");
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('userId');
-                        window.location.href = '/login.html';
-                        throw new Error("Session expired");
-                    }
-                    const errMsg = (data && data.message) || (typeof data === "string" ? data : res.statusText) || "Request failed";
-                    const error = new Error(errMsg);
-                    error.status = res.status;
-                    error.data = data;
-                    throw error;
-                }
-
-                return data;
-            } catch (err) {
-                if (err.message !== 'Authentication token not found' && err.message !== 'Session expired') {
-                    throw err;
-                }
-                throw new Error("Authentication required");
-            }
-        }
-
-        // ===== LOAD BUSINESS DETAILS FROM COMPANIES API =====
-        async function loadCompanyDetails() {
-            try {
-                const companies = await safeFetch(`${API_BASE_URL}/companies`, {
-                    method: 'GET'
-                });
-                
-                if (Array.isArray(companies) && companies.length > 0) {
-                    const company = companies[0];
-                    COMPANY_ID = company._id || company.id || null;
-                    
-                    // Populate business details
-                    const fromNameInput = document.getElementById('from-name');
-                    const fromCityInput = document.getElementById('from-city');
-                    const fromCountryInput = document.getElementById('from-country');
-                    
-                    if (fromNameInput) fromNameInput.value = company.company_name || '';
-                    if (fromCityInput) fromCityInput.value = company.address?.city || '';
-                    if (fromCountryInput) fromCountryInput.value = company.address?.country || '';
-                    
-                    // Set logo if available
-                    if (company.logo) {
-                        logoDataUrl = company.logo;
-                        document.getElementById('logo-preview').src = company.logo;
-                        document.getElementById('logo-preview-container').classList.remove('hidden');
-                        document.getElementById('logo-placeholder').classList.add('hidden');
-                    }
-                    
-                    console.log('Company details loaded:', company.company_name);
-                } else {
-                    console.warn("No company found.");
-                    alert("⚠️ No company details found. Please set up your company profile first.");
-                }
-            } catch (err) {
-                console.error('Error loading company details:', err);
-                alert('Could not load company details. Please check your connection.');
-            }
-        }
-        // ===== END LOAD COMPANY DETAILS =====
-
-        // ===== LOAD VENDORS FROM BACKEND =====
-        async function loadVendors() {
-            try {
-                const vendors = await safeFetch(`${API_BASE_URL}/vend`, {
-                    method: 'GET'
-                });
-                
-                const supplierSelect = document.getElementById('supplier-select');
-                supplierSelect.innerHTML = '<option value="">Select Supplier</option>';
-                
-                if (Array.isArray(vendors) && vendors.length > 0) {
-                    vendors.forEach(vendor => {
-                        const option = document.createElement('option');
-                        option.value = vendor._id || vendor.id;
-                        option.textContent = vendor.vendor_name || vendor.name;
-                        option.dataset.vendorData = JSON.stringify(vendor);
-                        supplierSelect.appendChild(option);
+            // Upload to server if company exists
+            if (COMPANY_ID) {
+                try {
+                    await fetchAPI(`${API_BASE_URL}/companies/${COMPANY_ID}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ logo: dataUrl })
                     });
-                    console.log(`Loaded ${vendors.length} vendors`);
-                } else {
-                    console.warn('No vendors found');
+                    showAlert('Logo uploaded successfully', 'success', 2000);
+                } catch (err) {
+                    console.error('Error uploading logo:', err);
+                    showAlert('Logo preview set, but upload failed', 'error');
                 }
-            } catch (err) {
-                console.error('Error loading vendors:', err);
-                alert('Could not load vendors. You can still add new suppliers manually.');
             }
-        }
-        // ===== END LOAD VENDORS =====
-
-        // ===== END AUTHENTICATION =====
-
-        const itemsContainer = document.getElementById('items-container');
-        const addItemBtn = document.getElementById('add-item-btn');
-        const supplierSelect = document.getElementById('supplier-select');
-        const addNewSupplierBtn = document.getElementById('add-new-supplier-btn');
-        const supplierModal = document.getElementById('supplier-modal');
-        const supplierForm = document.getElementById('supplier-form');
-        const supplierModalClose = document.getElementById('supplier-modal-close');
-        const supplierModalCancel = document.getElementById('supplier-modal-cancel');
-        const logoInput = document.getElementById('logo-input');
-        let logoDataUrl = null;
-
-        const formatCurrency = (v) => `₹${Number(v || 0).toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 })}`;
-
-        function createItemRow() {
-            const itemRow = document.createElement('div');
-            itemRow.className = 'item-row space-y-3';
-            itemRow.innerHTML = `
-                <div class="grid grid-cols-12 gap-4 items-start">
-                    <div class="col-span-5"><input class="item-name input-field" placeholder="Item name"></div>
-                    <div class="col-span-2"><input type="number" class="quantity input-field text-right" value="1" min="0"></div>
-                    <div class="col-span-2"><input type="number" class="rate input-field text-right" value="0" min="0"></div>
-                    <div class="col-span-3 flex items-start justify-end gap-x-3">
-                        <span class="amount font-semibold mt-2">₹0.00</span>
-                        <button type="button" class="remove-item-btn text-gray-400 pt-1"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </div>
-                <div><textarea class="description input-field" rows="1" placeholder="Item description"></textarea></div>
-            `;
-            itemsContainer.appendChild(itemRow);
-            updateTotals();
-        }
-
-        function updateTotals() {
-            let subtotal = 0;
-            document.querySelectorAll('#items-container .item-row').forEach(row => {
-                const qty = parseFloat(row.querySelector('.quantity').value) || 0;
-                const rate = parseFloat(row.querySelector('.rate').value) || 0;
-                const amount = qty * rate;
-                row.querySelector('.amount').textContent = formatCurrency(amount);
-                subtotal += amount;
-            });
-            const taxPct = parseFloat(document.getElementById('tax-percentage').value) || 0;
-            const tax = subtotal * (taxPct / 100);
-            document.getElementById('subtotal').textContent = formatCurrency(subtotal);
-            document.getElementById('total-tax').textContent = formatCurrency(tax);
-            document.getElementById('grand-total').textContent = formatCurrency(subtotal + tax);
-        }
-
-        addItemBtn.addEventListener('click', createItemRow);
-        itemsContainer.addEventListener('click', (e) => { 
-            if (e.target.closest('.remove-item-btn')) { 
-                e.target.closest('.item-row').remove(); 
-                updateTotals(); 
-            } 
-        });
-        itemsContainer.addEventListener('input', updateTotals);
-        document.getElementById('tax-percentage').addEventListener('input', updateTotals);
-
-        // Logo upload preview
-        logoInput.addEventListener('change', (e) => {
-            const file = e.target.files[0]; 
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                logoDataUrl = ev.target.result;
-                document.getElementById('logo-preview').src = logoDataUrl;
-                document.getElementById('logo-preview-container').classList.remove('hidden');
-                document.getElementById('logo-placeholder').classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
-        });
-
-        // Supplier modal
-        function openSupplierModal() { 
-            supplierForm.reset(); 
-            supplierModal.classList.remove('hidden'); 
-            supplierModal.classList.add('flex'); 
-            document.documentElement.style.overflow = 'hidden'; 
-        }
-        function closeSupplierModal() { 
-            supplierModal.classList.remove('flex'); 
-            supplierModal.classList.add('hidden'); 
-            document.documentElement.style.overflow = ''; 
-        }
-        addNewSupplierBtn.addEventListener('click', openSupplierModal);
-        supplierModalClose.addEventListener('click', closeSupplierModal);
-        supplierModalCancel.addEventListener('click', closeSupplierModal);
-
-        supplierForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const fd = new FormData(supplierForm);
-            const name = fd.get('supplier_name').trim();
-            if (!name) {
-                alert('Supplier name is required');
-                return;
-            }
-            
-            // Prepare vendor data for backend (using vend endpoint structure)
-            const vendorData = {
-                vendor_name: name,
-                country: fd.get('country') || '',
-                city: fd.get('city') || '',
-                state: fd.get('state') || '',
-                pincode: fd.get('pincode') || '',
-                gst_in: fd.get('gst_in') || ''
-            };
-            
-            try {
-                // Save to backend using vend endpoint
-                const response = await safeFetch(`${API_BASE_URL}/vend`, {
-                    method: 'POST',
-                    body: JSON.stringify(vendorData)
-                });
-                
-                // Add to dropdown
-                const opt = document.createElement('option');
-                opt.value = response.vendor._id || response.vendor.id || response._id;
-                opt.textContent = response.vendor.vendor_name || response.vendor_name;
-                opt.selected = true;
-                opt.dataset.vendorData = JSON.stringify(response.vendor || response);
-                supplierSelect.appendChild(opt);
-                
-                closeSupplierModal();
-                alert('✅ Supplier added successfully!');
-            } catch (err) {
-                console.error('Error saving supplier:', err);
-                alert(`❌ Error: ${err.message || 'Failed to save supplier'}`);
-            }
-        });
-
-        // Toggle optional sections with icon animation
-        document.querySelectorAll('.toggle-section-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const target = document.getElementById(btn.dataset.target);
-                const icon = btn.querySelector('i');
-                const isHidden = target.classList.contains('hidden');
-                
-                // Toggle visibility
-                target.classList.toggle('hidden');
-                
-                // Update icon and button style
-                if (isHidden) {
-                    // Section is now visible, change + to -
-                    icon.classList.remove('fa-plus');
-                    icon.classList.add('fa-minus');
-                    btn.classList.remove('btn-secondary');
-                    btn.classList.add('btn-primary');
-                } else {
-                    // Section is now hidden, change - to +
-                    icon.classList.remove('fa-minus');
-                    icon.classList.add('fa-plus');
-                    btn.classList.remove('btn-primary');
-                    btn.classList.add('btn-secondary');
-                }
-            });
-        });
-
-        // Signatory management (local storage)
-        const SIGNATORY_KEY = 'po_saved_signatories';
-        
-        function loadSignatories() {
-            const select = document.getElementById('signatory-select'); 
-            const saved = JSON.parse(localStorage.getItem(SIGNATORY_KEY)) || [];
-            while (select.options.length > 2) select.remove(1);
-            saved.forEach(s => { 
-                const o = document.createElement('option'); 
-                o.value = s; 
-                o.textContent = s; 
-                select.insertBefore(o, select.options[select.options.length-1]); 
-            });
-        }
-        
-        document.getElementById('save-signatory-btn').addEventListener('click', () => { 
-            const val = document.getElementById('new-signatory-input').value.trim(); 
-            if (!val) return; 
-            let arr = JSON.parse(localStorage.getItem(SIGNATORY_KEY)) || []; 
-            if (!arr.includes(val)) { 
-                arr.push(val); 
-                localStorage.setItem(SIGNATORY_KEY, JSON.stringify(arr)); 
-            } 
-            loadSignatories(); 
-            document.getElementById('signatory-select').value = val; 
-            document.getElementById('add-signatory-container').classList.add('hidden'); 
-            document.getElementById('new-signatory-input').value = ''; 
-        });
-        
-        document.getElementById('cancel-add-signatory-btn').addEventListener('click', () => { 
-            document.getElementById('add-signatory-container').classList.add('hidden'); 
-            document.getElementById('new-signatory-input').value = ''; 
-            document.getElementById('signatory-select').value = ''; 
-        });
-        
-        document.getElementById('signatory-select').addEventListener('change', (e) => { 
-            if (e.target.value === 'add_new') 
-                document.getElementById('add-signatory-container').classList.remove('hidden'); 
-            else 
-                document.getElementById('add-signatory-container').classList.add('hidden'); 
-        });
-        
-        document.querySelectorAll('input[name="signatory_type"]').forEach(r => r.addEventListener('change', (e) => { 
-            const isText = e.target.value === 'text'; 
-            document.getElementById('signatory-text-container').classList.toggle('hidden', !isText); 
-            document.getElementById('signatory-image-container').classList.toggle('hidden', isText); 
-        }));
-        
-        document.getElementById('signatory-image-input').addEventListener('change', (e) => { 
-            const file = e.target.files[0]; 
-            if (!file) return; 
-            const r = new FileReader(); 
-            r.onload = (ev) => { 
-                localStorage.setItem('po_sign_image', ev.target.result); 
-                document.getElementById('signatory-image-preview').innerHTML = `<img src="${ev.target.result}" class="max-h-full max-w-full object-contain">`; 
-            }; 
-            r.readAsDataURL(file); 
-        });
-
-        function buildDisplayView(data) {
-            document.getElementById('po-no-display').textContent = data.po_no;
-            document.getElementById('po-date-display').textContent = data.po_date;
-            document.getElementById('expected-delivery-display').textContent = data.expected_delivery || 'N/A';
-            document.getElementById('po-from-name').textContent = data.from_name;
-            document.getElementById('po-from-address').textContent = `${data.from_city}, ${data.from_country}`;
-            document.getElementById('po-to-name').textContent = data.supplier_name;
-
-            const itemsBody = document.getElementById('items-table-body'); 
-            itemsBody.innerHTML = '';
-            data.items.forEach(it => {
-                const row = itemsBody.insertRow();
-                const qty = it.quantity || 0; 
-                const rate = it.rate || 0; 
-                const amt = qty*rate;
-                row.innerHTML = `<td class="py-3 px-3 text-sm font-medium text-gray-800">${it.item_name}<br><small class="text-gray-500 font-normal">${it.description || ''}</small></td><td class="py-3 px-3 text-right text-gray-600">${qty}</td><td class="py-3 px-3 text-right text-gray-600">${formatCurrency(rate)}</td><td class="py-3 px-3 text-right font-semibold text-gray-800">${formatCurrency(amt)}</td>`;
-            });
-
-            document.getElementById('summary-subtotal').textContent = formatCurrency(data.sub_total);
-            document.getElementById('summary-tax').textContent = formatCurrency(data.tax);
-            document.getElementById('summary-total').textContent = formatCurrency(data.total);
-
-            if (data.logo) document.getElementById('po-logo').innerHTML = `<img src="${data.logo}" class="object-contain w-full h-full">`;
-            else document.getElementById('po-logo').innerHTML = '';
-
-            document.getElementById('po-terms').textContent = data.terms_and_condition; 
-            document.getElementById('display-terms-section').classList.toggle('hidden', !data.terms_and_condition);
-            document.getElementById('po-notes').textContent = data.notes; 
-            document.getElementById('display-notes-section').classList.toggle('hidden', !data.notes);
-
-            const signCont = document.getElementById('po-signatory'); 
-            signCont.innerHTML = '';
-            if (data.signatory) signCont.textContent = data.signatory;
-            else if (data.signatory_image) signCont.innerHTML = `<img src="${data.signatory_image}" class="max-h-20 mx-auto">`;
-
-            // Toggle views
-            document.getElementById('form-view').classList.add('hidden');
-            document.getElementById('display-view').classList.remove('hidden');
-        }
-
-        // Form submission: save to backend
-        document.getElementById('po-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // Validate basic fields
-            const items = Array.from(document.querySelectorAll('#items-container .item-row')).map(row => ({
-                item_name: row.querySelector('.item-name').value.trim(),
-                description: row.querySelector('.description').value.trim(),
-                quantity: Number(row.querySelector('.quantity').value || 0),
-                rate: Number(row.querySelector('.rate').value || 0),
-                amount: Number(row.querySelector('.quantity').value || 0) * Number(row.querySelector('.rate').value || 0)
-            }));
-
-            if (items.length === 0 || items.some(it => !it.item_name)) { 
-                alert('Please add at least one item with a name.'); 
-                return; 
-            }
-            if (!supplierSelect.value) { 
-                alert('Please select or add a supplier.'); 
-                return; 
-            }
-
-            // Get supplier data
-            const selectedOption = supplierSelect.options[supplierSelect.selectedIndex];
-            const supplierData = selectedOption.dataset.vendorData ? JSON.parse(selectedOption.dataset.vendorData) : null;
-
-            // Calculate totals
-            const subtotal = items.reduce((s, it) => s + (it.quantity * it.rate), 0);
-            const taxPct = Number(document.getElementById('tax-percentage').value) || 0;
-            const tax = subtotal * (taxPct/100);
-            const total = subtotal + tax;
-
-            // Get signatory data
-            const signatoryType = document.querySelector('input[name="signatory_type"]:checked').value;
-            let signatoryName = null;
-            let signatoryImage = null;
-            
-            if (signatoryType === 'text') {
-                const s = document.getElementById('signatory-select').value;
-                if (s && s !== 'add_new') signatoryName = s;
-            } else {
-                signatoryImage = localStorage.getItem('po_sign_image');
-            }
-
-            // Prepare data for backend
-            const poData = {
-                po_no: document.getElementById('po-no').value,
-                po_date: document.getElementById('po-date').value,
-                expected_delivery: document.getElementById('expected-delivery').value,
-                from_company_id: COMPANY_ID,
-                from_name: document.getElementById('from-name').value,
-                from_city: document.getElementById('from-city').value,
-                from_country: document.getElementById('from-country').value,
-                supplier_id: supplierSelect.value,
-                supplier_name: selectedOption.textContent,
-                supplier_data: supplierData,
-                items: items,
-                sub_total: subtotal,
-                tax_percentage: taxPct,
-                tax: tax,
-                total: total,
-                terms_and_condition: document.getElementById('terms-input').value.trim(),
-                notes: document.getElementById('notes-input').value.trim(),
-                signatory: signatoryName,
-                signatory_image: signatoryImage,
-                logo: logoDataUrl
-            };
-
-            try {
-                // Save to backend
-                const response = await safeFetch(`${API_BASE_URL}/purchase-orders`, {
-                    method: 'POST',
-                    body: JSON.stringify(poData)
-                });
-
-                console.log('Purchase Order saved:', response);
-                alert('✅ Purchase Order saved successfully!');
-
-                // Now build display with saved data
-                buildDisplayView(response.purchase_order || poData);
-
-            } catch (err) {
-                console.error('Save error:', err);
-                alert(`❌ Error: ${err.message || 'Failed to save purchase order'}`);
-            }
-        });
-
-        document.getElementById('edit-btn').addEventListener('click', () => { 
-            document.getElementById('display-view').classList.add('hidden'); 
-            document.getElementById('form-view').classList.remove('hidden'); 
-        });
-
-        document.getElementById('download-pdf-btn').addEventListener('click', () => {
-            const el = document.getElementById('po-display-content');
-            const opt = { 
-                margin: 10, 
-                filename: `PurchaseOrder-${document.getElementById('po-no').value || 'PO'}.pdf`, 
-                image: {type:'jpeg', quality:0.98}, 
-                html2canvas: {scale:2, useCORS:true}, 
-                jsPDF: {unit:'mm', format:'a4', orientation:'portrait'} 
-            };
-            html2pdf().from(el).set(opt).save();
-        });
-
-        // Initialize
-        const dateInput = document.getElementById('po-date');
-        if (dateInput) dateInput.value = new Date().toISOString().slice(0, 10);
-        
-        createItemRow(); 
-        loadSignatories();
-        loadCompanyDetails(); // Load company details first
-        loadVendors(); // Then load vendors
+        };
+        reader.readAsDataURL(file);
     });
-</script>
-</body>
+}
+// ========== VENDOR MANAGEMENT ==========
+async function loadVendors() {
+    try {
+        const vendors = await fetchAPI(`${API_BASE_URL}/vend`);
+        const vendorSelect = document.getElementById('vendor-select');
+        if (!vendorSelect) return;
+        
+        vendorSelect.innerHTML = '<option value="">Select Vendor</option>';
+        (vendors || []).forEach(vendor => {
+            const opt = document.createElement('option');
+            opt.value = vendor._id || vendor.id || '';
+            opt.textContent = vendor.vendor_name || vendor.name || opt.value;
+            vendorSelect.appendChild(opt);
+        });
+    } catch (err) {
+        console.error('Error loading vendors:', err);
+        showAlert('Could not load vendors', 'error');
+    }
+}
 
+function openVendorModal() {
+    document.getElementById('vendor-modal').classList.add('active');
+}
+
+function closeVendorModal() {
+    document.getElementById('vendor-modal').classList.remove('active');
+    document.getElementById('vendor-form').reset();
+}
+
+// ========== ITEM MANAGEMENT ==========
+function addItemRow() {
+    itemCounter++;
+    const container = document.getElementById('items-container');
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'item-row space-y-2 p-2 border rounded';
+    itemDiv.dataset.itemId = itemCounter;
+    itemDiv.innerHTML = `
+        <div class="grid grid-cols-12 gap-2 items-center">
+            <input type="text" placeholder="Item Name" class="col-span-4 item-name input-field" required>
+            <input type="number" placeholder="0" class="col-span-2 item-quantity input-field text-right" min="1" value="1" required>
+            <input type="number" placeholder="0" class="col-span-2 item-rate input-field text-right" min="0" step="0.01" required>
+            <span class="col-span-3 item-amount text-right">₹0.00</span>
+            <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <textarea class="item-description input-field col-span-12" rows="2" placeholder="Item description"></textarea>
+    `;
+    container.appendChild(itemDiv);
+
+    const qtyInput = itemDiv.querySelector('.item-quantity');
+    const rateInput = itemDiv.querySelector('.item-rate');
+    const deleteBtn = itemDiv.querySelector('.delete-item-btn');
+
+    qtyInput.addEventListener('input', () => calculateItemAmount(itemDiv));
+    rateInput.addEventListener('input', () => calculateItemAmount(itemDiv));
+    deleteBtn.addEventListener('click', () => {
+        itemDiv.remove();
+        calculateTotals();
+    });
+}
+
+function calculateItemAmount(itemDiv) {
+    const qty = parseFloat(itemDiv.querySelector('.item-quantity').value) || 0;
+    const rate = parseFloat(itemDiv.querySelector('.item-rate').value) || 0;
+    const amount = qty * rate;
+    itemDiv.querySelector('.item-amount').textContent = `₹${amount.toFixed(2)}`;
+    calculateTotals();
+}
+
+function calculateTotals() {
+    let subtotal = 0;
+    document.querySelectorAll('.item-row').forEach(item => {
+        const qty = parseFloat(item.querySelector('.item-quantity').value) || 0;
+        const rate = parseFloat(item.querySelector('.item-rate').value) || 0;
+        subtotal += qty * rate;
+    });
+
+    const taxPercentage = parseFloat(document.getElementById('tax-percentage').value) || 0;
+    const tax = (subtotal * taxPercentage) / 100;
+    const totalBeforeRound = subtotal + tax;
+    const totalRounded = Math.round(totalBeforeRound);
+    const roundOff = totalRounded - totalBeforeRound;
+
+    document.getElementById('subtotal-display').textContent = `₹${subtotal.toFixed(2)}`;
+    document.getElementById('tax-display').textContent = `₹${tax.toFixed(2)}`;
+    document.getElementById('round-off-display').textContent = `₹${roundOff.toFixed(2)}`;
+    document.getElementById('total-display').textContent = `₹${totalRounded}`;
+}
+
+// ========== FORM SUBMISSION ==========
+// ========== FORM SUBMISSION ==========
+async function handleFormSubmit(e) {
+    e.preventDefault();
+
+    const vendorSelect = document.getElementById('vendor-select');
+    if (!vendorSelect.value) {
+        showAlert('Please select a vendor', 'error');
+        return;
+    }
+
+    const items = [];
+    document.querySelectorAll('.item-row').forEach(itemDiv => {
+        const qty = parseFloat(itemDiv.querySelector('.item-quantity').value) || 0;
+        const rate = parseFloat(itemDiv.querySelector('.item-rate').value) || 0;
+        items.push({
+            item_name: itemDiv.querySelector('.item-name').value,
+            description: itemDiv.querySelector('.item-description').value,
+            quantity: qty,
+            rate: rate,
+            amount: qty * rate
+        });
+    });
+
+    if (items.length === 0) {
+        showAlert('Please add at least one item', 'error');
+        return;
+    }
+
+    const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
+    const taxPercentage = parseFloat(document.getElementById('tax-percentage').value) || 0;
+    const tax = (subtotal * taxPercentage) / 100;
+    const totalBeforeRound = subtotal + tax;
+    const totalRounded = Math.round(totalBeforeRound);
+    const roundOff = totalRounded - totalBeforeRound;
+
+    const poNumber = getNextPONumber(currentPrefix);
+
+    const poData = {
+        po_no: poNumber,
+        prefix: currentPrefix,
+        po_date: document.getElementById('po-date').value,
+        expected_delivery: document.getElementById('expected-delivery').value,
+        vendor_id: vendorSelect.value,
+        vendor_name: vendorSelect.options[vendorSelect.selectedIndex].text,
+        items: items,
+        sub_total: subtotal,
+        tax_percentage: taxPercentage,
+        tax: tax,
+        round_off: roundOff,
+        total: totalRounded,
+        terms_and_condition: document.getElementById('terms-input')?.value || '',
+        notes: document.getElementById('notes-input')?.value || ''
+    };
+
+    try {
+        setLoading(true);
+        
+        // Make sure to stringify the body
+        await fetchAPI(`${API_BASE_URL}/purchase-orders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'  // Explicitly set here
+            },
+            body: JSON.stringify(poData)  // Make sure it's stringified
+        });
+
+        showAlert('Purchase Order created successfully!', 'success');
+        
+        if (prefixChangeMode === 'once') {
+            currentPrefix = originalPrefix;
+            document.getElementById('po-prefix').value = originalPrefix;
+            prefixChangeMode = null;
+        }
+
+        setTimeout(() => {
+            window.location.href = 'home_purchase_orders.html';
+        }, 2000);
+    } catch (err) {
+        console.error('Error creating PO:', err);
+        showAlert('Failed to create Purchase Order: ' + err.message, 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+// ========== EVENT LISTENERS ==========
+document.addEventListener('DOMContentLoaded', () => {
+    // Set today's date
+    document.getElementById('po-date').valueAsDate = new Date();
+    
+    // Load initial data
+    loadSavedPrefix();
+    loadCompany();
+    loadVendors();
+    addItemRow();
+    setupLogoUpload();
+    
+    // Mobile menu
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const menuBackdrop = document.getElementById('menu-backdrop');
+    
+    if (menuToggle && sidebar && menuBackdrop) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+            menuBackdrop.classList.toggle('hidden');
+        });
+        menuBackdrop.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            menuBackdrop.classList.add('hidden');
+        });
+    }
+    
+    // Sidebar dropdowns
+    document.getElementById('documents-dropdown-btn')?.addEventListener('click', () => {
+        document.getElementById('documents-dropdown-content')?.classList.toggle('hidden');
+        document.getElementById('dropdown-icon')?.classList.toggle('rotate-180');
+    });
+    
+    document.getElementById('purchases-dropdown-btn')?.addEventListener('click', () => {
+        document.getElementById('purchases-dropdown-content')?.classList.toggle('hidden');
+        document.getElementById('purchases-dropdown-icon')?.classList.toggle('rotate-180');
+    });
+    
+    // Prefix input
+    const prefixInput = document.getElementById('po-prefix');
+    prefixInput.addEventListener('blur', function() {
+        const newValue = this.value.trim().toUpperCase();
+        this.value = newValue;
+        
+        if (newValue && newValue !== originalPrefix && newValue !== currentPrefix) {
+            openPrefixModal(originalPrefix, newValue);
+        }
+    });
+    
+    // Prefix modal buttons
+    document.getElementById('prefix-cancel-btn').addEventListener('click', () => {
+        document.getElementById('po-prefix').value = currentPrefix;
+        closePrefixModal();
+    });
+    
+    document.getElementById('prefix-once-btn').addEventListener('click', () => {
+        handlePrefixChange('once');
+    });
+    
+    document.getElementById('prefix-always-btn').addEventListener('click', () => {
+        handlePrefixChange('always');
+    });
+    
+    // Vendor modal
+    document.getElementById('add-new-vendor-btn').addEventListener('click', openVendorModal);
+    document.getElementById('vendor-modal-cancel').addEventListener('click', closeVendorModal);
+    
+    document.getElementById('vendor-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const vendorData = {
+            vendor_name: form.querySelector('[name="vendor_name"]').value.trim(),
+            address: {
+                country: form.querySelector('[name="country"]').value,
+                state: form.querySelector('[name="state"]').value.trim(),
+                city: form.querySelector('[name="city"]').value.trim()
+            }
+        };
+        
+        try {
+            const result = await fetchAPI(`${API_BASE_URL}/vendors`, {
+                method: 'POST',
+                body: JSON.stringify(vendorData)
+            });
+            
+            await loadVendors();
+            document.getElementById('vendor-select').value = result._id || result.id;
+            closeVendorModal();
+            showAlert('Vendor added successfully', 'success');
+        } catch (err) {
+            console.error('Error adding vendor:', err);
+            showAlert('Failed to add vendor', 'error');
+        }
+    });
+    
+    // Item management
+    document.getElementById('add-item-btn').addEventListener('click', addItemRow);
+    document.getElementById('tax-percentage').addEventListener('input', calculateTotals);
+    
+    // Toggle buttons
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.dataset.target;
+            const targetEl = document.getElementById(targetId);
+            if (!targetEl) return;
+            const isHidden = targetEl.classList.toggle('hidden');
+            btn.innerHTML = btn.innerHTML.replace(isHidden ? '-' : '+', isHidden ? '+' : '-');
+        });
+    });
+    
+    // Form submission
+    document.getElementById('po-form').addEventListener('submit', handleFormSubmit);
+});
+    </script>
+</body>
 </html>
