@@ -108,7 +108,6 @@
                         <a href="home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 bg-gray-700 text-sm">Purchase Orders</a>
                         <a href="../payout receipts/home_payout_receipts.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout Receipts</a>
                         <a href="../debit notes/home_debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
-                        
                     </div>
                 </div>
                 <a href="../../manage-clients.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
@@ -158,6 +157,7 @@
                         <label for="filter-status" class="text-sm font-medium text-gray-700">Select Order Status</label>
                         <select id="filter-status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option>All</option>
+                            <option>Draft</option>
                             <option>Pending</option>
                             <option>Approved</option>
                             <option>Received</option>
@@ -205,6 +205,80 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // --- AUTHENTICATION CHECK ---
+        const API_BASE_URL = 'http://Aixains-Mac-mini.local:8000/api';
+        const API_URL = `${API_BASE_URL}/purchase-orders`;
+
+        function checkAuthentication() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("⚠️ Authentication token is missing! Please log in.");
+                window.location.href = '/login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Check auth before proceeding
+        if (!checkAuthentication()) {
+            return;
+        }
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem("token");
+            if (token) {
+                return {'Authorization': `Bearer ${token}`};
+            }
+            return null;
+        }
+
+        async function safeFetch(url, opts = {}) {
+            const headers = Object.assign({}, opts.headers || {});
+            const authHeaders = getAuthHeaders();
+
+            if (!authHeaders) {
+                alert("Authentication token not found. Please log in.");
+                window.location.href = '/login.html';
+                throw new Error("Authentication token not found.");
+            }
+            Object.assign(headers, authHeaders);
+
+            if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
+                headers["Content-Type"] = "application/json";
+            }
+
+            const finalOpts = Object.assign({}, opts, { headers });
+
+            try {
+                const res = await fetch(url, finalOpts);
+                const text = await res.text();
+                let data;
+                try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        alert("Session expired or invalid. Please log in again.");
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userId');
+                        window.location.href = '/login.html';
+                        throw new Error("Session expired");
+                    }
+                    const errMsg = (data && data.message) || (typeof data === "string" ? data : res.statusText) || "Request failed";
+                    const error = new Error(errMsg);
+                    error.status = res.status;
+                    error.data = data;
+                    throw error;
+                }
+
+                return data;
+            } catch (err) {
+                if (err.message !== 'Authentication token not found' && err.message !== 'Session expired') {
+                    throw err;
+                }
+                throw new Error("Authentication required");
+            }
+        }
+
         // --- Sidebar dropdown logic ---
         const dropdownBtn = document.getElementById('documents-dropdown-btn');
         const dropdownContent = document.getElementById('documents-dropdown-content');
@@ -218,58 +292,20 @@
             document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
         });
 
-        // --- Elements & API Config ---
+        // --- Elements ---
         const tbody = document.getElementById('po-table-body');
         const selectAllCheckbox = document.getElementById('select-all-checkbox');
         const filterVendor = document.getElementById('filter-vendor');
-        const API_URL = 'http://Aixains-Mac-mini.local:8000/api/purchase-orders';
-
-        // --- Authentication & API Functions ---
-        function getAuthHeaders() {
-            const token = localStorage.getItem('auth_token');
-            const scheme = localStorage.getItem('auth_scheme') || 'Bearer';
-            if (token) {
-                return { 'Authorization': `${scheme} ${token}` };
-            }
-            return {};
-        }
-
-        async function fetchJsonAndParse(url, opts = {}) {
-            opts.headers = opts.headers || {};
-            const authHeaders = getAuthHeaders();
-            opts.headers = { ...opts.headers, ...authHeaders };
-
-            if (opts.body && typeof opts.body === 'string' && !opts.headers['Content-Type']) {
-                opts.headers = { ...opts.headers, 'Content-Type': 'application/json' };
-            }
-
-            const response = await fetch(url, opts);
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    alert("Authentication error or session expired. Please log in again.");
-                }
-                const errorText = await response.text().catch(() => response.statusText);
-                const error = new Error(`HTTP ${response.status}: ${errorText}`);
-                error.status = response.status;
-                throw error;
-            }
-
-            const contentType = response.headers.get('content-type') || '';
-            if (contentType.includes('application/json')) {
-                return response.json();
-            }
-            const text = await response.text();
-            try { return JSON.parse(text); } catch (e) { return text; }
-        }
+        const filterStatus = document.getElementById('filter-status');
 
         // --- Utility functions ---
-        function getId(po) { return po.po_no || po.purchase_order_no || 'unknown'; }
-        function getVendor(po) { return po.vendor?.name || po.vendor_name || 'Unknown Vendor'; }
-        function getStatus(po) { return po.status || 'Unknown'; }
+        function getId(po) { return po._id || po.id || 'unknown'; }
+        function getPoNo(po) { return po.po_no || po.purchase_order_no || 'N/A'; }
+        function getVendor(po) { return po.supplier_name || po.vendor_name || (po.supplier && po.supplier.vendor_name) || 'Unknown Vendor'; }
+        function getStatus(po) { return po.status || 'Draft'; }
         function getSubTotal(po) { return po.sub_total ?? po.subtotal ?? po.subTotal ?? 0; }
         function getAmount(po) { return po.total ?? po.amount ?? po.grand_total ?? 0; }
-        function getOrderDate(po) { return po.order_date || po.po_date || 'N/A'; }
+        function getOrderDate(po) { return po.po_date || po.order_date || 'N/A'; }
         
         function formatCurrency(value) {
             const num = Number(value) || 0;
@@ -311,14 +347,20 @@
         }
 
         // --- Render list and wire up actions ---
+        let allPurchaseOrders = [];
+
         function renderList(list) {
+            allPurchaseOrders = list || [];
+            
             if (!list || list.length === 0) {
-                tbody.innerHTML = `<tr><td class="table-body-cell text-center" colspan="7">No purchase orders found.</td></tr>`;
+                tbody.innerHTML = `<tr><td class="table-body-cell text-center" colspan="7">No purchase orders found. <a href="create_purchase_order.html" class="text-indigo-600 hover:underline">Create one now</a>.</td></tr>`;
                 return;
             }
+            
             let html = '';
             list.forEach((po, idx) => {
                 const id = escapeHtml(getId(po));
+                const poNo = escapeHtml(getPoNo(po));
                 const vendor = escapeHtml(getVendor(po));
                 const status = escapeHtml(getStatus(po));
                 const subtotal = formatCurrency(getSubTotal(po));
@@ -326,12 +368,12 @@
                 const orderDate = escapeHtml(getOrderDate(po));
                 
                 html += `
-                    <tr>
+                    <tr data-status="${status.toLowerCase()}" data-vendor="${vendor}">
                         <td class="table-body-cell text-center">
                             <input type="checkbox" class="po-checkbox" data-id="${id}">
                         </td>
                         <td class="table-body-cell">
-                            <div class="font-semibold">${id}</div>
+                            <div class="font-semibold">${poNo}</div>
                             <div class="text-xs text-gray-500">Date: ${orderDate}</div>
                         </td>
                         <td class="table-body-cell">${vendor}</td>
@@ -416,35 +458,34 @@
 
             menu.querySelector('.approve').addEventListener('click', async (ev) => {
                 const poid = decodeURIComponent(ev.currentTarget.dataset.id);
-                if (!confirm('Approve purchase order ' + poid + '?')) return;
+                if (!confirm('Approve purchase order?')) return;
                 
                 try {
-                    await fetchJsonAndParse(API_URL + '/' + encodeURIComponent(poid), {
-                        method: 'PATCH',
+                    await safeFetch(`${API_URL}/${poid}`, {
+                        method: 'PUT',
                         body: JSON.stringify({ status: 'Approved' })
                     });
-                    alert('Purchase order approved successfully.');
+                    alert('✅ Purchase order approved successfully.');
                     closeAllPopovers();
                     fetchPurchaseOrders();
                 } catch (err) {
                     console.error('Approve failed', err);
-                    alert('Failed to approve purchase order: ' + (err.message || 'Unknown error'));
+                    alert('❌ Failed to approve purchase order: ' + (err.message || 'Unknown error'));
                 }
             });
 
             menu.querySelector('.delete').addEventListener('click', async (ev) => {
                 const poid = decodeURIComponent(ev.currentTarget.dataset.id);
-                if (!confirm('Delete purchase order ' + poid + '? This cannot be undone.')) return;
+                if (!confirm('Delete this purchase order? This cannot be undone.')) return;
 
                 try {
-                    await fetchJsonAndParse(API_URL + '/' + encodeURIComponent(poid), { method: 'DELETE' });
-                    const rowToRemove = Array.from(document.querySelectorAll('.po-checkbox')).find(cb => cb.dataset.id === poid)?.closest('tr');
-                    if (rowToRemove) rowToRemove.remove();
-                    alert('Purchase order deleted successfully.');
+                    await safeFetch(`${API_URL}/${poid}`, { method: 'DELETE' });
+                    alert('✅ Purchase order deleted successfully.');
                     closeAllPopovers();
+                    fetchPurchaseOrders();
                 } catch (err) {
                     console.error('Delete failed', err);
-                    alert('Failed to delete purchase order: ' + (err.message || 'Unknown error'));
+                    alert('❌ Failed to delete purchase order: ' + (err.message || 'Unknown error'));
                 }
             });
             
@@ -455,7 +496,7 @@
             document.querySelectorAll('.popover-menu').forEach(m => m.remove());
         }
 
-        // --- Filter and Select-All Logic ---
+        // --- Filter Logic ---
         function populateVendorFilter(list) {
             const names = new Set(list.map(getVendor));
             filterVendor.innerHTML = '<option>All Vendors</option>';
@@ -466,40 +507,36 @@
                 filterVendor.appendChild(opt);
             });
         }
+
+        function applyFilters() {
+            const selectedVendor = filterVendor.value;
+            const selectedStatus = filterStatus.value;
+
+            document.querySelectorAll('#po-table-body tr').forEach(tr => {
+                const vendor = tr.dataset.vendor || '';
+                const status = tr.dataset.status || '';
+
+                const matchesVendor = selectedVendor === 'All Vendors' || vendor.includes(selectedVendor);
+                const matchesStatus = selectedStatus === 'All' || status.includes(selectedStatus.toLowerCase());
+
+                tr.style.display = (matchesVendor && matchesStatus) ? '' : 'none';
+            });
+        }
         
         selectAllCheckbox.addEventListener('change', () => {
             document.querySelectorAll('.po-checkbox').forEach(cb => cb.checked = selectAllCheckbox.checked);
         });
         
-        filterVendor.addEventListener('change', () => {
-            const selected = filterVendor.value;
-            document.querySelectorAll('#po-table-body tr').forEach(tr => {
-                if (selected === 'All Vendors') {
-                    tr.style.display = '';
-                } else {
-                    const vendorCell = tr.querySelector('td:nth-child(3)');
-                    tr.style.display = vendorCell?.textContent.includes(selected) ? '' : 'none';
-                }
-            });
-        });
+        filterVendor.addEventListener('change', applyFilters);
+        filterStatus.addEventListener('change', applyFilters);
 
         // --- Initial Fetch ---
         async function fetchPurchaseOrders() {
             showLoading();
             try {
-                const json = await fetchJsonAndParse(API_URL);
-                if (!json) {
-                    showError("Could not authenticate. Please log in.");
-                    return;
-                }
-
-                let list = Array.isArray(json) ? json
-                         : Array.isArray(json.data) ? json.data
-                         : Array.isArray(json.purchase_orders) ? json.purchase_orders
-                         : [];
-                
-                renderList(list);
-
+                const list = await safeFetch(API_URL);
+                console.log('Fetched purchase orders:', list);
+                renderList(Array.isArray(list) ? list : []);
             } catch (err) {
                 console.error('Fetch error:', err);
                 showError(err.message || 'Could not load purchase orders.');
