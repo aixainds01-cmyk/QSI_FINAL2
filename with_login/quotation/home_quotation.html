@@ -156,7 +156,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border rounded-lg bg-gray-50">
           <div>
-            <label for="filter-status" class="block text-sm font-medium text-gray-700 mb-1">Select Order Status</label>
+            <label for="filter-status" class="block text-sm font-medium text-gray-700 mb-1">Select Status</label>
             <select id="filter-status"
               class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
               <option value="all">All</option>
@@ -327,7 +327,7 @@ function renderOrders(orders) {
 
   orders.forEach((order) => {
     const clientName = order.to?.client_name || "Unknown Client";
-    const quoNumber = `QUO-${order.quotation_no || ""}`;
+    const quoNumber = `${order.quotation_no || ""}`;
     const row = document.createElement("tr");
     row.className = "hover:bg-gray-50";
     row.innerHTML = `

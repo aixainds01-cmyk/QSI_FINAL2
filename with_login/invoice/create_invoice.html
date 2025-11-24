@@ -1018,765 +1018,753 @@
     </div>
 
     <script>
-        (function () {
-            const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
-            const CLIENT_API_URL = `${API_BASE_URL}/clients`;
-            const COMPANY_API_URL = `${API_BASE_URL}/companies`;
-            const SALES_ORDER_API_URL = `${API_BASE_URL}/sales-order`;
-            const INVOICE_API_URL = `${API_BASE_URL}/invoic`;
-            const BANK_API_URL = `${API_BASE_URL}/banks`;
-            const SIGNATORY_STORAGE_KEY = 'qsi_saved_signatories';
-            const SIGNATURE_IMAGE_STORAGE_KEY = 'qsi_saved_signature_image';
-            const PREFIX_STORAGE_KEY = 'qsi_invoice_prefix';
-            const PREFIX_COUNTERS_KEY = 'qsi_invoice_prefix_counters';
-            let COMPANY_ID = null;
+    (function () {
+        const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
+        const CLIENT_API_URL = `${API_BASE_URL}/clients`;
+        const COMPANY_API_URL = `${API_BASE_URL}/companies`;
+        const SALES_ORDER_API_URL = `${API_BASE_URL}/sales-order`;
+        const INVOICE_API_URL = `${API_BASE_URL}/invoic`;
+        const BANK_API_URL = `${API_BASE_URL}/banks`;
+        const SIGNATORY_STORAGE_KEY = 'qsi_saved_signatories';
+        const SIGNATURE_IMAGE_STORAGE_KEY = 'qsi_saved_signature_image';
+        const PREFIX_STORAGE_KEY = 'qsi_invoice_prefix';
+        const PREFIX_COUNTERS_KEY = 'qsi_invoice_prefix_counters';
+        let COMPANY_ID = null;
 
-            // Prefix management variables
-            let originalPrefix = 'INV';
-            let currentPrefix = 'INV';
-            let prefixChangeMode = null; // 'once' or 'always'
+        // Prefix management variables
+        let originalPrefix = 'INV';
+        let currentPrefix = 'INV';
+        let prefixChangeMode = null; // 'once' or 'always'
 
-            const invoiceForm = document.getElementById("invoice-form");
-            const itemsContainer = document.getElementById("items-container");
-            const addItemBtn = document.getElementById("add-item-btn");
-            const taxPercentageInput = document.getElementById("tax-percentage");
-            const billedToSelect = document.getElementById("billed-to-select");
-            const logoInput = document.getElementById("logo-input");
-            const logoPreview = document.getElementById("logo-preview");
-            const logoPreviewContainer = document.getElementById("logo-preview-container");
-            const logoPlaceholder = document.getElementById("logo-placeholder");
-            const businessLogoPreview = document.getElementById("businessLogoPreview");
-            const saveBtnLoading = document.getElementById("save-btn-loading");
-            const saveBtn = document.getElementById("save-btn");
-            const saveContinueBtn = document.getElementById("save-continue-btn");
-            const previewPage = document.getElementById("preview-invoice-page");
-            const createPage = document.getElementById("create-invoice-page");
-            const editBtn = document.getElementById("edit-btn");
-            const downloadPdfBtn = document.getElementById("download-pdf-btn");
-            const alertContainer = document.getElementById("alert-container");
-            const menuToggle = document.getElementById("menu-toggle");
-            const sidebar = document.getElementById("sidebar");
-            const menuBackdrop = document.getElementById("menu-backdrop");
-            const invoicePrefixInput = document.getElementById("invoice-prefix");
+        const invoiceForm = document.getElementById("invoice-form");
+        const itemsContainer = document.getElementById("items-container");
+        const addItemBtn = document.getElementById("add-item-btn");
+        const taxPercentageInput = document.getElementById("tax-percentage");
+        const billedToSelect = document.getElementById("billed-to-select");
+        const logoInput = document.getElementById("logo-input");
+        const logoPreview = document.getElementById("logo-preview");
+        const logoPreviewContainer = document.getElementById("logo-preview-container");
+        const logoPlaceholder = document.getElementById("logo-placeholder");
+        const businessLogoPreview = document.getElementById("businessLogoPreview");
+        const saveBtnLoading = document.getElementById("save-btn-loading");
+        const saveBtn = document.getElementById("save-btn");
+        const saveContinueBtn = document.getElementById("save-continue-btn");
+        const previewPage = document.getElementById("preview-invoice-page");
+        const createPage = document.getElementById("create-invoice-page");
+        const editBtn = document.getElementById("edit-btn");
+        const downloadPdfBtn = document.getElementById("download-pdf-btn");
+        const alertContainer = document.getElementById("alert-container");
+        const menuToggle = document.getElementById("menu-toggle");
+        const sidebar = document.getElementById("sidebar");
+        const menuBackdrop = document.getElementById("menu-backdrop");
+        const invoicePrefixInput = document.getElementById("invoice-prefix");
 
-            // Prefix modal elements
-            const prefixModal = document.getElementById("prefix-modal");
-            const prefixModalClose = document.getElementById("prefix-modal-close");
-            const prefixOnceBtn = document.getElementById("prefix-once-btn");
-            const prefixAlwaysBtn = document.getElementById("prefix-always-btn");
-            const oldPrefixText = document.getElementById("old-prefix-text");
-            const newPrefixText = document.getElementById("new-prefix-text");
+        // Prefix modal elements
+        const prefixModal = document.getElementById("prefix-modal");
+        const prefixModalClose = document.getElementById("prefix-modal-close");
+        const prefixOnceBtn = document.getElementById("prefix-once-btn");
+        const prefixAlwaysBtn = document.getElementById("prefix-always-btn");
+        const oldPrefixText = document.getElementById("old-prefix-text");
+        const newPrefixText = document.getElementById("new-prefix-text");
 
-            if (menuToggle && sidebar && menuBackdrop) {
-                menuToggle.addEventListener("click", () => {
-                    sidebar.classList.toggle("-translate-x-full");
-                    menuBackdrop.classList.toggle("hidden");
-                });
-
-                menuBackdrop.addEventListener("click", () => {
-                    sidebar.classList.add("-translate-x-full");
-                    menuBackdrop.classList.add("hidden");
-                });
-            }
-
-            // ===== PREFIX MANAGEMENT FUNCTIONS =====
-
-            function loadSavedPrefix() {
-                const savedPrefix = localStorage.getItem(PREFIX_STORAGE_KEY);
-                if (savedPrefix) {
-                    originalPrefix = savedPrefix;
-                    currentPrefix = savedPrefix;
-                    if (invoicePrefixInput) {
-                        invoicePrefixInput.value = savedPrefix;
-                    }
-                }
-            }
-
-            function getPrefixCounters() {
-                const stored = localStorage.getItem(PREFIX_COUNTERS_KEY);
-                return stored ? JSON.parse(stored) : {};
-            }
-
-            function setPrefixCounter(prefix, count) {
-                const counters = getPrefixCounters();
-                counters[prefix] = count;
-                localStorage.setItem(PREFIX_COUNTERS_KEY, JSON.stringify(counters));
-            }
-
-            function getNextInvoiceNumber(prefix) {
-                const counters = getPrefixCounters();
-                const currentCount = counters[prefix] || 0;
-                const nextCount = currentCount + 1;
-                setPrefixCounter(prefix, nextCount);
-                return `${prefix}${String(nextCount).padStart(4, '0')}`;
-            }
-
-            function openPrefixModal(oldPrefix, newPrefix) {
-                if (oldPrefixText) oldPrefixText.textContent = oldPrefix;
-                if (newPrefixText) newPrefixText.textContent = newPrefix;
-                prefixModal?.classList.remove('hidden');
-            }
-
-            function closePrefixModal() {
-                prefixModal?.classList.add('hidden');
-            }
-
-            function handlePrefixChange(mode) {
-                const newPrefix = invoicePrefixInput.value.trim().toUpperCase();
-
-                if (mode === 'always') {
-                    localStorage.setItem(PREFIX_STORAGE_KEY, newPrefix);
-                    originalPrefix = newPrefix;
-                    showAlert(`Prefix changed to "${newPrefix}" for all future invoices.`, 'success', 3000);
-                } else if (mode === 'once') {
-                    showAlert(`Using prefix "${newPrefix}" for this invoice only.`, 'success', 3000);
-                }
-
-                currentPrefix = newPrefix;
-                prefixChangeMode = mode;
-                closePrefixModal();
-            }
-
-            // Prefix input change detection
-            if (invoicePrefixInput) {
-                invoicePrefixInput.addEventListener('blur', function () {
-                    const newValue = this.value.trim().toUpperCase();
-                    this.value = newValue;
-
-                    if (newValue && newValue !== originalPrefix && newValue !== currentPrefix) {
-                        openPrefixModal(originalPrefix, newValue);
-                    }
-                });
-
-                invoicePrefixInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        this.blur();
-                    }
-                });
-            }
-
-            // Prefix modal event listeners
-            prefixModalClose?.addEventListener('click', () => {
-                invoicePrefixInput.value = currentPrefix;
-                closePrefixModal();
+        if (menuToggle && sidebar && menuBackdrop) {
+            menuToggle.addEventListener("click", () => {
+                sidebar.classList.toggle("-translate-x-full");
+                menuBackdrop.classList.toggle("hidden");
             });
 
-            prefixOnceBtn?.addEventListener('click', () => {
-                handlePrefixChange('once');
+            menuBackdrop.addEventListener("click", () => {
+                sidebar.classList.add("-translate-x-full");
+                menuBackdrop.classList.add("hidden");
             });
+        }
 
-            prefixAlwaysBtn?.addEventListener('click', () => {
-                handlePrefixChange('always');
+        // ===== UTILITY FUNCTIONS =====
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/[&<>"']/g, function (m) {
+                return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[m];
             });
+        }
 
-            prefixModal?.addEventListener('click', (e) => {
-                if (e.target === prefixModal) {
-                    invoicePrefixInput.value = currentPrefix;
-                    closePrefixModal();
-                }
-            });
+        function setLoading(isLoading) {
+            if (saveContinueBtn) {
+                saveContinueBtn.disabled = isLoading;
+            }
+            if (saveBtnLoading) {
+                saveBtnLoading.classList.toggle("hidden", !isLoading);
+            }
+        }
 
-            // ===== END PREFIX MANAGEMENT =====
+        function showAlert(message, type = "success", duration = 5000) {
+            if (!alertContainer) return;
+            const alertDiv = document.createElement("div");
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            setTimeout(() => {
+                alertDiv.remove();
+            }, duration);
+        }
 
-            function setLoading(isLoading) {
-                if (saveContinueBtn) { // Use the correct button variable
-                    saveContinueBtn.disabled = isLoading;
-                }
-                if (saveBtnLoading) {
-                    saveBtnLoading.classList.toggle("hidden", !isLoading);
-                }
+        // ===== AUTH FUNCTIONS =====
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem("token");
+            if (token) {
+                return { 'Authorization': `Bearer ${token}` };
+            }
+            return null;
+        }
+
+        async function safeFetch(url, opts = {}) {
+            const headers = Object.assign({}, opts.headers || {});
+            const authHeaders = getAuthHeaders();
+
+            if (!authHeaders) {
+                alert("Authentication token not found. Please log in.");
+                window.location.href = '../../index.html';
+                throw new Error("Authentication token not found.");
+            }
+            Object.assign(headers, authHeaders);
+
+            if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
+                headers["Content-Type"] = "application/json";
             }
 
-            function showAlert(message, type = "success", duration = 5000) {
-                if (!alertContainer) return;
-                const alertDiv = document.createElement("div");
-                alertDiv.className = `alert alert-${type}`;
-                alertDiv.textContent = message;
-                alertContainer.innerHTML = ''; // Clear previous alerts
-                alertContainer.appendChild(alertDiv);
-                setTimeout(() => {
-                    alertDiv.remove();
-                }, duration);
-            }
+            const finalOpts = Object.assign({}, opts, { headers });
 
-            /* Persist token so reloads keep auth */
-            function setAuthToken(token, scheme = "Bearer") {
-                try {
-                    localStorage.setItem("auth_token", token);
-                    localStorage.setItem("auth_scheme", scheme);
-                } catch (e) { /* ignore storage errors */ }
-                window.__AUTH_TOKEN = token;
-                window.__AUTH_SCHEME = scheme;
-            }
-            function clearAuthToken() {
-                try {
-                    localStorage.removeItem("auth_token");
-                    localStorage.removeItem("auth_scheme");
-                } catch (e) { /* ignore */ }
-                window.__AUTH_TOKEN = null;
-                window.__AUTH_SCHEME = null;
-            }
+            try {
+                const res = await fetch(url, finalOpts);
+                const text = await res.text();
+                let data;
+                try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
 
-            /* Read token from memory OR localStorage; default scheme = Bearer */
-            function getAuthHeaders() {
-                const token = localStorage.getItem("token");
-                if (token) {
-                    return { 'Authorization': `Bearer ${token}` };
-                } return null;
-            }
-
-            /* Robust fetch wrapper that attaches auth headers and surfaces 401 clearly */
-            async function safeFetch(url, opts = {}) {
-                const headers = Object.assign({}, opts.headers || {});
-                const authHeaders = getAuthHeaders(); // Reads 'token', returns null if missing
-
-                // --- Handle Missing Token ---
-                if (!authHeaders) {
-                    alert("Authentication token not found. Please log in.");
-                    window.location.href = '../../index.html'; // Adjust login path
-                    throw new Error("Authentication token not found.");
-                }
-                Object.assign(headers, authHeaders);
-                // --- End Handle Missing Token ---
-
-                if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
-                    headers["Content-Type"] = "application/json";
-                }
-
-                const finalOpts = Object.assign({}, opts, { headers });
-
-                try {
-                    const res = await fetch(url, finalOpts);
-                    const text = await res.text();
-                    let data;
-                    try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
-
-                    if (!res.ok) {
-                        // --- Handle 401 Unauthorized ---
-                        if (res.status === 401) {
-                            alert("Session expired or invalid. Please log in again.");
-                            localStorage.removeItem('token');
-                            localStorage.removeItem('userId');
-                            window.location.href = '../../index.html'; // Redirect to login
-                            throw new Error("Session expired");
-                        }
-                        // --- End Handle 401 ---
-                        const errMsg = (data && data.message) || (typeof data === "string" ? data : res.statusText) || "Request failed";
-                        const error = new Error(errMsg);
-                        error.status = res.status;
-                        error.data = data;
-                        throw error;
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        alert("Session expired or invalid. Please log in again.");
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userId');
+                        window.location.href = '../../index.html';
+                        throw new Error("Session expired");
                     }
-
-                    return data;
-                } catch (err) {
-                    // rethrow so caller can handle and show alerts
-                    if (err.message !== 'Authentication token not found' && err.message !== 'Session expired') {
-                        throw err;
-                    }
-                    throw new Error("Authentication required");
-                }
-            }
-            function loadSignatories() {
-                const selectEl = document.getElementById('signatory-select');
-                const saved = JSON.parse(localStorage.getItem(SIGNATORY_STORAGE_KEY)) || [];
-
-                while (selectEl.options.length > 2) {
-                    selectEl.remove(1);
+                    const errMsg = (data && data.message) || (typeof data === "string" ? data : res.statusText) || "Request failed";
+                    const error = new Error(errMsg);
+                    error.status = res.status;
+                    error.data = data;
+                    throw error;
                 }
 
-                saved.forEach(name => {
-                    const opt = document.createElement('option');
-                    opt.value = name;
-                    opt.textContent = name;
-                    selectEl.insertBefore(opt, selectEl.options[selectEl.options.length - 1]);
-                });
-            }
-
-            function loadSignatureImage() {
-                const signatoryImagePreview = document.getElementById('signatory-image-preview');
-                const dataUrl = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
-                if (dataUrl) {
-                    signatoryImagePreview.innerHTML = `<img src="${dataUrl}" class="max-h-full max-w-full object-contain">`;
-                } else {
-                    signatoryImagePreview.innerHTML = '<span>Signature Preview</span>';
-                }
-            }
-
-
-            /* loadCompany: same behavior as before but clearer on 401 */
-            async function loadCompany() {
-                try {
-                    const companies = await safeFetch(COMPANY_API_URL, { method: "GET" });
-                    if (Array.isArray(companies) && companies.length > 0) {
-                        const company = companies[0];
-                        COMPANY_ID = company._id || company.id || null;
-                        // ... (rest of loadCompany is fine) ...
-                        const bn = document.getElementById("businessName");
-                        const bc = document.getElementById("business_city");
-                        const bco = document.getElementById("business_country");
-                        if (bn) bn.value = company.company_name || "";
-                        if (bc) bc.value = company.address?.city || "";
-                        if (bco) bco.value = company.address?.country || "";
-                        if (company.logo) {
-                            if (businessLogoPreview) businessLogoPreview.src = company.logo;
-                            if (logoPreview) logoPreview.src = company.logo;
-                            if (logoPreviewContainer) logoPreviewContainer.classList.remove("hidden");
-                            if (logoPlaceholder) logoPlaceholder.classList.add("hidden");
-                        }
-                    } else {
-                        console.warn("No company found.");
-                        showAlert("No company found. Please create a company.", "error", 7000);
-                    }
-                } catch (err) {
-                    console.error("Error loading companies:", err);
-                    if (err.status === 401) {
-                        showAlert("Unauthorized. Please login.", "error", 7000);
-                    } else {
-                        showAlert("Could not load company. Check server.", "error", 6000);
-                    }
-                }
-            }
-            /* loadClients: handles 401 explicitly so user knows to authenticate */
-            async function loadClients() {
-                try {
-                    const clients = await safeFetch(CLIENT_API_URL, { method: "GET" });
-                    if (!billedToSelect) return;
-                    billedToSelect.innerHTML = '<option value="">Select Client</option>';
-                    (clients || []).forEach((client) => {
-                        const opt = document.createElement("option");
-                        opt.value = client._id || client.id || "";
-                        opt.textContent = client.client_name || client.name || opt.value;
-                        billedToSelect.appendChild(opt);
-                    });
-                } catch (err) {
-                    console.error("Error loading clients:", err);
-                    if (err.status === 401) {
-                        showAlert("Unauthorized. Please login.", "error", 7000);
-                    } else {
-                        showAlert("Could not load clients.", "error", 4000);
-                    }
-                }
-            }
-
-            // Function to fetch bank details
-            async function fetchBankDetails() {
-                try {
-                    const banks = await safeFetch(BANK_API_URL, { method: "GET" });
-                    return Array.isArray(banks) ? banks : [];
-                } catch (err) {
-                    console.error("Error loading bank details:", err);
-                    showAlert("Could not load bank details.", "error", 4000);
-                    return []; // Return empty array on failure
-                }
-            }
-
-
-            function createItemRow() {
-                const row = document.createElement("div");
-                row.className = "item-row space-y-2 p-2 border rounded";
-                row.innerHTML = `
-                            <div class="grid grid-cols-12 gap-2 items-center">
-                                <input class="col-span-4 item-name input-field" placeholder="Item Name" required>
-                                <input type="number" class="col-span-2 quantity input-field text-right"  placeholder="0" min="0" required>
-                                <input type="text" class="col-span-2 rate input-field text-right"  placeholder="0" required>
-                                <span class="col-span-3 amount text-right">₹0.00</span>
-                                <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                            <textarea class="description input-field col-span-12" rows="2" placeholder="Item description"></textarea>
-                `;
-
-                const qtyEl = row.querySelector(".quantity");
-                const rateEl = row.querySelector(".rate");
-                const deleteBtn = row.querySelector(".delete-item-btn");
-
-                const onChange = () => updateRowAmount(row);
-                qtyEl?.addEventListener("input", onChange);
-                rateEl?.addEventListener("input", onChange);
-
-                deleteBtn?.addEventListener("click", () => {
-                    row.remove();
-                    updateTotals();
-                });
-
-                itemsContainer.appendChild(row);
-                updateRowAmount(row);
-            }
-
-            function updateRowAmount(row) {
-                try {
-                    const qty = parseFloat(row.querySelector(".quantity").value) || 0;
-                    const rate = parseFloat(row.querySelector(".rate").value) || 0;
-                    const amt = qty * rate;
-                    row.querySelector(".amount").textContent = `₹${amt.toFixed(2)}`;
-                    updateTotals();
-                } catch (e) { console.error(e); }
-            }
-
-            function updateTotals() {
-                let subtotal = 0;
-                document.querySelectorAll(".item-row").forEach((row) => {
-                    const qty = parseFloat(row.querySelector(".quantity").value) || 0;
-                    const rate = parseFloat(row.querySelector(".rate").value) || 0;
-                    subtotal += qty * rate;
-                });
-
-                const taxP = parseFloat(taxPercentageInput?.value) || 0;
-                const tax = subtotal * (taxP / 100);
-                const totalBeforeRound = subtotal + tax;
-
-                // Calculate round off
-                const totalRounded = Math.round(totalBeforeRound);
-                const roundOff = totalRounded - totalBeforeRound;
-
-                const sEl = document.getElementById("sub_total");
-                const taxEl = document.getElementById("tax");
-                const roundOffEl = document.getElementById("round_off");
-                const totalEl = document.getElementById("total");
-
-                if (sEl) sEl.textContent = `₹${subtotal.toFixed(2)}`;
-                if (taxEl) taxEl.textContent = `₹${tax.toFixed(2)}`;
-                if (roundOffEl) roundOffEl.textContent = `₹${roundOff.toFixed(2)}`;
-                if (totalEl) totalEl.textContent = `₹${totalRounded.toFixed(0)}`; // Show as whole number
-            }
-            function collectInvoiceData() {
-                const items = [...document.querySelectorAll(".item-row")].map((row) => {
-                    const qty = parseFloat(row.querySelector(".quantity").value) || 0;
-                    const rate = parseFloat(row.querySelector(".rate").value) || 0;
-                    return {
-                        item_name: (row.querySelector(".item-name").value || "").trim(),
-                        description: (row.querySelector(".description").value || "").trim(),
-                        quantity: qty,
-                        rate: rate,
-                        amount: +(qty * rate).toFixed(2),
-                    };
-                });
-
-                const subTotal = items.reduce((s, it) => s + it.amount, 0);
-                const taxP = parseFloat(taxPercentageInput?.value) || 0;
-                const tax = +(subTotal * (taxP / 100));
-                const totalBeforeRound = +(subTotal + tax);
-                const totalRounded = Math.round(totalBeforeRound);
-                const roundOff = totalRounded - totalBeforeRound;
-
-                const signatoryType = document.querySelector('input[name="signatory_type"]:checked').value;
-                let signatoryName = null;
-                let signatoryImage = null;
-
-                if (signatoryType === 'text') {
-                    const selectEl = document.getElementById('signatory-select');
-                    if (selectEl && selectEl.value && selectEl.value !== 'add_new') {
-                        signatoryName = selectEl.value;
-                    }
-                } else {
-                    signatoryImage = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
-                }
-
-                // ✅ CHANGE HERE:
-                // Get the prefix directly from the input box (What user typed)
-                // This ensures even if they click Save immediately, we use the new prefix.
-                const prefixInputVal = document.getElementById("invoice-prefix").value.trim().toUpperCase();
-                
-                // If prefix changed, we use the new one to generate number
-                const finalPrefix = prefixInputVal || currentPrefix;
-                const invoiceNumber = getNextInvoiceNumber(finalPrefix);
-
-                return {
-                    prefix: finalPrefix, // Sending the typed prefix
-                    invoice_number: invoiceNumber,
-                    date: document.getElementById("invoice-date")?.value || new Date().toISOString().slice(0, 10),
-                    due_date: document.getElementById("due-date")?.value || "",
-                    items,
-                    sub_total: +subTotal.toFixed(2),
-                    tax: +tax.toFixed(2),
-                    round_off: +roundOff.toFixed(2),
-                    total: totalRounded,
-                    tax_percentage: taxP,
-                    from_company_id: COMPANY_ID,
-                    to_client_id: billedToSelect?.value || "",
-                    terms_and_condition: (document.querySelector("#terms textarea")?.value || "").trim(),
-                    notes: (document.querySelector("#notes textarea")?.value || "").trim(),
-                    signatory: signatoryName,
-                    signatory_image: signatoryImage,
-                };
-            }
-
-            async function submitInvoice(data) {
-                try {
-                    const result = await safeFetch(INVOICE_API_URL, {
-                        method: "POST",
-                        body: JSON.stringify(data),
-                    });
-                    return result;
-                } catch (err) {
+                return data;
+            } catch (err) {
+                if (err.message !== 'Authentication token not found' && err.message !== 'Session expired') {
                     throw err;
                 }
+                throw new Error("Authentication required");
+            }
+        }
+
+        // ===== PREFIX MANAGEMENT FUNCTIONS =====
+
+        function loadSavedPrefix() {
+            const savedPrefix = localStorage.getItem(PREFIX_STORAGE_KEY);
+            if (savedPrefix) {
+                originalPrefix = savedPrefix;
+                currentPrefix = savedPrefix;
+                if (invoicePrefixInput) {
+                    invoicePrefixInput.value = savedPrefix;
+                }
+            }
+        }
+
+        function getPrefixCounters() {
+            const stored = localStorage.getItem(PREFIX_COUNTERS_KEY);
+            return stored ? JSON.parse(stored) : {};
+        }
+
+        function setPrefixCounter(prefix, count) {
+            const counters = getPrefixCounters();
+            counters[prefix] = count;
+            localStorage.setItem(PREFIX_COUNTERS_KEY, JSON.stringify(counters));
+        }
+
+        function getNextInvoiceNumber(prefix) {
+            const counters = getPrefixCounters();
+            const currentCount = counters[prefix] || 0;
+            const nextCount = currentCount + 1;
+            setPrefixCounter(prefix, nextCount);
+            return `${prefix}${String(nextCount).padStart(4, '0')}`;
+        }
+
+        function openPrefixModal(oldPrefix, newPrefix) {
+            if (oldPrefixText) oldPrefixText.textContent = oldPrefix;
+            if (newPrefixText) newPrefixText.textContent = newPrefix;
+            prefixModal?.classList.remove('hidden');
+        }
+
+        function closePrefixModal() {
+            prefixModal?.classList.add('hidden');
+        }
+
+        function handlePrefixChange(mode) {
+            const newPrefix = invoicePrefixInput.value.trim().toUpperCase();
+
+            if (mode === 'always') {
+                localStorage.setItem(PREFIX_STORAGE_KEY, newPrefix);
+                originalPrefix = newPrefix;
+                showAlert(`Prefix changed to "${newPrefix}" for all future invoices.`, 'success', 3000);
+            } else if (mode === 'once') {
+                showAlert(`Using prefix "${newPrefix}" for this invoice only.`, 'success', 3000);
             }
 
-            invoiceForm?.addEventListener("submit", async (e) => {
-                e.preventDefault();
+            currentPrefix = newPrefix;
+            prefixChangeMode = mode;
+            closePrefixModal();
+        }
 
-                // === 🧩 VALIDATION START ===
-                const rows = document.querySelectorAll('.item-row');
-                const messages = [];
-                let isValid = true;
-                let firstInvalidEl = null;
+        // Prefix input change detection
+        if (invoicePrefixInput) {
+            invoicePrefixInput.addEventListener('blur', function () {
+                const newValue = this.value.trim().toUpperCase();
+                this.value = newValue;
 
-                // Remove old inline errors
-                document.querySelectorAll('.error-text').forEach(el => el.remove());
-
-                // 1️⃣ Validate client
-                if (!billedToSelect?.value) {
-                    messages.push("⚠️ Please select a client before saving.");
-                    isValid = false;
+                if (newValue && newValue !== originalPrefix && newValue !== currentPrefix) {
+                    openPrefixModal(originalPrefix, newValue);
                 }
+            });
 
-                // 2️⃣ Validate items
-                if (!rows.length) {
-                    messages.push("⚠️ Please add at least one item.");
-                    isValid = false;
+            invoicePrefixInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.blur();
                 }
+            });
+        }
 
-                rows.forEach((row, index) => {
-                    const nameEl = row.querySelector('.item-name');
-                    const qtyEl = row.querySelector('.quantity');
-                    const rateEl = row.querySelector('.rate');
+        // Prefix modal event listeners
+        prefixModalClose?.addEventListener('click', () => {
+            invoicePrefixInput.value = currentPrefix;
+            closePrefixModal();
+        });
 
-                    const nameVal = nameEl?.value.trim() || '';
-                    const qtyVal = qtyEl?.value.trim() || '';
-                    const rateVal = rateEl?.value.trim() || '';
+        prefixOnceBtn?.addEventListener('click', () => {
+            handlePrefixChange('once');
+        });
 
-                    // Helper for inline errors
-                    const addInlineError = (el, msg) => {
-                        if (!el) return;
-                        const small = document.createElement('small');
-                        small.className = 'error-text text-red-500 text-xs block mt-1';
-                        small.textContent = msg;
-                        el.insertAdjacentElement('afterend', small);
-                    };
+        prefixAlwaysBtn?.addEventListener('click', () => {
+            handlePrefixChange('always');
+        });
 
-                    // 🧾 Item Name check
-                    if (!nameVal) {
-                        addInlineError(nameEl, "Required");
-                        messages.push(`Item ${index + 1}: Missing item name.`);
-                        if (!firstInvalidEl) firstInvalidEl = nameEl;
-                        isValid = false;
+        prefixModal?.addEventListener('click', (e) => {
+            if (e.target === prefixModal) {
+                invoicePrefixInput.value = currentPrefix;
+                closePrefixModal();
+            }
+        });
+
+        // ===== SIGNATORY FUNCTIONS =====
+
+        function loadSignatories() {
+            const selectEl = document.getElementById('signatory-select');
+            const saved = JSON.parse(localStorage.getItem(SIGNATORY_STORAGE_KEY)) || [];
+
+            while (selectEl.options.length > 2) {
+                selectEl.remove(1);
+            }
+
+            saved.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                selectEl.insertBefore(opt, selectEl.options[selectEl.options.length - 1]);
+            });
+        }
+
+        function loadSignatureImage() {
+            const signatoryImagePreview = document.getElementById('signatory-image-preview');
+            const dataUrl = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
+            if (dataUrl) {
+                signatoryImagePreview.innerHTML = `<img src="${dataUrl}" class="max-h-full max-w-full object-contain">`;
+            } else {
+                signatoryImagePreview.innerHTML = '<span>Signature Preview</span>';
+            }
+        }
+
+        // ===== DATA LOADING FUNCTIONS =====
+
+        async function loadCompany() {
+            try {
+                const companies = await safeFetch(COMPANY_API_URL, { method: "GET" });
+                if (Array.isArray(companies) && companies.length > 0) {
+                    const company = companies[0];
+                    COMPANY_ID = company._id || company.id || null;
+                    const bn = document.getElementById("businessName");
+                    const bc = document.getElementById("business_city");
+                    const bco = document.getElementById("business_country");
+                    if (bn) bn.value = company.company_name || "";
+                    if (bc) bc.value = company.address?.city || "";
+                    if (bco) bco.value = company.address?.country || "";
+                    if (company.logo) {
+                        if (businessLogoPreview) businessLogoPreview.src = company.logo;
+                        if (logoPreview) logoPreview.src = company.logo;
+                        if (logoPreviewContainer) logoPreviewContainer.classList.remove("hidden");
+                        if (logoPlaceholder) logoPlaceholder.classList.add("hidden");
                     }
+                } else {
+                    console.warn("No company found.");
+                    showAlert("No company found. Please create a company.", "error", 7000);
+                }
+            } catch (err) {
+                console.error("Error loading companies:", err);
+                if (err.status === 401) {
+                    showAlert("Unauthorized. Please login.", "error", 7000);
+                } else {
+                    showAlert("Could not load company. Check server.", "error", 6000);
+                }
+            }
+        }
 
-                    // 🔢 Quantity check
-                    if (!qtyVal) {
-                        addInlineError(qtyEl, "Required");
-                        messages.push(`Item ${index + 1}: Missing quantity.`);
-                        if (!firstInvalidEl) firstInvalidEl = qtyEl;
-                        isValid = false;
-                    } else if (!/^\d+(\.\d+)?$/.test(qtyVal)) {
-                        addInlineError(qtyEl, "Invalid format");
-                        messages.push(`Item ${index + 1}: Invalid quantity format.`);
-                        if (!firstInvalidEl) firstInvalidEl = qtyEl;
-                        isValid = false;
-                    }
-
-                    // 💰 Rate check
-                    if (!rateVal) {
-                        addInlineError(rateEl, "Required");
-                        messages.push(`Item ${index + 1}: Missing rate.`);
-                        if (!firstInvalidEl) firstInvalidEl = rateEl;
-                        isValid = false;
-                    } else if (!/^\d+(\.\d+)?$/.test(rateVal)) {
-                        addInlineError(rateEl, "Invalid format");
-                        messages.push(`Item ${index + 1}: Invalid rate format.`);
-                        if (!firstInvalidEl) firstInvalidEl = rateEl;
-                        isValid = false;
-                    }
+        async function loadClients() {
+            try {
+                const clients = await safeFetch(CLIENT_API_URL, { method: "GET" });
+                if (!billedToSelect) return;
+                billedToSelect.innerHTML = '<option value="">Select Client</option>';
+                (clients || []).forEach((client) => {
+                    const opt = document.createElement("option");
+                    opt.value = client._id || client.id || "";
+                    opt.textContent = client.client_name || client.name || opt.value;
+                    billedToSelect.appendChild(opt);
                 });
-
-                if (!isValid) {
-                    showAlert(messages.join("\n"), "error", 6000);
-                    if (firstInvalidEl) firstInvalidEl.focus();
-                    return; // stop submission
+            } catch (err) {
+                console.error("Error loading clients:", err);
+                if (err.status === 401) {
+                    showAlert("Unauthorized. Please login.", "error", 7000);
+                } else {
+                    showAlert("Could not load clients.", "error", 4000);
                 }
-                // === 🧩 VALIDATION END ===
+            }
+        }
 
+        async function fetchBankDetails() {
+            try {
+                const banks = await safeFetch(BANK_API_URL, { method: "GET" });
+                return Array.isArray(banks) ? banks : [];
+            } catch (err) {
+                console.error("Error loading bank details:", err);
+                showAlert("Could not load bank details.", "error", 4000);
+                return [];
+            }
+        }
+
+        // ===== ITEM ROW FUNCTIONS =====
+
+        function createItemRow() {
+            const row = document.createElement("div");
+            row.className = "item-row space-y-2 p-2 border rounded";
+            row.innerHTML = `
+                <div class="grid grid-cols-12 gap-2 items-center">
+                    <input class="col-span-4 item-name input-field" placeholder="Item Name" required>
+                    <input type="number" class="col-span-2 quantity input-field text-right" placeholder="0" min="0" required>
+                    <input type="text" class="col-span-2 rate input-field text-right" placeholder="0" required>
+                    <span class="col-span-3 amount text-right">₹0.00</span>
+                    <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <textarea class="description input-field col-span-12" rows="2" placeholder="Item description"></textarea>
+            `;
+
+            const qtyEl = row.querySelector(".quantity");
+            const rateEl = row.querySelector(".rate");
+            const deleteBtn = row.querySelector(".delete-item-btn");
+
+            const onChange = () => updateRowAmount(row);
+            qtyEl?.addEventListener("input", onChange);
+            rateEl?.addEventListener("input", onChange);
+
+            deleteBtn?.addEventListener("click", () => {
+                row.remove();
+                updateTotals();
+            });
+
+            itemsContainer.appendChild(row);
+            updateRowAmount(row);
+        }
+
+        function updateRowAmount(row) {
+            try {
+                const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+                const rate = parseFloat(row.querySelector(".rate").value) || 0;
+                const amt = qty * rate;
+                row.querySelector(".amount").textContent = `₹${amt.toFixed(2)}`;
+                updateTotals();
+            } catch (e) { console.error(e); }
+        }
+
+        function updateTotals() {
+            let subtotal = 0;
+            document.querySelectorAll(".item-row").forEach((row) => {
+                const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+                const rate = parseFloat(row.querySelector(".rate").value) || 0;
+                subtotal += qty * rate;
+            });
+
+            const taxP = parseFloat(taxPercentageInput?.value) || 0;
+            const tax = subtotal * (taxP / 100);
+            const totalBeforeRound = subtotal + tax;
+
+            const totalRounded = Math.round(totalBeforeRound);
+            const roundOff = totalRounded - totalBeforeRound;
+
+            const sEl = document.getElementById("sub_total");
+            const taxEl = document.getElementById("tax");
+            const roundOffEl = document.getElementById("round_off");
+            const totalEl = document.getElementById("total");
+
+            if (sEl) sEl.textContent = `₹${subtotal.toFixed(2)}`;
+            if (taxEl) taxEl.textContent = `₹${tax.toFixed(2)}`;
+            if (roundOffEl) roundOffEl.textContent = `₹${roundOff.toFixed(2)}`;
+            if (totalEl) totalEl.textContent = `₹${totalRounded.toFixed(0)}`;
+        }
+
+        // ===== INVOICE DATA FUNCTIONS =====
+
+        function collectInvoiceData() {
+            const items = [...document.querySelectorAll(".item-row")].map((row) => {
+                const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+                const rate = parseFloat(row.querySelector(".rate").value) || 0;
+                return {
+                    item_name: (row.querySelector(".item-name").value || "").trim(),
+                    description: (row.querySelector(".description").value || "").trim(),
+                    quantity: qty,
+                    rate: rate,
+                    amount: +(qty * rate).toFixed(2),
+                };
+            });
+
+            const subTotal = items.reduce((s, it) => s + it.amount, 0);
+            const taxP = parseFloat(taxPercentageInput?.value) || 0;
+            const tax = +(subTotal * (taxP / 100));
+            const totalBeforeRound = +(subTotal + tax);
+            const totalRounded = Math.round(totalBeforeRound);
+            const roundOff = totalRounded - totalBeforeRound;
+
+            const signatoryType = document.querySelector('input[name="signatory_type"]:checked').value;
+            let signatoryName = null;
+            let signatoryImage = null;
+
+            if (signatoryType === 'text') {
+                const selectEl = document.getElementById('signatory-select');
+                if (selectEl && selectEl.value && selectEl.value !== 'add_new') {
+                    signatoryName = selectEl.value;
+                }
+            } else {
+                signatoryImage = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
+            }
+
+            const isRecurring = document.getElementById('recurring-invoice')?.checked || false;
+
+            const prefixInputVal = document.getElementById("invoice-prefix").value.trim().toUpperCase();
+            const finalPrefix = prefixInputVal || currentPrefix;
+            const invoiceNumber = getNextInvoiceNumber(finalPrefix);
+
+            return {
+                prefix: finalPrefix,
+                invoice_number: invoiceNumber,
+                date: document.getElementById("invoice-date")?.value || new Date().toISOString().slice(0, 10),
+                due_date: document.getElementById("due-date")?.value || "",
+                items,
+                sub_total: +subTotal.toFixed(2),
+                tax: +tax.toFixed(2),
+                round_off: +roundOff.toFixed(2),
+                total: totalRounded,
+                tax_percentage: taxP,
+                from_company_id: COMPANY_ID,
+                to_client_id: billedToSelect?.value || "",
+                terms_and_condition: (document.querySelector("#terms textarea")?.value || "").trim(),
+                notes: (document.querySelector("#notes textarea")?.value || "").trim(),
+                signatory: signatoryName,
+                signatory_image: signatoryImage,
+                is_recurring: isRecurring,
+                payment_details_id: null  // Will be set in form submit handler
+            };
+        }
+
+        async function submitInvoice(data) {
+            try {
+                const result = await safeFetch(INVOICE_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify(data),
+                });
+                return result;
+            } catch (err) {
+                throw err;
+            }
+        }
+
+        // ===== FORM SUBMISSION =====
+
+        invoiceForm?.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            // Validation
+            const rows = document.querySelectorAll('.item-row');
+            const messages = [];
+            let isValid = true;
+            let firstInvalidEl = null;
+
+            document.querySelectorAll('.error-text').forEach(el => el.remove());
+
+            if (!billedToSelect?.value) {
+                messages.push("⚠️ Please select a client before saving.");
+                isValid = false;
+            }
+
+            if (!rows.length) {
+                messages.push("⚠️ Please add at least one item.");
+                isValid = false;
+            }
+
+            rows.forEach((row, index) => {
+                const nameEl = row.querySelector('.item-name');
+                const qtyEl = row.querySelector('.quantity');
+                const rateEl = row.querySelector('.rate');
+
+                const nameVal = nameEl?.value.trim() || '';
+                const qtyVal = qtyEl?.value.trim() || '';
+                const rateVal = rateEl?.value.trim() || '';
+
+                const addInlineError = (el, msg) => {
+                    if (!el) return;
+                    const small = document.createElement('small');
+                    small.className = 'error-text text-red-500 text-xs block mt-1';
+                    small.textContent = msg;
+                    el.insertAdjacentElement('afterend', small);
+                };
+
+                if (!nameVal) {
+                    addInlineError(nameEl, "Required");
+                    messages.push(`Item ${index + 1}: Missing item name.`);
+                    if (!firstInvalidEl) firstInvalidEl = nameEl;
+                    isValid = false;
+                }
+
+                if (!qtyVal) {
+                    addInlineError(qtyEl, "Required");
+                    messages.push(`Item ${index + 1}: Missing quantity.`);
+                    if (!firstInvalidEl) firstInvalidEl = qtyEl;
+                    isValid = false;
+                } else if (!/^\d+(\.\d+)?$/.test(qtyVal)) {
+                    addInlineError(qtyEl, "Invalid format");
+                    messages.push(`Item ${index + 1}: Invalid quantity format.`);
+                    if (!firstInvalidEl) firstInvalidEl = qtyEl;
+                    isValid = false;
+                }
+
+                if (!rateVal) {
+                    addInlineError(rateEl, "Required");
+                    messages.push(`Item ${index + 1}: Missing rate.`);
+                    if (!firstInvalidEl) firstInvalidEl = rateEl;
+                    isValid = false;
+                } else if (!/^\d+(\.\d+)?$/.test(rateVal)) {
+                    addInlineError(rateEl, "Invalid format");
+                    messages.push(`Item ${index + 1}: Invalid rate format.`);
+                    if (!firstInvalidEl) firstInvalidEl = rateEl;
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                showAlert(messages.join("\n"), "error", 6000);
+                if (firstInvalidEl) firstInvalidEl.focus();
+                return;
+            }
+
+            try {
+                setLoading(true);
+                const dataFromForm = collectInvoiceData();
+
+                // Get bank details ID
+                const showBankDetails = document.getElementById('show-bank-details')?.checked;
+                
                 try {
-                    setLoading(true);
-                    const dataFromForm = collectInvoiceData();
-
-                    // --- CAPTURE THE SERVER RESPONSE ---
-                    const serverResponse = await submitInvoice(dataFromForm);
-
-                    // The server response (result) contains the saved 'document'
-                    let savedDoc = serverResponse.document;
-                    if (!savedDoc) {
-                        if (serverResponse.invoice_no) {
-                            savedDoc = serverResponse;
-                        } else {
-                            throw new Error("Server did not return a saved document.");
-                        }
+                    const banks = await fetchBankDetails();
+                    if (banks && banks.length > 0) {
+                        const bankWithUpi = banks.find(b => b.upi_id) || banks[0];
+                        dataFromForm.payment_details_id = bankWithUpi._id || bankWithUpi.id;
+                    } else {
+                        showAlert("Please add a bank account in Settings before creating invoices.", "error", 6000);
+                        setLoading(false);
+                        return;
                     }
+                } catch (err) {
+                    console.error("Failed to get bank details:", err);
+                    showAlert("Unable to retrieve bank details. Please check your settings.", "error", 6000);
+                    setLoading(false);
+                    return;
+                }
 
-                    // --- Populate Preview USING 'savedDoc' ---
-                    document.getElementById("preview-inv-no").textContent = savedDoc.invoice_no || "N/A";
-                    document.getElementById("preview-inv-date").textContent = new Date(savedDoc.date).toLocaleDateString('en-GB');
-                    document.getElementById("preview-due-date").textContent = new Date(savedDoc.due_date).toLocaleDateString('en-GB');
+                console.log("Submitting invoice data:", dataFromForm);
 
-                    // --- ADDRESSES ---
+                const serverResponse = await submitInvoice(dataFromForm);
 
-                    // Format the "From" address block
-                    const fromAddress = [
-                        savedDoc.from?.company_name || '',
-                        `${savedDoc.from?.address?.street || ''},${savedDoc.from?.address?.city || ''}, ${savedDoc.from?.address?.state || ''} ${savedDoc.from?.address?.postalCode || ''}`
-                    ].filter(line => line.trim() !== '').join('\n'); // Join non-empty lines with a newline
+                let savedDoc = serverResponse.document;
+                if (!savedDoc) {
+                    if (serverResponse.invoice_no) {
+                        savedDoc = serverResponse;
+                    } else {
+                        throw new Error("Server did not return a saved document.");
+                    }
+                }
 
-                    document.getElementById("preview-from-details").textContent = fromAddress;
+                console.log("Server response:", savedDoc);
 
+                const isRecurring = document.getElementById("recurring-checkbox").checked;
+                
+                if (isRecurring) {
+                    console.log("✅ Recurring invoice template created!");
+                }
 
-                    // Format the "To" address block
-                    const toAddress = [
-                        savedDoc.to?.client_name || '',
-                        `${savedDoc.to?.address?.city || ''}, ${savedDoc.to?.address?.state || ''} ${savedDoc.to?.address?.pincode || ''}`
-                    ].filter(line => line.trim() !== '').join('\n'); // Join non-empty lines with a newline
+                // Populate preview
+                document.getElementById("preview-inv-no").textContent = savedDoc.invoice_no || "N/A";
+                document.getElementById("preview-inv-date").textContent = new Date(savedDoc.date).toLocaleDateString('en-GB');
+                document.getElementById("preview-due-date").textContent = new Date(savedDoc.due_date).toLocaleDateString('en-GB');
 
-                    document.getElementById("preview-to-details").textContent = toAddress;
+                const fromAddress = [
+                    savedDoc.from?.company_name || '',
+                    `${savedDoc.from?.address?.street || ''},${savedDoc.from?.address?.city || ''}, ${savedDoc.from?.address?.state || ''} ${savedDoc.from?.address?.postalCode || ''}`
+                ].filter(line => line.trim() !== '').join('\n');
 
-                    const tbody = document.getElementById("preview-items-tbody");
-                    if (tbody) {
-                        tbody.innerHTML = "";
-                        (savedDoc.items || []).forEach((item) => {
-                            const tr = document.createElement("tr");
-                            tr.innerHTML = `
+                document.getElementById("preview-from-details").textContent = fromAddress;
+
+                const toAddress = [
+                    savedDoc.to?.client_name || '',
+                    `${savedDoc.to?.address?.city || ''}, ${savedDoc.to?.address?.state || ''} ${savedDoc.to?.address?.pincode || ''}`
+                ].filter(line => line.trim() !== '').join('\n');
+
+                document.getElementById("preview-to-details").textContent = toAddress;
+
+                const tbody = document.getElementById("preview-items-tbody");
+                if (tbody) {
+                    tbody.innerHTML = "";
+                    (savedDoc.items || []).forEach((item) => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
                             <td>${escapeHtml(item.item_name)}</td>
                             <td class="text-center">${item.quantity}</td>
                             <td class="text-right">₹${item.rate.toFixed(2)}</td>
                             <td class="text-right">₹${item.amount.toFixed(2)}</td>
-                    `;
-                            tbody.appendChild(tr);
-                        });
-                    }
-
-                    // --- TOTALS ---
-                    document.getElementById("preview-subtotal").textContent = `₹${savedDoc.sub_total.toFixed(2)}`;
-                    document.getElementById("preview-tax-rate").textContent = savedDoc.tax_percentage;
-                    document.getElementById("preview-tax").textContent = `₹${savedDoc.tax.toFixed(2)}`;
-                    document.getElementById("preview-round-off").textContent = `₹${(savedDoc.round_off || 0).toFixed(2)}`;
-                    // Total as whole number
-                    document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc.total)}`;
-
-                    // --- NOTES & TERMS ---
-                    document.getElementById("preview-terms").textContent = savedDoc.terms_and_condition;
-                    document.getElementById("preview-terms-block")?.classList.toggle("hidden", !savedDoc.terms_and_condition);
-
-                    document.getElementById("preview-notes").textContent = savedDoc.notes;
-                    document.getElementById("preview-notes-block")?.classList.toggle("hidden", !savedDoc.notes);
-
-                    // --- SIGNATURE AREA ---
-                    const previewSignatureArea = document.getElementById("preview-signature-area");
-                    const signatureImageSpace = previewSignatureArea.querySelector(".signature-image-space");
-                    const previewSignatoryName = document.getElementById("preview-signatory-name");
-
-                    // Clear previous values
-                    signatureImageSpace.innerHTML = '';
-                    previewSignatoryName.textContent = '';
-                    previewSignatureArea.classList.add("hidden");
-
-                    const hasSignatureImage = !!dataFromForm.signatory_image;
-                    const hasSignatoryName = !!dataFromForm.signatory;
-
-                    if (hasSignatureImage || hasSignatoryName) {
-                        if (hasSignatureImage) {
-                            signatureImageSpace.innerHTML = `<img src="${dataFromForm.signatory_image}" alt="Signature">`;
-                        }
-                        if (hasSignatoryName) {
-                            previewSignatoryName.textContent = dataFromForm.signatory;
-                        }
-                        previewSignatureArea.classList.remove("hidden");
-                    }
-
-                    // Bank Details & QR Code Logic
-                    const showBankDetails = document.getElementById('show-bank-details')?.checked;
-                    const bankBlock = document.getElementById('preview-bank-details-block');
-                    const qrBlock = document.getElementById('preview-upi-qr-code');
-
-                    // Reset/hide bank block by default
-                    bankBlock.classList.add('hidden');
-                    qrBlock.innerHTML = '';
-
-                    if (showBankDetails) {
-                        try {
-                            const banks = await fetchBankDetails();
-                            if (banks && banks.length > 0) {
-                                // Find the first bank with a UPI ID
-                                const bankWithUpi = banks.find(b => b.upi_id);
-
-                                if (bankWithUpi) {
-                                    // 1. Populate Bank Details
-                                    document.getElementById('preview-bank-name').textContent = bankWithUpi.bank_name || 'N/A';
-                                    document.getElementById('preview-bank-acc-name').textContent = bankWithUpi.account_holder || 'N/A';
-                                    document.getElementById('preview-bank-acc-no').textContent = bankWithUpi.account_number || 'N/A';
-                                    document.getElementById('preview-bank-ifsc').textContent = bankWithUpi.ifsc_code || 'N/A';
-
-                                    // 2. Generate UPI QR Code
-                                    const upiId = bankWithUpi.upi_id;
-                                    const totalAmount = savedDoc.total;
-                                    const companyName = savedDoc.from?.company_name || 'Payment';
-
-                                    // Construct a UPI payment string
-                                    const upiString = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(companyName)}&am=${totalAmount.toFixed(2)}&cu=INR`;
-
-                                    if (typeof qrcode !== 'undefined') {
-                                        const typeNumber = 4; // Adjust complexity (4 is a good default)
-                                        const errorCorrectionLevel = 'L'; // Low
-                                        const qr = qrcode(typeNumber, errorCorrectionLevel);
-                                        qr.addData(upiString);
-                                        qr.make();
-                                        // createImgTag(cellSize, margin)
-                                        qrBlock.innerHTML = qr.createImgTag(3, 4); // 3px cell size, 4 cell margin
-                                    } else {
-                                        console.error("qrcode library is not loaded.");
-                                        qrBlock.innerHTML = '<span class="text-xs text-red-500">QR Lib Error</span>';
-                                    }
-
-                                    // 3. Show the block
-                                    bankBlock.classList.remove('hidden');
-
-                                } else {
-                                    console.warn("Bank details loaded, but no account with a UPI ID was found.");
-                                    bankBlock.classList.add('hidden');
-                                }
-                            } else {
-                                console.warn("User wanted to show bank details, but no bank accounts are set up.");
-                                bankBlock.classList.add('hidden');
-                            }
-                        } catch (bankErr) {
-                            console.error("Failed to fetch or display bank details:", bankErr);
-                            bankBlock.classList.add('hidden');
-                        }
-                    }
-
-                    createPage?.classList.add("hidden");
-                    previewPage?.classList.remove("hidden");
-
-                    showAlert("Invoice saved successfully.", "success", 4000);
-
-                    // Reset prefix to original if mode was 'once'
-                    if (prefixChangeMode === 'once') {
-                        currentPrefix = originalPrefix;
-                        if (invoicePrefixInput) {
-                            invoicePrefixInput.value = originalPrefix;
-                        }
-                        prefixChangeMode = null;
-                    }
-
-                } catch (err) {
-                    console.error("Save error:", err);
-                    const msg = err?.message || "Failed to save invoice";
-                    showAlert(`Error: ${msg}`, "error", 6000);
-                } finally {
-                    setLoading(false);
+                        `;
+                        tbody.appendChild(tr);
+                    });
                 }
-            });
+
+                document.getElementById("preview-subtotal").textContent = `₹${savedDoc.sub_total.toFixed(2)}`;
+                document.getElementById("preview-tax-rate").textContent = savedDoc.tax_percentage;
+                document.getElementById("preview-tax").textContent = `₹${savedDoc.tax.toFixed(2)}`;
+                document.getElementById("preview-round-off").textContent = `₹${(savedDoc.round_off || 0).toFixed(2)}`;
+                document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc.total)}`;
+
+                document.getElementById("preview-terms").textContent = savedDoc.terms_and_condition;
+                document.getElementById("preview-terms-block")?.classList.toggle("hidden", !savedDoc.terms_and_condition);
+
+                document.getElementById("preview-notes").textContent = savedDoc.notes;
+                document.getElementById("preview-notes-block")?.classList.toggle("hidden", !savedDoc.notes);
+
+                const previewSignatureArea = document.getElementById("preview-signature-area");
+                const signatureImageSpace = previewSignatureArea.querySelector(".signature-image-space");
+                const previewSignatoryName = document.getElementById("preview-signatory-name");
+                
+                signatureImageSpace.innerHTML = '';
+                previewSignatoryName.textContent = '';
+                previewSignatureArea.classList.add("hidden");
+
+                const hasSignatureImage = !!dataFromForm.signatory_image;
+                const hasSignatoryName = !!dataFromForm.signatory;
+
+                if (hasSignatureImage || hasSignatoryName) {
+                    if (hasSignatureImage) {
+                        signatureImageSpace.innerHTML = `<img src="${dataFromForm.signatory_image}" alt="Signature">`;
+                    }
+                    if (hasSignatoryName) {
+                        previewSignatoryName.textContent = dataFromForm.signatory;
+                    }
+                    previewSignatureArea.classList.remove("hidden");
+                }
+
+                const bankBlock = document.getElementById('preview-bank-details-block');
+                const qrBlock = document.getElementById('preview-upi-qr-code');
+
+                bankBlock.classList.add('hidden');
+                qrBlock.innerHTML = '';
+
+                if (showBankDetails) {
+                    try {
+                        const banks = await fetchBankDetails();
+                        if (banks && banks.length > 0) {
+                            const bankWithUpi = banks.find(b => b.upi_id);
+
+                            if (bankWithUpi) {
+                                document.getElementById('preview-bank-name').textContent = bankWithUpi.bank_name || 'N/A';
+                                document.getElementById('preview-bank-acc-name').textContent = bankWithUpi.account_holder || 'N/A';
+                                document.getElementById('preview-bank-acc-no').textContent = bankWithUpi.account_number || 'N/A';
+                                document.getElementById('preview-bank-ifsc').textContent = bankWithUpi.ifsc_code || 'N/A';
+
+                                const upiId = bankWithUpi.upi_id;
+                                const totalAmount = savedDoc.total;
+                                const companyName = savedDoc.from?.company_name || 'Payment';
+                                const upiString = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(companyName)}&am=${totalAmount.toFixed(2)}&cu=INR`;
+
+                                if (typeof qrcode !== 'undefined') {
+                                    const typeNumber = 4;
+                                    const errorCorrectionLevel = 'L';
+                                    const qr = qrcode(typeNumber, errorCorrectionLevel);
+                                    qr.addData(upiString);
+                                    qr.make();
+                                    qrBlock.innerHTML = qr.createImgTag(3, 4);
+                                } else {
+                                    console.error("qrcode library is not loaded.");
+                                    qrBlock.innerHTML = '<span class="text-xs text-red-500">QR Lib Error</span>';
+                                }
+
+                                bankBlock.classList.remove('hidden');
+                            }
+                        }
+                    } catch (bankErr) {
+                        console.error("Failed to fetch or display bank details:", bankErr);
+                    }
+                }
+
+                createPage?.classList.add("hidden");
+                previewPage?.classList.remove("hidden");
+
+                let successMsg = "Invoice saved successfully!";
+                if (isRecurring) {
+                    const nextDate = new Date();
+                    nextDate.setMonth(nextDate.getMonth() + 1);
+            successMsg += ` 🔄 Recurring invoice set up! Next invoice will be generated on ${nextDate.toLocaleDateString('en-GB')}.`;
+        }
+        showAlert(successMsg, "success", 6000);
+
+        // Reset prefix to original if mode was 'once'
+        if (prefixChangeMode === 'once') {
+            currentPrefix = originalPrefix;
+            if (invoicePrefixInput) {
+                invoicePrefixInput.value = originalPrefix;
+            }
+            prefixChangeMode = null;
+        }
+
+    } catch (err) {
+        console.error("Save error:", err);
+        const msg = err?.message || "Failed to save invoice";
+        showAlert(`Error: ${msg}`, "error", 6000);
+    } finally {
+        setLoading(false);
+    }
+});
 
 
             editBtn?.addEventListener("click", () => {
