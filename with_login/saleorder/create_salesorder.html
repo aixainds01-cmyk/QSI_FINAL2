@@ -1460,176 +1460,195 @@
                 }
             }
 
-            salesOrderForm?.addEventListener("submit", async (e) => {
-                e.preventDefault();
+            // Replace the submitSalesOrder form handler section (starting from line ~600)
+// Find this section in your code and replace it
 
-                // Validation
-                const rows = document.querySelectorAll('.item-row');
-                const messages = [];
-                let isValid = true;
-                let firstInvalidEl = null;
-                document.querySelectorAll('.error-text').forEach(el => el.remove());
+salesOrderForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-                if (!billedToSelect?.value) {
-                    messages.push("⚠️ Please select a client before saving.");
-                    isValid = false;
-                }
-                if (!rows.length) {
-                    messages.push("⚠️ Please add at least one item.");
-                    isValid = false;
-                }
-                rows.forEach((row, index) => {
-                    const nameEl = row.querySelector('.item-name');
-                    const qtyEl = row.querySelector('.quantity');
-                    const rateEl = row.querySelector('.rate');
-                    const nameVal = nameEl?.value.trim() || '';
-                    const qtyVal = qtyEl?.value.trim() || '';
-                    const rateVal = rateEl?.value.trim() || '';
+    // Validation
+    const rows = document.querySelectorAll('.item-row');
+    const messages = [];
+    let isValid = true;
+    let firstInvalidEl = null;
+    document.querySelectorAll('.error-text').forEach(el => el.remove());
 
-                    const addInlineError = (el, msg) => {
-                        if (!el) return;
-                        const small = document.createElement('small');
-                        small.className = 'error-text text-red-500 text-xs block mt-1';
-                        small.textContent = msg;
-                        el.insertAdjacentElement('afterend', small);
-                    };
+    if (!billedToSelect?.value) {
+        messages.push("⚠️ Please select a client before saving.");
+        isValid = false;
+    }
+    if (!rows.length) {
+        messages.push("⚠️ Please add at least one item.");
+        isValid = false;
+    }
+    rows.forEach((row, index) => {
+        const nameEl = row.querySelector('.item-name');
+        const qtyEl = row.querySelector('.quantity');
+        const rateEl = row.querySelector('.rate');
+        const nameVal = nameEl?.value.trim() || '';
+        const qtyVal = qtyEl?.value.trim() || '';
+        const rateVal = rateEl?.value.trim() || '';
 
-                    if (!nameVal) {
-                        addInlineError(nameEl, "Required");
-                        messages.push(`Item ${index + 1}: Missing item name.`);
-                        if (!firstInvalidEl) firstInvalidEl = nameEl;
-                        isValid = false;
-                    }
-                    if (!qtyVal) {
-                        addInlineError(qtyEl, "Required");
-                        messages.push(`Item ${index + 1}: Missing quantity.`);
-                        if (!firstInvalidEl) firstInvalidEl = qtyEl;
-                        isValid = false;
-                    } else if (!/^\d+(\.\d+)?$/.test(qtyVal)) {
-                        addInlineError(qtyEl, "Invalid format");
-                        messages.push(`Item ${index + 1}: Invalid quantity format.`);
-                        if (!firstInvalidEl) firstInvalidEl = qtyEl;
-                        isValid = false;
-                    }
-                    if (!rateVal) {
-                        addInlineError(rateEl, "Required");
-                        messages.push(`Item ${index + 1}: Missing rate.`);
-                        if (!firstInvalidEl) firstInvalidEl = rateEl;
-                        isValid = false;
-                    } else if (!/^\d+(\.\d+)?$/.test(rateVal)) {
-                        addInlineError(rateEl, "Invalid format");
-                        messages.push(`Item ${index + 1}: Invalid rate format.`);
-                        if (!firstInvalidEl) firstInvalidEl = rateEl;
-                        isValid = false;
-                    }
-                });
+        const addInlineError = (el, msg) => {
+            if (!el) return;
+            const small = document.createElement('small');
+            small.className = 'error-text text-red-500 text-xs block mt-1';
+            small.textContent = msg;
+            el.insertAdjacentElement('afterend', small);
+        };
 
-                if (!isValid) {
-                    showAlert(messages.join("\n"), "error", 6000);
-                    if (firstInvalidEl) firstInvalidEl.focus();
-                    return;
-                }
+        if (!nameVal) {
+            addInlineError(nameEl, "Required");
+            messages.push(`Item ${index + 1}: Missing item name.`);
+            if (!firstInvalidEl) firstInvalidEl = nameEl;
+            isValid = false;
+        }
+        if (!qtyVal) {
+            addInlineError(qtyEl, "Required");
+            messages.push(`Item ${index + 1}: Missing quantity.`);
+            if (!firstInvalidEl) firstInvalidEl = qtyEl;
+            isValid = false;
+        } else if (!/^\d+(\.\d+)?$/.test(qtyVal)) {
+            addInlineError(qtyEl, "Invalid format");
+            messages.push(`Item ${index + 1}: Invalid quantity format.`);
+            if (!firstInvalidEl) firstInvalidEl = qtyEl;
+            isValid = false;
+        }
+        if (!rateVal) {
+            addInlineError(rateEl, "Required");
+            messages.push(`Item ${index + 1}: Missing rate.`);
+            if (!firstInvalidEl) firstInvalidEl = rateEl;
+            isValid = false;
+        } else if (!/^\d+(\.\d+)?$/.test(rateVal)) {
+            addInlineError(rateEl, "Invalid format");
+            messages.push(`Item ${index + 1}: Invalid rate format.`);
+            if (!firstInvalidEl) firstInvalidEl = rateEl;
+            isValid = false;
+        }
+    });
 
-                try {
-                    setLoading(true);
-                    const dataFromForm = collectSalesOrderData();
-                    const serverResponse = await submitSalesOrder(dataFromForm);
+    if (!isValid) {
+        showAlert(messages.join("\n"), "error", 6000);
+        if (firstInvalidEl) firstInvalidEl.focus();
+        return;
+    }
 
-                    let savedDoc = serverResponse.document;
-                    if (!savedDoc) {
-                        if (serverResponse.sales_order_number) {
-                            savedDoc = serverResponse;
-                        } else {
-                            throw new Error("Server did not return a saved document.");
-                        }
-                    }
+    try {
+        setLoading(true);
+        const dataFromForm = collectSalesOrderData();
+        const serverResponse = await submitSalesOrder(dataFromForm);
 
-                    // Populate Preview
-                    document.getElementById("preview-so-no").textContent = savedDoc.sales_order_number || "N/A";
-                    document.getElementById("preview-so-date").textContent = new Date(savedDoc.sales_date).toLocaleDateString('en-GB');
-                    document.getElementById("preview-delivery-date").textContent = new Date(savedDoc.delivery_date).toLocaleDateString('en-GB');
+        let savedDoc = serverResponse.document;
+        if (!savedDoc) {
+            if (serverResponse.sales_order_number) {
+                savedDoc = serverResponse;
+            } else {
+                throw new Error("Server did not return a saved document.");
+            }
+        }
 
-                    const fromAddress = [
-                        savedDoc.from?.company_name || '',
-                        `${savedDoc.from?.address?.street || ''},${savedDoc.from?.address?.city || ''}, ${savedDoc.from?.address?.state || ''} ${savedDoc.from?.address?.postalCode || ''}`
-                    ].filter(line => line.trim() !== '').join('\n');
-                    document.getElementById("preview-from-details").textContent = fromAddress;
+        // Populate Preview - WITH SAFETY CHECKS
+        const previewSONo = document.getElementById("preview-so-no");
+        const previewSODate = document.getElementById("preview-so-date");
+        
+        if (previewSONo) previewSONo.textContent = savedDoc.sales_order_number || "N/A";
+        if (previewSODate) previewSODate.textContent = new Date(savedDoc.sales_date).toLocaleDateString('en-GB');
 
-                    const toAddress = [
-                        savedDoc.to?.client_name || '',
-                        `${savedDoc.to?.address?.city || ''}, ${savedDoc.to?.address?.state || ''} ${savedDoc.to?.address?.pincode || ''}`
-                    ].filter(line => line.trim() !== '').join('\n');
-                    document.getElementById("preview-to-details").textContent = toAddress;
+        const fromAddress = [
+            savedDoc.from?.company_name || '',
+            `${savedDoc.from?.address?.street || ''},${savedDoc.from?.address?.city || ''}, ${savedDoc.from?.address?.state || ''} ${savedDoc.from?.address?.postalCode || ''}`
+        ].filter(line => line.trim() !== '').join('\n');
+        
+        const previewFromDetails = document.getElementById("preview-from-details");
+        if (previewFromDetails) previewFromDetails.textContent = fromAddress;
 
-                    const tbody = document.getElementById("preview-items-tbody");
-                    if (tbody) {
-                        tbody.innerHTML = "";
-                        (savedDoc.items || []).forEach((item) => {
-                            const tr = document.createElement("tr");
-                            tr.innerHTML = `
-                            <td>${escapeHtml(item.item_name)}</td>
-                            <td class="text-center">${item.quantity}</td>
-                            <td class="text-right">₹${item.rate.toFixed(2)}</td>
-                            <td class="text-right">₹${item.amount.toFixed(2)}</td>
-                    `;
-                            tbody.appendChild(tr);
-                        });
-                    }
+        const toAddress = [
+            savedDoc.to?.client_name || '',
+            `${savedDoc.to?.address?.city || ''}, ${savedDoc.to?.address?.state || ''} ${savedDoc.to?.address?.pincode || ''}`
+        ].filter(line => line.trim() !== '').join('\n');
+        
+        const previewToDetails = document.getElementById("preview-to-details");
+        if (previewToDetails) previewToDetails.textContent = toAddress;
 
-                    document.getElementById("preview-subtotal").textContent = `₹${savedDoc.sub_total.toFixed(2)}`;
-                    document.getElementById("preview-tax-rate").textContent = savedDoc.tax_percentage;
-                    document.getElementById("preview-tax").textContent = `₹${savedDoc.tax.toFixed(2)}`;
-                    document.getElementById("preview-round-off").textContent = `₹${(savedDoc.round_off || 0).toFixed(2)}`;
-                    document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc.total)}`;
-
-                    document.getElementById("preview-terms").textContent = savedDoc.terms_and_condition;
-                    document.getElementById("preview-terms-block")?.classList.toggle("hidden", !savedDoc.terms_and_condition);
-                    document.getElementById("preview-notes").textContent = savedDoc.notes;
-                    document.getElementById("preview-notes-block")?.classList.toggle("hidden", !savedDoc.notes);
-
-                    const previewSignatureArea = document.getElementById("preview-signature-area");
-                    const signatureImageSpace = previewSignatureArea.querySelector(".signature-image-space");
-                    const previewSignatoryName = document.getElementById("preview-signatory-name");
-
-                    signatureImageSpace.innerHTML = '';
-                    previewSignatoryName.textContent = '';
-                    previewSignatureArea.classList.add("hidden");
-
-                    const hasSignatureImage = !!dataFromForm.signatory_image;
-                    const hasSignatoryName = !!dataFromForm.signatory;
-
-                    if (hasSignatureImage || hasSignatoryName) {
-                        if (hasSignatureImage) {
-                            signatureImageSpace.innerHTML = `<img src="${dataFromForm.signatory_image}" alt="Signature">`;
-                        }
-                        if (hasSignatoryName) {
-                            previewSignatoryName.textContent = dataFromForm.signatory;
-                        }
-                        previewSignatureArea.classList.remove("hidden");
-                    }
-
-                    createPage?.classList.add("hidden");
-                    previewPage?.classList.remove("hidden");
-
-                    showAlert("Sales Order saved successfully.", "success", 4000);
-
-                    if (prefixChangeMode === 'once') {
-                        currentPrefix = originalPrefix;
-                        if (prefixInput) {
-                            prefixInput.value = originalPrefix;
-                        }
-                        prefixChangeMode = null;
-                    }
-
-                } catch (err) {
-                    console.error("Save error:", err);
-                    const msg = err?.message || "Failed to save sales order";
-                    showAlert(`Error: ${msg}`, "error", 6000);
-                } finally {
-                    setLoading(false);
-                }
+        const tbody = document.getElementById("preview-items-tbody");
+        if (tbody) {
+            tbody.innerHTML = "";
+            (savedDoc.items || []).forEach((item) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${escapeHtml(item.item_name)}</td>
+                    <td class="text-center">${item.quantity}</td>
+                    <td class="text-right">₹${item.rate.toFixed(2)}</td>
+                    <td class="text-right">₹${item.amount.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
             });
+        }
 
+        const previewSubtotal = document.getElementById("preview-subtotal");
+        const previewTaxRate = document.getElementById("preview-tax-rate");
+        const previewTax = document.getElementById("preview-tax");
+        const previewRoundOff = document.getElementById("preview-round-off");
+        const previewTotal = document.getElementById("preview-total");
+        
+        if (previewSubtotal) previewSubtotal.textContent = `₹${savedDoc.sub_total.toFixed(2)}`;
+        if (previewTaxRate) previewTaxRate.textContent = savedDoc.tax_percentage;
+        if (previewTax) previewTax.textContent = `₹${savedDoc.tax.toFixed(2)}`;
+        if (previewRoundOff) previewRoundOff.textContent = `₹${(savedDoc.round_off || 0).toFixed(2)}`;
+        if (previewTotal) previewTotal.textContent = `₹${Math.round(savedDoc.total)}`;
+
+        const previewTerms = document.getElementById("preview-terms");
+        const previewTermsBlock = document.getElementById("preview-terms-block");
+        const previewNotes = document.getElementById("preview-notes");
+        const previewNotesBlock = document.getElementById("preview-notes-block");
+        
+        if (previewTerms) previewTerms.textContent = savedDoc.terms_and_condition;
+        previewTermsBlock?.classList.toggle("hidden", !savedDoc.terms_and_condition);
+        if (previewNotes) previewNotes.textContent = savedDoc.notes;
+        previewNotesBlock?.classList.toggle("hidden", !savedDoc.notes);
+
+        const previewSignatureArea = document.getElementById("preview-signature-area");
+        const signatureImageSpace = previewSignatureArea?.querySelector(".signature-image-space");
+        const previewSignatoryName = document.getElementById("preview-signatory-name");
+
+        if (signatureImageSpace) signatureImageSpace.innerHTML = '';
+        if (previewSignatoryName) previewSignatoryName.textContent = '';
+        previewSignatureArea?.classList.add("hidden");
+
+        const hasSignatureImage = !!dataFromForm.signatory_image;
+        const hasSignatoryName = !!dataFromForm.signatory;
+
+        if (hasSignatureImage || hasSignatoryName) {
+            if (hasSignatureImage && signatureImageSpace) {
+                signatureImageSpace.innerHTML = `<img src="${dataFromForm.signatory_image}" alt="Signature">`;
+            }
+            if (hasSignatoryName && previewSignatoryName) {
+                previewSignatoryName.textContent = dataFromForm.signatory;
+            }
+            previewSignatureArea?.classList.remove("hidden");
+        }
+
+        createPage?.classList.add("hidden");
+        previewPage?.classList.remove("hidden");
+
+        showAlert("Sales Order saved successfully.", "success", 4000);
+
+        if (prefixChangeMode === 'once') {
+            currentPrefix = originalPrefix;
+            if (prefixInput) {
+                prefixInput.value = originalPrefix;
+            }
+            prefixChangeMode = null;
+        }
+
+    } catch (err) {
+        console.error("Save error:", err);
+        const msg = err?.message || "Failed to save sales order";
+        showAlert(`Error: ${msg}`, "error", 6000);
+    } finally {
+        setLoading(false);
+    }
+});
             editBtn?.addEventListener("click", () => {
                 previewPage?.classList.add("hidden");
                 createPage?.classList.remove("hidden");
@@ -1881,114 +1900,183 @@
             }
         });
 
-        function populateSalesOrderFromQuotation(quotation) {
-  console.log('Starting to populate sales order from quotation:', quotation);
-  
-  // Populate client information - Wait for clients to load first
-  if (quotation.to_client_id || (quotation.to && quotation.to._id)) {
-    const clientId = quotation.to_client_id || quotation.to._id;
-    console.log('Setting client ID:', clientId);
+       // Replace the populateSalesOrderFromQuotation function
+// Find this function in your second <script> tag and replace it
+
+function populateSalesOrderFromQuotation(quotation) {
+    console.log('Starting to populate sales order from quotation:', quotation);
     
-    const clientSelect = document.getElementById('billed-to-select');
-    if (clientSelect) {
-      // Wait a bit for the client options to be loaded
-      const setClient = () => {
-        // Try to find the option with this client ID
-        const options = Array.from(clientSelect.options);
-        const matchingOption = options.find(opt => opt.value === clientId);
+    // Populate client information - Wait for clients to load first
+    if (quotation.to_client_id || (quotation.to && quotation.to._id)) {
+        const clientId = quotation.to_client_id || quotation.to._id;
+        console.log('Setting client ID:', clientId);
         
-        if (matchingOption) {
-          clientSelect.value = clientId;
-          console.log('Client selected successfully:', clientId);
-        } else {
-          console.warn('Client not found in dropdown. Available options:', 
-                       options.map(o => o.value));
-          
-          // If client not in dropdown, try to add it
-          if (quotation.to) {
-            const newOption = document.createElement('option');
-            newOption.value = clientId;
-            newOption.textContent = quotation.to.client_name || 'Imported Client';
-            clientSelect.appendChild(newOption);
-            clientSelect.value = clientId;
-            console.log('Added and selected new client option');
-          }
+        const clientSelect = document.getElementById('billed-to-select');
+        if (clientSelect) {
+            const setClient = () => {
+                const options = Array.from(clientSelect.options);
+                const matchingOption = options.find(opt => opt.value === clientId);
+                
+                if (matchingOption) {
+                    clientSelect.value = clientId;
+                    console.log('Client selected successfully:', clientId);
+                } else {
+                    console.warn('Client not found in dropdown. Available options:', 
+                               options.map(o => o.value));
+                    
+                    if (quotation.to) {
+                        const newOption = document.createElement('option');
+                        newOption.value = clientId;
+                        newOption.textContent = quotation.to.client_name || 'Imported Client';
+                        clientSelect.appendChild(newOption);
+                        clientSelect.value = clientId;
+                        console.log('Added and selected new client option');
+                    }
+                }
+            };
+            
+            setClient();
+            setTimeout(setClient, 100);
         }
-      };
-      
-      // Try immediately and also after a delay
-      setClient();
-      setTimeout(setClient, 100);
     }
-  }
-  
-  // Clear existing items first
-  const itemsContainer = document.getElementById('items-container');
-  if (itemsContainer) {
-    itemsContainer.innerHTML = '';
-    console.log('Cleared existing items');
-  }
-  
-  // Populate items/line items
-  if (quotation.items && Array.isArray(quotation.items)) {
-    console.log('Adding items:', quotation.items.length);
-    quotation.items.forEach((item, index) => {
-      console.log(`Adding item ${index}:`, item);
-      
-      // Add new item row using your existing function
-      if (window.SO_createItemRow) {
-        window.SO_createItemRow();
-      }
-      
-      // Small delay to ensure DOM is updated
-      setTimeout(() => {
-        populateItemRow(index, item);
-      }, 50 * (index + 1));
+    
+    // Clear existing items first
+    const itemsContainer = document.getElementById('items-container');
+    if (itemsContainer) {
+        itemsContainer.innerHTML = '';
+        console.log('Cleared existing items');
+    }
+    
+    // Populate items/line items
+    if (quotation.items && Array.isArray(quotation.items)) {
+        console.log('Adding items:', quotation.items.length);
+        quotation.items.forEach((item, index) => {
+            console.log(`Adding item ${index}:`, item);
+            
+            if (window.SO_createItemRow) {
+                window.SO_createItemRow();
+            }
+            
+            setTimeout(() => {
+                populateItemRow(index, item);
+            }, 50 * (index + 1));
+        });
+    }
+    
+    // Populate tax percentage and totals directly from backend
+    setTimeout(() => {
+        const taxPercentageField = document.getElementById('tax-percentage');
+        if (taxPercentageField && quotation.tax_percentage !== undefined) {
+            taxPercentageField.value = quotation.tax_percentage;
+            console.log('Set tax percentage:', quotation.tax_percentage);
+        }
+        
+        // Set totals directly from backend data WITH SAFETY CHECKS
+        const subTotalEl = document.getElementById('sub_total');
+        const taxEl = document.getElementById('tax');
+        const roundOffEl = document.getElementById('round_off');
+        const totalEl = document.getElementById('total');
+
+        if (subTotalEl && quotation.sub_total !== undefined) {
+            subTotalEl.textContent = `₹${parseFloat(quotation.sub_total).toFixed(2)}`;
+            console.log('Set subtotal from backend:', quotation.sub_total);
+        }
+
+        if (taxEl && quotation.tax !== undefined) {
+            taxEl.textContent = `₹${parseFloat(quotation.tax).toFixed(2)}`;
+            console.log('Set tax from backend:', quotation.tax);
+        }
+
+        if (roundOffEl && quotation.round_off !== undefined) {
+            roundOffEl.textContent = `₹${parseFloat(quotation.round_off).toFixed(2)}`;
+            console.log('Set round off from backend:', quotation.round_off);
+        }
+
+        if (totalEl && quotation.total !== undefined) {
+            totalEl.textContent = `₹${Math.round(quotation.total)}`;
+            console.log('Set total from backend:', quotation.total);
+        }
+        
+        // Copy over additional fields
+        copyAdditionalFields(quotation);
+        
+        // Show a success message
+        showNotification('Quotation data loaded successfully', 'success');
+    }, quotation.items ? quotation.items.length * 100 : 500);
+}
+
+function populateItemRow(rowIndex, item) {
+    const row = document.querySelector(`[data-row-index="${rowIndex}"]`) ||
+        document.querySelectorAll('.item-row')[rowIndex];
+
+    if (!row) {
+        console.warn(`Row ${rowIndex} not found`);
+        return;
+    }
+
+    const itemNameField = row.querySelector('[name="item_name"]') || row.querySelector('.item-name');
+    if (itemNameField) {
+        itemNameField.value = item.item_name || item.name || '';
+    }
+
+    const quantityField = row.querySelector('[name="quantity"]') || row.querySelector('.quantity');
+    if (quantityField) {
+        quantityField.value = item.quantity || 1;
+    }
+
+    const rateField = row.querySelector('[name="rate"]') || row.querySelector('.rate');
+    if (rateField) {
+        rateField.value = item.rate || item.price || 0;
+    }
+
+    const descriptionField = row.querySelector('[name="description"]') || row.querySelector('.description');
+    if (descriptionField && item.description) {
+        descriptionField.value = item.description;
+    }
+
+    // Trigger calculations
+    const changeEvent = new Event('change', { bubbles: true });
+    [quantityField, rateField].forEach(field => {
+        if (field) field.dispatchEvent(changeEvent);
     });
-  }
-  
-  // Populate tax percentage and totals directly from backend
-  setTimeout(() => {
-    const taxPercentageField = document.getElementById('tax-percentage');
-    if (taxPercentageField && quotation.tax_percentage !== undefined) {
-      taxPercentageField.value = quotation.tax_percentage;
-      console.log('Set tax percentage:', quotation.tax_percentage);
+    
+    console.log(`Populated row ${rowIndex}:`, item.item_name);
+}
+
+function copyAdditionalFields(quotation) {
+    // Copy notes/remarks
+    const notesInput = document.getElementById('notes-input');
+    if (notesInput && quotation.notes) {
+        notesInput.value = quotation.notes;
+        const notesSection = document.getElementById('notes');
+        if (notesSection) notesSection.classList.remove('hidden');
+    }
+
+    // Copy terms and conditions
+    const termsInput = document.getElementById('terms-input');
+    if (termsInput && quotation.terms_and_condition) {
+        termsInput.value = quotation.terms_and_condition;
+        const termsSection = document.getElementById('terms');
+        if (termsSection) termsSection.classList.remove('hidden');
     }
     
-    // Set totals directly from backend data
-    // Set totals directly from backend data
-const subTotalEl = document.getElementById('sub_total');
-const taxEl = document.getElementById('tax');
-const roundOffEl = document.getElementById('round_off');
-const totalEl = document.getElementById('total');
-
-if (subTotalEl && quotation.sub_total !== undefined) {
-  subTotalEl.textContent = `₹${parseFloat(quotation.sub_total).toFixed(2)}`;
-  console.log('Set subtotal from backend:', quotation.sub_total);
+    console.log('Additional fields copied');
 }
 
-if (taxEl && quotation.tax !== undefined) {
-  taxEl.textContent = `₹${parseFloat(quotation.tax).toFixed(2)}`;
-  console.log('Set tax from backend:', quotation.tax);
-}
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500' :
+        type === 'error' ? 'bg-red-500' :
+        'bg-blue-500'
+    } text-white`;
+    notification.textContent = message;
 
-// NEW: Handle round off
-if (roundOffEl && quotation.round_off !== undefined) {
-  roundOffEl.textContent = `₹${parseFloat(quotation.round_off).toFixed(2)}`;
-  console.log('Set round off from backend:', quotation.round_off);
-}
+    document.body.appendChild(notification);
 
-if (totalEl && quotation.total !== undefined) {
-  totalEl.textContent = `₹${Math.round(quotation.total)}`; // Whole number
-  console.log('Set total from backend:', quotation.total);
-}
-    
-    // Copy over additional fields
-    copyAdditionalFields(quotation);
-    
-    // Show a success message
-    showNotification('Quotation data loaded successfully', 'success');
-  }, quotation.items ? quotation.items.length * 100 : 500);
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
 }
 
         function populateItemRow(rowIndex, item) {
