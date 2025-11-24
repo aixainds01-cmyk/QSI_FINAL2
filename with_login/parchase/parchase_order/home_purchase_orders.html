@@ -39,7 +39,7 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             border-radius: 0.5rem;
             padding: 0.25rem;
-            z-index: 9999; /* High z-index to show above everything */
+            z-index: 9999;
             min-width: 160px;
         }
 
@@ -185,7 +185,8 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto min-h-[300px]"> <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                <div class="overflow-x-auto min-h-[300px]"> 
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th class="table-header-cell w-10 text-center">
@@ -220,6 +221,60 @@
         </main>
     </div>
 
+    <div id="payment-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-xl font-bold text-gray-800">Record Vendor Payment</h3>
+                <button id="close-payment-modal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="payment-form" class="space-y-4">
+                <input type="hidden" id="pay-po-id">
+                
+                <div class="bg-gray-50 p-3 rounded text-sm space-y-2">
+                    <div class="flex justify-between"><span>PO Number:</span> <span id="pay-po-no" class="font-semibold"></span></div>
+                    <div class="flex justify-between"><span>Vendor:</span> <span id="pay-vendor" class="font-semibold"></span></div>
+                    <div class="flex justify-between border-t pt-1 mt-1"><span>Total:</span> <span id="pay-total" class="font-semibold"></span></div>
+                    <div class="flex justify-between text-red-600 font-bold"><span>Pending:</span> <span id="pay-pending"></span></div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Amount</label>
+                    <input type="number" id="pay-amount-input" step="0.01" required 
+                        class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Date</label>
+                    <input type="date" id="pay-date-input" required 
+                        class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Method</label>
+                    <select id="pay-method-input" class="mt-1 w-full border border-gray-300 rounded-md p-2">
+                        <option>Bank Transfer</option>
+                        <option>Cash</option>
+                        <option>Cheque</option>
+                        <option>UPI</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Notes</label>
+                    <textarea id="pay-notes-input" rows="2" class="mt-1 w-full border border-gray-300 rounded-md p-2"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" id="cancel-payment-btn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" id="save-payment-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Record Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         // --- CONSTANTS & CONFIG ---
@@ -248,6 +303,17 @@
         const bulkActionsDeleted = document.getElementById('bulk-actions-deleted');
         const btnBulkCancel = document.getElementById('bulk-action-cancel');
         const btnBulkDeletePerm = document.getElementById('bulk-action-delete-perm');
+
+        // Payment Modal Elements
+        const paymentModal = document.getElementById('payment-modal');
+        const paymentForm = document.getElementById('payment-form');
+        const payPoId = document.getElementById('pay-po-id');
+        const payPoNo = document.getElementById('pay-po-no');
+        const payVendor = document.getElementById('pay-vendor');
+        const payTotal = document.getElementById('pay-total');
+        const payPending = document.getElementById('pay-pending');
+        const payAmountInput = document.getElementById('pay-amount-input');
+        const payDateInput = document.getElementById('pay-date-input');
 
         // State
         let currentTab = 'active'; // 'active' or 'deleted'
@@ -368,33 +434,65 @@
 
             displayedPurchaseOrders.forEach(po => {
                 const id = po._id || po.id;
+                // Data extraction
+                const poNo = escapeHtml(po.po_no);
+                const vendor = escapeHtml(po.supplier_name || 'N/A');
+                const status = po.status;
+                const totalAmt = po.total || 0;
+                const paidAmt = po.paid_amount || 0;
+                const pendingAmt = totalAmt - paidAmt;
+
+                // --- PAY BUTTON LOGIC START ---
+                let payButtonHtml = '';
+                
+                // Show pay button only for Active tab
+                if (currentTab === 'active') {
+                    if (pendingAmt > 0) {
+                        payButtonHtml = `
+                            <button class="action-payment flex items-center text-gray-500 hover:text-green-600 font-bold text-sm transition-colors duration-200" 
+                                    title="Record Vendor Payment" 
+                                    data-id="${id}" 
+                                    data-po-no="${poNo}"
+                                    data-vendor="${vendor}"
+                                    data-total="${totalAmt}"
+                                    data-paid="${paidAmt}">
+                                <i class="fas fa-dollar-sign mr-1"></i> Pay
+                            </button>`;
+                    } else {
+                        payButtonHtml = `<span class="text-xs text-green-600 font-bold flex items-center"><i class="fas fa-check-circle mr-1"></i>Paid</span>`;
+                    }
+                }
+                // --- PAY BUTTON LOGIC END ---
+
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors duration-150 group border-b';
                 tr.dataset.id = id;
-                
-                // ✅ ADDED: VIEW BUTTON and correct Action buttons
+
                 tr.innerHTML = `
                     <td class="table-body-cell text-center">
                         <input type="checkbox" class="po-checkbox w-4 h-4 text-indigo-600 border-gray-300 rounded cursor-pointer" data-id="${id}">
                     </td>
                     <td class="table-body-cell">
-                        <span class="font-medium text-gray-800">${escapeHtml(po.po_no)}</span>
+                        <span class="font-medium text-gray-800">${poNo}</span>
                     </td>
                     <td class="table-body-cell text-gray-500 text-sm">${escapeHtml(po.po_date || '')}</td>
-                    <td class="table-body-cell font-medium text-gray-700">${escapeHtml(po.supplier_name || 'N/A')}</td>
-                    <td class="table-body-cell">${statusBadge(po.status)}</td>
+                    <td class="table-body-cell font-medium text-gray-700">${vendor}</td>
+                    <td class="table-body-cell">${statusBadge(status)}</td>
                     <td class="table-body-cell text-right text-gray-600">${formatCurrency(po.sub_total)}</td>
-                    <td class="table-body-cell text-right font-bold text-gray-800">${formatCurrency(po.total)}</td>
-                    <td class="table-body-cell text-center relative">
-                        <button class="text-gray-400 hover:text-indigo-600 mx-1 action-open" title="View Order" data-id="${id}">
-                            <i class="fas fa-external-link-alt"></i>
-                        </button>
-                        <button class="text-gray-400 hover:text-indigo-600 mx-1 action-edit" title="Edit Order" data-id="${id}">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                        <button class="text-gray-400 hover:text-gray-600 mx-1 action-more" title="More Actions" data-id="${id}">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </button>
+                    <td class="table-body-cell text-right font-bold text-gray-800">${formatCurrency(totalAmt)}</td>
+                    <td class="table-body-cell">
+                        <div class="flex items-center justify-center space-x-4">
+                            <button class="text-gray-400 hover:text-indigo-600 action-open" title="View Order" data-id="${id}">
+                                <i class="fas fa-external-link-alt"></i>
+                            </button>
+                            <button class="text-gray-400 hover:text-indigo-600 action-edit" title="Edit Order" data-id="${id}">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            ${payButtonHtml}
+                            <button class="text-gray-400 hover:text-gray-600 action-more" title="More Actions" data-id="${id}">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -420,7 +518,22 @@
             tbody.querySelectorAll('.action-edit').forEach(btn => 
                 btn.addEventListener('click', () => window.location.href = `edit_purchase_order.html?id=${btn.dataset.id}`));
 
-            // ✅ FIXED: More Button Logic using document body
+            // --- PAYMENT BUTTON HANDLER ---
+            tbody.querySelectorAll('.action-payment').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const button = e.currentTarget;
+                    const poData = {
+                        id: button.dataset.id,
+                        po_no: button.dataset.poNo,
+                        vendor: button.dataset.vendor,
+                        total: parseFloat(button.dataset.total),
+                        paid: parseFloat(button.dataset.paid)
+                    };
+                    openPaymentModal(poData);
+                });
+            });
+
+            // More Button Logic
             tbody.querySelectorAll('.action-more').forEach(btn => 
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -548,12 +661,10 @@
             performBulkAction('delete-perm', ids);
         });
 
-        // --- ✅ FIXED POPOVER LOGIC ---
+        // --- POPOVER LOGIC ---
         function openPopover(triggerBtn, id) {
-            // 1. Remove existing popovers
             document.querySelectorAll('.popover-menu').forEach(el => el.remove());
-
-            // 2. Create Popover Element
+            
             const popover = document.createElement('div');
             popover.className = 'popover-menu fixed bg-white border border-gray-200 shadow-lg rounded-md z-50';
             
@@ -568,17 +679,12 @@
                             </button>`;
             }
             popover.innerHTML = menuHtml;
-            
-            // 3. Append to BODY (not table cell) to avoid clipping issues
             document.body.appendChild(popover);
 
-            // 4. Calculate Position
             const rect = triggerBtn.getBoundingClientRect();
-            // Position: Below the button, aligned slightly to the left
             popover.style.top = `${rect.bottom + window.scrollY + 5}px`;
             popover.style.left = `${rect.left + window.scrollX - 100}px`; 
 
-            // 5. Wire Events
             const btnCancel = popover.querySelector('#pop-cancel');
             if(btnCancel) {
                 btnCancel.addEventListener('click', () => {
@@ -595,7 +701,6 @@
                 });
             }
 
-            // 6. Close when clicking outside
             setTimeout(() => {
                 document.addEventListener('click', function close(e) {
                     if (!popover.contains(e.target) && e.target !== triggerBtn) {
@@ -604,6 +709,69 @@
                     }
                 });
             }, 0);
+        }
+
+        // --- PAYMENT MODAL LOGIC ---
+        function openPaymentModal(data) {
+            payPoId.value = data.id;
+            payPoNo.textContent = data.po_no;
+            payVendor.textContent = data.vendor;
+            
+            const pending = data.total - data.paid;
+            
+            payTotal.textContent = formatCurrency(data.total);
+            payPending.textContent = formatCurrency(pending);
+            
+            payAmountInput.value = pending.toFixed(2);
+            payAmountInput.max = pending.toFixed(2);
+            payDateInput.value = new Date().toISOString().split('T')[0];
+            
+            paymentModal.classList.remove('hidden');
+            paymentModal.classList.add('flex');
+        }
+
+        function closePaymentModal() {
+            paymentModal.classList.add('hidden');
+            paymentModal.classList.remove('flex');
+        }
+
+        document.getElementById('close-payment-modal').addEventListener('click', closePaymentModal);
+        document.getElementById('cancel-payment-btn').addEventListener('click', closePaymentModal);
+
+        if(paymentForm) {
+            paymentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const btn = document.getElementById('save-payment-btn');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                // NOTE: Adjust API endpoint as needed
+                const payload = {
+                    purchase_order_id: payPoId.value, 
+                    amount: parseFloat(payAmountInput.value),
+                    payment_date: payDateInput.value,
+                    payment_method: document.getElementById('pay-method-input').value,
+                    notes: document.getElementById('pay-notes-input').value
+                };
+
+                try {
+                    await safeFetch(`${API_BASE_URL}/vendor_payments`, {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    alert('Payment recorded successfully!');
+                    closePaymentModal();
+                    fetchOrders(); // Refresh table
+                } catch (err) {
+                    alert('Error recording payment: ' + err.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            });
         }
 
         // --- SIDEBAR TOGGLE ---
