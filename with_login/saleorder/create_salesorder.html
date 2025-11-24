@@ -1431,7 +1431,7 @@
                 return {
                     prefix: finalPrefix,
                     sales_order_number: soNumber,
-                    sales_order_date: document.getElementById("sales-order-date")?.value || new Date().toISOString().slice(0, 10),
+                    sales_date: document.getElementById("sales-order-date")?.value || new Date().toISOString().slice(0, 10),
                     delivery_date: document.getElementById("delivery-date")?.value || "",
                     items,
                     sub_total: +subTotal.toFixed(2),
@@ -1546,7 +1546,7 @@
 
                     // Populate Preview
                     document.getElementById("preview-so-no").textContent = savedDoc.sales_order_number || "N/A";
-                    document.getElementById("preview-so-date").textContent = new Date(savedDoc.sales_order_date).toLocaleDateString('en-GB');
+                    document.getElementById("preview-so-date").textContent = new Date(savedDoc.sales_date).toLocaleDateString('en-GB');
                     document.getElementById("preview-delivery-date").textContent = new Date(savedDoc.delivery_date).toLocaleDateString('en-GB');
 
                     const fromAddress = [
