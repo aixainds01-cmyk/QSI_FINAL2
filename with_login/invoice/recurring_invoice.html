@@ -1,0 +1,659 @@
+refer the above code to create the script for the below code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recurring Invoices - QSI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .table-header-cell {
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4b5563;
+            background-color: #f9fafb;
+            text-align: left;
+        }
+        .table-body-cell {
+            padding: 1rem 1rem;
+            font-size: 0.875rem;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 64px;
+            }
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .status-badge i {
+            font-size: 0.625rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex">
+        <!-- Mobile Header -->
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <span class="text-xl font-bold">QSI</span>
+            </div>
+        </header>
+
+        <!-- Backdrop -->
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class="mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="../dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-chart-pie mr-3"></i>Dashboard
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="../quotation/home_quotation.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="../saleorder/home_sales_order.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="home_invoice.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="../credit_note.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                    </div>
+                </div>
+                <a href="../manage-clients.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Manage Clients
+                </a>
+                <a href="../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-8" id="main-content">
+            <header class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-sync-alt mr-3 text-indigo-600"></i>Recurring Invoices
+                    </h1>
+                    <button id="create-recurring-btn" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i> Create Recurring Invoice
+                    </button>
+                </div>
+                <nav class="flex items-center space-x-6 border-b">
+                    <a href="home_invoice.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Overview</a>
+                    <a href="#" class="py-2 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600">Recurring Invoices</a>
+                    <a href="suggestion_inv.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Suggested Invoice</a>
+                </nav>
+            </header>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Total Active</p>
+                            <p class="text-2xl font-bold text-gray-800" id="total-active">0</p>
+                        </div>
+                        <div class="bg-indigo-100 p-3 rounded-full">
+                            <i class="fas fa-sync text-indigo-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Next Due</p>
+                            <p class="text-2xl font-bold text-gray-800" id="next-due">0</p>
+                        </div>
+                        <div class="bg-yellow-100 p-3 rounded-full">
+                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Paused</p>
+                            <p class="text-2xl font-bold text-gray-800" id="total-paused">0</p>
+                        </div>
+                        <div class="bg-orange-100 p-3 rounded-full">
+                            <i class="fas fa-pause text-orange-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Monthly Revenue</p>
+                            <p class="text-2xl font-bold text-gray-800" id="monthly-revenue">₹0</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <i class="fas fa-rupee-sign text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Table -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border rounded-lg bg-gray-50">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Status</label>
+                        <select id="filter-status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option>All</option>
+                            <option>Active</option>
+                            <option>Paused</option>
+                            <option>Completed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Client</label>
+                        <select id="filter-client" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option>All Clients</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Frequency</label>
+                        <select id="filter-frequency" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option>All</option>
+                            <option>Weekly</option>
+                            <option>Bi-Weekly</option>
+                            <option>Monthly</option>
+                            <option>Quarterly</option>
+                            <option>Yearly</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="table-header-cell">Client</th>
+                                <th class="table-header-cell">Frequency</th>
+                                <th class="table-header-cell">Next Invoice</th>
+                                <th class="table-header-cell">Amount</th>
+                                <th class="table-header-cell">Status</th>
+                                <th class="table-header-cell">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recurring-table-body" class="divide-y divide-gray-200">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Recurring Invoice Modal -->
+    <div id="recurring-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+        <div id="modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 transition-opacity duration-300"></div>
+        <div id="modal-panel" class="bg-white rounded-lg shadow-xl w-full max-w-2xl transform scale-95 transition-transform duration-300 mx-4 opacity-0 relative z-10 max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-gray-800" id="modal-title">Create Recurring Invoice</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="recurring-form" class="p-6 space-y-5">
+                <input type="hidden" id="recurring-id" />
+
+                <!-- Client Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Client <span class="text-red-500">*</span>
+                    </label>
+                    <select id="client-select" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                        <option value="">Select a client</option>
+                    </select>
+                </div>
+
+                <!-- Invoice Template -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Invoice Template <span class="text-red-500">*</span>
+                    </label>
+                    <select id="template-select" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                        <option value="">Select invoice template</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">This template will be used to generate invoices</p>
+                </div>
+
+                <!-- Frequency -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Billing Frequency <span class="text-red-500">*</span>
+                    </label>
+                    <select id="frequency-select" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                        <option value="weekly">Weekly</option>
+                        <option value="bi-weekly">Bi-Weekly (Every 2 weeks)</option>
+                        <option value="monthly" selected>Monthly</option>
+                        <option value="quarterly">Quarterly (Every 3 months)</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+
+                <!-- Start Date -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Start Date <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" id="start-date" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required />
+                    <p class="text-xs text-gray-500 mt-1">Date of the first invoice</p>
+                </div>
+
+                <!-- End Options -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        End Condition
+                    </label>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="radio" name="end-option" value="never" class="mr-2" checked />
+                            <span class="text-sm">Never end</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="end-option" value="date" class="mr-2" />
+                            <span class="text-sm">End on specific date:</span>
+                            <input type="date" id="end-date" class="ml-3 px-3 py-1 border border-gray-300 rounded-md text-sm" disabled />
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="end-option" value="count" class="mr-2" />
+                            <span class="text-sm">End after:</span>
+                            <input type="number" id="end-count" min="1" class="ml-3 w-20 px-3 py-1 border border-gray-300 rounded-md text-sm" placeholder="10" disabled />
+                            <span class="ml-2 text-sm">invoices</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Auto-send -->
+                <div class="flex items-center">
+                    <input type="checkbox" id="auto-send" class="mr-2" />
+                    <label for="auto-send" class="text-sm text-gray-700">
+                        Automatically send invoice to client on generation
+                    </label>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Notes (Optional)
+                    </label>
+                    <textarea id="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Internal notes about this recurring invoice..."></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" id="cancel-btn" class="py-2 px-6 bg-gray-100 rounded-md hover:bg-gray-200 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" id="save-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md">
+                        Create Schedule
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const BASE_URL = "http://Aixains-Mac-mini.local:8000";
+
+    // ------------------------------
+    // UI Elements
+    // ------------------------------
+    const sidebar = document.getElementById("sidebar");
+    const menuToggle = document.getElementById("menu-toggle");
+    const menuBackdrop = document.getElementById("menu-backdrop");
+    const dropdownBtn = document.getElementById("documents-dropdown-btn");
+    const dropdownContent = document.getElementById("documents-dropdown-content");
+    const dropdownIcon = document.getElementById("dropdown-icon");
+    const createBtn = document.getElementById("create-recurring-btn");
+
+    const modal = document.getElementById("recurring-modal");
+    const modalOverlay = document.getElementById("modal-overlay");
+    const modalPanel = document.getElementById("modal-panel");
+    const closeModalBtn = document.getElementById("close-modal");
+    const cancelBtn = document.getElementById("cancel-btn");
+
+    const recurringTable = document.getElementById("recurring-table-body");
+
+    const filterStatus = document.getElementById("filter-status");
+    const filterClient = document.getElementById("filter-client");
+    const filterFrequency = document.getElementById("filter-frequency");
+
+    const clientSelect = document.getElementById("client-select");
+    const templateSelect = document.getElementById("template-select");
+
+    const recurringForm = document.getElementById("recurring-form");
+    const recurringIdInput = document.getElementById("recurring-id");
+
+    // Summary elements
+    const totalActive = document.getElementById("total-active");
+    const nextDue = document.getElementById("next-due");
+    const totalPaused = document.getElementById("total-paused");
+    const monthlyRevenue = document.getElementById("monthly-revenue");
+
+    // ------------------------------
+    // Sidebar Toggle
+    // ------------------------------
+    menuToggle?.addEventListener("click", () => {
+        sidebar.classList.toggle("-translate-x-full");
+        menuBackdrop.classList.toggle("hidden");
+    });
+
+    menuBackdrop?.addEventListener("click", () => {
+        sidebar.classList.add("-translate-x-full");
+        menuBackdrop.classList.add("hidden");
+    });
+
+    // ------------------------------
+    // Dropdown Toggle
+    // ------------------------------
+    dropdownBtn?.addEventListener("click", () => {
+        dropdownContent.classList.toggle("hidden");
+        dropdownIcon.classList.toggle("rotate-180");
+    });
+
+    // ------------------------------
+    // Modal Handling
+    // ------------------------------
+    function openModal(editMode = false) {
+        modal.classList.remove("hidden");
+        setTimeout(() => {
+            modalOverlay.classList.add("opacity-50");
+            modalPanel.classList.remove("scale-95", "opacity-0");
+        }, 10);
+
+        document.getElementById("modal-title").innerText = 
+            editMode ? "Edit Recurring Invoice" : "Create Recurring Invoice";
+    }
+
+    function closeModal() {
+        modalOverlay.classList.remove("opacity-50");
+        modalPanel.classList.add("scale-95", "opacity-0");
+        setTimeout(() => {
+            modal.classList.add("hidden");
+            recurringForm.reset();
+        }, 200);
+    }
+
+    closeModalBtn?.addEventListener("click", closeModal);
+    cancelBtn?.addEventListener("click", closeModal);
+
+    createBtn?.addEventListener("click", () => {
+        recurringIdInput.value = "";
+        openModal(false);
+    });
+
+    // ------------------------------
+    // Load Clients
+    // ------------------------------
+    async function loadClients() {
+        try {
+            const res = await fetch(`${BASE_URL}/api/clients`);
+            const clients = await res.json();
+
+            filterClient.innerHTML = `<option value="">All Clients</option>`;
+            clientSelect.innerHTML = `<option value="">Select a client</option>`;
+
+            clients.forEach(c => {
+                filterClient.innerHTML += `<option value="${c._id}">${c.name}</option>`;
+                clientSelect.innerHTML += `<option value="${c._id}">${c.name}</option>`;
+            });
+
+        } catch (err) {
+            console.error("Error loading clients", err);
+        }
+    }
+
+    // ------------------------------
+    // Load Invoice Templates (Previous invoices)
+    // ------------------------------
+    async function loadInvoiceTemplates() {
+        try {
+            const res = await fetch(`${BASE_URL}/api/invoice`);
+            const invoices = await res.json();
+
+            templateSelect.innerHTML = `<option value="">Select invoice template</option>`;
+
+            invoices.forEach(inv => {
+                templateSelect.innerHTML += `
+                    <option value="${inv._id}">Invoice #${inv.invoice_no || inv._id}</option>
+                `;
+            });
+
+        } catch (err) {
+            console.error("Error loading templates", err);
+        }
+    }
+
+    // ------------------------------
+    // Load Recurring Invoices
+    // ------------------------------
+    async function loadRecurringInvoices() {
+        try {
+            const res = await fetch(`${BASE_URL}/api/recurring-invoices`);
+            let list = await res.json();
+
+            applyFilters(list);
+            updateSummary(list);
+
+        } catch (err) {
+            console.error("Error loading recurring invoices", err);
+        }
+    }
+
+    // ------------------------------
+    // Update Summary Cards
+    // ------------------------------
+    function updateSummary(list) {
+        totalActive.innerText = list.filter(x => x.is_active).length;
+        totalPaused.innerText = list.filter(x => !x.is_active).length;
+
+        const nextDates = list.map(x => new Date(x.next_due_date));
+        nextDue.innerText = nextDates.length ? nextDates.sort()[0].toDateString() : "0";
+
+        const monthly = list
+            .filter(x => x.frequency === "monthly" && x.is_active)
+            .reduce((a, b) => a + (b.total || 0), 0);
+
+        monthlyRevenue.innerText = "₹" + monthly;
+    }
+
+    // ------------------------------
+    // Apply Filters
+    // ------------------------------
+    function applyFilters(list) {
+        let filtered = [...list];
+
+        if (filterStatus.value !== "All") {
+            const st = filterStatus.value;
+            if (st === "Active") filtered = filtered.filter(x => x.is_active);
+            if (st === "Paused") filtered = filtered.filter(x => !x.is_active);
+        }
+
+        if (filterClient.value) {
+            filtered = filtered.filter(x => x.to_client_id === filterClient.value);
+        }
+
+        if (filterFrequency.value !== "All") {
+            filtered = filtered.filter(x => 
+                (x.frequency || "").toLowerCase() === filterFrequency.value.toLowerCase()
+            );
+        }
+
+        renderTable(filtered);
+    }
+
+    filterStatus.addEventListener("change", loadRecurringInvoices);
+    filterClient.addEventListener("change", loadRecurringInvoices);
+    filterFrequency.addEventListener("change", loadRecurringInvoices);
+
+    // ------------------------------
+    // Render Table
+    // ------------------------------
+    function renderTable(list) {
+        recurringTable.innerHTML = "";
+
+        if (!list.length) {
+            recurringTable.innerHTML = `
+                <tr><td colspan="6" class="text-center py-6 text-gray-500">No recurring invoices found.</td></tr>
+            `;
+            return;
+        }
+
+        list.forEach(item => {
+            recurringTable.innerHTML += `
+                <tr>
+                    <td class="table-body-cell">${item.to?.name || "Client"}</td>
+                    <td class="table-body-cell capitalize">${item.frequency}</td>
+                    <td class="table-body-cell">${new Date(item.next_due_date).toDateString()}</td>
+                    <td class="table-body-cell">₹${item.total}</td>
+                    <td class="table-body-cell">
+                        <span class="status-badge ${item.is_active ? 'text-green-600' : 'text-red-500'}">
+                            <i class="fas fa-circle"></i> 
+                            ${item.is_active ? "Active" : "Paused"}
+                        </span>
+                    </td>
+                    <td class="table-body-cell">
+                        <button onclick="editRecurring('${item._id}')" class="text-indigo-600 hover:text-indigo-800 mr-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="toggleRecurring('${item._id}')" class="text-yellow-600 hover:text-yellow-800 mr-3">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                        <button onclick="deleteRecurring('${item._id}')" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // ------------------------------
+    // Edit Recurring Invoice
+    // ------------------------------
+    window.editRecurring = async (id) => {
+        const res = await fetch(`${BASE_URL}/api/recurring-invoices/${id}`);
+        const data = await res.json();
+
+        recurringIdInput.value = id;
+
+        clientSelect.value = data.to_client_id;
+        templateSelect.value = data.original_invoice_id;
+        document.getElementById("frequency-select").value = data.frequency;
+        document.getElementById("start-date").value = data.start_date?.split("T")[0] || "";
+        document.getElementById("auto-send").checked = data.auto_send || false;
+        document.getElementById("notes").value = data.notes || "";
+
+        if (data.end_date) {
+            document.querySelector("input[value='date']").checked = true;
+            document.getElementById("end-date").value = data.end_date.split("T")[0];
+        }
+
+        if (data.end_after) {
+            document.querySelector("input[value='count']").checked = true;
+            document.getElementById("end-count").value = data.end_after;
+        }
+
+        openModal(true);
+    };
+
+    // ------------------------------
+    // Toggle (Activate/Deactivate)
+    // ------------------------------
+    window.toggleRecurring = async (id) => {
+        await fetch(`${BASE_URL}/api/recurring-invoices/${id}/toggle`, { method: "POST" });
+        loadRecurringInvoices();
+    };
+
+    // ------------------------------
+    // Delete (Deactivate)
+    // ------------------------------
+    window.deleteRecurring = async (id) => {
+        if (!confirm("Deactivate this recurring invoice?")) return;
+
+        await fetch(`${BASE_URL}/api/recurring-invoices/${id}`, { method: "DELETE" });
+        loadRecurringInvoices();
+    };
+
+    // ------------------------------
+    // Save (Create or Update)
+    // ------------------------------
+    recurringForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const id = recurringIdInput.value;
+        const formData = {
+            to_client_id: clientSelect.value,
+            original_invoice_id: templateSelect.value,
+            frequency: document.getElementById("frequency-select").value,
+            start_date: document.getElementById("start-date").value,
+            notes: document.getElementById("notes").value,
+            auto_send: document.getElementById("auto-send").checked
+        };
+
+        const selectedEnd = document.querySelector("input[name='end-option']:checked").value;
+        if (selectedEnd === "date") {
+            formData.end_date = document.getElementById("end-date").value;
+        }
+        if (selectedEnd === "count") {
+            formData.end_after = document.getElementById("end-count").value;
+        }
+
+        if (id) {
+            await fetch(`${BASE_URL}/api/recurring-invoices/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+        } else {
+            // Create recurring = create invoice with "is_recurring"
+            formData.is_recurring = true;
+
+            await fetch(`${BASE_URL}/api/invoice`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+        }
+
+        closeModal();
+        loadRecurringInvoices();
+    });
+
+    // ------------------------------
+    // Init
+    // ------------------------------
+    loadClients();
+    loadInvoiceTemplates();
+    loadRecurringInvoices();
+
+});
+</script>
+
+</body>
+</html>
