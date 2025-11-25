@@ -1,4 +1,3 @@
-refer the above code to create the script for the below code
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,25 +12,6 @@ refer the above code to create the script for the below code
             font-family: 'Inter', sans-serif;
             background-color: #f9fafb;
         }
-        .table-header-cell {
-            padding: 0.75rem 1rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #4b5563;
-            background-color: #f9fafb;
-            text-align: left;
-        }
-        .table-body-cell {
-            padding: 1rem 1rem;
-            font-size: 0.875rem;
-            color: #374151;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        @media (max-width: 768px) {
-            #main-content {
-                margin-top: 64px;
-            }
-        }
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -39,6 +19,27 @@ refer the above code to create the script for the below code
         }
         .status-badge i {
             font-size: 0.625rem;
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: -1rem;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 64px;
+            }
         }
     </style>
 </head>
@@ -122,7 +123,7 @@ refer the above code to create the script for the below code
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600 mb-1">Next Due</p>
-                            <p class="text-2xl font-bold text-gray-800" id="next-due">0</p>
+                            <p class="text-lg font-bold text-gray-800" id="next-due">-</p>
                         </div>
                         <div class="bg-yellow-100 p-3 rounded-full">
                             <i class="fas fa-clock text-yellow-600 text-xl"></i>
@@ -153,176 +154,82 @@ refer the above code to create the script for the below code
                 </div>
             </div>
 
-            <!-- Filters and Table -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border rounded-lg bg-gray-50">
+            <!-- Filters -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="text-sm font-medium text-gray-700">Status</label>
                         <select id="filter-status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option>All</option>
-                            <option>Active</option>
-                            <option>Paused</option>
-                            <option>Completed</option>
+                            <option value="all">All</option>
+                            <option value="active">Active</option>
+                            <option value="paused">Paused</option>
                         </select>
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-700">Client</label>
                         <select id="filter-client" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option>All Clients</option>
+                            <option value="all">All Clients</option>
                         </select>
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-700">Frequency</label>
                         <select id="filter-frequency" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option>All</option>
-                            <option>Weekly</option>
-                            <option>Bi-Weekly</option>
-                            <option>Monthly</option>
-                            <option>Quarterly</option>
-                            <option>Yearly</option>
+                            <option value="all">All</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="bi-weekly">Bi-Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
                         </select>
                     </div>
                 </div>
+            </div>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="table-header-cell">Client</th>
-                                <th class="table-header-cell">Frequency</th>
-                                <th class="table-header-cell">Next Invoice</th>
-                                <th class="table-header-cell">Amount</th>
-                                <th class="table-header-cell">Status</th>
-                                <th class="table-header-cell">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recurring-table-body" class="divide-y divide-gray-200">
-                            <!-- Data will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Recurring Invoices Container -->
+            <div id="recurring-container" class="space-y-4">
+                <!-- Recurring invoices will be dynamically loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden bg-white p-12 rounded-lg shadow-sm border border-gray-200 text-center">
+                <i class="fas fa-inbox text-gray-400 text-6xl mb-4"></i>
+                <p class="text-gray-600 text-lg mb-2">No recurring invoices found</p>
+                <p class="text-gray-500 text-sm">Create your first recurring invoice to get started</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="bg-white p-12 rounded-lg shadow-sm border border-gray-200 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">Loading recurring invoices...</p>
             </div>
         </div>
     </div>
 
-    <!-- Create/Edit Recurring Invoice Modal -->
-    <div id="recurring-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
-        <div id="modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 transition-opacity duration-300"></div>
-        <div id="modal-panel" class="bg-white rounded-lg shadow-xl w-full max-w-2xl transform scale-95 transition-transform duration-300 mx-4 opacity-0 relative z-10 max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
-                <h3 class="text-xl font-semibold text-gray-800" id="modal-title">Create Recurring Invoice</h3>
-                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
+                <h3 class="text-xl font-bold text-gray-800">Recurring Invoice Details</h3>
+                <button id="close-detail-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    ×
                 </button>
             </div>
-
-            <form id="recurring-form" class="p-6 space-y-5">
-                <input type="hidden" id="recurring-id" />
-
-                <!-- Client Selection -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Client <span class="text-red-500">*</span>
-                    </label>
-                    <select id="client-select" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
-                        <option value="">Select a client</option>
-                    </select>
-                </div>
-
-                <!-- Invoice Template -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Invoice Template <span class="text-red-500">*</span>
-                    </label>
-                    <select id="template-select" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
-                        <option value="">Select invoice template</option>
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">This template will be used to generate invoices</p>
-                </div>
-
-                <!-- Frequency -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Billing Frequency <span class="text-red-500">*</span>
-                    </label>
-                    <select id="frequency-select" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
-                        <option value="weekly">Weekly</option>
-                        <option value="bi-weekly">Bi-Weekly (Every 2 weeks)</option>
-                        <option value="monthly" selected>Monthly</option>
-                        <option value="quarterly">Quarterly (Every 3 months)</option>
-                        <option value="yearly">Yearly</option>
-                    </select>
-                </div>
-
-                <!-- Start Date -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Start Date <span class="text-red-500">*</span>
-                    </label>
-                    <input type="date" id="start-date" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required />
-                    <p class="text-xs text-gray-500 mt-1">Date of the first invoice</p>
-                </div>
-
-                <!-- End Options -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        End Condition
-                    </label>
-                    <div class="space-y-3">
-                        <label class="flex items-center">
-                            <input type="radio" name="end-option" value="never" class="mr-2" checked />
-                            <span class="text-sm">Never end</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="end-option" value="date" class="mr-2" />
-                            <span class="text-sm">End on specific date:</span>
-                            <input type="date" id="end-date" class="ml-3 px-3 py-1 border border-gray-300 rounded-md text-sm" disabled />
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="end-option" value="count" class="mr-2" />
-                            <span class="text-sm">End after:</span>
-                            <input type="number" id="end-count" min="1" class="ml-3 w-20 px-3 py-1 border border-gray-300 rounded-md text-sm" placeholder="10" disabled />
-                            <span class="ml-2 text-sm">invoices</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Auto-send -->
-                <div class="flex items-center">
-                    <input type="checkbox" id="auto-send" class="mr-2" />
-                    <label for="auto-send" class="text-sm text-gray-700">
-                        Automatically send invoice to client on generation
-                    </label>
-                </div>
-
-                <!-- Notes -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Notes (Optional)
-                    </label>
-                    <textarea id="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Internal notes about this recurring invoice..."></textarea>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex justify-end gap-3 pt-4 border-t">
-                    <button type="button" id="cancel-btn" class="py-2 px-6 bg-gray-100 rounded-md hover:bg-gray-200 transition">
-                        Cancel
-                    </button>
-                    <button type="submit" id="save-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md">
-                        Create Schedule
-                    </button>
-                </div>
-            </form>
+            
+            <div id="detail-content" class="p-6">
+                <!-- Details will be populated here -->
+            </div>
         </div>
     </div>
+
+    <!-- PASTE JAVASCRIPT CODE HERE -->
     <script>
-document.addEventListener("DOMContentLoaded", () => {
+        (function() {
+    'use strict';
 
-    const BASE_URL = "http://Aixains-Mac-mini.local:8000";
+    // Configuration
+    const BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
 
-    // ------------------------------
-    // UI Elements
-    // ------------------------------
+    // DOM Elements
     const sidebar = document.getElementById("sidebar");
     const menuToggle = document.getElementById("menu-toggle");
     const menuBackdrop = document.getElementById("menu-backdrop");
@@ -331,33 +238,65 @@ document.addEventListener("DOMContentLoaded", () => {
     const dropdownIcon = document.getElementById("dropdown-icon");
     const createBtn = document.getElementById("create-recurring-btn");
 
-    const modal = document.getElementById("recurring-modal");
-    const modalOverlay = document.getElementById("modal-overlay");
-    const modalPanel = document.getElementById("modal-panel");
-    const closeModalBtn = document.getElementById("close-modal");
-    const cancelBtn = document.getElementById("cancel-btn");
-
-    const recurringTable = document.getElementById("recurring-table-body");
+    const recurringContainer = document.getElementById("recurring-container");
+    const emptyState = document.getElementById("empty-state");
+    const loadingState = document.getElementById("loading-state");
 
     const filterStatus = document.getElementById("filter-status");
     const filterClient = document.getElementById("filter-client");
     const filterFrequency = document.getElementById("filter-frequency");
 
-    const clientSelect = document.getElementById("client-select");
-    const templateSelect = document.getElementById("template-select");
+    const totalActiveEl = document.getElementById("total-active");
+    const nextDueEl = document.getElementById("next-due");
+    const totalPausedEl = document.getElementById("total-paused");
+    const monthlyRevenueEl = document.getElementById("monthly-revenue");
 
-    const recurringForm = document.getElementById("recurring-form");
-    const recurringIdInput = document.getElementById("recurring-id");
+    const detailModal = document.getElementById("detail-modal");
+    const closeDetailModal = document.getElementById("close-detail-modal");
+    const detailContent = document.getElementById("detail-content");
 
-    // Summary elements
-    const totalActive = document.getElementById("total-active");
-    const nextDue = document.getElementById("next-due");
-    const totalPaused = document.getElementById("total-paused");
-    const monthlyRevenue = document.getElementById("monthly-revenue");
+    // State
+    let allRecurringInvoices = [];
+    let allClients = [];
+    let generatedInvoicesMap = {};
 
-    // ------------------------------
+    // Auth Headers
+    function getAuthHeaders() {
+        const token = localStorage.getItem('token');
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+        };
+    }
+
+    // Safe Fetch with Auth
+    async function safeFetch(url, options = {}) {
+        try {
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    ...getAuthHeaders(),
+                    ...options.headers
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert("Session expired. Please login again.");
+                    window.location.href = '../../index.html';
+                    return null;
+                }
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Fetch error:', error);
+            return null;
+        }
+    }
+
     // Sidebar Toggle
-    // ------------------------------
     menuToggle?.addEventListener("click", () => {
         sidebar.classList.toggle("-translate-x-full");
         menuBackdrop.classList.toggle("hidden");
@@ -368,292 +307,411 @@ document.addEventListener("DOMContentLoaded", () => {
         menuBackdrop.classList.add("hidden");
     });
 
-    // ------------------------------
     // Dropdown Toggle
-    // ------------------------------
     dropdownBtn?.addEventListener("click", () => {
         dropdownContent.classList.toggle("hidden");
         dropdownIcon.classList.toggle("rotate-180");
     });
 
-    // ------------------------------
-    // Modal Handling
-    // ------------------------------
-    function openModal(editMode = false) {
-        modal.classList.remove("hidden");
-        setTimeout(() => {
-            modalOverlay.classList.add("opacity-50");
-            modalPanel.classList.remove("scale-95", "opacity-0");
-        }, 10);
-
-        document.getElementById("modal-title").innerText = 
-            editMode ? "Edit Recurring Invoice" : "Create Recurring Invoice";
-    }
-
-    function closeModal() {
-        modalOverlay.classList.remove("opacity-50");
-        modalPanel.classList.add("scale-95", "opacity-0");
-        setTimeout(() => {
-            modal.classList.add("hidden");
-            recurringForm.reset();
-        }, 200);
-    }
-
-    closeModalBtn?.addEventListener("click", closeModal);
-    cancelBtn?.addEventListener("click", closeModal);
-
+    // Create Recurring Invoice
     createBtn?.addEventListener("click", () => {
-        recurringIdInput.value = "";
-        openModal(false);
+        // Redirect to create invoice page with recurring flag
+        window.location.href = 'home_invoice.html?action=create&recurring=true'; 
     });
 
-    // ------------------------------
+    // Load All Data
+    async function loadAllData() {
+        showLoading(true);
+        await Promise.all([
+            loadClients(),
+            loadRecurringInvoices()
+        ]);
+        showLoading(false);
+    }
+
     // Load Clients
-    // ------------------------------
     async function loadClients() {
-        try {
-            const res = await fetch(`${BASE_URL}/api/clients`);
-            const clients = await res.json();
-
-            filterClient.innerHTML = `<option value="">All Clients</option>`;
-            clientSelect.innerHTML = `<option value="">Select a client</option>`;
-
-            clients.forEach(c => {
-                filterClient.innerHTML += `<option value="${c._id}">${c.name}</option>`;
-                clientSelect.innerHTML += `<option value="${c._id}">${c.name}</option>`;
-            });
-
-        } catch (err) {
-            console.error("Error loading clients", err);
+        const data = await safeFetch(`${BASE_URL}/clients`);
+        if (data) {
+            allClients = data;
+            populateClientFilter();
         }
     }
 
-    // ------------------------------
-    // Load Invoice Templates (Previous invoices)
-    // ------------------------------
-    async function loadInvoiceTemplates() {
-        try {
-            const res = await fetch(`${BASE_URL}/api/invoice`);
-            const invoices = await res.json();
-
-            templateSelect.innerHTML = `<option value="">Select invoice template</option>`;
-
-            invoices.forEach(inv => {
-                templateSelect.innerHTML += `
-                    <option value="${inv._id}">Invoice #${inv.invoice_no || inv._id}</option>
-                `;
-            });
-
-        } catch (err) {
-            console.error("Error loading templates", err);
-        }
-    }
-
-    // ------------------------------
-    // Load Recurring Invoices
-    // ------------------------------
-    async function loadRecurringInvoices() {
-        try {
-            const res = await fetch(`${BASE_URL}/api/recurring-invoices`);
-            let list = await res.json();
-
-            applyFilters(list);
-            updateSummary(list);
-
-        } catch (err) {
-            console.error("Error loading recurring invoices", err);
-        }
-    }
-
-    // ------------------------------
-    // Update Summary Cards
-    // ------------------------------
-    function updateSummary(list) {
-        totalActive.innerText = list.filter(x => x.is_active).length;
-        totalPaused.innerText = list.filter(x => !x.is_active).length;
-
-        const nextDates = list.map(x => new Date(x.next_due_date));
-        nextDue.innerText = nextDates.length ? nextDates.sort()[0].toDateString() : "0";
-
-        const monthly = list
-            .filter(x => x.frequency === "monthly" && x.is_active)
-            .reduce((a, b) => a + (b.total || 0), 0);
-
-        monthlyRevenue.innerText = "₹" + monthly;
-    }
-
-    // ------------------------------
-    // Apply Filters
-    // ------------------------------
-    function applyFilters(list) {
-        let filtered = [...list];
-
-        if (filterStatus.value !== "All") {
-            const st = filterStatus.value;
-            if (st === "Active") filtered = filtered.filter(x => x.is_active);
-            if (st === "Paused") filtered = filtered.filter(x => !x.is_active);
-        }
-
-        if (filterClient.value) {
-            filtered = filtered.filter(x => x.to_client_id === filterClient.value);
-        }
-
-        if (filterFrequency.value !== "All") {
-            filtered = filtered.filter(x => 
-                (x.frequency || "").toLowerCase() === filterFrequency.value.toLowerCase()
-            );
-        }
-
-        renderTable(filtered);
-    }
-
-    filterStatus.addEventListener("change", loadRecurringInvoices);
-    filterClient.addEventListener("change", loadRecurringInvoices);
-    filterFrequency.addEventListener("change", loadRecurringInvoices);
-
-    // ------------------------------
-    // Render Table
-    // ------------------------------
-    function renderTable(list) {
-        recurringTable.innerHTML = "";
-
-        if (!list.length) {
-            recurringTable.innerHTML = `
-                <tr><td colspan="6" class="text-center py-6 text-gray-500">No recurring invoices found.</td></tr>
-            `;
-            return;
-        }
-
-        list.forEach(item => {
-            recurringTable.innerHTML += `
-                <tr>
-                    <td class="table-body-cell">${item.to?.name || "Client"}</td>
-                    <td class="table-body-cell capitalize">${item.frequency}</td>
-                    <td class="table-body-cell">${new Date(item.next_due_date).toDateString()}</td>
-                    <td class="table-body-cell">₹${item.total}</td>
-                    <td class="table-body-cell">
-                        <span class="status-badge ${item.is_active ? 'text-green-600' : 'text-red-500'}">
-                            <i class="fas fa-circle"></i> 
-                            ${item.is_active ? "Active" : "Paused"}
-                        </span>
-                    </td>
-                    <td class="table-body-cell">
-                        <button onclick="editRecurring('${item._id}')" class="text-indigo-600 hover:text-indigo-800 mr-3">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="toggleRecurring('${item._id}')" class="text-yellow-600 hover:text-yellow-800 mr-3">
-                            <i class="fas fa-sync"></i>
-                        </button>
-                        <button onclick="deleteRecurring('${item._id}')" class="text-red-600 hover:text-red-800">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
+    // Populate Client Filter
+    function populateClientFilter() {
+        filterClient.innerHTML = '<option value="all">All Clients</option>';
+        allClients.forEach(client => {
+            const option = document.createElement('option');
+            option.value = client._id;
+            option.textContent = client.client_name || client.name || 'Unknown';
+            filterClient.appendChild(option);
         });
     }
 
-    // ------------------------------
-    // Edit Recurring Invoice
-    // ------------------------------
-    window.editRecurring = async (id) => {
-        const res = await fetch(`${BASE_URL}/api/recurring-invoices/${id}`);
-        const data = await res.json();
-
-        recurringIdInput.value = id;
-
-        clientSelect.value = data.to_client_id;
-        templateSelect.value = data.original_invoice_id;
-        document.getElementById("frequency-select").value = data.frequency;
-        document.getElementById("start-date").value = data.start_date?.split("T")[0] || "";
-        document.getElementById("auto-send").checked = data.auto_send || false;
-        document.getElementById("notes").value = data.notes || "";
-
-        if (data.end_date) {
-            document.querySelector("input[value='date']").checked = true;
-            document.getElementById("end-date").value = data.end_date.split("T")[0];
+    // Load Recurring Invoices
+    async function loadRecurringInvoices() {
+        // 1. Fetch the recurring templates
+        const data = await safeFetch(`${BASE_URL}/recurring-invoices`);
+        if (data) {
+            allRecurringInvoices = data;
+            console.log("Recurring Templates Loaded:", allRecurringInvoices);
+            
+            // 2. Load generated invoices history for each recurring invoice
+            for (const recurring of allRecurringInvoices) {
+                await loadGeneratedInvoices(recurring._id);
+            }
+            
+            updateSummaryCards();
+            applyFilters();
         }
+    }
 
-        if (data.end_after) {
-            document.querySelector("input[value='count']").checked = true;
-            document.getElementById("end-count").value = data.end_after;
+    // Load Generated Invoices for a Recurring Invoice
+    async function loadGeneratedInvoices(recurringId) {
+        // ✅ FIX: URL changed from /invoic to /invoice
+        const data = await safeFetch(`${BASE_URL}/invoic`); 
+        
+        if (data) {
+            // Filter invoices created from this recurring template
+            const generated = data.filter(inv => 
+                inv.created_from_recurring_id && inv.created_from_recurring_id === recurringId
+            );
+            generatedInvoicesMap[recurringId] = generated;
         }
+    }
 
-        openModal(true);
-    };
+    // Update Summary Cards
+    function updateSummaryCards() {
+        const activeCount = allRecurringInvoices.filter(r => r.is_active).length;
+        const pausedCount = allRecurringInvoices.filter(r => !r.is_active).length;
 
-    // ------------------------------
-    // Toggle (Activate/Deactivate)
-    // ------------------------------
-    window.toggleRecurring = async (id) => {
-        await fetch(`${BASE_URL}/api/recurring-invoices/${id}/toggle`, { method: "POST" });
-        loadRecurringInvoices();
-    };
+        totalActiveEl.textContent = activeCount;
+        totalPausedEl.textContent = pausedCount;
 
-    // ------------------------------
-    // Delete (Deactivate)
-    // ------------------------------
-    window.deleteRecurring = async (id) => {
-        if (!confirm("Deactivate this recurring invoice?")) return;
+        // Find next due date
+        const activeDates = allRecurringInvoices
+            .filter(r => r.is_active && r.next_due_date)
+            .map(r => new Date(r.next_due_date))
+            .sort((a, b) => a - b);
 
-        await fetch(`${BASE_URL}/api/recurring-invoices/${id}`, { method: "DELETE" });
-        loadRecurringInvoices();
-    };
-
-    // ------------------------------
-    // Save (Create or Update)
-    // ------------------------------
-    recurringForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const id = recurringIdInput.value;
-        const formData = {
-            to_client_id: clientSelect.value,
-            original_invoice_id: templateSelect.value,
-            frequency: document.getElementById("frequency-select").value,
-            start_date: document.getElementById("start-date").value,
-            notes: document.getElementById("notes").value,
-            auto_send: document.getElementById("auto-send").checked
-        };
-
-        const selectedEnd = document.querySelector("input[name='end-option']:checked").value;
-        if (selectedEnd === "date") {
-            formData.end_date = document.getElementById("end-date").value;
-        }
-        if (selectedEnd === "count") {
-            formData.end_after = document.getElementById("end-count").value;
-        }
-
-        if (id) {
-            await fetch(`${BASE_URL}/api/recurring-invoices/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            });
+        if (activeDates.length > 0) {
+            nextDueEl.textContent = formatDate(activeDates[0]);
         } else {
-            // Create recurring = create invoice with "is_recurring"
-            formData.is_recurring = true;
-
-            await fetch(`${BASE_URL}/api/invoice`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            });
+            nextDueEl.textContent = '-';
         }
 
-        closeModal();
-        loadRecurringInvoices();
+        // Calculate monthly revenue
+        const monthlyRev = allRecurringInvoices
+            .filter(r => r.is_active && r.frequency === 'monthly')
+            .reduce((sum, r) => sum + (r.total || 0), 0);
+
+        monthlyRevenueEl.textContent = `₹${monthlyRev.toFixed(0)}`;
+    }
+
+    // Apply Filters
+    function applyFilters() {
+        let filtered = [...allRecurringInvoices];
+
+        // Status filter
+        if (filterStatus.value !== 'all') {
+            if (filterStatus.value === 'active') {
+                filtered = filtered.filter(r => r.is_active);
+            } else if (filterStatus.value === 'paused') {
+                filtered = filtered.filter(r => !r.is_active);
+            }
+        }
+
+        // Client filter
+        if (filterClient.value !== 'all') {
+            filtered = filtered.filter(r => r.to_client_id === filterClient.value);
+        }
+
+        // Frequency filter
+        if (filterFrequency.value !== 'all') {
+            filtered = filtered.filter(r => r.frequency === filterFrequency.value);
+        }
+
+        renderRecurringInvoices(filtered);
+    }
+
+    // Render Recurring Invoices
+    function renderRecurringInvoices(invoices) {
+        recurringContainer.innerHTML = '';
+
+        if (invoices.length === 0) {
+            emptyState.classList.remove('hidden');
+            return;
+        }
+
+        emptyState.classList.add('hidden');
+
+        invoices.forEach(recurring => {
+            const card = createRecurringCard(recurring);
+            recurringContainer.appendChild(card);
+        });
+    }
+
+    // Create Recurring Card
+    function createRecurringCard(recurring) {
+        const generated = generatedInvoicesMap[recurring._id] || [];
+        const clientName = getClientName(recurring.to_client_id);
+
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden';
+
+        card.innerHTML = `
+            <div class="p-6 bg-gradient-to-r from-indigo-50 to-white border-b">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h3 class="text-xl font-bold text-gray-800">${clientName}</h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${
+                                recurring.is_active 
+                                    ? 'bg-green-100 text-green-700' 
+                                    : 'bg-red-100 text-red-700'
+                            }">
+                                ${recurring.is_active ? 'Active' : 'Paused'}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            <div>
+                                <p class="text-xs text-gray-600">Frequency</p>
+                                <p class="text-sm font-semibold capitalize">${recurring.frequency || 'Monthly'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-600">Next Invoice</p>
+                                <p class="text-sm font-semibold">${formatDate(recurring.next_due_date)}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-600">Amount</p>
+                                <p class="text-sm font-semibold">₹${(recurring.total || 0).toFixed(2)}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-600">Generated</p>
+                                <p class="text-sm font-semibold">${generated.length} invoices</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button 
+                            onclick="toggleRecurringStatus('${recurring._id}')"
+                            class="p-2 rounded-lg transition ${
+                                recurring.is_active
+                                    ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                                    : 'bg-green-100 text-green-700 hover:bg-green-200'
+                            }"
+                            title="${recurring.is_active ? 'Pause' : 'Activate'}"
+                        >
+                            <i class="fas fa-${recurring.is_active ? 'pause' : 'play'}"></i>
+                        </button>
+                        <button 
+                            onclick="viewRecurringDetails('${recurring._id}')"
+                            class="p-2 rounded-lg bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
+                            title="View Details"
+                        >
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button 
+                            onclick="deleteRecurring('${recurring._id}')"
+                            class="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
+                            title="Delete"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            ${generated.length > 0 ? `
+                <div class="p-6">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                        <i class="fas fa-calendar-alt"></i>
+                        Generated Invoices (${generated.length})
+                    </h4>
+                    <div class="space-y-3">
+                        ${generated.slice(0, 5).map(invoice => `
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex items-center gap-4">
+                                    <div class="bg-indigo-100 p-2 rounded">
+                                        <i class="fas fa-file-invoice text-indigo-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">${invoice.invoice_no}</p>
+                                        <p class="text-xs text-gray-600">${formatDate(invoice.date)}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-semibold text-gray-800">₹${(invoice.total || 0).toFixed(2)}</p>
+                                    <span class="text-xs px-2 py-1 rounded ${getStatusClass(invoice.status)}">
+                                        ${invoice.status || 'Unpaid'}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('')}
+                        
+                        ${generated.length > 5 ? `
+                            <button 
+                                onclick="viewAllGeneratedInvoices('${recurring._id}')"
+                                class="w-full py-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                            >
+                                View all ${generated.length} invoices →
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            ` : ''}
+        `;
+
+        return card;
+    }
+
+    // Get Client Name
+    function getClientName(clientId) {
+        const client = allClients.find(c => c._id === clientId);
+        return client?.client_name || client?.name || 'Unknown Client';
+    }
+
+    // Get Status Class
+    function getStatusClass(status) {
+        switch(status) {
+            case 'Paid':
+                return 'bg-green-100 text-green-700';
+            case 'Partially Paid':
+                return 'bg-yellow-100 text-yellow-700';
+            case 'Unpaid':
+                return 'bg-red-100 text-red-700';
+            default:
+                return 'bg-gray-100 text-gray-700';
+        }
+    }
+
+    // Format Date
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+
+    // Toggle Recurring Status
+    window.toggleRecurringStatus = async function(id) {
+        await safeFetch(`${BASE_URL}/recurring-invoices/${id}/toggle`, {
+            method: 'POST'
+        });
+        await loadRecurringInvoices();
+    };
+
+    // Delete Recurring
+    window.deleteRecurring = async function(id) {
+        if (!confirm('Are you sure you want to deactivate this recurring invoice?')) return;
+        
+        await safeFetch(`${BASE_URL}/recurring-invoices/${id}`, {
+            method: 'DELETE'
+        });
+        await loadRecurringInvoices();
+    };
+
+    // View Recurring Details
+    window.viewRecurringDetails = function(id) {
+        const recurring = allRecurringInvoices.find(r => r._id === id);
+        if (!recurring) return;
+
+        const clientName = getClientName(recurring.to_client_id);
+
+        detailContent.innerHTML = `
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-600">Client</p>
+                    <p class="text-base font-semibold">${clientName}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Status</p>
+                    <p class="text-base font-semibold">${recurring.is_active ? 'Active' : 'Paused'}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Frequency</p>
+                    <p class="text-base font-semibold capitalize">${recurring.frequency || 'Monthly'}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Amount</p>
+                    <p class="text-base font-semibold">₹${(recurring.total || 0).toFixed(2)}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Start Date</p>
+                    <p class="text-base font-semibold">${formatDate(recurring.start_date)}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Next Due</p>
+                    <p class="text-base font-semibold">${formatDate(recurring.next_due_date)}</p>
+                </div>
+            </div>
+            
+            ${recurring.notes ? `
+                <div class="mt-4">
+                    <p class="text-sm text-gray-600 mb-1">Notes</p>
+                    <p class="text-sm text-gray-800 bg-gray-50 p-3 rounded">${recurring.notes}</p>
+                </div>
+            ` : ''}
+
+            <div class="mt-6 pt-4 border-t">
+                <h4 class="text-sm font-semibold text-gray-700 mb-2">Items</h4>
+                <div class="space-y-2">
+                    ${(recurring.items || []).map(item => `
+                        <div class="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                            <span>${item.item_name}</span>
+                            <span class="font-semibold">₹${(item.amount || 0).toFixed(2)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        detailModal.classList.remove('hidden');
+    };
+
+    // View All Generated Invoices
+    window.viewAllGeneratedInvoices = function(recurringId) {
+        // Navigate to invoices page with filter
+        window.location.href = `home_invoice.html?recurring_id=${recurringId}`;
+    };
+
+    // Close Detail Modal
+    closeDetailModal?.addEventListener('click', () => {
+        detailModal.classList.add('hidden');
     });
 
-    // ------------------------------
-    // Init
-    // ------------------------------
-    loadClients();
-    loadInvoiceTemplates();
-    loadRecurringInvoices();
+    detailModal?.addEventListener('click', (e) => {
+        if (e.target === detailModal) {
+            detailModal.classList.add('hidden');
+        }
+    });
 
-});
-</script>
+    // Show/Hide Loading
+    function showLoading(show) {
+        if (show) {
+            loadingState.classList.remove('hidden');
+            recurringContainer.classList.add('hidden');
+            emptyState.classList.add('hidden');
+        } else {
+            loadingState.classList.add('hidden');
+            recurringContainer.classList.remove('hidden');
+        }
+    }
 
+    // Filter Event Listeners
+    filterStatus.addEventListener('change', applyFilters);
+    filterClient.addEventListener('change', applyFilters);
+    filterFrequency.addEventListener('change', applyFilters);
+
+    // Initialize
+    loadAllData();
+})();
+    </script>
 </body>
 </html>

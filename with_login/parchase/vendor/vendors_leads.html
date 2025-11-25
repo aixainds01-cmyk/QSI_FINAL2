@@ -71,77 +71,100 @@
             }
         }
 
+
         .modal-overlay {
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
+        }
+
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 64px;
+                /* height of the fixed header */
+            }
         }
     </style>
 </head>
 
 <body class="bg-gradient-to-br from-gray-50 to-gray-100">
-    <div class="flex">
-        <!-- Left Sidebar Navigation -->
-        <aside class="w-64 bg-gray-900 text-white h-screen sticky top-0 flex flex-col shadow-2xl">
-            <div class="p-6 text-2xl font-bold border-b border-gray-700 gradient-bg">
-                <i class="fas fa-cube mr-2"></i> QSI
+    <div class="flex min-h-screen">
+        <!-- Mobile Header -->
+        <header
+            class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <span class="text-xl font-bold">QSI</span>
             </div>
-            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+        </header>
+
+        <!-- Backdrop for mobile -->
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+        <!-- Left Sidebar Navigation -->
+        <aside id="sidebar"
+            class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class=" mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
                 <a href="../../dashboard_with_login.html"
-                    class="flex items-center py-2.5 px-4 rounded-lg transition duration-200 hover:bg-gray-800">
-                    <i class="fas fa-chart-pie mr-3 text-indigo-400"></i>Dashboard
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-chart-pie mr-3"></i>Dashboard
                 </a>
                 <div>
                     <button id="documents-dropdown-btn"
-                        class="w-full flex justify-between items-center py-2.5 px-4 rounded-lg transition duration-200 hover:bg-gray-800 text-left">
-                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3 text-green-400"></i>Sales
-                            Documents</span>
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
                         <i id="dropdown-icon"
                             class="fas fa-chevron-down transform transition-transform duration-200"></i>
                     </button>
                     <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
                         <a href="../../quotation/home_quotation.html"
-                            class="block py-2 px-4 rounded-lg transition duration-200 hover:bg-gray-800 text-sm">Quotation</a>
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
                         <a href="../../saleorder/home_sales_order.html"
-                            class="block py-2 px-4 rounded-lg transition duration-200 hover:bg-gray-800 text-sm">Sales
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales
                             Order</a>
                         <a href="../../invoice/home_invoice.html"
-                            class="block py-2 px-4 rounded-lg transition duration-200 hover:bg-gray-800 text-sm">Invoice</a>
-                            <a href="../../credit_note.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="../../credit_note.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit
+                            note</a>
                     </div>
                 </div>
                 <div>
                     <button id="purchases-dropdown-btn"
-                        class="w-full flex justify-between items-center py-2.5 px-4 rounded-lg transition duration-200 hover:bg-gray-800 text-left">
-                        <span class="flex items-center"><i
-                                class="fas fa-shopping-cart mr-3 text-purple-400"></i>Purchases</span>
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
                         <i id="purchases-dropdown-icon"
                             class="fas fa-chevron-down transform transition-transform duration-200 rotate-180"></i>
                     </button>
                     <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1">
                         <a href="vendors_leads.html"
-                            class="block py-2 px-4 rounded-lg transition duration-200 bg-indigo-600 text-sm font-medium">Vendors
+                            class="block py-2 px-4 rounded transition duration-200 bg-indigo-600 text-sm font-medium">Vendors
                             Leads</a>
                         <a href="../parchase_order/home_purchase_orders.html"
-                            class="block py-2 px-4 rounded-lg transition duration-200 hover:bg-gray-800 text-sm">Purchase
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase
                             Orders</a>
                         <a href="../debit notes/debit_notes.html"
-                            class="block py-2 px-4 rounded-lg transition duration-200 hover:bg-gray-800 text-sm">Debit
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit
                             Notes</a>
                     </div>
                 </div>
                 <a href="../../manage-clients.html"
-                    class="flex items-center py-2.5 px-4 rounded-lg transition duration-200 hover:bg-gray-800">
-                    <i class="fas fa-users mr-3 text-blue-400"></i>Manage Clients
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Manage Clients
                 </a>
                 <a href="../../settings.html"
-                    class="flex items-center py-2.5 px-4 rounded-lg transition duration-200 hover:bg-gray-800">
-                    <i class="fas fa-cog mr-3 text-gray-400"></i>Settings
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
                 </a>
             </nav>
         </aside>
 
         <!-- Main Content -->
-        <div class="flex-1">
+        <div id="main-content" class="flex-1">
             <!-- Top Header -->
             <header class="glass-effect shadow-lg p-5 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center space-x-3">
@@ -324,182 +347,200 @@
 
     <script>
         // State management
-let vendors = [];
-let selectedVendors = new Set();
-let vendorToDelete = null;
-let vendorsToDelete = [];
+        let vendors = [];
+        let selectedVendors = new Set();
+        let vendorToDelete = null;
+        let vendorsToDelete = [];
 
-// API Configuration
-const API_BASE_URL = 'http://Aixains-Mac-mini.local:8000/api/vend';
+        // API Configuration
+        const API_BASE_URL = 'http://Aixains-Mac-mini.local:8000/api/vend';
 
-// Get auth token from localStorage
-function getAuthToken() {
-    return localStorage.getItem('token');
-}
+        // Get auth token from localStorage
+        function getAuthToken() {
+            return localStorage.getItem('token');
+        }
 
-// Create headers with auth token
-function getAuthHeaders() {
-    const token = getAuthToken();
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
-}
+        // Create headers with auth token
+        function getAuthHeaders() {
+            const token = getAuthToken();
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+        }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    loadVendors();
-    initEventListeners();
-});
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVendors();
+            initEventListeners();
+        });
 
-// Event Listeners
-function initEventListeners() {
-    // Dropdown toggles
-    document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
-        document.getElementById('documents-dropdown-content').classList.toggle('hidden');
-        document.getElementById('dropdown-icon').classList.toggle('rotate-180');
-    });
+        // Event Listeners
+        function initEventListeners() {
+            // Dropdown toggles
+            document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
+                document.getElementById('documents-dropdown-content').classList.toggle('hidden');
+                document.getElementById('dropdown-icon').classList.toggle('rotate-180');
+            });
 
-    document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
-        document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
-        document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
-    });
+            document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
+                document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
+                document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
+            });
 
-    // Select all checkbox
-    document.getElementById('select-all').addEventListener('change', (e) => {
-        const checkboxes = document.querySelectorAll('.vendor-checkbox');
-        checkboxes.forEach(cb => {
-            cb.checked = e.target.checked;
-            if (e.target.checked) {
-                selectedVendors.add(cb.dataset.vendorId);
-            } else {
-                selectedVendors.delete(cb.dataset.vendorId);
+            // Mobile menu toggle
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('menu-backdrop');
+
+            if (menuToggle && sidebar && backdrop) {
+                menuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('-translate-x-full');
+                    backdrop.classList.toggle('hidden');
+                });
+
+                backdrop.addEventListener('click', () => {
+                    sidebar.classList.add('-translate-x-full');
+                    backdrop.classList.add('hidden');
+                });
             }
-        });
-        updateActionBar();
-    });
 
-    // Deselect all
-    document.getElementById('deselect-all-btn').addEventListener('click', () => {
-        selectedVendors.clear();
-        document.querySelectorAll('.vendor-checkbox').forEach(cb => cb.checked = false);
-        document.getElementById('select-all').checked = false;
-        updateActionBar();
-    });
 
-    // Delete selected
-    document.getElementById('delete-selected-btn').addEventListener('click', () => {
-        vendorsToDelete = Array.from(selectedVendors);
-        const message = `Are you sure you want to delete ${vendorsToDelete.length} vendor${vendorsToDelete.length > 1 ? 's' : ''}? This action cannot be undone.`;
-        document.getElementById('delete-message').textContent = message;
-        showDeleteModal();
-    });
+            // Select all checkbox
+            document.getElementById('select-all').addEventListener('change', (e) => {
+                const checkboxes = document.querySelectorAll('.vendor-checkbox');
+                checkboxes.forEach(cb => {
+                    cb.checked = e.target.checked;
+                    if (e.target.checked) {
+                        selectedVendors.add(cb.dataset.vendorId);
+                    } else {
+                        selectedVendors.delete(cb.dataset.vendorId);
+                    }
+                });
+                updateActionBar();
+            });
 
-    // Modal actions
-    document.getElementById('cancel-delete-btn').addEventListener('click', hideDeleteModal);
-    document.getElementById('confirm-delete-btn').addEventListener('click', confirmDelete);
+            // Deselect all
+            document.getElementById('deselect-all-btn').addEventListener('click', () => {
+                selectedVendors.clear();
+                document.querySelectorAll('.vendor-checkbox').forEach(cb => cb.checked = false);
+                document.getElementById('select-all').checked = false;
+                updateActionBar();
+            });
 
-    // Refresh
-    document.getElementById('refresh-btn').addEventListener('click', loadVendors);
+            // Delete selected
+            document.getElementById('delete-selected-btn').addEventListener('click', () => {
+                vendorsToDelete = Array.from(selectedVendors);
+                const message = `Are you sure you want to delete ${vendorsToDelete.length} vendor${vendorsToDelete.length > 1 ? 's' : ''}? This action cannot be undone.`;
+                document.getElementById('delete-message').textContent = message;
+                showDeleteModal();
+            });
 
-    // Search
-    document.getElementById('search-input').addEventListener('input', (e) => {
-        filterVendors(e.target.value);
-    });
+            // Modal actions
+            document.getElementById('cancel-delete-btn').addEventListener('click', hideDeleteModal);
+            document.getElementById('confirm-delete-btn').addEventListener('click', confirmDelete);
 
-    // Download CSV
-    document.getElementById('download-csv-btn').addEventListener('click', downloadCSV);
+            // Refresh
+            document.getElementById('refresh-btn').addEventListener('click', loadVendors);
 
-    // Create vendor
-    document.getElementById('create-vendor-btn').addEventListener('click', () => {
-        window.location.href = 'create_vendor_leads.html';
-    });
-}
+            // Search
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                filterVendors(e.target.value);
+            });
 
-// Load vendors from API
-async function loadVendors() {
-    try {
-        // Check if user is authenticated
-        const token = getAuthToken();
-        if (!token) {
-            window.location.href = '../../login.html';
-            return;
+            // Download CSV
+            document.getElementById('download-csv-btn').addEventListener('click', downloadCSV);
+
+            // Create vendor
+            document.getElementById('create-vendor-btn').addEventListener('click', () => {
+                window.location.href = 'create_vendor_leads.html';
+            });
         }
 
-        showLoading();
-        const response = await fetch(API_BASE_URL, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
+        // Load vendors from API
+        async function loadVendors() {
+            try {
+                // Check if user is authenticated
+                const token = getAuthToken();
+                if (!token) {
+                    window.location.href = '../../login.html';
+                    return;
+                }
 
-        if (response.status === 401) {
-            // Token expired or invalid
-            localStorage.removeItem('token');
-            window.location.href = '../../login.html';
-            return;
+                showLoading();
+                const response = await fetch(API_BASE_URL, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+
+                if (response.status === 401) {
+                    // Token expired or invalid
+                    localStorage.removeItem('token');
+                    window.location.href = '../../login.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch vendors: ${response.status}`);
+                }
+
+                vendors = await response.json();
+                console.log('Loaded vendors:', vendors); // Debug log
+                renderVendors(vendors);
+                updateCounts();
+                updateLastUpdated();
+            } catch (error) {
+                console.error('Error loading vendors:', error);
+                showError('Failed to load vendors. Please try again.');
+                // Show empty state on error
+                document.getElementById('loading-row').classList.add('hidden');
+                document.getElementById('empty-row').classList.remove('hidden');
+            }
         }
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch vendors: ${response.status}`);
+        // Render vendors in table
+        function renderVendors(vendorList) {
+            const tbody = document.getElementById('vendor-table-body');
+            const loadingRow = document.getElementById('loading-row');
+            const emptyRow = document.getElementById('empty-row');
+
+            // Remove existing vendor rows
+            tbody.querySelectorAll('.vendor-row').forEach(row => row.remove());
+
+            loadingRow.classList.add('hidden');
+
+            if (vendorList.length === 0) {
+                emptyRow.classList.remove('hidden');
+                return;
+            }
+
+            emptyRow.classList.add('hidden');
+
+            vendorList.forEach(vendor => {
+                const row = createVendorRow(vendor);
+                tbody.appendChild(row);
+            });
         }
 
-        vendors = await response.json();
-        console.log('Loaded vendors:', vendors); // Debug log
-        renderVendors(vendors);
-        updateCounts();
-        updateLastUpdated();
-    } catch (error) {
-        console.error('Error loading vendors:', error);
-        showError('Failed to load vendors. Please try again.');
-        // Show empty state on error
-        document.getElementById('loading-row').classList.add('hidden');
-        document.getElementById('empty-row').classList.remove('hidden');
-    }
-}
+        // Create vendor row
+        function createVendorRow(vendor) {
+            const tr = document.createElement('tr');
+            tr.className = 'vendor-row table-row';
 
-// Render vendors in table
-function renderVendors(vendorList) {
-    const tbody = document.getElementById('vendor-table-body');
-    const loadingRow = document.getElementById('loading-row');
-    const emptyRow = document.getElementById('empty-row');
+            const statusColors = {
+                'active': 'bg-green-100 text-green-800',
+                'inactive': 'bg-gray-100 text-gray-800',
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'blocked': 'bg-red-100 text-red-800'
+            };
 
-    // Remove existing vendor rows
-    tbody.querySelectorAll('.vendor-row').forEach(row => row.remove());
+            const status = vendor.status || 'pending';
+            const statusClass = statusColors[status.toLowerCase()] || statusColors['pending'];
 
-    loadingRow.classList.add('hidden');
+            // Use _id from MongoDB
+            const vendorId = vendor._id || vendor.id;
 
-    if (vendorList.length === 0) {
-        emptyRow.classList.remove('hidden');
-        return;
-    }
-
-    emptyRow.classList.add('hidden');
-
-    vendorList.forEach(vendor => {
-        const row = createVendorRow(vendor);
-        tbody.appendChild(row);
-    });
-}
-
-// Create vendor row
-function createVendorRow(vendor) {
-    const tr = document.createElement('tr');
-    tr.className = 'vendor-row table-row';
-
-    const statusColors = {
-        'active': 'bg-green-100 text-green-800',
-        'inactive': 'bg-gray-100 text-gray-800',
-        'pending': 'bg-yellow-100 text-yellow-800',
-        'blocked': 'bg-red-100 text-red-800'
-    };
-
-    const status = vendor.status || 'pending';
-    const statusClass = statusColors[status.toLowerCase()] || statusColors['pending'];
-
-    // Use _id from MongoDB
-    const vendorId = vendor._id || vendor.id;
-
-    tr.innerHTML = `
+            tr.innerHTML = `
         <td class="px-6 py-4">
             <input type="checkbox" class="vendor-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" 
                 data-vendor-id="${vendorId}">
@@ -559,27 +600,27 @@ function createVendorRow(vendor) {
         </td>
     `;
 
-    // Add checkbox event listener
-    const checkbox = tr.querySelector('.vendor-checkbox');
-    checkbox.addEventListener('change', (e) => {
-        const vendorId = e.target.dataset.vendorId;
-        if (e.target.checked) {
-            selectedVendors.add(vendorId);
-        } else {
-            selectedVendors.delete(vendorId);
+            // Add checkbox event listener
+            const checkbox = tr.querySelector('.vendor-checkbox');
+            checkbox.addEventListener('change', (e) => {
+                const vendorId = e.target.dataset.vendorId;
+                if (e.target.checked) {
+                    selectedVendors.add(vendorId);
+                } else {
+                    selectedVendors.delete(vendorId);
+                }
+                updateActionBar();
+            });
+
+            return tr;
         }
-        updateActionBar();
-    });
 
-    return tr;
-}
+        // View vendor details
+        function viewVendor(vendorId) {
+            const vendor = vendors.find(v => (v._id || v.id) === vendorId);
+            if (!vendor) return;
 
-// View vendor details
-function viewVendor(vendorId) {
-    const vendor = vendors.find(v => (v._id || v.id) === vendorId);
-    if (!vendor) return;
-
-    const details = `
+            const details = `
         <strong>Name:</strong> ${vendor.name || 'N/A'}<br>
         <strong>Type:</strong> ${vendor.vendor_type || 'Individual'}<br>
         <strong>Phone:</strong> ${vendor.country_code || '+91'} ${vendor.phone || 'N/A'}<br>
@@ -596,186 +637,186 @@ function viewVendor(vendorId) {
         <strong>Status:</strong> ${vendor.status || 'Pending'}<br>
         <strong>Workflow:</strong> ${vendor.workflow || 'New Lead'}
     `;
-    
-    showInfo('Vendor Details', details);
-}
 
-// Edit vendor
-function editVendor(vendorId) {
-    // Redirect to edit page
-    window.location.href = `edit_vendor_leads.html?id=${vendorId}`;
-}
-
-// Delete vendor
-function deleteVendor(vendorId) {
-    vendorToDelete = vendorId;
-    vendorsToDelete = [vendorId];
-    document.getElementById('delete-message').textContent = 'Are you sure you want to delete this vendor? This action cannot be undone.';
-    showDeleteModal();
-}
-
-// Confirm delete
-async function confirmDelete() {
-    try {
-        const token = getAuthToken();
-        if (!token) {
-            window.location.href = '../../../index.html';
-            return;
+            showInfo('Vendor Details', details);
         }
 
-        const deletePromises = vendorsToDelete.map(id =>
-            fetch(`${API_BASE_URL}/${id}`, { 
-                method: 'DELETE',
-                headers: getAuthHeaders()
-            })
-        );
-
-        const results = await Promise.all(deletePromises);
-        
-        // Check if all deletions were successful
-        const allSuccessful = results.every(r => r.ok);
-        if (!allSuccessful) {
-            throw new Error('Some vendors could not be deleted');
+        // Edit vendor
+        function editVendor(vendorId) {
+            // Redirect to edit page
+            window.location.href = `edit_vendor_leads.html?id=${vendorId}`;
         }
 
-        // Remove from local state
-        vendors = vendors.filter(v => !vendorsToDelete.includes(v._id || v.id));
+        // Delete vendor
+        function deleteVendor(vendorId) {
+            vendorToDelete = vendorId;
+            vendorsToDelete = [vendorId];
+            document.getElementById('delete-message').textContent = 'Are you sure you want to delete this vendor? This action cannot be undone.';
+            showDeleteModal();
+        }
 
-        // Clear selections
-        selectedVendors.clear();
-        document.getElementById('select-all').checked = false;
+        // Confirm delete
+        async function confirmDelete() {
+            try {
+                const token = getAuthToken();
+                if (!token) {
+                    window.location.href = '../../../index.html';
+                    return;
+                }
 
-        // Re-render
-        renderVendors(vendors);
-        updateCounts();
-        updateActionBar();
+                const deletePromises = vendorsToDelete.map(id =>
+                    fetch(`${API_BASE_URL}/${id}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    })
+                );
 
-        hideDeleteModal();
-        showSuccess(`Successfully deleted ${vendorsToDelete.length} vendor${vendorsToDelete.length > 1 ? 's' : ''}`);
-    } catch (error) {
-        console.error('Error deleting vendors:', error);
-        showError('Failed to delete vendors. Please try again.');
-        hideDeleteModal();
-    }
-}
+                const results = await Promise.all(deletePromises);
 
-// Filter vendors
-function filterVendors(searchTerm) {
-    const filtered = vendors.filter(vendor => {
-        const searchStr = searchTerm.toLowerCase();
-        return (
-            (vendor.name || '').toLowerCase().includes(searchStr) ||
-            (vendor.email || '').toLowerCase().includes(searchStr) ||
-            (vendor.phone || '').toLowerCase().includes(searchStr) ||
-            (vendor.country || '').toLowerCase().includes(searchStr) ||
-            (vendor.vendor_type || '').toLowerCase().includes(searchStr) ||
-            (vendor.gstin || '').toLowerCase().includes(searchStr) ||
-            (vendor.pan || '').toLowerCase().includes(searchStr)
-        );
-    });
-    renderVendors(filtered);
-    document.getElementById('showing-count').textContent = filtered.length;
-}
+                // Check if all deletions were successful
+                const allSuccessful = results.every(r => r.ok);
+                if (!allSuccessful) {
+                    throw new Error('Some vendors could not be deleted');
+                }
 
-// Update action bar
-function updateActionBar() {
-    const actionBar = document.getElementById('action-bar');
-    const count = selectedVendors.size;
+                // Remove from local state
+                vendors = vendors.filter(v => !vendorsToDelete.includes(v._id || v.id));
 
-    if (count > 0) {
-        actionBar.classList.remove('hidden');
-        document.getElementById('selected-count').textContent = count;
-    } else {
-        actionBar.classList.add('hidden');
-    }
-}
+                // Clear selections
+                selectedVendors.clear();
+                document.getElementById('select-all').checked = false;
 
-// Update counts
-function updateCounts() {
-    const count = vendors.length;
-    document.getElementById('vendor-count').textContent = count;
-    document.getElementById('total-count').textContent = count;
-    document.getElementById('showing-count').textContent = count;
-}
+                // Re-render
+                renderVendors(vendors);
+                updateCounts();
+                updateActionBar();
 
-// Update last updated time
-function updateLastUpdated() {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('last-updated').textContent = timeStr;
-}
+                hideDeleteModal();
+                showSuccess(`Successfully deleted ${vendorsToDelete.length} vendor${vendorsToDelete.length > 1 ? 's' : ''}`);
+            } catch (error) {
+                console.error('Error deleting vendors:', error);
+                showError('Failed to delete vendors. Please try again.');
+                hideDeleteModal();
+            }
+        }
 
-// Show/hide modal
-function showDeleteModal() {
-    document.getElementById('delete-modal').classList.remove('hidden');
-}
+        // Filter vendors
+        function filterVendors(searchTerm) {
+            const filtered = vendors.filter(vendor => {
+                const searchStr = searchTerm.toLowerCase();
+                return (
+                    (vendor.name || '').toLowerCase().includes(searchStr) ||
+                    (vendor.email || '').toLowerCase().includes(searchStr) ||
+                    (vendor.phone || '').toLowerCase().includes(searchStr) ||
+                    (vendor.country || '').toLowerCase().includes(searchStr) ||
+                    (vendor.vendor_type || '').toLowerCase().includes(searchStr) ||
+                    (vendor.gstin || '').toLowerCase().includes(searchStr) ||
+                    (vendor.pan || '').toLowerCase().includes(searchStr)
+                );
+            });
+            renderVendors(filtered);
+            document.getElementById('showing-count').textContent = filtered.length;
+        }
 
-function hideDeleteModal() {
-    document.getElementById('delete-modal').classList.add('hidden');
-    vendorToDelete = null;
-    vendorsToDelete = [];
-}
+        // Update action bar
+        function updateActionBar() {
+            const actionBar = document.getElementById('action-bar');
+            const count = selectedVendors.size;
 
-// Show loading state
-function showLoading() {
-    document.getElementById('loading-row').classList.remove('hidden');
-    document.getElementById('empty-row').classList.add('hidden');
-}
+            if (count > 0) {
+                actionBar.classList.remove('hidden');
+                document.getElementById('selected-count').textContent = count;
+            } else {
+                actionBar.classList.add('hidden');
+            }
+        }
 
-// Show success message
-function showSuccess(message) {
-    alert('✓ ' + message);
-}
+        // Update counts
+        function updateCounts() {
+            const count = vendors.length;
+            document.getElementById('vendor-count').textContent = count;
+            document.getElementById('total-count').textContent = count;
+            document.getElementById('showing-count').textContent = count;
+        }
 
-// Show error message
-function showError(message) {
-    alert('✗ ' + message);
-}
+        // Update last updated time
+        function updateLastUpdated() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('last-updated').textContent = timeStr;
+        }
 
-// Show info message
-function showInfo(title, message) {
-    const formattedMessage = `${title}\n\n${message.replace(/<br>/g, '\n').replace(/<strong>|<\/strong>/g, '')}`;
-    alert(formattedMessage);
-}
+        // Show/hide modal
+        function showDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
 
-// Download CSV
-function downloadCSV() {
-    if (vendors.length === 0) {
-        showError('No data to export');
-        return;
-    }
+        function hideDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            vendorToDelete = null;
+            vendorsToDelete = [];
+        }
 
-    const headers = ['Name', 'Type', 'Phone', 'Email', 'Country', 'State', 'City', 'GSTIN', 'PAN', 'Workflow', 'Status'];
-    const csvContent = [
-        headers.join(','),
-        ...vendors.map(v => [
-            `"${v.name || ''}"`,
-            `"${v.vendor_type || ''}"`,
-            `"${(v.country_code || '') + ' ' + (v.phone || '')}"`,
-            `"${v.email || ''}"`,
-            `"${v.country || ''}"`,
-            `"${v.state || ''}"`,
-            `"${v.city || ''}"`,
-            `"${v.gstin || ''}"`,
-            `"${v.pan || ''}"`,
-            `"${v.workflow || ''}"`,
-            `"${v.status || ''}"`
-        ].join(','))
-    ].join('\n');
+        // Show loading state
+        function showLoading() {
+            document.getElementById('loading-row').classList.remove('hidden');
+            document.getElementById('empty-row').classList.add('hidden');
+        }
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `vendor_leads_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-}
+        // Show success message
+        function showSuccess(message) {
+            alert('✓ ' + message);
+        }
 
-// Make functions globally accessible
-window.viewVendor = viewVendor;
-window.editVendor = editVendor;
-window.deleteVendor = deleteVendor;
+        // Show error message
+        function showError(message) {
+            alert('✗ ' + message);
+        }
+
+        // Show info message
+        function showInfo(title, message) {
+            const formattedMessage = `${title}\n\n${message.replace(/<br>/g, '\n').replace(/<strong>|<\/strong>/g, '')}`;
+            alert(formattedMessage);
+        }
+
+        // Download CSV
+        function downloadCSV() {
+            if (vendors.length === 0) {
+                showError('No data to export');
+                return;
+            }
+
+            const headers = ['Name', 'Type', 'Phone', 'Email', 'Country', 'State', 'City', 'GSTIN', 'PAN', 'Workflow', 'Status'];
+            const csvContent = [
+                headers.join(','),
+                ...vendors.map(v => [
+                    `"${v.name || ''}"`,
+                    `"${v.vendor_type || ''}"`,
+                    `"${(v.country_code || '') + ' ' + (v.phone || '')}"`,
+                    `"${v.email || ''}"`,
+                    `"${v.country || ''}"`,
+                    `"${v.state || ''}"`,
+                    `"${v.city || ''}"`,
+                    `"${v.gstin || ''}"`,
+                    `"${v.pan || ''}"`,
+                    `"${v.workflow || ''}"`,
+                    `"${v.status || ''}"`
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `vendor_leads_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Make functions globally accessible
+        window.viewVendor = viewVendor;
+        window.editVendor = editVendor;
+        window.deleteVendor = deleteVendor;
     </script>
 </body>
 
