@@ -233,21 +233,22 @@
         }
 
         async function loadVendors() {
-            try {
-                const vendors = await fetchAPI(`${API_BASE_URL}/vend`);
-                const select = document.getElementById('vendor-select');
-                select.innerHTML = '<option value="">Select Vendor</option>';
-                (vendors || []).forEach(v => {
-                    const opt = document.createElement('option');
-                    opt.value = v._id || v.id;
-                    // Updated to handle both supplier_name and vendor_name
-                    opt.textContent = v.vendor_name || v.supplier_name;
-                    select.appendChild(opt);
-                });
-            } catch (error) {
-                console.error("Error loading vendors", error);
-            }
-        }
+         try {
+            const vendors = await fetchAPI(`${API_BASE_URL}/vend`);        
+            console.log("API Response (Vendors):", vendors); 
+            const select = document.getElementById('vendor-select');
+            select.innerHTML = '<option value="">Select Vendor</option>';       
+            const vendorList = Array.isArray(vendors) ? vendors : (vendors.data || vendors.vendors || []);
+            vendorList.forEach(v => {
+            const opt = document.createElement('option');           
+            opt.value = v._id || v.id;                       
+            opt.textContent = v.vendor_name || v.supplier_name || v.name || v.contact_person || "Unknown Name";            
+            select.appendChild(opt);
+        });
+    } catch (error) {
+        console.error("Error loading vendors", error);
+    }
+}
 
         // --- POPULATE FORM WITH EXISTING DATA ---
         async function loadPOData(id) {
