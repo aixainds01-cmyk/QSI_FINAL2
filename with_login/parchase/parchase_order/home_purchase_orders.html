@@ -274,52 +274,46 @@
         </div>
     </div>
 
-    <script>
+   <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // --- CONSTANTS & CONFIG ---
         const API_BASE_URL = 'http://Aixains-Mac-mini.local:8000/api';
         const API_URL = `${API_BASE_URL}/purchase-orders`;
 
-        // --- ELEMENTS ---
+        // --- GLOBAL VARIABLE FOR SAFETY ---
+        let CURRENT_PO_ID = null; 
+
+        // Elements
         const tbody = document.getElementById('po-table-body');
         const totalCountSpan = document.getElementById('total-count');
-        
-        // Filters
         const filterStatus = document.getElementById('filter-status');
         const filterVendor = document.getElementById('filter-vendor');
         const filterDate = document.getElementById('filter-date');
-        
-        // Tabs
         const tabActive = document.getElementById('tab-active');
         const tabDeleted = document.getElementById('tab-deleted');
-        
-        // Bulk Actions
         const selectAllCheckbox = document.getElementById('select-all-checkbox');
+        
+        // Bulk Action Elements
         const bulkActionBar = document.getElementById('bulk-action-bar');
         const bulkActionCount = document.getElementById('bulk-action-count');
         const bulkActionClose = document.getElementById('bulk-action-close');
         const bulkActionsActive = document.getElementById('bulk-actions-active');
         const bulkActionsDeleted = document.getElementById('bulk-actions-deleted');
-        const btnBulkCancel = document.getElementById('bulk-action-cancel');
-        const btnBulkDeletePerm = document.getElementById('bulk-action-delete-perm');
 
         // Payment Modal Elements
         const paymentModal = document.getElementById('payment-modal');
         const paymentForm = document.getElementById('payment-form');
-        const payPoId = document.getElementById('pay-po-id');
         const payPoNo = document.getElementById('pay-po-no');
         const payVendor = document.getElementById('pay-vendor');
         const payTotal = document.getElementById('pay-total');
+        const payAlreadyPaid = document.getElementById('pay-already-paid');
         const payPending = document.getElementById('pay-pending');
         const payAmountInput = document.getElementById('pay-amount-input');
         const payDateInput = document.getElementById('pay-date-input');
 
-        // State
-        let currentTab = 'active'; // 'active' or 'deleted'
+        let currentTab = 'active';
         let allPurchaseOrders = [];
         let displayedPurchaseOrders = [];
 
-        // --- AUTH ---
         function getAuthHeaders() {
             const token = localStorage.getItem("token");
             return token ? {'Authorization': `Bearer ${token}`} : null;
@@ -328,20 +322,16 @@
         async function safeFetch(url, opts = {}) {
             const headers = Object.assign({}, opts.headers || {});
             const authHeaders = getAuthHeaders();
-            if(!authHeaders) {
-                console.warn("No auth token found");
-            }
             if(authHeaders) Object.assign(headers, authHeaders);
-            
             if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
                 headers["Content-Type"] = "application/json";
             }
-            
-            const finalOpts = Object.assign({}, opts, { headers });
-            
             try {
-                const res = await fetch(url, finalOpts);
-                if (!res.ok) throw new Error(res.statusText);
+                const res = await fetch(url, Object.assign({}, opts, { headers }));
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.message || res.statusText);
+                }
                 const text = await res.text();
                 return text ? JSON.parse(text) : {};
             } catch (error) {
@@ -350,29 +340,31 @@
             }
         }
 
-        // --- HELPERS ---
         const formatCurrency = val => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(val) || 0);
-        const escapeHtml = str => (str || '').toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        // ✅ SUPER CLEAN ID FUNCTION
+        function getCleanId(doc) {
+            if (!doc) return null;
+            // Check various possible ID locations
+            let id = doc._id || doc.id || doc.original_id;
+            
+            // If it's an object like {$oid: "..."}
+            if (typeof id === 'object' && id !== null) {
+                if (id.$oid) return id.$oid;
+                return id.toString();
+            }
+            return id;
+        }
 
         function statusBadge(status) {
             const s = (status || 'draft').toLowerCase();
-            const classes = {
-                'approved': 'bg-green-100 text-green-800',
-                'pending': 'bg-yellow-100 text-yellow-800',
-                'received': 'bg-blue-100 text-blue-800',
-                'cancelled': 'bg-red-100 text-red-800',
-                'draft': 'bg-gray-100 text-gray-800'
-            };
-            let cls = classes['draft'];
-            if(s.includes('approv')) cls = classes['approved'];
-            else if(s.includes('pend')) cls = classes['pending'];
-            else if(s.includes('receiv')) cls = classes['received'];
-            else if(s.includes('cancel') || s.includes('delete')) cls = classes['cancelled'];
-
-            return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium ${cls}">${status}</span>`;
+            if(s.includes('receiv') || s === 'paid') return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Received / Paid</span>`;
+            if(s.includes('partial')) return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Partially Paid</span>`;
+            if(s.includes('approv')) return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Approved</span>`;
+            if(s.includes('pend')) return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>`;
+            if(s.includes('cancel') || s.includes('delete')) return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Cancelled</span>`;
+            return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Draft</span>`;
         }
-
-        // --- CORE LOGIC ---
 
         async function fetchOrders() {
             try {
@@ -381,11 +373,12 @@
                 populateVendorFilter();
                 applyFilters();
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">Error loading data: ${err.message}</td></tr>`;
+                if(tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">Error: ${err.message}</td></tr>`;
             }
         }
 
         function populateVendorFilter() {
+            if(!filterVendor) return;
             const vendors = new Set(allPurchaseOrders.map(po => po.supplier_name || 'Unknown'));
             filterVendor.innerHTML = '<option>All Vendors</option>';
             Array.from(vendors).sort().forEach(v => {
@@ -397,17 +390,15 @@
         }
 
         function applyFilters() {
-            // 1. Filter by Tab
             let filtered = allPurchaseOrders.filter(po => {
                 const status = (po.status || '').toLowerCase();
-                const isDeletedOrCancelled = status.includes('cancel') || status.includes('delete');
-                return currentTab === 'active' ? !isDeletedOrCancelled : isDeletedOrCancelled;
+                const isDeleted = status.includes('cancel') || status.includes('delete');
+                return currentTab === 'active' ? !isDeleted : isDeleted;
             });
 
-            // 2. Filter by Inputs
-            const sVendor = filterVendor.value;
-            const sStatus = filterStatus.value;
-            const sDate = filterDate.value;
+            const sVendor = filterVendor ? filterVendor.value : 'All Vendors';
+            const sStatus = filterStatus ? filterStatus.value : 'All';
+            const sDate = filterDate ? filterDate.value : '';
 
             filtered = filtered.filter(po => {
                 const matchVendor = sVendor === 'All Vendors' || (po.supplier_name || '') === sVendor;
@@ -418,79 +409,66 @@
 
             displayedPurchaseOrders = filtered;
             renderTable();
-            updateSelectionUI(); 
         }
 
         function renderTable() {
-            totalCountSpan.textContent = displayedPurchaseOrders.length;
+            if (totalCountSpan) totalCountSpan.textContent = displayedPurchaseOrders.length;
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             if (displayedPurchaseOrders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">No orders found in this view.</td></tr>`;
-                if(selectAllCheckbox) selectAllCheckbox.checked = false;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">No orders found.</td></tr>`;
                 return;
             }
 
             displayedPurchaseOrders.forEach(po => {
-                const id = po._id || po.id;
-                // Data extraction
-                const poNo = escapeHtml(po.po_no);
-                const vendor = escapeHtml(po.supplier_name || 'N/A');
-                const status = po.status;
+                // ✅ CLEAN ID Extraction
+                const id = getCleanId(po);
+                
+                if (!id) {
+                    console.error("❌ Missing ID for PO:", po);
+                    return; 
+                }
+                
                 const totalAmt = po.total || 0;
                 const paidAmt = po.paid_amount || 0;
-                const pendingAmt = totalAmt - paidAmt;
-
-                // --- PAY BUTTON LOGIC START ---
-                let payButtonHtml = '';
+                const pendingAmt = Math.max(0, totalAmt - paidAmt);
                 
-                // Show pay button only for Active tab
+                let payButton = '';
                 if (currentTab === 'active') {
-                    if (pendingAmt > 0) {
-                        payButtonHtml = `
-                            <button class="action-payment flex items-center text-gray-500 hover:text-green-600 font-bold text-sm transition-colors duration-200" 
-                                    title="Record Vendor Payment" 
+                    if (pendingAmt > 1) { 
+                        // ✅ ID is set directly here
+                        payButton = `
+                            <button class="action-payment text-gray-400 hover:text-green-600 font-bold text-sm flex items-center gap-1 transition-colors" 
+                                    title="Pay Vendor"
                                     data-id="${id}" 
-                                    data-po-no="${poNo}"
-                                    data-vendor="${vendor}"
+                                    data-po-no="${po.po_no}"
+                                    data-vendor="${po.supplier_name}"
                                     data-total="${totalAmt}"
                                     data-paid="${paidAmt}">
-                                <i class="fas fa-dollar-sign mr-1"></i> Pay
+                                <i class="fas fa-money-bill-wave"></i> Pay
                             </button>`;
                     } else {
-                        payButtonHtml = `<span class="text-xs text-green-600 font-bold flex items-center"><i class="fas fa-check-circle mr-1"></i>Paid</span>`;
+                        payButton = `<span class="text-xs text-green-600 font-bold flex items-center gap-1"><i class="fas fa-check-circle"></i> Paid</span>`;
                     }
                 }
-                // --- PAY BUTTON LOGIC END ---
 
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-50 transition-colors duration-150 group border-b';
-                tr.dataset.id = id;
-
+                tr.className = 'hover:bg-gray-50 border-b transition-colors';
                 tr.innerHTML = `
-                    <td class="table-body-cell text-center">
-                        <input type="checkbox" class="po-checkbox w-4 h-4 text-indigo-600 border-gray-300 rounded cursor-pointer" data-id="${id}">
-                    </td>
-                    <td class="table-body-cell">
-                        <span class="font-medium text-gray-800">${poNo}</span>
-                    </td>
-                    <td class="table-body-cell text-gray-500 text-sm">${escapeHtml(po.po_date || '')}</td>
-                    <td class="table-body-cell font-medium text-gray-700">${vendor}</td>
-                    <td class="table-body-cell">${statusBadge(status)}</td>
-                    <td class="table-body-cell text-right text-gray-600">${formatCurrency(po.sub_total)}</td>
+                    <td class="table-body-cell text-center"><input type="checkbox" class="po-checkbox w-4 h-4 rounded text-indigo-600" data-id="${id}"></td>
+                    <td class="table-body-cell font-medium text-gray-800">${po.po_no}</td>
+                    <td class="table-body-cell text-gray-500 text-sm">${po.po_date || '-'}</td>
+                    <td class="table-body-cell font-medium text-gray-700">${po.supplier_name || 'N/A'}</td>
+                    <td class="table-body-cell">${statusBadge(po.status)}</td>
+                    <td class="table-body-cell text-right text-green-600 font-medium">${formatCurrency(paidAmt)}</td>
                     <td class="table-body-cell text-right font-bold text-gray-800">${formatCurrency(totalAmt)}</td>
                     <td class="table-body-cell">
-                        <div class="flex items-center justify-center space-x-4">
-                            <button class="text-gray-400 hover:text-indigo-600 action-open" title="View Order" data-id="${id}">
-                                <i class="fas fa-external-link-alt"></i>
-                            </button>
-                            <button class="text-gray-400 hover:text-indigo-600 action-edit" title="Edit Order" data-id="${id}">
-                                <i class="fas fa-pencil-alt"></i>
-                            </button>
-                            ${payButtonHtml}
-                            <button class="text-gray-400 hover:text-gray-600 action-more" title="More Actions" data-id="${id}">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
+                        <div class="flex items-center justify-center space-x-3">
+                            <button class="text-gray-400 hover:text-indigo-600 action-open" data-id="${id}"><i class="fas fa-external-link-alt"></i></button>
+                            <button class="text-gray-400 hover:text-indigo-600 action-edit" data-id="${id}"><i class="fas fa-pencil-alt"></i></button>
+                            ${payButton}
+                            <button class="text-gray-400 hover:text-red-600 action-cancel" title="Cancel Order" data-id="${id}"><i class="fas fa-ban"></i></button>
                         </div>
                     </td>
                 `;
@@ -501,271 +479,116 @@
         }
 
         function attachEventHandlers() {
-            // Checkbox Highlight Logic
-            tbody.querySelectorAll('.po-checkbox').forEach(cb => {
-                cb.addEventListener('change', (e) => {
-                    toggleRowHighlight(e.target);
-                    updateSelectionUI();
-                    updateSelectAllState();
-                });
-            });
-
-            // Action Buttons
-            tbody.querySelectorAll('.action-open').forEach(btn => 
-                btn.addEventListener('click', () => window.location.href = `view_purchase_order.html?id=${btn.dataset.id}`));
+            tbody.querySelectorAll('.po-checkbox').forEach(cb => cb.addEventListener('change', updateSelectionUI));
+            tbody.querySelectorAll('.action-open').forEach(btn => btn.addEventListener('click', () => window.location.href = `view_purchase_order.html?id=${btn.dataset.id}`));
+            tbody.querySelectorAll('.action-edit').forEach(btn => btn.addEventListener('click', () => window.location.href = `edit_purchase_order.html?id=${btn.dataset.id}`));
             
-            tbody.querySelectorAll('.action-edit').forEach(btn => 
-                btn.addEventListener('click', () => window.location.href = `edit_purchase_order.html?id=${btn.dataset.id}`));
+            tbody.querySelectorAll('.action-cancel').forEach(btn => btn.addEventListener('click', async () => {
+                if(!confirm("Cancel this order?")) return;
+                try {
+                    await safeFetch(`${API_URL}/${btn.dataset.id}/status`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ status: 'Cancelled' })
+                    });
+                    fetchOrders();
+                } catch(e) { alert(e.message); }
+            }));
 
-            // --- PAYMENT BUTTON HANDLER ---
+            // ✅ Robust Pay Button Handler
             tbody.querySelectorAll('.action-payment').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const button = e.currentTarget;
-                    const poData = {
-                        id: button.dataset.id,
-                        po_no: button.dataset.poNo,
-                        vendor: button.dataset.vendor,
-                        total: parseFloat(button.dataset.total),
-                        paid: parseFloat(button.dataset.paid)
-                    };
-                    openPaymentModal(poData);
-                });
-            });
+                    const d = e.currentTarget.dataset;
+                    const rawId = d.id;
 
-            // More Button Logic
-            tbody.querySelectorAll('.action-more').forEach(btn => 
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    openPopover(e.currentTarget, e.currentTarget.dataset.id);
-                }));
-        }
-
-        function toggleRowHighlight(checkbox) {
-            const row = checkbox.closest('tr');
-            if (checkbox.checked) {
-                row.classList.add('bg-indigo-50');
-            } else {
-                row.classList.remove('bg-indigo-50');
-            }
-        }
-
-        function updateSelectAllState() {
-            const allCbs = tbody.querySelectorAll('.po-checkbox');
-            const checkedCbs = tbody.querySelectorAll('.po-checkbox:checked');
-            if (selectAllCheckbox) {
-                selectAllCheckbox.checked = allCbs.length > 0 && allCbs.length === checkedCbs.length;
-                selectAllCheckbox.indeterminate = checkedCbs.length > 0 && checkedCbs.length < allCbs.length;
-            }
-        }
-
-        function updateSelectionUI() {
-            const checkedCbs = tbody.querySelectorAll('.po-checkbox:checked');
-            const count = checkedCbs.length;
-
-            if (count > 0) {
-                bulkActionBar.classList.remove('hidden');
-                bulkActionCount.textContent = count;
-
-                if (currentTab === 'active') {
-                    bulkActionsActive.classList.remove('hidden');
-                    bulkActionsDeleted.classList.add('hidden');
-                } else {
-                    bulkActionsActive.classList.add('hidden');
-                    bulkActionsDeleted.classList.remove('hidden');
-                }
-            } else {
-                bulkActionBar.classList.add('hidden');
-            }
-        }
-
-        if(selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', (e) => {
-                const isChecked = e.target.checked;
-                tbody.querySelectorAll('.po-checkbox').forEach(cb => {
-                    cb.checked = isChecked;
-                    toggleRowHighlight(cb);
-                });
-                updateSelectionUI();
-            });
-        }
-
-        bulkActionClose.addEventListener('click', () => {
-            if(selectAllCheckbox) selectAllCheckbox.checked = false;
-            tbody.querySelectorAll('.po-checkbox').forEach(cb => {
-                cb.checked = false;
-                toggleRowHighlight(cb);
-            });
-            updateSelectionUI();
-        });
-
-        // --- TABS ---
-        function switchTab(tab) {
-            currentTab = tab;
-            const activeClass = "px-3 py-1.5 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-md";
-            const inactiveClass = "px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md";
-            
-            if (tab === 'active') {
-                tabActive.className = activeClass;
-                tabDeleted.className = inactiveClass;
-                filterStatus.value = 'All'; 
-            } else {
-                tabDeleted.className = activeClass;
-                tabActive.className = inactiveClass;
-            }
-            applyFilters();
-        }
-
-        tabActive.addEventListener('click', () => switchTab('active'));
-        tabDeleted.addEventListener('click', () => switchTab('deleted'));
-
-        filterVendor.addEventListener('change', applyFilters);
-        filterStatus.addEventListener('change', applyFilters);
-        filterDate.addEventListener('change', applyFilters);
-
-        // --- BULK API ACTIONS ---
-        async function performBulkAction(actionType, ids) {
-            if (ids.length === 0) return;
-            const msg = actionType === 'cancel' 
-                ? `Move ${ids.length} orders to Deleted/Cancelled list?` 
-                : `PERMANENTLY DELETE ${ids.length} orders? Undoing this is impossible.`;
-            
-            if (!confirm(msg)) return;
-
-            try {
-                const promises = ids.map(id => {
-                    if (actionType === 'cancel') {
-                        return safeFetch(`${API_URL}/${id}/status`, {
-                            method: 'PUT',
-                            body: JSON.stringify({ status: 'Cancelled' })
-                        });
-                    } else { 
-                        return safeFetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                    // 🔍 DIAGNOSTIC CHECK
+                    if (!rawId || rawId === "undefined" || rawId === "null") {
+                        alert("Error: ID not found on button. Please refresh page.");
+                        console.error("Bad ID on button:", d);
+                        return;
                     }
+
+                    openPaymentModal({
+                        id: rawId, // Pass clean string ID
+                        po_no: d.poNo,
+                        vendor: d.vendor,
+                        total: parseFloat(d.total),
+                        paid: parseFloat(d.paid)
+                    });
                 });
-                await Promise.all(promises);
-                alert('Action completed successfully.');
-                fetchOrders(); 
-            } catch (err) {
-                alert(`Error: ${err.message}`);
-            }
+            });
         }
 
-        btnBulkCancel.addEventListener('click', () => {
-            const ids = Array.from(tbody.querySelectorAll('.po-checkbox:checked')).map(cb => cb.dataset.id);
-            performBulkAction('cancel', ids);
-        });
-
-        btnBulkDeletePerm.addEventListener('click', () => {
-            const ids = Array.from(tbody.querySelectorAll('.po-checkbox:checked')).map(cb => cb.dataset.id);
-            performBulkAction('delete-perm', ids);
-        });
-
-        // --- POPOVER LOGIC ---
-        function openPopover(triggerBtn, id) {
-            document.querySelectorAll('.popover-menu').forEach(el => el.remove());
-            
-            const popover = document.createElement('div');
-            popover.className = 'popover-menu fixed bg-white border border-gray-200 shadow-lg rounded-md z-50';
-            
-            let menuHtml = '';
-            if (currentTab === 'active') {
-                menuHtml = `<button class="popover-item text-red-600 w-full hover:bg-gray-50 text-left px-4 py-2" id="pop-cancel">
-                                <i class="fas fa-ban w-5"></i> Delete
-                            </button>`;
-            } else {
-                menuHtml = `<button class="popover-item text-red-600 w-full hover:bg-gray-50 text-left px-4 py-2" id="pop-delete">
-                                <i class="fas fa-trash-alt w-5"></i> Delete Permanently
-                            </button>`;
-            }
-            popover.innerHTML = menuHtml;
-            document.body.appendChild(popover);
-
-            const rect = triggerBtn.getBoundingClientRect();
-            popover.style.top = `${rect.bottom + window.scrollY + 5}px`;
-            popover.style.left = `${rect.left + window.scrollX - 100}px`; 
-
-            const btnCancel = popover.querySelector('#pop-cancel');
-            if(btnCancel) {
-                btnCancel.addEventListener('click', () => {
-                    performBulkAction('cancel', [id]);
-                    popover.remove();
-                });
-            }
-            
-            const btnDelete = popover.querySelector('#pop-delete');
-            if(btnDelete) {
-                btnDelete.addEventListener('click', () => {
-                    performBulkAction('delete-perm', [id]);
-                    popover.remove();
-                });
-            }
-
-            setTimeout(() => {
-                document.addEventListener('click', function close(e) {
-                    if (!popover.contains(e.target) && e.target !== triggerBtn) {
-                        popover.remove();
-                        document.removeEventListener('click', close);
-                    }
-                });
-            }, 0);
-        }
-
-        // --- PAYMENT MODAL LOGIC ---
         function openPaymentModal(data) {
-            payPoId.value = data.id;
-            payPoNo.textContent = data.po_no;
-            payVendor.textContent = data.vendor;
+            if(!paymentModal) return;
+            
+            // ✅ SAVE ID TO GLOBAL VARIABLE (Safest method)
+            CURRENT_PO_ID = data.id;
+            console.log("✅ Payment Modal Opened for ID:", CURRENT_PO_ID);
+
+            if(payPoNo) payPoNo.textContent = data.po_no;
+            if(payVendor) payVendor.textContent = data.vendor || 'Unknown';
             
             const pending = data.total - data.paid;
             
-            payTotal.textContent = formatCurrency(data.total);
-            payPending.textContent = formatCurrency(pending);
+            if(payTotal) payTotal.textContent = formatCurrency(data.total);
+            if(payAlreadyPaid) payAlreadyPaid.textContent = formatCurrency(data.paid);
+            if(payPending) payPending.textContent = formatCurrency(pending);
             
-            payAmountInput.value = pending.toFixed(2);
-            payAmountInput.max = pending.toFixed(2);
-            payDateInput.value = new Date().toISOString().split('T')[0];
+            if(payAmountInput) {
+                payAmountInput.value = pending.toFixed(2);
+                payAmountInput.max = pending.toFixed(2);
+            }
+            if(payDateInput) payDateInput.value = new Date().toISOString().split('T')[0];
             
             paymentModal.classList.remove('hidden');
             paymentModal.classList.add('flex');
         }
 
         function closePaymentModal() {
+            if(!paymentModal) return;
             paymentModal.classList.add('hidden');
             paymentModal.classList.remove('flex');
+            CURRENT_PO_ID = null; // Clear ID
+            if(paymentForm) paymentForm.reset();
         }
-
-        document.getElementById('close-payment-modal').addEventListener('click', closePaymentModal);
-        document.getElementById('cancel-payment-btn').addEventListener('click', closePaymentModal);
 
         if(paymentForm) {
             paymentForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
+                // ✅ USE GLOBAL ID VARIABLE
+                if (!CURRENT_PO_ID) {
+                    alert("System Error: No Purchase Order Selected. Please close and try again.");
+                    return;
+                }
+
                 const btn = document.getElementById('save-payment-btn');
                 const originalText = btn.innerHTML;
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
-                // NOTE: Adjust API endpoint as needed
                 const payload = {
-                    purchase_order_id: payPoId.value, 
+                    purchase_order_id: CURRENT_PO_ID, // Using Global Var
                     amount: parseFloat(payAmountInput.value),
                     payment_date: payDateInput.value,
                     payment_method: document.getElementById('pay-method-input').value,
                     notes: document.getElementById('pay-notes-input').value
                 };
 
+                // Uncomment below line to see what is being sent
+                // alert("Sending ID: " + payload.purchase_order_id); 
+
                 try {
-                    await safeFetch(`${API_BASE_URL}/vendor_payments`, {
+                    await safeFetch(`${API_BASE_URL}/vendor-payments`, {
                         method: 'POST',
                         body: JSON.stringify(payload)
                     });
                     
                     alert('Payment recorded successfully!');
                     closePaymentModal();
-                    fetchOrders(); // Refresh table
+                    fetchOrders(); 
                 } catch (err) {
-                    alert('Error recording payment: ' + err.message);
+                    alert('Failed: ' + err.message);
                 } finally {
                     btn.disabled = false;
                     btn.innerHTML = originalText;
@@ -773,42 +596,70 @@
             });
         }
 
-        // --- SIDEBAR TOGGLE ---
+        const closeBtn = document.getElementById('close-payment-modal');
+        if(closeBtn) closeBtn.addEventListener('click', closePaymentModal);
+        const cancelBtn = document.getElementById('cancel-payment-btn');
+        if(cancelBtn) cancelBtn.addEventListener('click', closePaymentModal);
+
+        // Sidebar & UI Logic
         const sidebar = document.getElementById('sidebar');
         const mobileBtn = document.getElementById('mobile-menu-btn');
-        const closeSidebar = document.getElementById('close-sidebar');
+        if(mobileBtn) mobileBtn.addEventListener('click', () => sidebar.classList.remove('hidden'));
+        
+        if(tabActive) tabActive.addEventListener('click', () => { currentTab = 'active'; updateTabUI(); applyFilters(); });
+        if(tabDeleted) tabDeleted.addEventListener('click', () => { currentTab = 'deleted'; updateTabUI(); applyFilters(); });
 
-        if(mobileBtn) {
-            mobileBtn.addEventListener('click', () => {
-                sidebar.classList.remove('hidden');
-                sidebar.classList.add('flex', 'absolute', 'h-full', 'z-50');
-            });
+        function updateTabUI() {
+            if(currentTab === 'active') {
+                tabActive.classList.replace('text-gray-600','text-indigo-700'); tabActive.classList.replace('hover:bg-gray-100','bg-indigo-100'); 
+                tabDeleted.classList.replace('text-indigo-700','text-gray-600'); tabDeleted.classList.replace('bg-indigo-100','hover:bg-gray-100'); 
+            } else {
+                tabDeleted.classList.replace('text-gray-600','text-indigo-700'); tabDeleted.classList.replace('hover:bg-gray-100','bg-indigo-100'); 
+                tabActive.classList.replace('text-indigo-700','text-gray-600'); tabActive.classList.replace('bg-indigo-100','hover:bg-gray-100'); 
+            }
         }
-        if(closeSidebar) {
-            closeSidebar.addEventListener('click', () => {
-                sidebar.classList.add('hidden');
-                sidebar.classList.remove('flex', 'absolute', 'h-full', 'z-50');
-            });
+
+        if(selectAllCheckbox) selectAllCheckbox.addEventListener('change', e => {
+            tbody.querySelectorAll('.po-checkbox').forEach(cb => cb.checked = e.target.checked);
+            updateSelectionUI();
+        });
+
+        function updateSelectionUI() {
+            if(!bulkActionBar) return;
+            const count = tbody.querySelectorAll('.po-checkbox:checked').length;
+            if(count > 0) {
+                bulkActionBar.classList.remove('hidden');
+                if(bulkActionCount) bulkActionCount.textContent = count;
+                if(currentTab === 'active') { 
+                    if(bulkActionsActive) bulkActionsActive.classList.remove('hidden'); 
+                    if(bulkActionsDeleted) bulkActionsDeleted.classList.add('hidden'); 
+                } else { 
+                    if(bulkActionsActive) bulkActionsActive.classList.add('hidden'); 
+                    if(bulkActionsDeleted) bulkActionsDeleted.classList.remove('hidden'); 
+                }
+            } else {
+                bulkActionBar.classList.add('hidden');
+            }
         }
         
-        // Dropdowns
+        const closeBulk = document.getElementById('bulk-action-close');
+        if(closeBulk) closeBulk.addEventListener('click', () => {
+             if(selectAllCheckbox) selectAllCheckbox.checked = false;
+             tbody.querySelectorAll('.po-checkbox').forEach(cb => cb.checked = false);
+             updateSelectionUI();
+        });
+
         const setupDropdown = (btnId, contentId, iconId) => {
             const btn = document.getElementById(btnId);
             const content = document.getElementById(contentId);
             const icon = document.getElementById(iconId);
-            if(btn) {
-                btn.addEventListener('click', () => {
-                    content.classList.toggle('hidden');
-                    icon.classList.toggle('rotate-180');
-                });
-            }
+            if(btn) btn.addEventListener('click', () => { content.classList.toggle('hidden'); icon.classList.toggle('rotate-180'); });
         };
         setupDropdown('documents-dropdown-btn', 'documents-dropdown-content', 'dropdown-icon');
         setupDropdown('purchases-dropdown-btn', 'purchases-dropdown-content', 'purchases-dropdown-icon');
 
-        // --- INIT ---
         fetchOrders();
     });
-    </script>
+</script>
 </body>
 </html>
