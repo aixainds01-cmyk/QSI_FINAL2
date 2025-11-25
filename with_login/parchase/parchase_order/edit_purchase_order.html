@@ -93,7 +93,9 @@
                                     <select id="vendor-select" class="input-field w-full mb-3" required>
                                         <option value="">Select Vendor</option>
                                     </select>
-                                    
+                                    <button type="button" id="add-new-vendor-btn" class="w-full text-center text-purple-600 font-semibold py-2.5 border-2 border-dashed border-purple-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 text-sm transition-colors">
+                                        + Add New Vendor
+                                    </button>
                                 </div>
                             </div>
 
@@ -232,15 +234,23 @@
 
         async function loadVendors() {
          try {
-            const vendors = await fetchAPI(`${API_BASE_URL}/vend`);        
-            console.log("API Response (Vendors):", vendors); 
-            const select = document.getElementById('vendor-select');
-            select.innerHTML = '<option value="">Select Vendor</option>';       
-            const vendorList = Array.isArray(vendors) ? vendors : (vendors.data || vendors.vendors || []);
-            vendorList.forEach(v => {
+            const vendors = await fetchAPI(`${API_BASE_URL}/vend`);
+        
+           console.log("API Response (Vendors):", vendors); 
+
+           const select = document.getElementById('vendor-select');
+           select.innerHTML = '<option value="">Select Vendor</option>';
+        
+          const vendorList = Array.isArray(vendors) ? vendors : (vendors.data || vendors.vendors || []);
+
+           vendorList.forEach(v => {
+
             const opt = document.createElement('option');           
-            opt.value = v._id || v.id;                       
-            opt.textContent = v.vendor_name || v.supplier_name || v.name || v.contact_person || "Unknown Name";            
+            opt.value = v._id || v.id;
+            
+            
+            opt.textContent = v.vendor_name || v.supplier_name || v.name || v.contact_person || "Unknown Name";
+            
             select.appendChild(opt);
         });
     } catch (error) {
