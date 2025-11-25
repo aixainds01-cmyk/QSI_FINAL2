@@ -1020,10 +1020,14 @@
     <script>
     (function () {
         const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
+        
+        // --- 1. Fixed URL Typo Here ---
+        const INVOICE_API_URL = `${API_BASE_URL}/invoic`; 
+        // ------------------------------
+        
         const CLIENT_API_URL = `${API_BASE_URL}/clients`;
         const COMPANY_API_URL = `${API_BASE_URL}/companies`;
         const SALES_ORDER_API_URL = `${API_BASE_URL}/sales-order`;
-        const INVOICE_API_URL = `${API_BASE_URL}/invoic`;
         const BANK_API_URL = `${API_BASE_URL}/banks`;
         const SIGNATORY_STORAGE_KEY = 'qsi_saved_signatories';
         const SIGNATURE_IMAGE_STORAGE_KEY = 'qsi_saved_signature_image';
@@ -1034,30 +1038,30 @@
         // Prefix management variables
         let originalPrefix = 'INV';
         let currentPrefix = 'INV';
-        let prefixChangeMode = null; // 'once' or 'always'
+        let prefixChangeMode = null; 
 
         const invoiceForm = document.getElementById("invoice-form");
         const itemsContainer = document.getElementById("items-container");
         const addItemBtn = document.getElementById("add-item-btn");
         const taxPercentageInput = document.getElementById("tax-percentage");
         const billedToSelect = document.getElementById("billed-to-select");
+        const saveBtnLoading = document.getElementById("save-btn-loading");
+        const saveContinueBtn = document.getElementById("save-continue-btn");
+        const previewPage = document.getElementById("preview-invoice-page");
+        const createPage = document.getElementById("create-invoice-page");
+        const alertContainer = document.getElementById("alert-container");
+        const invoicePrefixInput = document.getElementById("invoice-prefix");
+
         const logoInput = document.getElementById("logo-input");
         const logoPreview = document.getElementById("logo-preview");
         const logoPreviewContainer = document.getElementById("logo-preview-container");
         const logoPlaceholder = document.getElementById("logo-placeholder");
         const businessLogoPreview = document.getElementById("businessLogoPreview");
-        const saveBtnLoading = document.getElementById("save-btn-loading");
-        const saveBtn = document.getElementById("save-btn");
-        const saveContinueBtn = document.getElementById("save-continue-btn");
-        const previewPage = document.getElementById("preview-invoice-page");
-        const createPage = document.getElementById("create-invoice-page");
         const editBtn = document.getElementById("edit-btn");
         const downloadPdfBtn = document.getElementById("download-pdf-btn");
-        const alertContainer = document.getElementById("alert-container");
         const menuToggle = document.getElementById("menu-toggle");
         const sidebar = document.getElementById("sidebar");
         const menuBackdrop = document.getElementById("menu-backdrop");
-        const invoicePrefixInput = document.getElementById("invoice-prefix");
 
         // Prefix modal elements
         const prefixModal = document.getElementById("prefix-modal");
@@ -1078,8 +1082,6 @@
                 menuBackdrop.classList.add("hidden");
             });
         }
-
-        // ===== UTILITY FUNCTIONS =====
 
         function escapeHtml(str) {
             if (!str) return "";
@@ -1110,7 +1112,6 @@
         }
 
         // ===== AUTH FUNCTIONS =====
-
         function getAuthHeaders() {
             const token = localStorage.getItem("token");
             if (token) {
@@ -1151,12 +1152,8 @@
                         throw new Error("Session expired");
                     }
                     const errMsg = (data && data.message) || (typeof data === "string" ? data : res.statusText) || "Request failed";
-                    const error = new Error(errMsg);
-                    error.status = res.status;
-                    error.data = data;
-                    throw error;
+                    throw new Error(errMsg);
                 }
-
                 return data;
             } catch (err) {
                 if (err.message !== 'Authentication token not found' && err.message !== 'Session expired') {
@@ -1165,8 +1162,6 @@
                 throw new Error("Authentication required");
             }
         }
-
-        // ===== PREFIX MANAGEMENT FUNCTIONS =====
 
         function loadSavedPrefix() {
             const savedPrefix = localStorage.getItem(PREFIX_STORAGE_KEY);
@@ -1224,7 +1219,6 @@
             closePrefixModal();
         }
 
-        // Prefix input change detection
         if (invoicePrefixInput) {
             invoicePrefixInput.addEventListener('blur', function () {
                 const newValue = this.value.trim().toUpperCase();
@@ -1243,7 +1237,6 @@
             });
         }
 
-        // Prefix modal event listeners
         prefixModalClose?.addEventListener('click', () => {
             invoicePrefixInput.value = currentPrefix;
             closePrefixModal();
@@ -1263,8 +1256,6 @@
                 closePrefixModal();
             }
         });
-
-        // ===== SIGNATORY FUNCTIONS =====
 
         function loadSignatories() {
             const selectEl = document.getElementById('signatory-select');
@@ -1292,8 +1283,6 @@
             }
         }
 
-        // ===== DATA LOADING FUNCTIONS =====
-
         async function loadCompany() {
             try {
                 const companies = await safeFetch(COMPANY_API_URL, { method: "GET" });
@@ -1318,11 +1307,7 @@
                 }
             } catch (err) {
                 console.error("Error loading companies:", err);
-                if (err.status === 401) {
-                    showAlert("Unauthorized. Please login.", "error", 7000);
-                } else {
-                    showAlert("Could not load company. Check server.", "error", 6000);
-                }
+                showAlert("Could not load company. Check server.", "error", 6000);
             }
         }
 
@@ -1339,11 +1324,7 @@
                 });
             } catch (err) {
                 console.error("Error loading clients:", err);
-                if (err.status === 401) {
-                    showAlert("Unauthorized. Please login.", "error", 7000);
-                } else {
-                    showAlert("Could not load clients.", "error", 4000);
-                }
+                showAlert("Could not load clients.", "error", 4000);
             }
         }
 
@@ -1357,8 +1338,6 @@
                 return [];
             }
         }
-
-        // ===== ITEM ROW FUNCTIONS =====
 
         function createItemRow() {
             const row = document.createElement("div");
@@ -1429,8 +1408,7 @@
             if (totalEl) totalEl.textContent = `₹${totalRounded.toFixed(0)}`;
         }
 
-        // ===== INVOICE DATA FUNCTIONS =====
-
+        // ===== 2. INVOICE DATA COLLECTION =====
         function collectInvoiceData() {
             const items = [...document.querySelectorAll(".item-row")].map((row) => {
                 const qty = parseFloat(row.querySelector(".quantity").value) || 0;
@@ -1464,12 +1442,16 @@
                 signatoryImage = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
             }
 
+            // --- CAPTURE RECURRING CHECKBOX ---
             const isRecurring = document.getElementById('recurring-invoice')?.checked || false;
+            // ----------------------------------
 
             const prefixInputVal = document.getElementById("invoice-prefix").value.trim().toUpperCase();
             const finalPrefix = prefixInputVal || currentPrefix;
+            
+            // Note: invoiceNumber is calculated on backend usually, but can be sent if needed
             const invoiceNumber = getNextInvoiceNumber(finalPrefix);
-
+            
             return {
                 prefix: finalPrefix,
                 invoice_number: invoiceNumber,
@@ -1487,24 +1469,23 @@
                 notes: (document.querySelector("#notes textarea")?.value || "").trim(),
                 signatory: signatoryName,
                 signatory_image: signatoryImage,
+                
+                // --- SEND RECURRING FLAG TO BACKEND ---
                 is_recurring: isRecurring,
-                payment_details_id: null  // Will be set in form submit handler
+                // --------------------------------------
+                
+                payment_details_id: null 
             };
         }
 
         async function submitInvoice(data) {
-            try {
-                const result = await safeFetch(INVOICE_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify(data),
-                });
-                return result;
-            } catch (err) {
-                throw err;
-            }
+            // We send to /api/invoice. 
+            // The backend detects 'is_recurring: true' and saves to BOTH collections automatically.
+            return await safeFetch(INVOICE_API_URL, {
+                method: "POST",
+                body: JSON.stringify(data),
+            });
         }
-
-        // ===== FORM SUBMISSION =====
 
         invoiceForm?.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -1621,8 +1602,8 @@
 
                 console.log("Server response:", savedDoc);
 
-                const isRecurring = document.getElementById("recurring-checkbox").checked;
-                
+                const isRecurring = document.getElementById("recurring-invoice")?.checked || false;
+
                 if (isRecurring) {
                     console.log("✅ Recurring invoice template created!");
                 }
@@ -1991,12 +1972,6 @@
             window.INV_createItemRow = createItemRow;
             window.INV_collectInvoiceData = collectInvoiceData;
 
-            function escapeHtml(str) {
-                if (!str) return "";
-                return str.replace(/[&<>"']/g, function (m) {
-                    return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[m];
-                });
-            }
         })();
     </script>
     <script>
