@@ -298,9 +298,7 @@
                                     <select id="vendor-select" class="input-field w-full mb-2" required>
                                         <option value="">Select Vendor</option>
                                     </select>
-                                    <button type="button" id="add-new-vendor-btn" class="w-full text-center text-purple-600 font-semibold py-2 border-2 border-dashed rounded-lg hover:bg-purple-50 text-sm">
-                                        + Add New Vendor
-                                    </button>
+                                    
                                 </div>
                             </div>
 
@@ -634,7 +632,7 @@ async function loadVendors() {
         (vendors || []).forEach(vendor => {
             const opt = document.createElement('option');
             opt.value = vendor._id || vendor.id || '';
-            opt.textContent = vendor.supplier_name || vendor.name || opt.value;
+            opt.textContent = vendor.vendor_name || vendor.name || opt.value;
             vendorSelect.appendChild(opt);
         });
     } catch (err) {
@@ -757,7 +755,7 @@ async function handleFormSubmit(e) {
         po_date: document.getElementById('po-date').value,
         expected_delivery: document.getElementById('expected-delivery').value,
         supplier_id: vendorSelect.value,
-        supplier_name: vendorSelect.options[vendorSelect.selectedIndex].text,
+        vendor_name: vendorSelect.options[vendorSelect.selectedIndex].text,
         items: items,
         sub_total: subtotal,
         tax_percentage: taxPercentage,
@@ -870,7 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const form = e.target;
         const vendorData = {
-            supplier_name: form.querySelector('[name="supplier_name"]').value.trim(),
+            vendor_name: form.querySelector('[name="supplier_name"]').value.trim(),
             address: {
                 country: form.querySelector('[name="country"]').value,
                 state: form.querySelector('[name="state"]').value.trim(),

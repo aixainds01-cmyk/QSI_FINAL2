@@ -96,8 +96,11 @@
                     </button>
                     <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
                         <a href="../parchase/vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
+                        <a href="../parchase/vendor/vendors_suppliers.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors & Suppliers</a>
+                        <a href="../parchase/purchases&expenses/purchases_expenses_home.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchases & Expenses</a>
                         <a href="../parchase/parchase_order/create_purchase_order.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
-                        <a href="../parchase/debit notes/debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
+                        <a href="../parchase/payout receipts/home_payout_receipts.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout Receipts</a>
+                        <a href="../parchase/debit notes/home_debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
                         </div>
                 </div>
             </div>
@@ -123,9 +126,7 @@
                 <nav class="flex items-center space-x-6 border-b">
                     <a href="#"
                         class="py-2 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600">Overview</a>
-                        <a href="recurring_invoice.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Recurring Invoice</a>
                     <a href="suggestion_inv.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Suggested Invoice</a>
-                    
                     
                 </nav>
             </header>
@@ -134,7 +135,9 @@
                 <div class="flex items-center space-x-4 border-b pb-4 mb-4">
                     <button id="active-invoices-btn"
                         class="view-btn px-3 py-1.5 text-sm font-semibold rounded-md active">Active Invoices</button>
-                    
+                    <button id="recurring-invoices-btn"
+                        class="view-btn px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">Recurring
+                        Invoices</button>
                     <button id="deleted-invoices-btn"
                         class="view-btn px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">Deleted
                         Invoices</button>
@@ -264,7 +267,7 @@ const DELETED_API_URL = `http://Aixains-Mac-mini.local:8000/api/deleted/${DOC_TY
                 const authHeaders = getAuthHeaders(); 
                 if (!authHeaders) {
                     alert("Authentication token not found. Please log in.");
-                    window.location.href = '../../index.html';
+                    window.location.href = '../index.html';
                     throw new Error("Authentication token not found.");
                 }
                 opts.headers = { ...opts.headers, ...getAuthHeaders() };
