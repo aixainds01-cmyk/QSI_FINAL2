@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,51 +13,61 @@
             font-family: 'Inter', sans-serif;
             background-color: #f9fafb;
         }
+
         .sidebar-link.active {
             background-color: #4f46e5;
             color: white;
         }
-        .sidebar-link.active .icon, .sidebar-link.active .text {
+
+        .sidebar-link.active .icon,
+        .sidebar-link.active .text {
             color: white;
         }
+
         .card {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+
         @media (max-width: 768px) {
-  #main-content {
-    margin-top: 64px; /* height of the fixed header */
-  }
-}
+            #main-content {
+                margin-top: 64px;
+                /* height of the fixed header */
+            }
+        }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <div class="flex">
         <!-- Left Sidebar Navigation -->
-        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
-  <div class="flex items-center space-x-3">
-    <button id="menu-toggle" class="text-white focus:outline-none">
-      <i class="fas fa-bars text-2xl"></i>
-    </button>
-    <span class="text-xl font-bold">QSI</span>
-  </div>
-  <div class="flex items-center space-x-2">
-                        <button id="business-avatar-btn" title="Account" class="p-0 bg-transparent border-0">
-                            <img id="business-avatar-img" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U" alt="Business Logo" class="w-8 h-8 rounded-full">
-                        </button>
-                    </div>
-</header>
+        <header
+            class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <span class="text-xl font-bold">QSI</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="business-avatar-btn" title="Account" class="p-0 bg-transparent border-0">
+                    <img id="business-avatar-img" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U"
+                        alt="Business Logo" class="w-8 h-8 rounded-full">
+                </button>
+            </div>
+        </header>
 
 
-<!-- ✅ BACKDROP for mobile -->
-<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+        <!-- ✅ BACKDROP for mobile -->
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
 
-<!-- ✅ SIDEBAR -->
-<aside id="sidebar"
-  class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+        <!-- ✅ SIDEBAR -->
+        <aside id="sidebar"
+            class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
             <div class="p-6 text-2xl font-bold border-b border-gray-700">
                 <i class=" mr-2 text-indigo-400"></i> QSI
             </div>
@@ -80,8 +91,9 @@
                             Order</a>
                         <a href="invoice/home_invoice.html"
                             class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
-                            <a href="credit_note.html"
-                    class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                        <a href="credit_note.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit
+                            note</a>
                     </div>
                     <div>
                         <button id="purchases-dropdown-btn"
@@ -91,17 +103,26 @@
                                 class="fas fa-chevron-down transform transition-transform duration-200"></i>
                         </button>
                         <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
-                            <a href="parchase/vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
-                        <a href="parchase/parchase_order/home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
-                            <a href="parchase/debit notes/debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
-                             </div>
+                            <a href="parchase/vendor/vendors_leads.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors
+                                Leads</a>
+                            <a href="parchase/parchase_order/home_purchase_orders.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase
+                                Orders</a>
+                            <a href="parchase/debit notes/debit_notes.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit
+                                Notes</a>
+                            <a href="payout.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout</a>
+                        </div>
                     </div>
                 </div>
                 <a href="manage-clients.html"
                     class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-users mr-3"></i>Manage Clients
                 </a>
-                <a href="settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <a href="settings.html"
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-cog mr-3"></i>Settings
                 </a>
             </nav>
@@ -109,14 +130,15 @@
 
         <!-- Main Content -->
         <div class="flex-1">
-             <!-- Top Header -->
+            <!-- Top Header -->
             <header class="bg-white shadow-sm p-4 flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">Dashboard</h1>
                 <div class="flex items-center space-x-4">
                     <p id="live-datetime" class="text-sm text-gray-600 font-medium"></p>
                     <div class="flex items-center space-x-2">
                         <button id="business-avatar-btn" title="Account" class="p-0 bg-transparent border-0">
-                            <img id="business-avatar-img" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U" alt="Business Logo" class="w-8 h-8 rounded-full">
+                            <img id="business-avatar-img" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U"
+                                alt="Business Logo" class="w-8 h-8 rounded-full">
                         </button>
                     </div>
                 </div>
@@ -199,13 +221,15 @@
     <div id="logout-modal" class="absolute z-50 hidden" style="top:64px; right:32px; min-width:220px;">
         <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
             <div class="flex items-center gap-3 mb-2">
-                <img id="modal-business-logo" src="https://placehold.co/48x48/E2E8F0/4A5568?text=U" class="w-12 h-12 rounded" alt="Logo">
+                <img id="modal-business-logo" src="https://placehold.co/48x48/E2E8F0/4A5568?text=U"
+                    class="w-12 h-12 rounded" alt="Logo">
                 <div class="flex-1">
                     <h3 id="modal-business-name" class="text-sm font-semibold text-gray-800">Business</h3>
                     <p id="modal-business-email" class="text-xs text-gray-500">&nbsp;</p>
                 </div>
             </div>
-            <button id="logout-confirm" class="w-full mt-2 px-3 py-2 bg-red-600 text-white rounded text-sm">Log out</button>
+            <button id="logout-confirm" class="w-full mt-2 px-3 py-2 bg-red-600 text-white rounded text-sm">Log
+                out</button>
         </div>
     </div>
 
@@ -331,4 +355,5 @@
         })();
     </script>
 </body>
+
 </html>
