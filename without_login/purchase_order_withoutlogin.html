@@ -17,6 +17,17 @@
       background-color: #f9fafb;
     }
 
+    /* --- Hide Arrows ONLY in Rate Input --- */
+    .rate::-webkit-inner-spin-button, 
+    .rate::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
+    .rate {
+        -moz-appearance: textfield;
+    }
+    /* -------------------------------------- */
+
     /* Form styles remain unchanged */
     .form-container {
       max-width: 960px;
@@ -345,10 +356,6 @@
 
 <body>
   <div class="flex">
-    <!-- ✅ MOBILE NAV + SIDEBAR -->
-    <!-- Mobile Header -->
-    <!-- ✅ MOBILE HEADER (Fixed on top for mobile) -->
-    <!-- ✅ MOBILE HEADER (Menu icon on the left) -->
     <header
       class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
       <div class="flex items-center space-x-3">
@@ -360,10 +367,8 @@
     </header>
 
 
-    <!-- ✅ BACKDROP for mobile -->
     <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
 
-    <!-- ✅ SIDEBAR -->
     <aside id="sidebar"
       class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
       <div class="p-6 text-2xl font-bold border-b border-gray-700">
@@ -442,68 +447,54 @@
                 </div>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="border rounded-lg p-4 space-y-2">
-                  <h3 class="font-semibold text-gray-700">
-                    From
-                    <span class="text-gray-400 text-sm">(Your Details)</span>
-                  </h3>
-                  <div>
-                    <label for="businessName" class="text-sm font-medium text-gray-600">
-                      Business Name
-                    </label>
-                    <input type="text" id="businessName" class="input-field" placeholder="Your Business Name"
-                      required />
-                  </div>
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <label for="business_city" class="text-sm font-medium text-gray-600">
-                        City
-                      </label>
-                      <input type="text" id="business_city" class="input-field" placeholder="Your City" required />
-                    </div>
-                    <div>
-                      <label for="business_country" class="text-sm font-medium text-gray-600">
-                        Country
-                      </label>
-                      <input type="text" id="business_country" class="input-field" placeholder="Your Country"
-                        required />
-                    </div>
-                  </div>
-                </div>
+                            <div class="border rounded-lg p-4 space-y-2">
+                                <h3 class="font-semibold text-gray-700">From <span class="text-gray-400 text-sm">(Your
+                                        Details)</span></h3>
+                                <input type="text" id="from-name" class="input-field" placeholder="Business Name">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="from-street" class="input-field" placeholder="Street">
+                                    <input type="text" id="from-city" class="input-field" placeholder="City">
+                                    <input type="text" id="from-state" class="input-field" placeholder="State">
+                                    <input type="text" id="from-pincode" class="input-field" placeholder="Pincode">
 
-                <div class="border rounded-lg p-4 space-y-2">
-                  <h3 class="font-semibold text-gray-700">
-                    Billed To <span class="text-gray-400 text-sm">(Vendor's Details)</span>
-                  </h3>
-                  <div>
-                    <label for="vendorName" class="text-sm font-medium text-gray-600">
-                      Vendor Name
-                    </label>
-                    <input type="text" id="vendorName" class="input-field" placeholder="Vendor's Business Name"
-                      required />
-                  </div>
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <label for="vendor_city" class="text-sm font-medium text-gray-600">
-                        City
-                      </label>
-                      <input type="text" id="vendor_city" class="input-field" placeholder="Vendor's City" required />
-                    </div>
-                    <div>
-                      <label for="vendor_country" class="text-sm font-medium text-gray-600">
-                        Country
-                      </label>
-                      <input type="text" id="vendor_country" class="input-field" placeholder="Vendor's Country"
-                        required />
-                    </div>
-                  </div>
-                </div>
-              </div>
+                                </div>
+                            </div>
+                            <div class="border rounded-lg p-4 space-y-2">
+                                    <h3 class="font-semibold text-gray-700">
+                                        Billed To <span class="text-gray-400 text-sm">(Vendor's Details)</span>
+                                    </h3>
+                                    <div>
+                                        
+                                        <input type="text" id="vendorName" class="input-field"
+                                            placeholder="Vendor's Business Name" required />
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            
+                                            <input type="text" id="vendor_city" class="input-field"
+                                                placeholder="Vendor's Street" required />
+                                        </div>
+                                        
+                                        <div>
+                                            
+                                            <input type="text" id="vendor_city" class="input-field"
+                                                placeholder="Vendor's City" required />
+                                                
+                                        </div>
+                                
+                                        <div>
+                                                <input type="text" id="from-vendor_state" class="input-field" placeholder="vendor's State">
+                                        </div>
+                                        <div>
+                                                <input type="text" id="from-vendor_pincode" class="input-field" placeholder="Pincode">
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
 
 
 
 
-              <!-- Items Section -->
               <div class="col-span-2 p-4 rounded-lg border shadow-sm bg-white">
                 <div class="item-table-header grid grid-cols-12 gap-2 p-3 rounded-t-lg text-sm border-b">
                   <h4 class="col-span-4 font-semibold">Item</h4>
@@ -520,7 +511,6 @@
                 </div>
               </div>
 
-              <!-- Totals Section -->
               <div class="w-full mt-4 flex justify-end">
                 <div class="w-80 p-4 rounded-lg border bg-white shadow-sm space-y-3">
                   <div class="flex justify-between items-center">
@@ -543,7 +533,6 @@
                 </div>
               </div>
 
-              <!-- Terms, Notes, Signature -->
               <div class="flex flex-col md:flex-row gap-6 mt-6">
                 <div class="flex-1 space-y-4">
                   <div class="w-full overflow-x-auto">
@@ -583,10 +572,8 @@ All purchase are final.</textarea>
           </form>
         </main>
 
-        <!-- PREVIEW SECTION -->
         <div id="preview-purshase-order-page" class="hidden-section">
           <div id="preview-content">
-            <!-- Header -->
             <div class="flex justify-between items-start mb-10">
               <div class="logo-preview-container w-1/2">
                 <img id="businessLogoPreview" src="" alt="" class="max-w-[150px] max-h-[80px] object-contain hidden" />
@@ -604,7 +591,6 @@ All purchase are final.</textarea>
               </div>
             </div>
 
-            <!-- Addresses -->
             <div class="flex justify-between mb-12">
               <div class="w-[45%]">
                 <h3 class="text-gray-500 font-medium mb-2 text-sm">From:</h3>
@@ -616,7 +602,6 @@ All purchase are final.</textarea>
               </div>
             </div>
 
-            <!-- Items Table -->
             <div class="mb-8">
               <table class="w-full">
                 <thead>
@@ -630,17 +615,11 @@ All purchase are final.</textarea>
                   </tr>
                 </thead>
                 <tbody id="preview-items-tbody" class="text-sm text-gray-700">
-                  <!-- Items go here -->
-                </tbody>
+                  </tbody>
               </table>
             </div>
 
-            <!-- Totals & Bank Details -->
             <div class="flex justify-end items-start mt-8">
-              <!-- Left Side: Bank Details & Notes -->
-
-
-              <!-- Right Side: Totals -->
               <div class="w-1/3">
                 <div class="space-y-3">
                   <div class="flex justify-between text-sm">
@@ -744,10 +723,10 @@ All purchase are final.</textarea>
         row.className = "item-row space-y-2 p-2 border rounded";
         row.innerHTML = `
                 <div class="grid grid-cols-12 gap-2 items-center">
-                    <input class="col-span-4 item-name input-field" placeholder="Item Name" required>
+                    <input class="col-span-5 item-name input-field" placeholder="Item Name" required>
                     <input type="number" class="col-span-2 quantity input-field text-right" placeholder="0" min="1" required>
                     <input type="number" class="col-span-2 rate input-field text-right" placeholder="0" min="0" required>
-                    <span class="col-span-3 amount text-right font-semibold">₹0.00</span>
+                    <span class="col-span-2 amount text-right font-semibold">₹0.00</span>
                     <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn"><i class="fas fa-trash"></i></button>
                 </div>
                 <textarea class="description input-field col-span-12" rows="1" placeholder="Item description"></textarea>
@@ -841,14 +820,14 @@ All purchase are final.</textarea>
           po_date: document.getElementById("purshase-order-date").value,
           due_date: document.getElementById("purshase-order-due-date").value,
           business_details: {
-            name: document.getElementById("businessName").value,
-            city: document.getElementById("business_city").value,
-            country: document.getElementById("business_country").value,
+            name: document.getElementById("from-name").value,
+            city: document.getElementById("from-city").value,
+            country: document.getElementById("from-state").value, // Using state as country placeholder based on ID
           },
           vendor_details: {
             name: vendorName,
             city: document.getElementById("vendor_city").value,
-            country: document.getElementById("vendor_country").value,
+            country: document.getElementById("from-vendor_state").value,
           },
           items: items,
           sub_total: subTotal,
