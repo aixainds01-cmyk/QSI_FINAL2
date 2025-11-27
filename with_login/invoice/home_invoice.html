@@ -45,8 +45,7 @@
 
 <body>
     <div class="flex">
-        <!-- Left Sidebar Navigation -->
-    <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
   <div class="flex items-center space-x-3">
     <button id="menu-toggle" class="text-white focus:outline-none">
       <i class="fas fa-bars text-2xl"></i>
@@ -56,10 +55,8 @@
 </header>
 
 
-<!-- ✅ BACKDROP for mobile -->
 <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
 
-<!-- ✅ SIDEBAR -->
 <aside id="sidebar"
   class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg"><div class="p-6 text-2xl font-bold border-b border-gray-700">
             <i class=" mr-2 text-indigo-400"></i> QSI
@@ -435,13 +432,13 @@ function renderList(list) {
                 // Store invoice ID separately for payment button
                 const paymentBtn = pendingAmt > 0 
                     ? `<button class="hover:text-green-600 action-payment text-sm font-semibold" title="Record Payment" 
-                         data-invoice-id="${id}" 
-                         data-invoice-no="${escapeHtml(invoiceNo)}"
-                         data-client-name="${client}"
-                         data-total="${totalAmt}"
-                         data-paid="${paidAmt}">
-                         <i class="fas fa-dollar-sign mr-1"></i> Pay
-                       </button>`
+                          data-invoice-id="${id}" 
+                          data-invoice-no="${escapeHtml(invoiceNo)}"
+                          data-client-name="${client}"
+                          data-total="${totalAmt}"
+                          data-paid="${paidAmt}">
+                          <i class="fas fa-dollar-sign mr-1"></i> Pay
+                        </button>`
                     : `<span class="text-xs text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Paid</span>`;
                 
                 actionButtons = `
@@ -809,6 +806,10 @@ function openPaymentModal(invoiceData) {
     // Show modal with animation
     paymentModal.classList.remove('hidden');
     paymentModal.classList.add('flex');
+    
+    // ✅ ADDED: Prevent background scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+
     setTimeout(() => {
         paymentModalOverlay.classList.replace('opacity-0', 'opacity-50');
         paymentModalPanel.classList.replace('scale-95', 'scale-100');
@@ -824,6 +825,10 @@ function closePaymentModal() {
     setTimeout(() => {
         paymentModal.classList.add('hidden');
         paymentModal.classList.remove('flex');
+        
+        // ✅ ADDED: Restore background scrolling when modal is closed
+        document.body.style.overflow = '';
+
         paymentForm.reset();
         currentInvoiceForPayment = null;
     }, 300);
@@ -966,10 +971,10 @@ if (paymentModalOverlay) paymentModalOverlay.addEventListener('click', closePaym
             init();
         });
     </script>
-    <!-- ADD THIS PAYMENT MODAL before the closing </body> tag -->
-<div id="payment-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+    <div id="payment-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
   <div id="payment-modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 transition-opacity duration-300"></div>
-  <div id="payment-modal-panel" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg transform scale-95 transition-transform duration-300 mx-4 opacity-0 relative z-10">
+  
+  <div id="payment-modal-panel" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg transform scale-95 transition-transform duration-300 mx-4 opacity-0 relative z-10 max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-4 border-b pb-3">
       <h3 class="text-xl font-semibold text-gray-800">Record Payment</h3>
       <button id="close-payment-modal" class="text-gray-500 hover:text-gray-700">
@@ -980,7 +985,6 @@ if (paymentModalOverlay) paymentModalOverlay.addEventListener('click', closePaym
     <form id="payment-form" class="space-y-4">
       <input type="hidden" id="payment-invoice-id" />
 
-      <!-- Invoice Details (Read-only) -->
       <div class="bg-gray-50 p-4 rounded-lg space-y-2">
         <div class="flex justify-between">
           <span class="text-sm text-gray-600">Invoice Number:</span>
@@ -1004,7 +1008,6 @@ if (paymentModalOverlay) paymentModalOverlay.addEventListener('click', closePaym
         </div>
       </div>
 
-      <!-- Payment Input -->
       <div>
         <label for="payment-amount-input" class="block text-sm font-medium text-gray-700 mb-1">
           Amount to Pay <span class="text-red-500">*</span>
@@ -1018,7 +1021,6 @@ if (paymentModalOverlay) paymentModalOverlay.addEventListener('click', closePaym
         <p class="text-xs text-gray-500 mt-1">Enter the amount received from the customer</p>
       </div>
 
-      <!-- Payment Date -->
       <div>
         <label for="payment-date-input" class="block text-sm font-medium text-gray-700 mb-1">
           Payment Date <span class="text-red-500">*</span>
@@ -1028,7 +1030,6 @@ if (paymentModalOverlay) paymentModalOverlay.addEventListener('click', closePaym
           required />
       </div>
 
-      <!-- Payment Method -->
       <div>
         <label for="payment-method-input" class="block text-sm font-medium text-gray-700 mb-1">
           Payment Method
@@ -1044,7 +1045,6 @@ if (paymentModalOverlay) paymentModalOverlay.addEventListener('click', closePaym
         </select>
       </div>
 
-      <!-- Payment Notes -->
       <div>
         <label for="payment-notes-input" class="block text-sm font-medium text-gray-700 mb-1">
           Notes (Optional)
@@ -1054,7 +1054,6 @@ if (paymentModalOverlay) paymentModalOverlay.addEventListener('click', closePaym
           placeholder="Add any notes about this payment..."></textarea>
       </div>
 
-      <!-- Action Buttons -->
       <div class="flex justify-end gap-3 pt-4 border-t">
         <button type="button" id="cancel-payment-btn" 
           class="py-2 px-6 bg-gray-100 rounded-md hover:bg-gray-200 transition">
