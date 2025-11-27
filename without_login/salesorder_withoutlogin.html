@@ -18,17 +18,18 @@
         }
 
         /* --- Hide Arrows ONLY in Rate Input --- */
-        .rate::-webkit-inner-spin-button, 
-        .rate::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
+        .rate::-webkit-inner-spin-button,
+        .rate::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
+
         .rate {
             -moz-appearance: textfield;
         }
+
         /* -------------------------------------- */
 
-        /* Form styles remain unchanged */
         .form-container {
             max-width: 960px;
             margin: 2rem auto;
@@ -92,10 +93,6 @@
             cursor: pointer;
         }
 
-        .btn-link:hover {
-            text-decoration: underline;
-        }
-
         .item-table-header {
             background-color: #4338ca;
             color: white;
@@ -115,7 +112,7 @@
             display: none !important;
         }
 
-        /* --- PREVIEW STYLES (ALIGNMENT FIXED) --- */
+        /* --- PREVIEW STYLES (PDF DESIGN) --- */
         #preview-sales-order-page {
             background-color: #f5f5f5;
             padding: 2rem;
@@ -123,15 +120,14 @@
 
         #preview-content {
             background-color: #ffffff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 210mm;
-            min-height: 267mm;
-            /* A4 height minus padding */
+            min-height: 297mm;
             padding: 15mm;
             margin: 0 auto;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            color: #333;
         }
 
         .invoice-header {
@@ -139,171 +135,134 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 2rem;
-            border-bottom: 4px solid #4338ca;
-            padding-bottom: 1rem;
         }
 
-        .invoice-body {
-            flex-grow: 1;
-            /* This is crucial to push the footer down */
+        .logo-preview-container img {
+            max-width: 150px;
+            max-height: 100px;
+            object-fit: contain;
         }
 
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem 2rem;
-            margin-bottom: 1.5rem;
+        .header-right {
+            text-align: right;
+        }
+
+        .header-right h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+            margin: 0 0 10px 0;
         }
 
         .address-section {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Items table: fixed layout for predictable column widths */
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            /* enforce widths */
-            margin-bottom: 2rem;
-        }
-
-        .items-table thead {
-            background-color: #4338ca;
-            color: #ffffff;
-        }
-
-        .items-table th,
-        .items-table td {
-            padding: 0.9rem 1rem;
-            font-size: 0.9rem;
-            vertical-align: top;
-            word-wrap: break-word;
-        }
-
-        /* column widths and alignment */
-        .items-table th:nth-child(1),
-        .items-table td:nth-child(1) {
-            width: 52%;
-            text-align: left;
-        }
-
-        .items-table th:nth-child(2),
-        .items-table td:nth-child(2),
-        .items-table th:nth-child(3),
-        .items-table td:nth-child(3),
-        .items-table th:nth-child(4),
-        .items-table td:nth-child(4) {
-            width: 16%;
-            text-align: right;
-            /* right-align quantity, rate, amount */
-        }
-
-        .items-table tbody tr:nth-child(even) {
-            background-color: #f9fafc;
-        }
-
-        /* SUMMARY ALIGNMENT FIX */
-        .summary-section {
-            display: flex;
-            justify-content: flex-end;
-            /* Align to the right */
-            margin-top: 1.5rem;
-        }
-
-        .summary-section .summary-box {
-            width: 320px;
-            max-width: 45%;
-        }
-
-        .summary-section table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .summary-section td {
-            padding: 6px 6px;
-        }
-
-        .summary-section td:last-child {
-            text-align: right;
-            font-weight: 600;
-        }
-
-        .total-row td {
-            font-size: 1.25rem;
-            font-weight: 700;
-            padding-top: 0.75rem;
-            border-top: 2px solid #333;
-        }
-
-        /* FOOTER */
-        .invoice-footer {
-            margin-top: 2rem;
-            padding-top: 1rem;
             display: flex;
             justify-content: space-between;
-            /* This separates left and right content */
-            align-items: flex-end;
-            border-top: 1px solid #e2e8f0;
+            margin-bottom: 2rem;
+            gap: 2rem;
         }
 
-        .footer-left {
-            width: 65%;
-            text-align: left;
+        .address-box {
+            width: 48%;
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            border-radius: 0.5rem;
         }
 
-        .footer-right {
-            width: 30%;
-            text-align: center;
-        }
-
-        /* Signature: name first, then line, then title; centered */
-        .preview-signature {
-            text-align: center;
-            margin-top: 12px;
-        }
-
-        /* Name displayed above the line */
-        .signature-name {
-            display: block;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            /* space before the line */
-            font-size: 1rem;
-        }
-
-        /* Thin line under the name */
-        .signature-hr {
-            width: 60%;
-            /* adjust length of the line */
-            max-width: 240px;
-            height: 0;
-            border-top: 1px solid #333;
-            margin: 0 auto;
-            /* center the line */
-        }
-
-        /* Title under the line */
-        .signature-title {
-            display: block;
-            margin-top: 8px;
+        .address-label {
+            font-size: 0.85rem;
             font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .address-content {
             font-size: 0.95rem;
+            line-height: 1.5;
             color: #111;
         }
 
+        .company-name-bold {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 1.1rem;
+        }
 
+        /* PDF Table Style - Blue Header */
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
 
-        .logo-preview-container img,
-        .logo-preview-container #businessLogoPreview {
-            max-width: 160px;
-            max-height: 80px;
-            object-fit: contain;
+        .preview-table th {
+            background-color: #fcfcfc; /* Indigo Blue */
+            color: rgb(0, 0, 0);
+            text-align: right;
+            padding: 12px 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .preview-table th:first-child {
+            text-align: left;
+        }
+
+        .preview-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.95rem;
+            vertical-align: top;
+            color: #111;
+        }
+
+        .preview-table td:not(:first-child) {
+            text-align: right;
+        }
+
+        .footer-layout {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .footer-left-section { width: 50%; }
+        .footer-right-section { width: 45%; }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+
+        .summary-table td {
+            padding: 10px 15px;
+            text-align: right;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .summary-table td:first-child {
+            text-align: left;
+            color: #666;
+        }
+
+        .total-row td {
+            border-top: 2px solid #333;
+            padding-top: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #000;
+        }
+        
+        .preview-signature {
+            margin-top: 20px;
+            text-align: center;
         }
 
         .action-buttons {
@@ -311,81 +270,63 @@
             width: 210mm;
             margin: 1.5rem auto 0;
         }
-        @media (max-width: 768px) {
-          #main-content {
-            margin-top: 64px; /* height of the fixed header */
-          }
-        }
 
         @media print {
-            body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                background-color: #ffffff;
-            }
-
-            #preview-sales-order-page {
-                padding: 0;
-            }
-
-            #preview-content {
-                box-shadow: none;
-                margin: 0;
-                padding: 0;
-            }
-
-            .action-buttons {
-                display: none;
-            }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white; }
+            #preview-sales-order-page { padding: 0; background-color: white; }
+            #preview-content { margin: 0; padding: 15mm; box-shadow: none; border: none; }
+            .action-buttons { display: none; }
         }
     </style>
 </head>
 
 <body>
     <div class="flex">
-        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
-  <div class="flex items-center space-x-3">
-    <button id="menu-toggle" class="text-white focus:outline-none">
-      <i class="fas fa-bars text-2xl"></i>
-    </button>
-    <span class="text-xl font-bold">QSI</span>
-  </div>
-</header>
+        <header
+            class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <span class="text-xl font-bold">QSI</span>
+            </div>
+        </header>
 
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
 
-<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
-
-<aside id="sidebar"
-  class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
-  <div class="p-6 text-2xl font-bold border-b border-gray-700">
-    <i class="mr-2 text-indigo-400"></i> QSI
-  </div>
-  <nav class="flex-1 p-4 space-y-2">
-    <a href="dashboard_without_login.html"
-      class="sidebar-link flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-500">
-      <i class="fas fa-home mr-3 icon"></i><span class="text">Dashboard</span>
-    </a>
-    <div>
-      <button id="documents-dropdown-btn"
-        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 bg-gray-900 text-left">
-        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
-        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
-      </button>
-      <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
-        <a href="quotation_without_login.html"
-          class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
-        <a href="salesorder_withoutlogin.html"
-          class="block py-2 px-4 rounded transition duration-200 bg-gray-700 font-semibold text-sm">Sales Order</a>
-        <a href="invoice_without_login.html"
-          class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
-      </div>
-    </div>
-  </nav>
-</aside>
-
+        <aside id="sidebar"
+            class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class="mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="dashboard_without_login.html"
+                    class="sidebar-link flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-indigo-500">
+                    <i class="fas fa-home mr-3 icon"></i><span class="text">Dashboard</span>
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn"
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 bg-gray-900 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon"
+                            class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="quotation_without_login.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="salesorder_withoutlogin.html"
+                            class="block py-2 px-4 rounded transition duration-200 bg-gray-700 font-semibold text-sm">Sales
+                            Order</a>
+                        <a href="invoice_without_login.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
 
         <div id="main-content" class="content-area flex-1 flex justify-center">
             <div class="w-full max-w-5xl">
+                
                 <main id="create-sales-order-page" class="form-container">
                     <form id="sales-order-form">
                         <div class="flex justify-between items-center mb-6">
@@ -403,20 +344,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <div class="grid grid-cols-3 gap-2 items-center mb-2">
-                                        <label for="sales-order-no" class="text-gray-600 text-sm">Sales Order No.</label>
-<input type="text" id="sales-order-no" class="input-field col-span-2" value="SO0001" required />
-
+                                        <label for="sales-order-no" class="text-gray-600 text-sm">Sales Order
+                                            No.</label>
+                                        <input type="text" id="sales-order-no" class="input-field col-span-2"
+                                            value="SO0001" required />
                                     </div>
-                                    <script>
-                                        function updateTime() {
-                                            const now = new Date();
-                                            const timeString = now.toLocaleTimeString();
-                                            document.getElementById("sales-order-time").value =
-                                                timeString;
-                                        }
-                                        updateTime();
-                                        setInterval(updateTime, 1000);
-                                    </script>
                                     <div class="grid grid-cols-3 gap-2 items-center mb-2">
                                         <label for="sales-order-date" class="text-gray-600 text-sm">Sales Order
                                             Date</label>
@@ -439,55 +371,35 @@
                                         accept="image/png, image/jpeg" />
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="border rounded-lg p-4 space-y-2">
-                                <h3 class="font-semibold text-gray-700">From <span class="text-gray-400 text-sm">(Your
-                                        Details)</span></h3>
-                                <input type="text" id="from-name" class="input-field" placeholder="Business Name">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <input type="text" id="from-street" class="input-field" placeholder="Street">
-                                    <input type="text" id="from-city" class="input-field" placeholder="City">
-                                    <input type="text" id="from-state" class="input-field" placeholder="State">
-                                    <input type="text" id="from-pincode" class="input-field" placeholder="Pincode">
 
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="border rounded-lg p-4 space-y-2">
+                                    <h3 class="font-semibold text-gray-700">From <span class="text-gray-400 text-sm">(Your Details)</span></h3>
+                                    <input type="text" id="from-name" class="input-field" placeholder="Business Name">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="text" id="from-street" class="input-field" placeholder="Street">
+                                        <input type="text" id="from-city" class="input-field" placeholder="City">
+                                        <input type="text" id="from-state" class="input-field" placeholder="State">
+                                        <input type="text" id="from-pincode" class="input-field" placeholder="Pincode">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="border rounded-lg p-4 space-y-2">
-                                    <h3 class="font-semibold text-gray-700">
-                                        Billed To <span class="text-gray-400 text-sm">(Client's Details)</span>
-                                    </h3>
+
+                                <div class="border rounded-lg p-4 space-y-2">
+                                    <h3 class="font-semibold text-gray-700">Billed To <span class="text-gray-400 text-sm">(Client's Details)</span></h3>
                                     <div>
-                                        
-                                        <input type="text" id="clientName" class="input-field"
-                                            placeholder="Client's Business Name" required />
+                                        <input type="text" id="clientName" class="input-field" placeholder="Client's Business Name" required />
                                     </div>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <div>
-                                            
-                                            <input type="text" id="client_Street" class="input-field"
-                                                placeholder="Client's Street" required />
-                                        </div>
-                                        
-                                        <div>
-                                            
-                                            <input type="text" id="client_city" class="input-field"
-                                                placeholder="Client's City" required />
-                                                
-                                        </div>
-                                
-                                        <div>
-                                                <input type="text" id="from-state" class="input-field" placeholder="State">
-                                        </div>
-                                        <div>
-                                                <input type="text" id="from-pincode" class="input-field" placeholder="Pincode">
-                                        </div>
+                                        <div><input type="text" id="client_Street" class="input-field" placeholder="Client's Street" required /></div>
+                                        <div><input type="text" id="client_city" class="input-field" placeholder="Client's City" required /></div>
+                                        <div><input type="text" id="client_state" class="input-field" placeholder="State"></div>
+                                        <div><input type="text" id="client_pincode" class="input-field" placeholder="Pincode"></div>
                                     </div>
                                 </div>
-                        </div>
+                            </div>
 
                             <div class="col-span-2 p-4 rounded-lg border shadow-sm">
-                                <div
-                                    class="item-table-header grid grid-cols-12 gap-2 p-3 rounded-t-lg text-sm border-b">
+                                <div class="item-table-header grid grid-cols-12 gap-2 p-3 rounded-t-lg text-sm border-b">
                                     <h4 class="col-span-4 font-semibold">Item</h4>
                                     <h4 class="col-span-2 font-semibold text-right">Quantity</h4>
                                     <h4 class="col-span-2 font-semibold text-right">Rate</h4>
@@ -569,89 +481,87 @@ All sales are final.</textarea>
 
                 <div id="preview-sales-order-page" class="hidden-section">
                     <div id="preview-content">
+                        
                         <header class="invoice-header">
-                            <div>
-                                <h1 class="text-3xl font-bold text-gray-800">Sales Order</h1>
-                                <span class="status"></span>
-                            </div>
                             <div class="logo-preview-container">
-                                <img id="businessLogoPreview" src="" alt="Business Logo" />
+                                <img id="businessLogoPreview" src="" alt="" />
+                            </div>
+                            <div class="header-right">
+                                <h1>SALES ORDER</h1>
+                                <div>
+                                    <p>Order No: <span id="preview-so-no"></span></p>
+                                    <p>Date: <span id="preview-so-date"></span></p>
+                                </div>
                             </div>
                         </header>
 
-                        <div class="invoice-body">
-                            <section class="details-grid">
-                                <p><strong>Sales Order #:</strong> <span id="preview-so-no"></span></p>
-                                <p><strong>Order Date:</strong> <span id="preview-so-date"></span></p>
-                            </section>
-
-                            <section class="address-section">
-                                <div>
-                                    <h4 class="font-semibold text-gray-500 text-sm mb-1">Billed From</h4>
-                                    <p id="preview-from-details" class="text-gray-700"></p>
+                        <section class="address-section">
+                            <div class="address-box">
+                                <span class="address-label">From:</span>
+                                <div class="address-content">
+                                    <span id="preview-from-name" class="company-name-bold"></span>
+                                    <span id="preview-from-street"></span><br>
+                                    <span id="preview-from-city-state"></span><br>
+                                    <span id="preview-from-zip"></span>
                                 </div>
-                                <div>
-                                    <h4 class="font-semibold text-gray-500 text-sm mb-1">Billed To</h4>
-                                    <p id="preview-to-details" class="text-gray-700"></p>
+                            </div>
+                            <div class="address-box">
+                                <span class="address-label">To:</span>
+                                <div class="address-content">
+                                    <span id="preview-to-name" class="company-name-bold"></span>
+                                    <span id="preview-to-street"></span><br>
+                                    <span id="preview-to-city-state"></span><br>
+                                    <span id="preview-to-zip"></span>
                                 </div>
-                            </section>
+                            </div>
+                        </section>
 
-                            <table class="items-table">
-                                <thead>
-                                    <tr>
-                                        <th>Item</th>
-                                        <th>Quantity</th>
-                                        <th>Rate</th>
-                                        <th>Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="preview-items-tbody"></tbody>
-                            </table>
+                        <table class="preview-table">
+                            <thead>
+                                <tr>
+                                    <th>ITEM NAME</th>
+                                    <th>QUANTITY</th>
+                                    <th>RATE</th>
+                                    <th>AMOUNT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-items-tbody"></tbody>
+                        </table>
 
-                            <section class="summary-section">
-                                <div class="summary-box">
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                <td class="text-gray-600 pr-4">Subtotal</td>
-                                                <td id="preview-subtotal" class="text-right font-semibold"></td>
-                                            </tr>
-                                            <tr id="preview-tax-row">
-                                                <td class="text-gray-600 pr-4">Tax (<span
-                                                        id="preview-tax-rate"></span>%)</td>
-                                                <td id="preview-tax" class="text-right font-semibold"></td>
-                                            </tr>
-                                            <tr class="total-row">
-                                                <td><strong>Total (INR)</strong></td>
-                                                <td id="preview-total" class="text-right"><strong></strong></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        <div class="footer-layout">
+                            <div class="footer-left-section">
+                                <div id="preview-terms-block" class="hidden" style="margin-top: 20px;">
+                                    <strong>Terms & Conditions:</strong>
+                                    <p id="preview-terms" style="margin-top: 5px; white-space: pre-wrap; font-size: 0.9rem; color: #555;"></p>
                                 </div>
-                            </section>
+                                <div id="preview-notes-block" class="hidden" style="margin-top: 20px;">
+                                    <strong>Notes:</strong>
+                                    <p id="preview-notes" style="margin-top: 5px; white-space: pre-wrap; font-size: 0.9rem; color: #555;"></p>
+                                </div>
+                            </div>
+                            <div class="footer-right-section">
+                                <table class="summary-table">
+                                    <tbody>
+                                        <tr>
+                                            <td>Sub Total</td>
+                                            <td id="preview-subtotal"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tax (<span id="preview-tax-rate"></span>%)</td>
+                                            <td id="preview-tax"></td>
+                                        </tr>
+                                        <tr class="total-row">
+                                            <td>Total Amount</td>
+                                            <td id="preview-total"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="preview-signature hidden" id="preview-signature-block">
+                                     <p>Authorized Signatory</p>
+                                     <strong id="preview-signature-name"></strong>
+                                </div>
+                            </div>
                         </div>
-
-                        <footer class="invoice-footer">
-                            <div class="footer-left">
-                                <div id="preview-terms-block" class="hidden">
-                                    <h3 class="font-semibold mb-1">Terms & Conditions</h3>
-                                    <p id="preview-terms" class="text-gray-700 text-sm whitespace-pre-wrap"></p>
-                                </div>
-                                <div id="preview-notes-block" class="hidden mt-4">
-                                    <h3 class="font-semibold mb-1">Notes</h3>
-                                    <p id="preview-notes" class="text-gray-700 text-sm whitespace-pre-wrap"></p>
-                                </div>
-                            </div>
-                            <div class="footer-right hidden" id="preview-signature-block">
-                                <div class="preview-signature">
-                                    <span id="preview-signature-name" class="signature-name"></span>
-                                    <div class="signature-hr" aria-hidden="true"></div>
-                                    <span class="signature-title">Authorised Signatory</span>
-                                </div>
-                            </div>
-
-
-                        </footer>
                     </div>
 
                     <div class="action-buttons flex justify-end space-x-3 mt-4">
@@ -691,23 +601,36 @@ All sales are final.</textarea>
                     reader.readAsDataURL(file);
                 }
             });
-// ✅ Mobile menu toggle and backdrop
-const menuToggle = document.getElementById("menu-toggle");
-const sidebar = document.getElementById("sidebar");
-const menuBackdrop = document.getElementById("menu-backdrop");
 
-if (menuToggle && sidebar && menuBackdrop) {
-  menuToggle.addEventListener("click", () => {
-    sidebar.classList.toggle("-translate-x-full");
-    menuBackdrop.classList.toggle("hidden");
-  });
+            const menuToggle = document.getElementById("menu-toggle");
+            const sidebar = document.getElementById("sidebar");
+            const menuBackdrop = document.getElementById("menu-backdrop");
+            const dropdownBtn = document.getElementById("documents-dropdown-btn");
 
-  menuBackdrop.addEventListener("click", () => {
-    sidebar.classList.add("-translate-x-full");
-    menuBackdrop.classList.add("hidden");
-  });
-}
-
+            if (menuToggle && sidebar && menuBackdrop) {
+                menuToggle.addEventListener("click", () => {
+                    sidebar.classList.toggle("-translate-x-full");
+                    menuBackdrop.classList.toggle("hidden");
+                });
+                menuBackdrop.addEventListener("click", () => {
+                    sidebar.classList.add("-translate-x-full");
+                    menuBackdrop.classList.add("hidden");
+                });
+            }
+            if(dropdownBtn) {
+                 dropdownBtn.addEventListener("click", () => {
+                    document.getElementById("documents-dropdown-content").classList.toggle("hidden");
+                    document.getElementById("dropdown-icon").classList.toggle("rotate-180");
+                });
+            }
+            
+            // Toggle buttons logic from Original Code
+            document.querySelectorAll(".toggle-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const targetEl = document.getElementById(btn.dataset.target);
+                    if (targetEl) targetEl.classList.toggle("hidden");
+                });
+            });
 
             function createItemRow() {
                 const row = document.createElement("div");
@@ -760,7 +683,6 @@ if (menuToggle && sidebar && menuBackdrop) {
             salesOrderForm.addEventListener("submit", (e) => {
                 e.preventDefault();
 
-                // Validation for client name
                 const clientName = document.getElementById("clientName").value.trim();
                 if (!clientName) {
                     alert("Please enter the client's name.");
@@ -789,31 +711,35 @@ if (menuToggle && sidebar && menuBackdrop) {
                 const tax = subTotal * (taxP / 100);
                 const total = subTotal + tax;
 
-                const formData = {
-                    sales_date: document.getElementById("sales-order-date").value,
-                    items,
-                    sub_total: subTotal,
-                    tax,
-                    total,
-                    tax_percentage: taxP,
-                };
+                // Map to Preview
+                document.getElementById("preview-so-no").textContent = document.getElementById("sales-order-no").value;
+                const dateVal = document.getElementById("sales-order-date").value;
+                document.getElementById("preview-so-date").textContent = dateVal ? new Date(dateVal).toLocaleDateString('en-GB') : '';
+                
+                // MAPPING ADDRESS FIELDS CORRECTLY
+                document.getElementById("preview-from-name").textContent = document.getElementById("from-name").value;
+                document.getElementById("preview-from-street").textContent = document.getElementById("from-street").value;
+                const fromCity = document.getElementById("from-city").value;
+                const fromState = document.getElementById("from-state").value;
+                document.getElementById("preview-from-city-state").textContent = (fromCity && fromState) ? `${fromCity}, ${fromState}` : (fromCity || fromState);
+                document.getElementById("preview-from-zip").textContent = document.getElementById("from-pincode").value;
 
-                // Populate Preview
-                document.getElementById("preview-so-no").textContent = "SO-" + Date.now().toString().slice(-6);
-                document.getElementById("preview-so-date").textContent = formData.sales_date;
-                document.getElementById("preview-from-details").innerHTML = `${document.getElementById("businessName").value}<br>${document.getElementById("business_city").value}, ${document.getElementById("business_country").value}`;
-
-                // Get client details from manual inputs
+                document.getElementById("preview-to-name").textContent = clientName;
+                document.getElementById("preview-to-street").textContent = document.getElementById("client_Street").value; 
                 const clientCity = document.getElementById("client_city").value;
-                const clientCountry = document.getElementById("client_country").value;
-                document.getElementById("preview-to-details").innerHTML = `${clientName}<br>${clientCity}, ${clientCountry}`;
+                const clientState = document.getElementById("client_state").value;
+                document.getElementById("preview-to-city-state").textContent = (clientCity && clientState) ? `${clientCity}, ${clientState}` : (clientCity || clientState);
+                document.getElementById("preview-to-zip").textContent = document.getElementById("client_pincode").value;
 
                 const tbody = document.getElementById("preview-items-tbody");
                 tbody.innerHTML = "";
-                formData.items.forEach(item => {
+                items.forEach(item => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                    <td><strong>${item.item_name}</strong><br><small class="text-gray-600">${item.description}</small></td>
+                    <td>
+                        <strong>${item.item_name}</strong>
+                        ${item.description ? `<br><small style="color:#666">${item.description}</small>` : ''}
+                    </td>
                     <td>${item.quantity}</td>
                     <td>₹${item.rate.toFixed(2)}</td>
                     <td>₹${item.amount.toFixed(2)}</td>
@@ -821,42 +747,35 @@ if (menuToggle && sidebar && menuBackdrop) {
                     tbody.appendChild(tr);
                 });
 
-                document.getElementById("preview-subtotal").textContent = `₹${formData.sub_total.toFixed(2)}`;
-                document.getElementById("preview-tax-rate").textContent = formData.tax_percentage;
-                document.getElementById("preview-tax").textContent = `₹${formData.tax.toFixed(2)}`;
-                document.getElementById("preview-total").innerHTML = `<strong>₹${formData.total.toFixed(2)}</strong>`;
-
+                document.getElementById("preview-subtotal").textContent = `₹${subTotal.toFixed(2)}`;
+                document.getElementById("preview-tax-rate").textContent = taxP;
+                document.getElementById("preview-tax").textContent = `₹${tax.toFixed(2)}`;
+                document.getElementById("preview-total").textContent = `₹${total.toFixed(2)}`;
+                
+                // Terms, Notes, Signature
                 const terms = document.querySelector("#terms textarea").value.trim();
                 const notes = document.querySelector("#notes textarea").value.trim();
+                const sigName = document.getElementById("signature-input").value.trim();
 
-                if (terms) {
+                if(terms) {
                     document.getElementById("preview-terms-block").classList.remove("hidden");
                     document.getElementById("preview-terms").textContent = terms;
                 } else {
-                    document.getElementById("preview-terms-block").classList.add("hidden");
+                     document.getElementById("preview-terms-block").classList.add("hidden");
                 }
-                if (notes) {
+
+                if(notes) {
                     document.getElementById("preview-notes-block").classList.remove("hidden");
                     document.getElementById("preview-notes").textContent = notes;
                 } else {
-                    document.getElementById("preview-notes-block").classList.add("hidden");
+                     document.getElementById("preview-notes-block").classList.add("hidden");
                 }
-
-                const signatureFormSection = document.getElementById("signature");
-                const signaturePreviewBlock = document.getElementById("preview-signature-block");
-                // wherever you set the preview name
-                const signatureInputValue = document.getElementById("signature-input").value.trim();
-                document.getElementById("preview-signature-name").textContent = signatureInputValue.toUpperCase();
-
-                const previewSignatureName = document.getElementById("preview-signature-name");
-
-                // Show signature in preview if user toggled the signature section open AND there's a value
-                if (!signatureFormSection.classList.contains("hidden") && signatureInputValue) {
-                    previewSignatureName.textContent = signatureInputValue;
-                    signaturePreviewBlock.classList.remove("hidden");
+                
+                if(sigName) {
+                    document.getElementById("preview-signature-block").classList.remove("hidden");
+                    document.getElementById("preview-signature-name").textContent = sigName;
                 } else {
-                    previewSignatureName.textContent = "";
-                    signaturePreviewBlock.classList.add("hidden");
+                     document.getElementById("preview-signature-block").classList.add("hidden");
                 }
 
                 document.getElementById("create-sales-order-page").classList.add("hidden-section");
@@ -868,77 +787,34 @@ if (menuToggle && sidebar && menuBackdrop) {
                 document.getElementById("create-sales-order-page").classList.remove("hidden-section");
             });
 
-            // NEW: PDF downloader that handles multi-page content (doesn't clip footer)
             document.getElementById("download-pdf-btn").addEventListener("click", async () => {
                 const element = document.getElementById("preview-content");
                 if (!element) return;
-
+                
+                window.scrollTo(0,0);
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF("p", "mm", "a4");
 
-                // Render at moderate scale to balance quality & size
                 const canvas = await html2canvas(element, {
-                    scale: 2,
+                    scale: 2, 
                     useCORS: true,
                     logging: false,
-                    allowTaint: true
+                    backgroundColor: '#ffffff'
                 });
 
-                const imgWidthMm = pdf.internal.pageSize.getWidth();
-                const pageHeightMm = pdf.internal.pageSize.getHeight();
-
-                // Canvas sizes in px
-                const canvasW = canvas.width;
-                const canvasH = canvas.height;
-
-                // conversion px -> mm based on canvas width vs pdf width in mm
-                const pxPerMm = canvasW / imgWidthMm;
-                const pageHeightPx = Math.floor(pageHeightMm * pxPerMm);
-
-                let position = 0;
-                while (position < canvasH) {
-                    const canvasPage = document.createElement("canvas");
-                    canvasPage.width = canvasW;
-                    const remaining = canvasH - position;
-                    canvasPage.height = remaining > pageHeightPx ? pageHeightPx : remaining;
-                    const ctx = canvasPage.getContext("2d");
-
-                    // draw the slice from the main canvas
-                    ctx.drawImage(canvas, 0, position, canvasW, canvasPage.height, 0, 0, canvasW, canvasPage.height);
-
-                    const imgData = canvasPage.toDataURL("image/png");
-                    const imgHeightMm = canvasPage.height / pxPerMm;
-
-                    pdf.addImage(imgData, "PNG", 0, 0, imgWidthMm, imgHeightMm);
-
-                    position += canvasPage.height;
-                    if (position < canvasH) pdf.addPage();
-                }
-
+                const imgWidth = 210;
+                const pageHeight = 297; 
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                const imgData = canvas.toDataURL("image/png");
+                
+                pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
                 pdf.save(`SalesOrder-${document.getElementById("preview-so-no").textContent}.pdf`);
             });
 
-            // Toggle buttons for terms, notes, etc.
-            document.querySelectorAll(".toggle-btn").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const targetEl = document.getElementById(btn.dataset.target);
-                    if (targetEl) targetEl.classList.toggle("hidden");
-                });
-            });
-
-            // Sidebar dropdown
-            const dropdownBtn = document.getElementById("documents-dropdown-btn");
-            dropdownBtn.addEventListener("click", () => {
-                document.getElementById("documents-dropdown-content").classList.toggle("hidden");
-                document.getElementById("dropdown-icon").classList.toggle("rotate-180");
-            });
-
-            // Initializations
-            document.getElementById("sales-order-date").value = new Date().toISOString().slice(0, 10);
+            document.getElementById("sales-order-date").valueAsDate = new Date();
             createItemRow();
         });
     </script>
-
 </body>
-
 </html>
