@@ -15,6 +15,17 @@
             background-color: #f9fafb;
         }
 
+        /* --- Hide Arrows ONLY in Rate Input --- */
+        .rate::-webkit-inner-spin-button, 
+        .rate::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        .rate {
+            -moz-appearance: textfield;
+        }
+        /* -------------------------------------- */
+
         .form-container,
         .details-container {
             max-width: 960px;
@@ -235,22 +246,48 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="border rounded-lg p-4 space-y-2">
-                                <h3 class="font-semibold text-gray-700">From</h3>
-                                <input type="text" id="from-name" class="input-field" placeholder="Business Name" required>
+                                <h3 class="font-semibold text-gray-700">From <span class="text-gray-400 text-sm">(Your
+                                        Details)</span></h3>
+                                <input type="text" id="from-name" class="input-field" placeholder="Business Name">
                                 <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="from-street" class="input-field" placeholder="Street">
                                     <input type="text" id="from-city" class="input-field" placeholder="City">
-                                    <input type="text" id="from-country" class="input-field" placeholder="Country">
-                                </div>
-                            </div>
+                                    <input type="text" id="from-state" class="input-field" placeholder="State">
+                                    <input type="text" id="from-pincode" class="input-field" placeholder="Pincode">
 
-                            <div class="border rounded-lg p-4 space-y-2">
-                                <h3 class="font-semibold text-gray-700">Billed To</h3>
-                                <input type="text" id="to-name" class="input-field" placeholder="Client's Business Name" required>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <input type="text" id="to-city" class="input-field" placeholder="Client's City">
-                                    <input type="text" id="to-country" class="input-field" placeholder="Client's Country">
                                 </div>
                             </div>
+                            <div class="border rounded-lg p-4 space-y-2">
+                                    <h3 class="font-semibold text-gray-700">
+                                        Billed To <span class="text-gray-400 text-sm">(Client's Details)</span>
+                                    </h3>
+                                    <div>
+                                        
+                                        <input type="text" id="clientName" class="input-field"
+                                            placeholder="Client's Business Name" required />
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                           
+                                            <input type="text" id="client_Street" class="input-field"
+                                                placeholder="Client's Street" required />
+                                        </div>
+                                        
+                                        <div>
+                                           
+                                            <input type="text" id="client_city" class="input-field"
+                                                placeholder="Client's City" required />
+                                                
+                                        </div>
+                                
+                                        <div>
+                                                <input type="text" id="from-state" class="input-field" placeholder="State">
+                                        </div>
+                                        <div>
+                                                <input type="text" id="from-pincode" class="input-field" placeholder="Pincode">
+                                        </div>
+                                    </div>
+                                </div>
                         </div>
 
                         <div>
@@ -271,7 +308,7 @@
                                     <span class="font-semibold text-gray-800" id="subtotal">₹0.00</span>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-gray-600 flex items-center">Tax (<input type="number" id="tax-percentage" value="0" class="input-field w-16 mx-1 text-right p-1 h-7">%)</span>
+                                    <span class="text-gray-600 flex items-center">Tax (<input type="number" id="tax-percentage" value="0" min="0" oninput="if(this.value < 0) this.value = 0;" class="input-field w-16 mx-1 text-right p-1 h-7">%)</span>
                                     <span class="font-semibold text-gray-800" id="total-tax">₹0.00</span>
                                 </div>
                                 <div class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
@@ -544,7 +581,6 @@
             sigModal.classList.add('hidden');
         });
         
-        // ✅ FIXED: Added navigation for Bank and PDF views
         document.getElementById('back-to-create-btn')?.addEventListener('click', () => showView('create'));
         document.getElementById('continue-to-preview-btn')?.addEventListener('click', () => {
             invoiceData.upiId = document.getElementById('upi-id').value.trim();
@@ -562,7 +598,6 @@
             }).from(element.innerHTML).save();
         });
 
-        // ✅ ADDED: Function to generate the final invoice preview
         const generatePreview = () => {
             const itemsHtml = invoiceData.items.map(item => `<tr class="border-b"><td class="py-2 pr-2"><p class="font-semibold">${escapeHtml(item.name)}</p><p class="text-xs text-gray-600">${escapeHtml(item.desc)}</p></td><td class="py-2 text-right">${item.qty}</td><td class="py-2 text-right">${formatCurrency(item.rate)}</td><td class="py-2 text-right font-semibold">${formatCurrency(item.amount)}</td></tr>`).join('');
             const upiQrHtml = invoiceData.upiId ? `<div><h4 class="font-semibold text-sm">Scan to Pay</h4><img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=upi://pay?pa=${encodeURIComponent(invoiceData.upiId)}&pn=Payment" alt="UPI QR Code" class="mt-1"><p class="text-xs text-gray-600">${escapeHtml(invoiceData.upiId)}</p></div>` : '';

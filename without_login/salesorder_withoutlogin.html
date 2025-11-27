@@ -17,6 +17,17 @@
             background-color: #f9fafb;
         }
 
+        /* --- Hide Arrows ONLY in Rate Input --- */
+        .rate::-webkit-inner-spin-button, 
+        .rate::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        .rate {
+            -moz-appearance: textfield;
+        }
+        /* -------------------------------------- */
+
         /* Form styles remain unchanged */
         .form-container {
             max-width: 960px;
@@ -300,11 +311,11 @@
             width: 210mm;
             margin: 1.5rem auto 0;
         }
-@media (max-width: 768px) {
-  #main-content {
-    margin-top: 64px; /* height of the fixed header */
-  }
-}
+        @media (max-width: 768px) {
+          #main-content {
+            margin-top: 64px; /* height of the fixed header */
+          }
+        }
 
         @media print {
             body {
@@ -332,11 +343,7 @@
 
 <body>
     <div class="flex">
-        <!-- ✅ MOBILE NAV + SIDEBAR -->
-<!-- Mobile Header -->
-<!-- ✅ MOBILE HEADER (Fixed on top for mobile) -->
-<!-- ✅ MOBILE HEADER (Menu icon on the left) -->
-<header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
   <div class="flex items-center space-x-3">
     <button id="menu-toggle" class="text-white focus:outline-none">
       <i class="fas fa-bars text-2xl"></i>
@@ -346,10 +353,8 @@
 </header>
 
 
-<!-- ✅ BACKDROP for mobile -->
 <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
 
-<!-- ✅ SIDEBAR -->
 <aside id="sidebar"
   class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
   <div class="p-6 text-2xl font-bold border-b border-gray-700">
@@ -435,65 +440,50 @@
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="border rounded-lg p-4 space-y-2">
-                                    <h3 class="font-semibold text-gray-700">
-                                        From
-                                        <span class="text-gray-400 text-sm">(Your Details)</span>
-                                    </h3>
-                                    <div>
-                                        <label for="businessName" class="text-sm font-medium text-gray-600">
-                                            Business Name
-                                        </label>
-                                        <input type="text" id="businessName" class="input-field"
-                                            placeholder="Your Business Name" required />
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <div>
-                                            <label for="business_city" class="text-sm font-medium text-gray-600">
-                                                City
-                                            </label>
-                                            <input type="text" id="business_city" class="input-field"
-                                                placeholder="Your City" required />
-                                        </div>
-                                        <div>
-                                            <label for="business_country" class="text-sm font-medium text-gray-600">
-                                                Country
-                                            </label>
-                                            <input type="text" id="business_country" class="input-field"
-                                                placeholder="Your Country" required />
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="border rounded-lg p-4 space-y-2">
+                                <h3 class="font-semibold text-gray-700">From <span class="text-gray-400 text-sm">(Your
+                                        Details)</span></h3>
+                                <input type="text" id="from-name" class="input-field" placeholder="Business Name">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="from-street" class="input-field" placeholder="Street">
+                                    <input type="text" id="from-city" class="input-field" placeholder="City">
+                                    <input type="text" id="from-state" class="input-field" placeholder="State">
+                                    <input type="text" id="from-pincode" class="input-field" placeholder="Pincode">
 
-                                <div class="border rounded-lg p-4 space-y-2">
+                                </div>
+                            </div>
+                            <div class="border rounded-lg p-4 space-y-2">
                                     <h3 class="font-semibold text-gray-700">
                                         Billed To <span class="text-gray-400 text-sm">(Client's Details)</span>
                                     </h3>
                                     <div>
-                                        <label for="clientName" class="text-sm font-medium text-gray-600">
-                                            Client Name
-                                        </label>
+                                        
                                         <input type="text" id="clientName" class="input-field"
                                             placeholder="Client's Business Name" required />
                                     </div>
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label for="client_city" class="text-sm font-medium text-gray-600">
-                                                City
-                                            </label>
+                                            
+                                            <input type="text" id="client_Street" class="input-field"
+                                                placeholder="Client's Street" required />
+                                        </div>
+                                        
+                                        <div>
+                                            
                                             <input type="text" id="client_city" class="input-field"
                                                 placeholder="Client's City" required />
+                                                
+                                        </div>
+                                
+                                        <div>
+                                                <input type="text" id="from-state" class="input-field" placeholder="State">
                                         </div>
                                         <div>
-                                            <label for="client_country" class="text-sm font-medium text-gray-600">
-                                                Country
-                                            </label>
-                                            <input type="text" id="client_country" class="input-field"
-                                                placeholder="Client's Country" required />
+                                                <input type="text" id="from-pincode" class="input-field" placeholder="Pincode">
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                        </div>
 
                             <div class="col-span-2 p-4 rounded-lg border shadow-sm">
                                 <div
