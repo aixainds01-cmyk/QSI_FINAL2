@@ -782,6 +782,32 @@ All purchase are final.</textarea>
         document.getElementById("sub_total").textContent = `₹${subtotal.toFixed(2)}`;
         document.getElementById("tax").textContent = `₹${tax.toFixed(2)}`;
         document.getElementById("total").textContent = `₹${total.toFixed(2)}`;
+      }
+
+      addItemBtn.addEventListener("click", createItemRow);
+      taxPercentageInput.addEventListener("input", updateTotals);
+
+      // Automatically set Due Date to 30 days after Purchase Order Date
+      const poDateInput = document.getElementById("purshase-order-date");
+      const dueDateInput = document.getElementById("purshase-order-due-date");
+
+      if (poDateInput && dueDateInput) {
+        poDateInput.addEventListener("change", function () {
+          const poDateVal = this.value;
+          if (poDateVal) {
+            const date = new Date(poDateVal);
+            date.setDate(date.getDate() + 30);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            dueDateInput.value = `${year}-${month}-${day}`;
+          }
+        });
+      }
+
+      PurchaseOrderForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
         const vendorName = document.getElementById("vendorName").value.trim();
         if (!vendorName) {
           alert("Please enter the vendor's name.");
@@ -922,70 +948,65 @@ All purchase are final.</textarea>
         document.getElementById("preview-purshase-order-page").classList.remove("hidden-section");
       });
 
-    document.getElementById("edit-btn").addEventListener("click", () => {
-      document.getElementById("preview-purshase-order-page").classList.add("hidden-section");
-      document.getElementById("create-purshase-order-page").classList.remove("hidden-section");
-    });
-
-    document.getElementById("download-pdf-btn").addEventListener("click", async () => {
-      const element = document.getElementById("preview-content");
-      if (!element) return;
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        allowTaint: true
+      document.getElementById("edit-btn").addEventListener("click", () => {
+        document.getElementById("preview-purshase-order-page").classList.add("hidden-section");
+        document.getElementById("create-purshase-order-page").classList.remove("hidden-section");
       });
 
-      const imgWidthMm = pdf.internal.pageSize.getWidth();
-      const pageHeightMm = pdf.internal.pageSize.getHeight();
-      const canvasW = canvas.width;
-      const canvasH = canvas.height;
-      const pxPerMm = canvasW / imgWidthMm;
-      const pageHeightPx = Math.floor(pageHeightMm * pxPerMm);
+      document.getElementById("download-pdf-btn").addEventListener("click", async () => {
+        const element = document.getElementById("preview-content");
+        if (!element) return;
 
-      let position = 0;
-      while (position < canvasH) {
-        const canvasPage = document.createElement("canvas");
-        canvasPage.width = canvasW;
-        const remaining = canvasH - position;
-        canvasPage.height = remaining > pageHeightPx ? pageHeightPx : remaining;
-        const ctx = canvasPage.getContext("2d");
-        ctx.drawImage(canvas, 0, position, canvasW, canvasPage.height, 0, 0, canvasW, canvasPage.height);
-        const imgData = canvasPage.toDataURL("image/png");
-        const imgHeightMm = canvasPage.height / pxPerMm;
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidthMm, imgHeightMm);
-        position += canvasPage.height;
-        if (position < canvasH) pdf.addPage();
-      }
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p", "mm", "a4");
 
-      pdf.save(`PurchaseOrder-${document.getElementById("preview-po-no").textContent}.pdf`);
-    });
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          allowTaint: true
+        });
 
-    document.querySelectorAll(".toggle-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const targetEl = document.getElementById(btn.dataset.target);
-        if (targetEl) targetEl.classList.toggle("hidden");
+        const imgWidthMm = pdf.internal.pageSize.getWidth();
+        const pageHeightMm = pdf.internal.pageSize.getHeight();
+        const canvasW = canvas.width;
+        const canvasH = canvas.height;
+        const pxPerMm = canvasW / imgWidthMm;
+        const pageHeightPx = Math.floor(pageHeightMm * pxPerMm);
+
+        let position = 0;
+        while (position < canvasH) {
+          const canvasPage = document.createElement("canvas");
+          canvasPage.width = canvasW;
+          const remaining = canvasH - position;
+          canvasPage.height = remaining > pageHeightPx ? pageHeightPx : remaining;
+          const ctx = canvasPage.getContext("2d");
+          ctx.drawImage(canvas, 0, position, canvasW, canvasPage.height, 0, 0, canvasW, canvasPage.height);
+          const imgData = canvasPage.toDataURL("image/png");
+          const imgHeightMm = canvasPage.height / pxPerMm;
+          pdf.addImage(imgData, "PNG", 0, 0, imgWidthMm, imgHeightMm);
+          position += canvasPage.height;
+          if (position < canvasH) pdf.addPage();
+        }
+
+        pdf.save(`PurchaseOrder-${document.getElementById("preview-po-no").textContent}.pdf`);
       });
-    });
 
-    const dropdownBtn = document.getElementById("documents-dropdown-btn");
-    dropdownBtn.addEventListener("click", () => {
-      document.getElementById("documents-dropdown-content").classList.toggle("hidden");
-      document.getElementById("dropdown-icon").classList.toggle("rotate-180");
-    });
+      document.querySelectorAll(".toggle-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const targetEl = document.getElementById(btn.dataset.target);
+          if (targetEl) targetEl.classList.toggle("hidden");
+        });
+      });
 
-    const today = new Date();
-    document.getElementById("purshase-order-date").value = today.toISOString().slice(0, 10);
+      const dropdownBtn = document.getElementById("documents-dropdown-btn");
+      dropdownBtn.addEventListener("click", () => {
+        document.getElementById("documents-dropdown-content").classList.toggle("hidden");
+        document.getElementById("dropdown-icon").classList.toggle("rotate-180");
+      });
 
-    const dueDate = new Date(today);
-    dueDate.setDate(dueDate.getDate() + 30);
-    document.getElementById("purshase-order-due-date").value = dueDate.toISOString().slice(0, 10);
-    createItemRow();
+      document.getElementById("purshase-order-date").value = new Date().toISOString().slice(0, 10);
+      createItemRow();
     });
   </script>
 </body>
