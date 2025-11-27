@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Purchase Order - QSI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        /* Sidebar & Layout Styles (Same as Create Page) */
+        .form-container {
+            max-width: 960px;
+            margin: 2rem auto;
+        }
+
+        .view-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            background-color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.625rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #7c3aed;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #6d28d9;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-outline {
+            background-color: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-outline:hover {
+            background-color: #f3f4f6;
+        }
+
+        .item-table-header {
+            background-color: #6d28d9;
+            color: white;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2rem;
+            color: #6b7280;
+        }
+
+        .label-text {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .value-text {
+            font-size: 0.95rem;
+            color: #111827;
+            font-weight: 500;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-approved {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-draft {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        /* Print Styles */
+        @media print {
+
+            aside,
+            header,
+            #view-actions,
+            .no-print {
+                display: none !important;
+            }
+
+            #main-content {
+                margin: 0;
+                padding: 0;
+                overflow: visible;
+
+                return token ? {
+                    'Authorization': `Bearer $ {
+                        token
+                    }
+
+                    `
+                }
+
+                : null;
+            }
+
+            async function fetchAPI(url) {
+                const headers=getAuthHeaders();
+
+                if ( !headers) {
+                    window.location.href='../../index.html';
+                    throw new Error("No token");
+                }
+
+                const res=await fetch(url, {
+                    headers
+                });
+            if ( !res.ok) throw new Error("API Error");
+            return res.json();
+        }
+
+        // --- Formatting Helpers ---
+        const formatCurrency=(amount)=> {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency', currency: 'INR'
+            }).format(amount || 0);
+        }
+
+        ;
+
+        const formatDate=(dateString)=> {
+            if ( !dateString) return '-';
+
+            return new Date(dateString).toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        }
+
+        ;
+
+        const getStatusBadge=(status)=> {
+            const s=(status || 'draft').toLowerCase();
+            let cls='badge-draft';
+            if (s==='approved') cls='badge-approved';
+            if (s==='pending') cls='badge-pending';
+            if (s==='cancelled') cls='badge-cancelled';
+
+            return `<span class="badge ${cls}">$ {
+                status || 'Draft'
+            }
+
+            </span>`;
+        }
+
+        ;
+
+        // --- Main Logic ---
+        document.addEventListener('DOMContentLoaded', async ()=> {
+                const params=new URLSearchParams(window.location.search);
+                const poId=params.get('id');
+
+                if ( !poId) {
+                    alert('No Purchase Order ID found');
+                    window.location.href='home_purchase_orders.html';
+                    return;
+                }
+
+                // Setup Edit Button Link
+                document.getElementById('edit-btn').onclick=()=> {
+                    window.location.href=`create_purchase_order.html?edit_id=$ {
+                        poId
+                    }
+
+                    `; // Assuming create page handles edit mode
+                }
+
+                ;
+
+                try {
+
+                    // 1. Fetch PO Details
+                    const poData=await fetchAPI(`$ {
+                            API_BASE_URL
+                        }
+
+                        /purchase-orders/$ {
+                            poId
+                        }
+
+                        `);
+
+                    // 2. Fetch Company Details (for 'From' section)
+                    let companyData= {}
+
+                    ;
+
+                    try {
+                        const companies=await fetchAPI(`$ {
+                                API_BASE_URL
+                            }
+
+                            /companies`);
+                        if (companies && companies.length > 0) companyData=companies[0];
+                    }
+
+                    catch (e) {
+                        console.error("Company fetch error", e);
+                    }
+
+                    renderPO(poData, companyData);
+                    document.getElementById('loading-indicator').classList.add('hidden');
+                    document.getElementById('po-view-container').classList.remove('hidden');
+
+                }
+
+                catch (err) {
+                    console.error(err);
+                    document.getElementById('loading-indicator').innerHTML=`<span class="text-red-500" >Error loading data.</span>`;
+                }
+            });
+
+        function renderPO(po, company) {
+            // Header Info
+            document.getElementById('view-po-no').textContent=po.po_no || po.purchase_order_no || 'N/A';
+            document.getElementById('view-status-badge').outerHTML=getStatusBadge(po.status);
+            document.getElementById('view-po-date').textContent=formatDate(po.po_date || po.order_date);
+            document.getElementById('view-delivery-date').textContent=formatDate(po.expected_delivery);
+
+            // Company Info (From)
+            document.getElementById('view-company-name').textContent=company.company_name || 'My Company';
+            document.getElementById('addr-company-name').textContent=company.company_name || 'My Company';
+            document.getElementById('addr-company-city').textContent=company.address?.city || '';
+            document.getElementById('addr-company-country').textContent=company.address?.country || '';
+
+            if (company.logo) {
+                const img=document.getElementById('view-logo');
+                img.src=company.logo;
+                img.classList.remove('hidden');
+            }
+
+            // Vendor Info (To)
+            const vendorName=po.supplier_name || (po.supplier ? po.supplier.vendor_name : 'Unknown Vendor');
+            document.getElementById('addr-vendor-name').textContent=vendorName;
+
+            // Check if vendor address exists in PO object, else leave blank or fetch vendor details separately
+            // For now, assume simple display
+            document.getElementById('addr-vendor-country').textContent='Vendor Details';
+
+            // Items List
+            const itemsContainer=document.getElementById('view-items-container');
+            const items=po.items || [];
+
+            if (items.length===0) {
+                itemsContainer.innerHTML='<div class="p-4 text-center text-gray-500">No items found</div>';
+            }
+
+            else {
+                itemsContainer.innerHTML=items.map(item=> ` <div class="grid grid-cols-12 gap-4 p-4 text-sm items-start" > <div class="col-span-5" > <p class="font-medium text-gray-900" >$ {
+                        item.item_name || 'Item'
+                    }
+
+                    </p> <p class="text-gray-500 text-xs mt-0.5" >$ {
+                        item.description || ''
+                    }
+
+                    </p> </div> <div class="col-span-2 text-center text-gray-700" >$ {
+                        item.quantity || 0
+                    }
+
+                    </div> <div class="col-span-2 text-right text-gray-700" >$ {
+                        formatCurrency(item.rate)
+                    }
+
+                    </div> <div class="col-span-3 text-right font-medium text-gray-900" >$ {
+                        formatCurrency(item.amount)
+                    }
+
+                    </div> </div> `).join('');
+            }
+
+            // Totals
+            document.getElementById('view-subtotal').textContent=formatCurrency(po.sub_total || po.subtotal);
+            document.getElementById('view-tax-percent').textContent=po.tax_percentage || 0;
+            document.getElementById('view-tax').textContent=formatCurrency(po.tax);
+            document.getElementById('view-roundoff').textContent=formatCurrency(po.round_off);
+            document.getElementById('view-total').textContent=formatCurrency(po.total || po.grand_total);
+
+            // Footer
+            if (po.terms_and_condition) {
+                document.getElementById('view-terms-box').classList.remove('hidden');
+                document.getElementById('view-terms').textContent=po.terms_and_condition;
+            }
+
+            if (po.notes) {
+                document.getElementById('view-notes-box').classList.remove('hidden');
+                document.getElementById('view-notes').textContent=po.notes;
+            }
+        }
+
+        </script></body></html>
