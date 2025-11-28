@@ -141,11 +141,23 @@
                         / Cancelled</button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border rounded-lg bg-gray-50">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 border rounded-lg bg-gray-50 items-end">
+                    
                     <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</label>
+                        <label for="filter-search" class="block text-sm font-medium text-gray-700 mb-1">Search PO Number</label>
+                        <div class="relative">
+                            <input type="text" id="filter-search" placeholder="Search PO..."
+                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="filter-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                         <select id="filter-status"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                            class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option value="All">All Statuses</option>
                             <option value="Draft">Draft</option>
                             <option value="Pending">Pending</option>
@@ -153,17 +165,26 @@
                             <option value="Received">Received</option>
                         </select>
                     </div>
+
                     <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Vendor</label>
+                        <label for="filter-vendor" class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
                         <select id="filter-vendor"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                            class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option>All Vendors</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</label>
-                        <input type="date" id="filter-date"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+
+                    <div class="flex gap-2">
+                        <div class="flex-grow">
+                            <label for="filter-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                            <input type="date" id="filter-date"
+                                class="block w-full border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        </div>
+                        <button id="clear-filters-btn"
+                            class="mb-[2px] px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition duration-200"
+                            title="Clear Filters">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -314,6 +335,8 @@
             const tabActive = document.getElementById('tab-active');
             const tabDeleted = document.getElementById('tab-deleted');
             const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            const filterSearch = document.getElementById('filter-search');
+            const clearFiltersBtn = document.getElementById('clear-filters-btn');
 
             // Bulk Action Elements
             const bulkActionBar = document.getElementById('bulk-action-bar');
@@ -413,21 +436,27 @@
             }
 
             function applyFilters() {
+                // 1. Tab Filter (Active vs Deleted)
                 let filtered = allPurchaseOrders.filter(po => {
                     const status = (po.status || '').toLowerCase();
                     const isDeleted = status.includes('cancel') || status.includes('delete');
                     return currentTab === 'active' ? !isDeleted : isDeleted;
                 });
 
+                // Get values
+                const sSearch = filterSearch ? filterSearch.value.trim().toLowerCase() : '';
                 const sVendor = filterVendor ? filterVendor.value : 'All Vendors';
                 const sStatus = filterStatus ? filterStatus.value : 'All';
                 const sDate = filterDate ? filterDate.value : '';
 
+                // 2. Filter Logic
                 filtered = filtered.filter(po => {
+                    const matchSearch = !sSearch || (po.po_no || '').toLowerCase().includes(sSearch);
                     const matchVendor = sVendor === 'All Vendors' || (po.supplier_name || '') === sVendor;
                     const matchStatus = sStatus === 'All' || (po.status || '').toLowerCase().includes(sStatus.toLowerCase());
                     const matchDate = !sDate || (po.po_date && po.po_date.startsWith(sDate));
-                    return matchVendor && matchStatus && matchDate;
+
+                    return matchSearch && matchVendor && matchStatus && matchDate;
                 });
 
                 displayedPurchaseOrders = filtered;
@@ -513,6 +542,18 @@
                             method: 'PUT',
                             body: JSON.stringify({ status: 'Cancelled' })
                         });
+                        // Search & Clear Button Events
+            if (filterSearch) filterSearch.addEventListener('input', applyFilters);
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', () => {
+                    if (filterSearch) filterSearch.value = '';
+                    if (filterStatus) filterStatus.value = 'All';
+                    if (filterVendor) filterVendor.value = 'All Vendors';
+                    if (filterDate) filterDate.value = '';
+                    applyFilters();
+                });
+            }
+
                         fetchOrders();
                     } catch (e) { alert(e.message); }
                 }));
@@ -664,7 +705,7 @@
                     bulkActionBar.classList.add('hidden');
                 }
             }
-
+            
             const closeBulk = document.getElementById('bulk-action-close');
             if (closeBulk) closeBulk.addEventListener('click', () => {
                 if (selectAllCheckbox) selectAllCheckbox.checked = false;
@@ -680,7 +721,9 @@
             };
             setupDropdown('documents-dropdown-btn', 'documents-dropdown-content', 'dropdown-icon');
             setupDropdown('purchases-dropdown-btn', 'purchases-dropdown-content', 'purchases-dropdown-icon');
-
+            if (filterStatus) filterStatus.addEventListener('change', applyFilters);
+            if (filterVendor) filterVendor.addEventListener('change', applyFilters);
+            if (filterDate) filterDate.addEventListener('change', applyFilters);
             fetchOrders();
         });
     </script>

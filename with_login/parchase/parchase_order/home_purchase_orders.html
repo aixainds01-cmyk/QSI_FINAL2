@@ -103,7 +103,18 @@
                     </div>
                 </div>
 
-                </a>
+                <div>
+                     <button id="purchases-dropdown-btn"
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-shopping-cart mr-3 w-6 text-center"></i>Purchases</span>
+                        <i id="purchases-dropdown-icon"
+                            class="fas fa-chevron-down transform transition-transform duration-200 text-xs"></i>
+                    </button>
+                    <div id="purchases-dropdown-content"
+                        class="pl-8 pt-1 space-y-1 hidden bg-gray-900 bg-opacity-50 rounded-md mt-1">
+                         </div>
+                </div>
+
                 <a href="../../settings.html"
                     class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-cog mr-3 w-6 text-center"></i>Settings
@@ -141,11 +152,23 @@
                         / Cancelled</button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border rounded-lg bg-gray-50">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 border rounded-lg bg-gray-50 items-end">
+                    
                     <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</label>
+                        <label for="filter-search" class="block text-sm font-medium text-gray-700 mb-1">Search PO Number</label>
+                        <div class="relative">
+                            <input type="text" id="filter-search" placeholder="Search PO..."
+                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="filter-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                         <select id="filter-status"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                            class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option value="All">All Statuses</option>
                             <option value="Draft">Draft</option>
                             <option value="Pending">Pending</option>
@@ -153,17 +176,26 @@
                             <option value="Received">Received</option>
                         </select>
                     </div>
+
                     <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Vendor</label>
+                        <label for="filter-vendor" class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
                         <select id="filter-vendor"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                            class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option>All Vendors</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</label>
-                        <input type="date" id="filter-date"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+
+                    <div class="flex gap-2">
+                        <div class="flex-grow">
+                            <label for="filter-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                            <input type="date" id="filter-date"
+                                class="block w-full border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        </div>
+                        <button id="clear-filters-btn"
+                            class="mb-[2px] px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition duration-200"
+                            title="Clear Filters">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -233,7 +265,6 @@
             </div>
         </main>
     </div>
-    <!-- Payment Modal -->
     <div id="payment-modal"
         class="fixed inset-0 z-[60] hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
         <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all">
@@ -314,6 +345,10 @@
             const tabActive = document.getElementById('tab-active');
             const tabDeleted = document.getElementById('tab-deleted');
             const selectAllCheckbox = document.getElementById('select-all-checkbox');
+
+            // NEW: Search & Clear Elements
+            const filterSearch = document.getElementById('filter-search');
+            const clearFiltersBtn = document.getElementById('clear-filters-btn');
 
             // Bulk Action Elements
             const bulkActionBar = document.getElementById('bulk-action-bar');
@@ -412,22 +447,36 @@
                 });
             }
 
+            // NEW UPDATED APPLY FILTERS FUNCTION
             function applyFilters() {
+                // 1. Filter by Tab (Active vs Deleted) first
                 let filtered = allPurchaseOrders.filter(po => {
                     const status = (po.status || '').toLowerCase();
                     const isDeleted = status.includes('cancel') || status.includes('delete');
                     return currentTab === 'active' ? !isDeleted : isDeleted;
                 });
 
+                // Get values from inputs
+                const sSearch = filterSearch ? filterSearch.value.trim().toLowerCase() : '';
                 const sVendor = filterVendor ? filterVendor.value : 'All Vendors';
                 const sStatus = filterStatus ? filterStatus.value : 'All';
                 const sDate = filterDate ? filterDate.value : '';
 
+                // 2. Filter by Inputs
                 filtered = filtered.filter(po => {
+                    // Search Filter (PO Number)
+                    const matchSearch = !sSearch || (po.po_no || '').toLowerCase().includes(sSearch);
+                    
+                    // Vendor Filter
                     const matchVendor = sVendor === 'All Vendors' || (po.supplier_name || '') === sVendor;
+                    
+                    // Status Filter
                     const matchStatus = sStatus === 'All' || (po.status || '').toLowerCase().includes(sStatus.toLowerCase());
+                    
+                    // Date Filter
                     const matchDate = !sDate || (po.po_date && po.po_date.startsWith(sDate));
-                    return matchVendor && matchStatus && matchDate;
+
+                    return matchSearch && matchVendor && matchStatus && matchDate;
                 });
 
                 displayedPurchaseOrders = filtered;
@@ -598,9 +647,6 @@
                         notes: document.getElementById('pay-notes-input').value
                     };
 
-                    // Uncomment below line to see what is being sent
-                    // alert("Sending ID: " + payload.purchase_order_id); 
-
                     try {
                         await safeFetch(`${API_BASE_URL}/vendor-payments`, {
                             method: 'POST',
@@ -680,6 +726,22 @@
             };
             setupDropdown('documents-dropdown-btn', 'documents-dropdown-content', 'dropdown-icon');
             setupDropdown('purchases-dropdown-btn', 'purchases-dropdown-content', 'purchases-dropdown-icon');
+
+            if (filterStatus) filterStatus.addEventListener('change', applyFilters);
+            if (filterVendor) filterVendor.addEventListener('change', applyFilters);
+            if (filterDate) filterDate.addEventListener('change', applyFilters);
+
+            // NEW: SEARCH & RESET EVENT LISTENERS
+            if (filterSearch) filterSearch.addEventListener('input', applyFilters);
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', () => {
+                    if (filterSearch) filterSearch.value = '';
+                    if (filterStatus) filterStatus.value = 'All';
+                    if (filterVendor) filterVendor.value = 'All Vendors';
+                    if (filterDate) filterDate.value = '';
+                    applyFilters(); // Refresh table
+                });
+            }
 
             fetchOrders();
         });
