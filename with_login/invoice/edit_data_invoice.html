@@ -7,11 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-    <link rel="stylesheet" href="edit_invoice_styles.css">
-    <style>
-    body {
+    
+   <style>
+        body {
     font-family: "Inter", sans-serif;
     background-color: #f9fafb;
 }
@@ -343,11 +344,12 @@
         display: none !important;
     }
 }
-</style>
+    </style>
 </head>
 
 <body>
     <div class="flex">
+        <!-- Mobile Header -->
         <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
             <div class="flex items-center space-x-3">
                 <button id="menu-toggle" class="text-white focus:outline-none">
@@ -357,8 +359,10 @@
             </div>
         </header>
 
+        <!-- Mobile Menu Backdrop -->
         <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
 
+        <!-- Sidebar -->
         <aside id="sidebar" class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
             <div class="p-6 text-2xl font-bold border-b border-gray-700">
                 <i class="mr-2 text-indigo-400"></i> QSI
@@ -399,17 +403,17 @@
             </nav>
         </aside>
 
+        <!-- Main Content -->
         <div id="main-content" class="flex-1 overflow-y-auto">
             <div class="w-full max-w-5xl mx-auto p-6">
+                <!-- Edit Invoice Page -->
                 <div id="create-invoice-page">
                     <main class="form-container">
                         <form id="invoice-form">
                             <div class="flex justify-between items-center mb-6">
                                 <h1 class="text-3xl font-bold text-gray-800">Edit Invoice</h1>
                                 <div class="flex items-center space-x-2">
-                                    <button id="update-btn" type="submit" class="btn btn-primary">
-                                        Update
-                                    </button>
+                                    <button id="update-btn" type="submit" class="btn btn-primary">Update</button>
                                     <span id="save-btn-loading" class="hidden">Updating...</span>
                                 </div>
                             </div>
@@ -417,6 +421,7 @@
                             <div id="alert-container"></div>
 
                             <div class="form-section space-y-6">
+                                <!-- Invoice Details and Logo -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <div class="grid grid-cols-3 gap-2 items-center mb-2">
@@ -427,11 +432,9 @@
                                             <label for="invoice-no" class="text-gray-600 text-sm">Invoice No.</label>
                                             <input type="text" id="invoice-no" class="input-field col-span-2 bg-gray-100" placeholder="Will be generated" readonly />
                                         </div>
-
                                         <div class="grid grid-cols-3 gap-2 items-center mb-2">
                                             <label for="invoice-date" class="text-gray-600 text-sm">Invoice Date</label>
                                             <input type="date" id="invoice-date" class="input-field col-span-2" readonly />
-
                                             <label for="due-date" class="text-gray-600 text-sm mt-2 block">Due Date</label>
                                             <input type="date" id="due-date" class="input-field col-span-2" required />
                                         </div>
@@ -448,16 +451,14 @@
                                     </div>
                                 </div>
 
+                                <!-- From/To Details -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="border rounded-lg p-4 space-y-2">
-                                        <h3 class="font-semibold text-gray-700">
-                                            From <span class="text-gray-400 text-sm">(Your Details)</span>
-                                        </h3>
+                                        <h3 class="font-semibold text-gray-700">From <span class="text-gray-400 text-sm">(Your Details)</span></h3>
                                         <div>
                                             <label for="businessName" class="text-sm font-medium text-gray-600">Business Name</label>
                                             <input type="text" id="businessName" class="input-field" required readonly />
                                         </div>
-
                                         <div class="grid grid-cols-2 gap-2">
                                             <div>
                                                 <label for="business_city" class="text-sm font-medium text-gray-600">City</label>
@@ -471,20 +472,17 @@
                                     </div>
 
                                     <div class="border rounded-lg p-4">
-                                        <h3 class="font-semibold text-gray-700 mb-2">
-                                            Billed To <span class="text-gray-400 text-sm">(Client's Details)</span>
-                                        </h3>
-
+                                        <h3 class="font-semibold text-gray-700 mb-2">Billed To <span class="text-gray-400 text-sm">(Client's Details)</span></h3>
                                         <select id="billed-to-select" class="input-field w-full mb-2" required>
                                             <option value="">Select Client</option>
                                         </select>
-
                                         <button type="button" id="add-new-client-btn" class="w-full text-center text-indigo-600 font-semibold py-2 border-2 border-dashed rounded-lg hover:bg-indigo-50 text-sm">
                                             + Add New Client
                                         </button>
                                     </div>
                                 </div>
 
+                                <!-- Items Table -->
                                 <div class="col-span-2 p-4 rounded-lg border shadow-sm">
                                     <div class="item-table-header grid grid-cols-12 gap-2 p-3 rounded-t-lg text-sm border-b">
                                         <h4 class="col-span-4 font-semibold">Item</h4>
@@ -493,9 +491,7 @@
                                         <h4 class="col-span-3 font-semibold text-right">Amount</h4>
                                         <h4 class="col-span-1 text-center">--</h4>
                                     </div>
-
                                     <div id="items-container" class="space-y-2 py-2"></div>
-
                                     <div class="pt-2">
                                         <button type="button" id="add-item-btn" class="btn-link">
                                             <i class="fas fa-plus mr-1"></i> Add New Line
@@ -503,39 +499,42 @@
                                     </div>
                                 </div>
 
-                                <!-- Find this section in your HTML (around line 520) and update it: -->
-<div class="w-full flex justify-end mt-4">
-    <div class="w-80 p-4 rounded-lg border bg-white shadow-sm space-y-3">
-        <div class="flex justify-between items-center">
-            <span class="text-gray-600">Subtotal</span>
-            <span class="font-semibold text-gray-800" id="sub_total">₹0.00</span>
-        </div>
+                                <!-- Totals Section -->
+                                <div class="w-full flex justify-end mt-4">
+                                    <div class="w-80 p-4 rounded-lg border bg-white shadow-sm space-y-3">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">Subtotal</span>
+                                            <span class="font-semibold text-gray-800" id="sub_total">₹0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600 flex items-center">
+                                                Tax (
+                                                <input type="number" id="tax-percentage" min="0" max="100" class="w-16 mx-1 border rounded text-right text-sm px-2 py-1" value="0" placeholder="0" />%)
+                                            </span>
+                                            <span class="font-semibold text-gray-800" id="tax">₹0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">Round Off</span>
+                                            <span class="font-semibold text-gray-800" id="round_off">₹0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
+                                            <span class="font-bold text-lg text-gray-800">Total (INR)</span>
+                                            <span class="font-bold text-lg text-gray-800" id="total">₹0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
 
-        <div class="flex justify-between items-center">
-            <span class="text-gray-600 flex items-center">
-                Tax (
-                <input type="number" id="tax-percentage" min="0" max="100" class="w-16 mx-1 border rounded text-right text-sm px-2 py-1" value="0" placeholder="0" />%)
-            </span>
-            <span class="font-semibold text-gray-800" id="tax">₹0.00</span>
-        </div>
-
-        <!-- ADD THIS DIV FOR ROUND OFF -->
-        <div class="flex justify-between items-center">
-            <span class="text-gray-600">Round Off</span>
-            <span class="font-semibold text-gray-800" id="round_off">₹0.00</span>
-        </div>
-        <!-- END -->
-
-        <div class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
-            <span class="font-bold text-lg text-gray-800">Total (INR)</span>
-            <span class="font-bold text-lg text-gray-800" id="total">₹0.00</span>
-        </div>
-    </div>
-</div>
-
+                                <!-- Additional Options -->
                                 <div class="flex flex-col md:flex-row gap-6 mt-6">
                                     <div class="flex-1 space-y-4">
                                         <div class="w-full overflow-x-auto">
+                                            <div class="mb-2">
+                                                <label class="flex items-center gap-2 cursor-pointer">
+                                                    <input type="checkbox" id="show-bank-details" class="form-checkbox h-4 w-4 text-indigo-600 rounded">
+                                                    <span class="text-sm text-gray-700 font-medium">Show bank details with UPI QR code in invoice PDF</span>
+                                                </label>
+                                            </div>
+                                            
                                             <div class="flex flex-nowrap gap-2 mb-4 whitespace-nowrap">
                                                 <button type="button" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="terms">+ Terms & Conditions</button>
                                                 <button type="button" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="notes">+ Notes</button>
@@ -589,6 +588,7 @@
                     </main>
                 </div>
 
+                <!-- Preview Invoice Page -->
                 <div id="preview-invoice-page" class="hidden">
                     <div class="invoice-container">
                         <header class="invoice-header">
@@ -624,37 +624,45 @@
                                     <th>Amount</th>
                                 </tr>
                             </thead>
-                            <tbody id="preview-items-tbody">
-                            </tbody>
+                            <tbody id="preview-items-tbody"></tbody>
                         </table>
 
                         <section class="totals-section">
-    <div class="totals-table">
-        <div>
-            <span>Sub Total</span>
-            <span id="preview-subtotal"></span>
-        </div>
-        <div>
-            <span>Tax (<span id="preview-tax-rate"></span>%)</span>
-            <span id="preview-tax"></span>
-        </div>
-        <!-- ADD THIS DIV FOR ROUND OFF IN PREVIEW -->
-        <div>
-            <span>Round Off</span>
-            <span id="preview-round-off"></span>
-        </div>
-        <!-- END -->
-        <div class="total-amount">
-            <span>Total Amount</span>
-            <span id="preview-total"></span>
-        </div>
-    </div>
-</section>
+                            <div class="totals-table">
+                                <div>
+                                    <span>Sub Total</span>
+                                    <span id="preview-subtotal"></span>
+                                </div>
+                                <div>
+                                    <span>Tax (<span id="preview-tax-rate"></span>%)</span>
+                                    <span id="preview-tax"></span>
+                                </div>
+                                <div>
+                                    <span>Round Off</span>
+                                    <span id="preview-round-off"></span>
+                                </div>
+                                <div class="total-amount">
+                                    <span>Total Amount</span>
+                                    <span id="preview-total"></span>
+                                </div>
+                            </div>
+                        </section>
 
                         <div class="separator"></div>
 
                         <footer class="invoice-footer">
                             <div class="notes-terms">
+                                <div id="preview-bank-details-block" class="hidden mb-4">
+                                    <h3 class="font-semibold mb-2 text-gray-700">Bank Details</h3>
+                                    <p class="text-sm text-gray-700" style="line-height: 1.6;">
+                                        <strong>Bank:</strong> <span id="preview-bank-name"></span><br>
+                                        <strong>A/c Name:</strong> <span id="preview-bank-acc-name"></span><br>
+                                        <strong>A/c No:</strong> <span id="preview-bank-acc-no"></span><br>
+                                        <strong>IFSC:</strong> <span id="preview-bank-ifsc"></span>
+                                    </p>
+                                    <div id="preview-upi-qr-code" class="mt-2" style="max-width: 100px;"></div>
+                                </div>
+                                
                                 <div id="preview-notes-block" class="hidden">
                                     <h3 class="font-semibold mb-1">Notes</h3>
                                     <p id="preview-notes" class="text-sm text-gray-700 whitespace-pre-wrap"></p>
@@ -665,11 +673,8 @@
                                 </div>
                             </div>
                             <div id="preview-signature-area" class="signature-section hidden">
-                                <div class="signature-image-space">
-                                </div>
-                                <div class="signature-line">
-                                    Authorized Signitary
-                                </div>
+                                <div class="signature-image-space"></div>
+                                <div class="signature-line">Authorized Signitary</div>
                                 <p id="preview-signatory-name" class="font-semibold"></p>
                             </div>
                         </footer>
@@ -686,6 +691,7 @@
         </div>
     </div>
 
+    <!-- Client Modal -->
     <div id="client-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
         <div id="client-modal-backdrop" class="absolute inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm"></div>
         <div id="client-modal-panel" class="relative w-full max-w-2xl mx-4">
@@ -759,13 +765,9 @@
         </div>
     </div>
 
+    <!-- Include the JavaScript file -->
     <script>
-    // ============================================
-// COMPLETE EDIT INVOICE SCRIPT
-// Place this in your edit_invoice_script.js file
-// ============================================
-
-(function () {
+        (function () {
     // ============================================
     // CONFIGURATION
     // ============================================
@@ -773,6 +775,7 @@
     const CLIENT_API_URL = `${API_BASE_URL}/clients`;
     const COMPANY_API_URL = `${API_BASE_URL}/companies`;
     const INVOICE_API_URL = `${API_BASE_URL}/invoic`;
+    const BANK_API_URL = `${API_BASE_URL}/banks`;
     const SIGNATORY_STORAGE_KEY = 'qsi_saved_signatories';
     const SIGNATURE_IMAGE_STORAGE_KEY = 'qsi_saved_signature_image';
 
@@ -902,6 +905,20 @@
     }
 
     // ============================================
+    // FETCH BANK DETAILS
+    // ============================================
+    async function fetchBankDetails() {
+        try {
+            const banks = await safeFetch(BANK_API_URL, { method: "GET" });
+            return Array.isArray(banks) ? banks : [];
+        } catch (err) {
+            console.error("Error loading bank details:", err);
+            showAlert("Could not load bank details.", "error", 4000);
+            return [];
+        }
+    }
+
+    // ============================================
     // LOAD SIGNATORIES
     // ============================================
     function loadSignatories() {
@@ -976,6 +993,7 @@
 
         document.getElementById("sub_total").textContent = `₹${subtotal.toFixed(2)}`;
         document.getElementById("tax").textContent = `₹${tax.toFixed(2)}`;
+        document.getElementById("round_off").textContent = `₹${roundOff.toFixed(2)}`;
         document.getElementById("total").textContent = `₹${totalRounded.toFixed(0)}`;
     }
 
@@ -1032,6 +1050,7 @@
             notes: document.getElementById("notes-input")?.value.trim(),
             signatory: signatoryType === 'text' && signatorySelect?.value !== 'add_new' ? signatorySelect?.value : null,
             signatory_image: signatoryType === 'image' ? localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY) : null,
+            show_bank_details: document.getElementById("show-bank-details")?.checked || false,
         };
     }
 
@@ -1074,6 +1093,7 @@
                 const opt = document.createElement("option");
                 opt.value = invoice.to_client_id;
                 opt.textContent = invoice.to.client_name;
+                opt.dataset.clientData = JSON.stringify(invoice.to);
                 select.appendChild(opt);
                 select.value = invoice.to_client_id;
             }
@@ -1095,6 +1115,11 @@
             document.getElementById("terms").classList.remove('hidden');
             document.getElementById("notes").classList.remove('hidden');
             document.getElementById("signature-box").classList.remove('hidden');
+
+            // Load bank details checkbox state
+            if (invoice.show_bank_details) {
+                document.getElementById("show-bank-details").checked = true;
+            }
 
             if (invoice.signatory_image) {
                 document.querySelector('input[name="signatory_type"][value="image"]').checked = true;
@@ -1151,10 +1176,25 @@
             document.getElementById("preview-inv-date").textContent = new Date(doc.date || data.date).toLocaleDateString('en-GB');
             document.getElementById("preview-due-date").textContent = new Date(doc.due_date || data.due_date).toLocaleDateString('en-GB');
             
+            // Get the selected client from dropdown for most current data
+            const billedSelect = document.getElementById("billed-to-select");
+            const selectedOption = billedSelect.options[billedSelect.selectedIndex];
+            let clientData = doc.to;
+            
+            // Try to get fresh client data from dropdown
+            if (selectedOption && selectedOption.dataset.clientData) {
+                try {
+                    const freshClientData = JSON.parse(selectedOption.dataset.clientData);
+                    if (freshClientData) clientData = freshClientData;
+                } catch (e) {
+                    console.warn("Could not parse client data from dropdown");
+                }
+            }
+            
             const fromAddr = [doc.from?.company_name || '', `${doc.from?.address?.city || ''}, ${doc.from?.address?.state || ''}`].filter(Boolean).join('\n');
             document.getElementById("preview-from-details").textContent = fromAddr;
             
-            const toAddr = [doc.to?.client_name || '', `${doc.to?.address?.city || ''}, ${doc.to?.address?.state || ''}`].filter(Boolean).join('\n');
+            const toAddr = [clientData?.client_name || '', `${clientData?.address?.city || ''}, ${clientData?.address?.state || ''}`].filter(Boolean).join('\n');
             document.getElementById("preview-to-details").textContent = toAddr;
 
             const tbody = document.getElementById("preview-items-tbody");
@@ -1193,6 +1233,61 @@
                 sigArea.classList.remove("hidden");
             }
 
+            // Bank Details & QR Code Logic
+            const showBankDetails = data.show_bank_details;
+            const bankBlock = document.getElementById('preview-bank-details-block');
+            const qrBlock = document.getElementById('preview-upi-qr-code');
+
+            // Reset/hide bank block by default
+            bankBlock.classList.add('hidden');
+            qrBlock.innerHTML = '';
+
+            if (showBankDetails) {
+                try {
+                    const banks = await fetchBankDetails();
+                    if (banks && banks.length > 0) {
+                        const bankWithUpi = banks.find(b => b.upi_id);
+
+                        if (bankWithUpi) {
+                            // Populate Bank Details
+                            document.getElementById('preview-bank-name').textContent = bankWithUpi.bank_name || 'N/A';
+                            document.getElementById('preview-bank-acc-name').textContent = bankWithUpi.account_holder || 'N/A';
+                            document.getElementById('preview-bank-acc-no').textContent = bankWithUpi.account_number || 'N/A';
+                            document.getElementById('preview-bank-ifsc').textContent = bankWithUpi.ifsc_code || 'N/A';
+                            
+                            // Generate UPI QR Code
+                            const upiId = bankWithUpi.upi_id;
+                            const totalAmount = data.total;
+                            const companyName = doc.from?.company_name || 'Payment';
+
+                            // Construct UPI payment string
+                            const upiString = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(companyName)}&am=${totalAmount.toFixed(2)}&cu=INR`;
+                            
+                            // Generate QR code using qrcode library
+                            if (typeof qrcode !== 'undefined') {
+                                const typeNumber = 4;
+                                const errorCorrectionLevel = 'L';
+                                const qr = qrcode(typeNumber, errorCorrectionLevel);
+                                qr.addData(upiString);
+                                qr.make();
+                                qrBlock.innerHTML = qr.createImgTag(3, 4);
+                            } else {
+                                console.error("QR code library not loaded");
+                                qrBlock.innerHTML = '<span class="text-xs text-red-500">QR generation error</span>';
+                            }
+
+                            bankBlock.classList.remove('hidden');
+                        } else {
+                            console.warn("No bank account with UPI ID found");
+                        }
+                    } else {
+                        console.warn("No bank accounts configured");
+                    }
+                } catch (bankErr) {
+                    console.error("Failed to fetch/display bank details:", bankErr);
+                }
+            }
+
             document.getElementById("create-invoice-page").classList.add("hidden");
             document.getElementById("preview-invoice-page").classList.remove("hidden");
             showAlert("Invoice updated successfully!", "success", 4000);
@@ -1219,13 +1314,13 @@
             const actionButtons = document.querySelector(".bottom-button-container");
             if (actionButtons) actionButtons.style.display = "none";
 
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const canvas = await html2canvas(element, { scale: 1.2, useCORS: true, backgroundColor: '#ffffff' });
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF("p", "mm", "a4");
-            const imgData = canvas.toDataURL("image/png");
+            const imgData = canvas.toDataURL("image/jpeg", 0.85);
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = (canvas.height * pageWidth) / canvas.width;
-            pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pdfHeight);
+            pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pdfHeight, 'FAST');
             
             let clientName = document.getElementById("preview-to-details")?.textContent.split('\n')[0] || "Client";
             clientName = clientName.replace(/[^a-zA-Z0-9-_ ]/g, "").replace(/\s+/g, "_");

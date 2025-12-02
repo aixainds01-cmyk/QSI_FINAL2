@@ -940,7 +940,7 @@ All purchase are final.</textarea>
         const pdf = new jsPDF("p", "mm", "a4");
 
         const canvas = await html2canvas(element, {
-          scale: 2,
+          scale: 1.2,
           useCORS: true,
           logging: false,
           allowTaint: true
@@ -961,9 +961,9 @@ All purchase are final.</textarea>
           canvasPage.height = remaining > pageHeightPx ? pageHeightPx : remaining;
           const ctx = canvasPage.getContext("2d");
           ctx.drawImage(canvas, 0, position, canvasW, canvasPage.height, 0, 0, canvasW, canvasPage.height);
-          const imgData = canvasPage.toDataURL("image/png");
+          const imgData = canvasPage.toDataURL("image/jpeg", 0.85);
           const imgHeightMm = canvasPage.height / pxPerMm;
-          pdf.addImage(imgData, "PNG", 0, 0, imgWidthMm, imgHeightMm);
+          pdf.addImage(imgData, "PNG", 0, 0, imgWidthMm, imgHeightMm, 'FAST');
           position += canvasPage.height;
           if (position < canvasH) pdf.addPage();
         }
