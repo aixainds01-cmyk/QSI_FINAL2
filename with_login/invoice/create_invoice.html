@@ -753,12 +753,12 @@
                                             <label class="block text-sm font-medium text-gray-700">Terms &
                                                 Conditions</label>
                                             <textarea id="terms-input"
-                                                class="w-full border rounded p-2 mt-1">THANK YOU!</textarea>
+                                                class="w-full border rounded p-2 mt-1">PAYMENT SHOULD BE MADE WITHIN 5 DAYS</textarea>
                                         </div>
                                         <div id="notes" class="hidden mt-2">
                                             <label class="block text-sm font-medium text-gray-700">Notes</label>
                                             <textarea id="notes-input"
-                                                class="w-full border rounded p-2 mt-1">Thanks For Business With Us</textarea>
+                                                class="w-full border rounded p-2 mt-1">THANKS FOR BUSINESS WITH US!</textarea>
                                         </div>
                                         <div id="signature-box" class="hidden mt-2">
                                             <div class="flex items-center gap-4 mb-3 border-b pb-3">
@@ -1830,7 +1830,7 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
                 const dueInput = document.getElementById("due-date");
                 if (dueInput) {
                     const due = new Date();
-                    due.setDate(due.getDate() + 30); // Default due date = 7 days after invoice date
+                    due.setDate(due.getDate() + 5); // Default due date = 7 days after invoice date
                     dueInput.value = due.toISOString().slice(0, 10);
                 }
 

@@ -402,7 +402,7 @@
 
             function populateVendorFilter() {
                 if (!filterVendor) return;
-                const vendors = new Set(allPurchaseOrders.map(po => po.supplier_name || 'Unknown'));
+                const vendors = new Set(allPurchaseOrders.map(po => po.vendor_name || 'Unknown'));
                 filterVendor.innerHTML = '<option>All Vendors</option>';
                 Array.from(vendors).sort().forEach(v => {
                     const opt = document.createElement('option');
@@ -424,7 +424,7 @@
                 const sDate = filterDate ? filterDate.value : '';
 
                 filtered = filtered.filter(po => {
-                    const matchVendor = sVendor === 'All Vendors' || (po.supplier_name || '') === sVendor;
+                    const matchVendor = sVendor === 'All Vendors' || (po.vendor_name || '') === sVendor;
                     const matchStatus = sStatus === 'All' || (po.status || '').toLowerCase().includes(sStatus.toLowerCase());
                     const matchDate = !sDate || (po.po_date && po.po_date.startsWith(sDate));
                     return matchVendor && matchStatus && matchDate;
@@ -466,7 +466,7 @@
                                     title="Pay Vendor"
                                     data-id="${id}" 
                                     data-po-no="${po.po_no}"
-                                    data-vendor="${po.supplier_name}"
+                                    data-vendor="${po.vendor_name}"
                                     data-total="${totalAmt}"
                                     data-paid="${paidAmt}">
                                 <i class="fas fa-money-bill-wave"></i> Pay
@@ -482,7 +482,7 @@
                     <td class="table-body-cell text-center"><input type="checkbox" class="po-checkbox w-4 h-4 rounded text-indigo-600" data-id="${id}"></td>
                     <td class="table-body-cell font-medium text-gray-800">${po.po_no}</td>
                     <td class="table-body-cell text-gray-500 text-sm">${po.po_date || '-'}</td>
-                    <td class="table-body-cell font-medium text-gray-700">${po.supplier_name || 'N/A'}</td>
+                    <td class="table-body-cell font-medium text-gray-700">${po.vendor_name || 'N/A'}</td>
                     <td class="table-body-cell">${statusBadge(po.status)}</td>
                     <td class="table-body-cell text-right text-green-600 font-medium">${formatCurrency(paidAmt)}</td>
                     <td class="table-body-cell text-right font-bold text-gray-800">${formatCurrency(totalAmt)}</td>

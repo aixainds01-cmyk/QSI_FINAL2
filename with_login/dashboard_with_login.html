@@ -36,7 +36,6 @@
         @media (max-width: 768px) {
             #main-content {
                 margin-top: 64px;
-                /* height of the fixed header */
             }
         }
     </style>
@@ -61,11 +60,10 @@
             </div>
         </header>
 
-
-        <!-- ✅ BACKDROP for mobile -->
+        <!-- BACKDROP for mobile -->
         <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
 
-        <!-- ✅ SIDEBAR -->
+        <!-- SIDEBAR -->
         <aside id="sidebar"
             class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
             <div class="p-6 text-2xl font-bold border-b border-gray-700">
@@ -95,26 +93,26 @@
                             class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit
                             note</a>
                     </div>
-                    <div>
-                        <button id="purchases-dropdown-btn"
-                            class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
-                            <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
-                            <i id="purchases-dropdown-icon"
-                                class="fas fa-chevron-down transform transition-transform duration-200"></i>
-                        </button>
-                        <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
-                            <a href="parchase/vendor/vendors_leads.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors
-                                Leads</a>
-                            <a href="parchase/parchase_order/home_purchase_orders.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase
-                                Orders</a>
-                            <a href="parchase/debit notes/debit_notes.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit
-                                Notes</a>
-                            <a href="payout.html"
-                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout</a>
-                        </div>
+                </div>
+                <div>
+                    <button id="purchases-dropdown-btn"
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
+                        <i id="purchases-dropdown-icon"
+                            class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="parchase/vendor/vendors_leads.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors
+                            Leads</a>
+                        <a href="parchase/parchase_order/home_purchase_orders.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase
+                            Orders</a>
+                        <a href="parchase/debit notes/debit_notes.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit
+                            Notes</a>
+                        <a href="payout.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout</a>
                     </div>
                 </div>
                 <a href="manage-clients.html"
@@ -162,7 +160,6 @@
                         <p class="mt-2 text-gray-500">Send price quotes and estimates to potential customers.</p>
                     </a>
 
-
                     <!-- Create Sales Orders Card -->
                     <a href="saleorder/create_salesorder.html"
                         class="card block p-6 bg-white rounded-xl shadow-md border border-gray-200">
@@ -172,7 +169,6 @@
                         <h2 class="text-xl font-bold text-gray-800">Create Sales Orders</h2>
                         <p class="mt-2 text-gray-500">Generate a professional Sales order for your clients quickly .</p>
                     </a>
-
 
                     <!-- Create New Invoice Card -->
                     <a href="invoice/create_invoice.html"
@@ -184,6 +180,7 @@
                         <p class="mt-2 text-gray-500">Generate a professional invoice for your clients quickly and
                             easily.</p>
                     </a>
+
                     <!-- Manage Quotation Card -->
                     <a href="quotation/home_quotation.html"
                         class="card block p-6 bg-white rounded-xl shadow-md border border-gray-200">
@@ -193,6 +190,7 @@
                         <h2 class="text-xl font-bold text-gray-800">Manage Quotations</h2>
                         <p class="mt-2 text-gray-500">View, edit, and manage all your quotations in one place.</p>
                     </a>
+
                     <!-- Manage Sales Orders Card -->
                     <a href="saleorder/home_sales_order.html"
                         class="card block p-6 bg-white rounded-xl shadow-md border border-gray-200">
@@ -216,8 +214,8 @@
             </main>
         </div>
     </div>
+
     <!-- Logout modal -->
-    <!-- Top-right popover account panel -->
     <div id="logout-modal" class="absolute z-50 hidden" style="top:64px; right:32px; min-width:220px;">
         <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
             <div class="flex items-center gap-3 mb-2">
@@ -244,6 +242,7 @@
             </div>
         </div>
     </div>
+
     <script>
     // ------------------------------
     // 📌 MOBILE SIDEBAR TOGGLE
@@ -263,25 +262,40 @@
     });
 
     // ------------------------------
+    // 📌 SIDEBAR DROPDOWN FUNCTIONALITY
+    // ------------------------------
+    // Sales Documents Dropdown
+    const documentsDropdownBtn = document.getElementById("documents-dropdown-btn");
+    const documentsDropdownContent = document.getElementById("documents-dropdown-content");
+    const dropdownIcon = document.getElementById("dropdown-icon");
+
+    documentsDropdownBtn.addEventListener("click", () => {
+        documentsDropdownContent.classList.toggle("hidden");
+        dropdownIcon.classList.toggle("rotate-180");
+    });
+
+    // Purchases Dropdown
+    const purchasesDropdownBtn = document.getElementById("purchases-dropdown-btn");
+    const purchasesDropdownContent = document.getElementById("purchases-dropdown-content");
+    const purchasesDropdownIcon = document.getElementById("purchases-dropdown-icon");
+
+    purchasesDropdownBtn.addEventListener("click", () => {
+        purchasesDropdownContent.classList.toggle("hidden");
+        purchasesDropdownIcon.classList.toggle("rotate-180");
+    });
+
+    // ------------------------------
     // 📌 BUSINESS LOGO + LOGOUT PANEL
     // ------------------------------
     (function () {
-
-        // 🌐 Desktop avatar
         const desktopAvatarBtn = document.getElementById('desktop-avatar-btn');
         const desktopAvatarImg = document.getElementById('desktop-avatar-img');
-
-        // 📱 Mobile avatar
         const mobileAvatarBtn = document.getElementById('mobile-avatar-btn');
         const mobileAvatarImg = document.getElementById('mobile-avatar-img');
-
-        // Popover
         const modalLogo = document.getElementById('modal-business-logo');
         const modalNameEl = document.getElementById('modal-business-name');
         const modalEmailEl = document.getElementById('modal-business-email');
         const logoutModal = document.getElementById('logout-modal');
-
-        // Confirm modal
         const logoutConfirm = document.getElementById('logout-confirm');
         const logoutConfirmModal = document.getElementById('logout-confirm-modal');
         const confirmCancel = document.getElementById('confirm-cancel');
@@ -291,9 +305,6 @@
             return localStorage.getItem('auth_token') || localStorage.getItem('token');
         }
 
-        // ------------------------------
-        // 📌 Fetch Company Details
-        // ------------------------------
         async function fetchCompanyDetails() {
             const token = getToken();
             if (!token) return;
@@ -313,7 +324,6 @@
                     const logo = comp.logo || '';
                     const email = comp.email || comp.contact_email || '';
 
-                    // Set logos everywhere
                     if (logo) {
                         desktopAvatarImg.src = logo;
                         mobileAvatarImg.src = logo;
@@ -328,18 +338,13 @@
             }
         }
 
-        // ------------------------------
-        // 📌 Toggle Logout Popover
-        // ------------------------------
         function toggleLogout() {
             logoutModal.classList.toggle("hidden");
         }
 
-        // Desktop & mobile avatar click
         desktopAvatarBtn?.addEventListener("click", toggleLogout);
         mobileAvatarBtn?.addEventListener("click", toggleLogout);
 
-        // Hide popover if clicking outside
         document.addEventListener("mousedown", (event) => {
             if (!logoutModal.classList.contains("hidden")) {
                 if (!logoutModal.contains(event.target) &&
@@ -353,9 +358,6 @@
             }
         });
 
-        // ------------------------------
-        // 📌 Logout Confirmation
-        // ------------------------------
         logoutConfirm.addEventListener("click", () => {
             logoutModal.classList.add("hidden");
             logoutConfirmModal.classList.remove("hidden");
@@ -375,9 +377,6 @@
             window.location.href = '../index.html';
         });
 
-        // ------------------------------
-        // 📌 LIVE DATE & TIME
-        // ------------------------------
         function updateDateTime() {
             const el = document.getElementById('live-datetime');
             if (!el) return;
@@ -390,11 +389,9 @@
         updateDateTime();
         setInterval(updateDateTime, 1000);
 
-        // Init
         fetchCompanyDetails();
-
     })();
-</script>
+    </script>
 
 </body>
 
