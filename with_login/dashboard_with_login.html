@@ -54,8 +54,8 @@
                 <span class="text-xl font-bold">QSI</span>
             </div>
             <div class="flex items-center space-x-2">
-                <button id="business-avatar-btn" title="Account" class="p-0 bg-transparent border-0">
-                    <img id="business-avatar-img" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U"
+                <button id="desktop-avatar-btn" title="Account" class="p-0 bg-transparent border-0">
+                    <img id="desktop-avatar-img" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U"
                         alt="Business Logo" class="w-8 h-8 rounded-full">
                 </button>
             </div>
@@ -136,8 +136,8 @@
                 <div class="flex items-center space-x-4">
                     <p id="live-datetime" class="text-sm text-gray-600 font-medium"></p>
                     <div class="flex items-center space-x-2">
-                        <button id="business-avatar-btn" title="Account" class="p-0 bg-transparent border-0">
-                            <img id="business-avatar-img" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U"
+                        <button id="mobile-avatar-btn" title="Account" class="p-0 bg-transparent border-0">
+                            <img id="mobile-avatar-img" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U"
                                 alt="Business Logo" class="w-8 h-8 rounded-full">
                         </button>
                     </div>
@@ -245,115 +245,157 @@
         </div>
     </div>
     <script>
-        // Sidebar dropdowns
-        document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
-            document.getElementById('documents-dropdown-content').classList.toggle('hidden');
-            document.getElementById('dropdown-icon').classList.toggle('rotate-180');
-        });
-        document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
-            document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
-            document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
-        });
+    // ------------------------------
+    // 📌 MOBILE SIDEBAR TOGGLE
+    // ------------------------------
+    const menuToggle = document.getElementById("menu-toggle");
+    const sidebar = document.getElementById("sidebar");
+    const backdrop = document.getElementById("menu-backdrop");
 
-        // --- Top-right business name population and logout modal ---
-        (function () {
-            const avatarBtn = document.getElementById('business-avatar-btn');
-            const avatarImg = document.getElementById('business-avatar-img');
-            const modalLogo = document.getElementById('modal-business-logo');
-            const modalNameEl = document.getElementById('modal-business-name');
-            const modalEmailEl = document.getElementById('modal-business-email');
-            const logoutModal = document.getElementById('logout-modal');
-            const logoutConfirm = document.getElementById('logout-confirm');
-            const logoutConfirmModal = document.getElementById('logout-confirm-modal');
-            const confirmCancel = document.getElementById('confirm-cancel');
-            const confirmOk = document.getElementById('confirm-ok');
+    menuToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("-translate-x-full");
+        backdrop.classList.toggle("hidden");
+    });
 
-            function getToken() {
-                return localStorage.getItem('auth_token') || localStorage.getItem('token');
-            }
+    backdrop.addEventListener("click", () => {
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
+    });
 
-            async function fetchCompanyDetails() {
-                const token = getToken();
-                if (!token) return;
-                try {
-                    const res = await fetch('http://Aixains-Mac-mini.local:8000/api/companies', { headers: { 'Authorization': 'Bearer ' + token } });
-                    if (!res.ok) return;
-                    const data = await res.json();
-                    const list = Array.isArray(data) ? data : (data.data || data.companies || []);
-                    if (list && list[0]) {
-                        const comp = list[0];
-                        const name = comp.company_name || comp.business_name || comp.name || 'Business';
-                        const logo = comp.logo || '';
-                        const email = comp.email || comp.contact_email || '';
-                        // set avatar image and modal details
-                        if (logo) {
-                            avatarImg.src = logo;
-                            modalLogo.src = logo;
-                        }
-                        modalNameEl.textContent = name;
-                        if (email) modalEmailEl.textContent = email; else modalEmailEl.textContent = '';
+    // ------------------------------
+    // 📌 BUSINESS LOGO + LOGOUT PANEL
+    // ------------------------------
+    (function () {
+
+        // 🌐 Desktop avatar
+        const desktopAvatarBtn = document.getElementById('desktop-avatar-btn');
+        const desktopAvatarImg = document.getElementById('desktop-avatar-img');
+
+        // 📱 Mobile avatar
+        const mobileAvatarBtn = document.getElementById('mobile-avatar-btn');
+        const mobileAvatarImg = document.getElementById('mobile-avatar-img');
+
+        // Popover
+        const modalLogo = document.getElementById('modal-business-logo');
+        const modalNameEl = document.getElementById('modal-business-name');
+        const modalEmailEl = document.getElementById('modal-business-email');
+        const logoutModal = document.getElementById('logout-modal');
+
+        // Confirm modal
+        const logoutConfirm = document.getElementById('logout-confirm');
+        const logoutConfirmModal = document.getElementById('logout-confirm-modal');
+        const confirmCancel = document.getElementById('confirm-cancel');
+        const confirmOk = document.getElementById('confirm-ok');
+
+        function getToken() {
+            return localStorage.getItem('auth_token') || localStorage.getItem('token');
+        }
+
+        // ------------------------------
+        // 📌 Fetch Company Details
+        // ------------------------------
+        async function fetchCompanyDetails() {
+            const token = getToken();
+            if (!token) return;
+
+            try {
+                const res = await fetch('http://Aixains-Mac-mini.local:8000/api/companies', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!res.ok) return;
+
+                const data = await res.json();
+                const list = Array.isArray(data) ? data : (data.data || data.companies || []);
+
+                if (list && list[0]) {
+                    const comp = list[0];
+                    const name = comp.company_name || comp.business_name || comp.name || 'Business';
+                    const logo = comp.logo || '';
+                    const email = comp.email || comp.contact_email || '';
+
+                    // Set logos everywhere
+                    if (logo) {
+                        desktopAvatarImg.src = logo;
+                        mobileAvatarImg.src = logo;
+                        modalLogo.src = logo;
                     }
-                } catch (e) {
-                    console.warn('Could not fetch company details', e);
+
+                    modalNameEl.textContent = name;
+                    modalEmailEl.textContent = email;
+                }
+            } catch (e) {
+                console.warn('Could not fetch company details', e);
+            }
+        }
+
+        // ------------------------------
+        // 📌 Toggle Logout Popover
+        // ------------------------------
+        function toggleLogout() {
+            logoutModal.classList.toggle("hidden");
+        }
+
+        // Desktop & mobile avatar click
+        desktopAvatarBtn?.addEventListener("click", toggleLogout);
+        mobileAvatarBtn?.addEventListener("click", toggleLogout);
+
+        // Hide popover if clicking outside
+        document.addEventListener("mousedown", (event) => {
+            if (!logoutModal.classList.contains("hidden")) {
+                if (!logoutModal.contains(event.target) &&
+                    event.target !== desktopAvatarBtn &&
+                    event.target !== mobileAvatarBtn &&
+                    !desktopAvatarBtn?.contains(event.target) &&
+                    !mobileAvatarBtn?.contains(event.target)
+                ) {
+                    logoutModal.classList.add("hidden");
                 }
             }
+        });
 
-            // Toggle popover panel on avatar click
-            avatarBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                logoutModal.classList.toggle('hidden');
-            });
+        // ------------------------------
+        // 📌 Logout Confirmation
+        // ------------------------------
+        logoutConfirm.addEventListener("click", () => {
+            logoutModal.classList.add("hidden");
+            logoutConfirmModal.classList.remove("hidden");
+            logoutConfirmModal.classList.add("flex");
+        });
 
-            // Hide popover if click outside
-            document.addEventListener('mousedown', (event) => {
-                if (!logoutModal.classList.contains('hidden')) {
-                    if (!logoutModal.contains(event.target) && event.target !== avatarBtn && !avatarBtn.contains(event.target)) {
-                        logoutModal.classList.add('hidden');
-                    }
-                }
-            });
+        confirmCancel.addEventListener("click", () => {
+            logoutConfirmModal.classList.add("hidden");
+            logoutConfirmModal.classList.remove("flex");
+        });
 
-            // When user clicks Log out in the bottom sheet, show confirmation modal
-            logoutConfirm.addEventListener('click', (e) => {
-                e.preventDefault();
-                // hide bottom sheet and show centered confirm
-                logoutModal.classList.add('hidden');
-                logoutConfirmModal.classList.remove('hidden');
-                logoutConfirmModal.classList.add('flex');
-            });
+        confirmOk.addEventListener("click", () => {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_scheme');
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            window.location.href = '../index.html';
+        });
 
-            // Cancel the centered confirmation
-            confirmCancel.addEventListener('click', () => {
-                logoutConfirmModal.classList.add('hidden');
-                logoutConfirmModal.classList.remove('flex');
-            });
+        // ------------------------------
+        // 📌 LIVE DATE & TIME
+        // ------------------------------
+        function updateDateTime() {
+            const el = document.getElementById('live-datetime');
+            if (!el) return;
+            const d = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            el.textContent =
+                `${d.toLocaleDateString(undefined, options)} 
+                 ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
 
-            // Final OK - perform logout
-            confirmOk.addEventListener('click', () => {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('auth_scheme');
-                localStorage.removeItem('token');
-                localStorage.removeItem('userId');
-                window.location.href = '../index.html';
-            });
+        // Init
+        fetchCompanyDetails();
 
-            // Live datetime update
-            function updateDateTime() {
-                const el = document.getElementById('live-datetime');
-                if (!el) return;
-                const d = new Date();
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                const datePart = d.toLocaleDateString(undefined, options);
-                const timePart = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                el.textContent = `${datePart} ${timePart}`;
-            }
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
+    })();
+</script>
 
-            // Initialize
-            fetchCompanyDetails();
-        })();
-    </script>
 </body>
 
 </html>
