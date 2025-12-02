@@ -441,13 +441,30 @@ function renderList(list) {
                         </button>`
                     : `<span class="text-xs text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Paid</span>`;
                 
-                actionButtons = `
-                <button class="hover:text-indigo-600 action-open" title="Open" data-id="${id}"><i class="fas fa-external-link-alt"></i></button>
-                <button class="hover:text-indigo-600 action-edit" title="Edit" data-id="${id}"><i class="fas fa-pencil-alt"></i></button>
-                ${paymentBtn}
-                <div class="relative">
-                    <button class="hover:text-indigo-600 action-more" title="More" data-id="${id}"><i class="fas fa-ellipsis-h"></i></button>
-                </div>`;
+                // Determine if edit button should be shown
+const statusLower = status.toLowerCase();
+const allowEdit = !(statusLower === "paid" || statusLower.includes("partial"));
+
+actionButtons = `
+    <button class="hover:text-indigo-600 action-open" title="Open" data-id="${id}">
+        <i class="fas fa-external-link-alt"></i>
+    </button>
+
+    ${allowEdit ? `
+        <button class="hover:text-indigo-600 action-edit" title="Edit" data-id="${id}">
+            <i class="fas fa-pencil-alt"></i>
+        </button>
+    ` : ''}
+
+    ${paymentBtn}
+
+    <div class="relative">
+        <button class="hover:text-indigo-600 action-more" title="More" data-id="${id}">
+            <i class="fas fa-ellipsis-h"></i>
+        </button>
+    </div>
+`;
+
             } else { // Deleted view
                 actionButtons = `
                 <button class="hover:text-green-600 action-restore text-sm font-semibold" title="Restore Invoice" data-id="${id}">

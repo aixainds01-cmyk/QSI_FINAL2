@@ -1585,7 +1585,7 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
 
                                     // Construct a UPI payment string
                                     // upi://pay?pa=UPI_ID&pn=PAYEE_NAME&am=AMOUNT&cu=CURRENCY
-                                    const upiString = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(companyName)}&am=${totalAmount.toFixed(2)}&cu=INR`;
+                                    const upiString = `upi://pay?pa=UPI_ID&pn=COMPANY_NAME&am=AMOUNT&cu=INR`;
                                     
                                     if (typeof qrcode !== 'undefined') {
                                         const typeNumber = 4; // Adjust complexity (4 is a good default)
@@ -1646,17 +1646,30 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
                     const actionButtons = document.querySelector(".bottom-button-container");
                     if (actionButtons) actionButtons.style.display = "none";
 
-                    const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+                    // Reduced scale from 2 to 1.2 for better file size
+                    const canvas = await html2canvas(element, { 
+                        scale: 1.2, 
+                        useCORS: true, 
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                        imageTimeout: 0
+                    });
+                    
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF("p", "mm", "a4");
-                    const imgData = canvas.toDataURL("image/png");
+                    
+                    // Convert to JPEG with compression instead of PNG
+                    const imgData = canvas.toDataURL("image/jpeg", 0.85);
+                    
                     const pageWidth = pdf.internal.pageSize.getWidth();
                     const pageHeight = pdf.internal.pageSize.getHeight();
                     const imgProps = pdf.getImageProperties(imgData);
                     const pdfWidth = pageWidth;
                     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-                    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+                    // Use JPEG format for smaller file size
+                    pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+                    
                     let clientName = document.getElementById("preview-to-details")?.textContent || "Client";
                     clientName = clientName.replace(/[^a-zA-Z0-9-_ ]/g, "").replace(/\s+/g, "_");
                     const filename = `${clientName}-invoice.pdf`;
@@ -1668,7 +1681,6 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
                     showAlert("Error exporting PDF: " + (err.message || err), "error", 6000);
                 }
             });
-
             const addNewClientBtn = document.getElementById("add-new-client-btn");
             const clientModal = document.getElementById("client-modal");
             const clientModalClose = document.getElementById("client-modal-close");
