@@ -330,27 +330,23 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Update URL to match your server configuration
             const API_BASE_URL = 'http://Aixains-Mac-mini.local:8000/api';
             const API_URL = `${API_BASE_URL}/purchase-orders`;
 
-            // --- GLOBAL VARIABLE FOR SAFETY ---
             let CURRENT_PO_ID = null;
 
             // Elements
             const tbody = document.getElementById('po-table-body');
-            const totalCountSpan = document.getElementById('total-count');
+            const totalCountSpan = document.getElementById('total-count'); // Ensure this ID exists in HTML or remove check
             const filterStatus = document.getElementById('filter-status');
             const filterVendor = document.getElementById('filter-vendor');
             const filterDate = document.getElementById('filter-date');
             const tabActive = document.getElementById('tab-active');
             const tabDeleted = document.getElementById('tab-deleted');
             const selectAllCheckbox = document.getElementById('select-all-checkbox');
-
-            // NEW: Search & Clear Elements
             const filterSearch = document.getElementById('filter-search');
             const clearFiltersBtn = document.getElementById('clear-filters-btn');
-
-            // Bulk Action Elements
             const bulkActionBar = document.getElementById('bulk-action-bar');
             const bulkActionCount = document.getElementById('bulk-action-count');
             const bulkActionClose = document.getElementById('bulk-action-close');
@@ -400,13 +396,9 @@
 
             const formatCurrency = val => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(val) || 0);
 
-            // ✅ SUPER CLEAN ID FUNCTION
             function getCleanId(doc) {
                 if (!doc) return null;
-                // Check various possible ID locations
                 let id = doc._id || doc.id || doc.original_id;
-
-                // If it's an object like {$oid: "..."}
                 if (typeof id === 'object' && id !== null) {
                     if (id.$oid) return id.$oid;
                     return id.toString();
@@ -424,9 +416,20 @@
                 return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Draft</span>`;
             }
 
-            async function fetchOrders() {
+           async function fetchOrders() {
                 try {
                     const data = await safeFetch(API_URL);
+                    
+                    console.log("🔥 FULL DATA:", data);
+                    if(data.length > 0) {
+                        console.log("👉 First Order Vendor Info:", {
+                            supplier_name: data[0].supplier_name,
+                            vendor_name: data[0].vendor_name,
+                            supplier_obj: data[0].supplier
+                        });
+                    }
+                    // ---------------------------------------------
+
                     allPurchaseOrders = Array.isArray(data) ? data : [];
                     populateVendorFilter();
                     applyFilters();
@@ -435,9 +438,15 @@
                 }
             }
 
+            // ✅ FIX 1: Check for BOTH supplier_name AND vendor_name
+            function getVendorName(po) {
+                return po.supplier_name || po.vendor_name || 'Unknown Supplier';
+            }
+
             function populateVendorFilter() {
                 if (!filterVendor) return;
-                const vendors = new Set(allPurchaseOrders.map(po => po.vendor_name || 'Unknown'));
+                // Use the helper function to get names
+                const vendors = new Set(allPurchaseOrders.map(po => getVendorName(po)));
                 filterVendor.innerHTML = '<option>All Vendors</option>';
                 Array.from(vendors).sort().forEach(v => {
                     const opt = document.createElement('option');
@@ -447,37 +456,23 @@
                 });
             }
 
-            // NEW UPDATED APPLY FILTERS FUNCTION
             function applyFilters() {
-                // 1. Filter by Tab (Active vs Deleted) first
                 let filtered = allPurchaseOrders.filter(po => {
                     const status = (po.status || '').toLowerCase();
                     const isDeleted = status.includes('cancel') || status.includes('delete');
                     return currentTab === 'active' ? !isDeleted : isDeleted;
                 });
 
-                // Get values from inputs
                 const sSearch = filterSearch ? filterSearch.value.trim().toLowerCase() : '';
                 const sVendor = filterVendor ? filterVendor.value : 'All Vendors';
                 const sStatus = filterStatus ? filterStatus.value : 'All';
                 const sDate = filterDate ? filterDate.value : '';
 
-                // 2. Filter by Inputs
                 filtered = filtered.filter(po => {
-<<<<<<< HEAD
-                    // Search Filter (PO Number)
+                    const vName = getVendorName(po); // Use helper
                     const matchSearch = !sSearch || (po.po_no || '').toLowerCase().includes(sSearch);
-                    
-                    // Vendor Filter
-                    const matchVendor = sVendor === 'All Vendors' || (po.supplier_name || '') === sVendor;
-                    
-                    // Status Filter
-=======
-                    const matchVendor = sVendor === 'All Vendors' || (po.vendor_name || '') === sVendor;
->>>>>>> 90d5df3ed6464a9be9e0a477693ee24e69a98caa
+                    const matchVendor = sVendor === 'All Vendors' || vName === sVendor;
                     const matchStatus = sStatus === 'All' || (po.status || '').toLowerCase().includes(sStatus.toLowerCase());
-                    
-                    // Date Filter
                     const matchDate = !sDate || (po.po_date && po.po_date.startsWith(sDate));
 
                     return matchSearch && matchVendor && matchStatus && matchDate;
@@ -488,7 +483,9 @@
             }
 
             function renderTable() {
-                if (totalCountSpan) totalCountSpan.textContent = displayedPurchaseOrders.length;
+                const countElem = document.getElementById('bulk-action-count'); // Or any count element
+                // if (totalCountSpan) totalCountSpan.textContent = displayedPurchaseOrders.length;
+                
                 if (!tbody) return;
                 tbody.innerHTML = '';
 
@@ -498,28 +495,26 @@
                 }
 
                 displayedPurchaseOrders.forEach(po => {
-                    // ✅ CLEAN ID Extraction
                     const id = getCleanId(po);
-
-                    if (!id) {
-                        console.error("❌ Missing ID for PO:", po);
-                        return;
-                    }
+                    if (!id) return;
 
                     const totalAmt = po.total || 0;
                     const paidAmt = po.paid_amount || 0;
                     const pendingAmt = Math.max(0, totalAmt - paidAmt);
+                    
+                    // ✅ FIX 2: Check multiple fields for Sub Total
+                    const subTotal = po.sub_total || po.subTotal || 0;
+                    const vendorName = getVendorName(po);
 
                     let payButton = '';
                     if (currentTab === 'active') {
                         if (pendingAmt > 1) {
-                            // ✅ ID is set directly here
                             payButton = `
                             <button class="action-payment text-gray-400 hover:text-green-600 font-bold text-sm flex items-center gap-1 transition-colors" 
                                     title="Pay Vendor"
                                     data-id="${id}" 
                                     data-po-no="${po.po_no}"
-                                    data-vendor="${po.vendor_name}"
+                                    data-vendor="${vendorName}" 
                                     data-total="${totalAmt}"
                                     data-paid="${paidAmt}">
                                 <i class="fas fa-money-bill-wave"></i> Pay
@@ -532,22 +527,22 @@
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-gray-50 border-b transition-colors';
                     tr.innerHTML = `
-                    <td class="table-body-cell text-center"><input type="checkbox" class="po-checkbox w-4 h-4 rounded text-indigo-600" data-id="${id}"></td>
-                    <td class="table-body-cell font-medium text-gray-800">${po.po_no}</td>
-                    <td class="table-body-cell text-gray-500 text-sm">${po.po_date || '-'}</td>
-                    <td class="table-body-cell font-medium text-gray-700">${po.vendor_name || 'N/A'}</td>
-                    <td class="table-body-cell">${statusBadge(po.status)}</td>
-                    <td class="table-body-cell text-right text-green-600 font-medium">${formatCurrency(paidAmt)}</td>
-                    <td class="table-body-cell text-right font-bold text-gray-800">${formatCurrency(totalAmt)}</td>
-                    <td class="table-body-cell">
-                        <div class="flex items-center justify-center space-x-3">
-                            <button class="text-gray-400 hover:text-indigo-600 action-open" data-id="${id}"><i class="fas fa-external-link-alt"></i></button>
-                            <button class="text-gray-400 hover:text-indigo-600 action-edit" data-id="${id}"><i class="fas fa-pencil-alt"></i></button>
-                            ${payButton}
-                            <button class="text-gray-400 hover:text-red-600 action-cancel" title="Cancel Order" data-id="${id}"><i class="fas fa-ban"></i></button>
-                        </div>
-                    </td>
-                `;
+                        <td class="table-body-cell text-center"><input type="checkbox" class="po-checkbox w-4 h-4 rounded text-indigo-600" data-id="${id}"></td>
+                        <td class="table-body-cell font-medium text-gray-800">${po.po_no}</td>
+                        <td class="table-body-cell text-gray-500 text-sm">${po.po_date || '-'}</td>
+                        <td class="table-body-cell font-medium text-gray-700">${vendorName}</td>
+                        <td class="table-body-cell">${statusBadge(po.status)}</td>
+                        <td class="table-body-cell text-right text-gray-600 font-medium">${formatCurrency(subTotal)}</td>
+                        <td class="table-body-cell text-right font-bold text-gray-800">${formatCurrency(totalAmt)}</td>
+                        <td class="table-body-cell">
+                            <div class="flex items-center justify-center space-x-3">
+                                <button class="text-gray-400 hover:text-indigo-600 action-open" data-id="${id}"><i class="fas fa-external-link-alt"></i></button>
+                                <button class="text-gray-400 hover:text-indigo-600 action-edit" data-id="${id}"><i class="fas fa-pencil-alt"></i></button>
+                                ${payButton}
+                                <button class="text-gray-400 hover:text-red-600 action-cancel" title="Cancel Order" data-id="${id}"><i class="fas fa-ban"></i></button>
+                            </div>
+                        </td>
+                    `;
                     tbody.appendChild(tr);
                 });
 
@@ -570,21 +565,13 @@
                     } catch (e) { alert(e.message); }
                 }));
 
-                // ✅ Robust Pay Button Handler
                 tbody.querySelectorAll('.action-payment').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const d = e.currentTarget.dataset;
                         const rawId = d.id;
-
-                        // 🔍 DIAGNOSTIC CHECK
-                        if (!rawId || rawId === "undefined" || rawId === "null") {
-                            alert("Error: ID not found on button. Please refresh page.");
-                            console.error("Bad ID on button:", d);
-                            return;
-                        }
-
+                        if (!rawId || rawId === "undefined") return;
                         openPaymentModal({
-                            id: rawId, // Pass clean string ID
+                            id: rawId,
                             po_no: d.poNo,
                             vendor: d.vendor,
                             total: parseFloat(d.total),
@@ -596,26 +583,18 @@
 
             function openPaymentModal(data) {
                 if (!paymentModal) return;
-
-                // ✅ SAVE ID TO GLOBAL VARIABLE (Safest method)
                 CURRENT_PO_ID = data.id;
-                console.log("✅ Payment Modal Opened for ID:", CURRENT_PO_ID);
-
                 if (payPoNo) payPoNo.textContent = data.po_no;
                 if (payVendor) payVendor.textContent = data.vendor || 'Unknown';
-
                 const pending = data.total - data.paid;
-
                 if (payTotal) payTotal.textContent = formatCurrency(data.total);
                 if (payAlreadyPaid) payAlreadyPaid.textContent = formatCurrency(data.paid);
                 if (payPending) payPending.textContent = formatCurrency(pending);
-
                 if (payAmountInput) {
                     payAmountInput.value = pending.toFixed(2);
                     payAmountInput.max = pending.toFixed(2);
                 }
                 if (payDateInput) payDateInput.value = new Date().toISOString().split('T')[0];
-
                 paymentModal.classList.remove('hidden');
                 paymentModal.classList.add('flex');
             }
@@ -624,39 +603,30 @@
                 if (!paymentModal) return;
                 paymentModal.classList.add('hidden');
                 paymentModal.classList.remove('flex');
-                CURRENT_PO_ID = null; // Clear ID
+                CURRENT_PO_ID = null;
                 if (paymentForm) paymentForm.reset();
             }
 
             if (paymentForm) {
                 paymentForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
-
-                    // ✅ USE GLOBAL ID VARIABLE
-                    if (!CURRENT_PO_ID) {
-                        alert("System Error: No Purchase Order Selected. Please close and try again.");
-                        return;
-                    }
-
+                    if (!CURRENT_PO_ID) return;
                     const btn = document.getElementById('save-payment-btn');
                     const originalText = btn.innerHTML;
                     btn.disabled = true;
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
                     const payload = {
-                        purchase_order_id: CURRENT_PO_ID, // Using Global Var
+                        purchase_order_id: CURRENT_PO_ID,
                         amount: parseFloat(payAmountInput.value),
                         payment_date: payDateInput.value,
                         payment_method: document.getElementById('pay-method-input').value,
                         notes: document.getElementById('pay-notes-input').value
                     };
-
                     try {
                         await safeFetch(`${API_BASE_URL}/vendor-payments`, {
                             method: 'POST',
                             body: JSON.stringify(payload)
                         });
-
                         alert('Payment recorded successfully!');
                         closePaymentModal();
                         fetchOrders();
@@ -674,7 +644,6 @@
             const cancelBtn = document.getElementById('cancel-payment-btn');
             if (cancelBtn) cancelBtn.addEventListener('click', closePaymentModal);
 
-            // Sidebar & UI Logic
             const sidebar = document.getElementById('sidebar');
             const mobileBtn = document.getElementById('mobile-menu-btn');
             if (mobileBtn) mobileBtn.addEventListener('click', () => sidebar.classList.remove('hidden'));
@@ -734,16 +703,15 @@
             if (filterStatus) filterStatus.addEventListener('change', applyFilters);
             if (filterVendor) filterVendor.addEventListener('change', applyFilters);
             if (filterDate) filterDate.addEventListener('change', applyFilters);
-
-            // NEW: SEARCH & RESET EVENT LISTENERS
             if (filterSearch) filterSearch.addEventListener('input', applyFilters);
+            
             if (clearFiltersBtn) {
                 clearFiltersBtn.addEventListener('click', () => {
                     if (filterSearch) filterSearch.value = '';
                     if (filterStatus) filterStatus.value = 'All';
                     if (filterVendor) filterVendor.value = 'All Vendors';
                     if (filterDate) filterDate.value = '';
-                    applyFilters(); // Refresh table
+                    applyFilters();
                 });
             }
 
