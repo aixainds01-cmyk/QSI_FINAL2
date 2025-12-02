@@ -1213,8 +1213,8 @@
                 if(btns) btns.style.display = 'none';
                 
                 try {
-                    const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-                    const imgData = canvas.toDataURL('image/png');
+                    const canvas = await html2canvas(element, { scale: 1.2, useCORS: true, backgroundColor: '#ffffff' });
+                    const imgData = canvas.toDataURL('image/jpeg', 0.85);
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF('p', 'mm', 'a4');
                     
@@ -1225,13 +1225,13 @@
                     let heightLeft = pdfHeight;
                     let position = 0;
 
-                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight, 'FAST');
                     heightLeft -= pageHeight;
 
                     while (heightLeft > 0) {
                         position = heightLeft - pdfHeight;
                         pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight, 'FAST');
                         heightLeft -= pageHeight;
                     }
 
