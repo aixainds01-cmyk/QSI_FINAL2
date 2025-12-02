@@ -104,7 +104,7 @@
                 </div>
 
                 <div>
-                    <button id="purchases-dropdown-btn"
+                     <button id="purchases-dropdown-btn"
                         class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
                         <span class="flex items-center"><i class="fas fa-shopping-cart mr-3 w-6 text-center"></i>Purchases</span>
                         <i id="purchases-dropdown-icon"
@@ -112,7 +112,7 @@
                     </button>
                     <div id="purchases-dropdown-content"
                         class="pl-8 pt-1 space-y-1 hidden bg-gray-900 bg-opacity-50 rounded-md mt-1">
-                    </div>
+                         </div>
                 </div>
 
                 <a href="../../settings.html"
@@ -447,7 +447,7 @@
                 });
             }
 
-            // NEW UPDATED APPLY FILTERS FUNCTION (FIXED)
+            // NEW UPDATED APPLY FILTERS FUNCTION
             function applyFilters() {
                 // 1. Filter by Tab (Active vs Deleted) first
                 let filtered = allPurchaseOrders.filter(po => {
@@ -464,13 +464,17 @@
 
                 // 2. Filter by Inputs
                 filtered = filtered.filter(po => {
+<<<<<<< HEAD
                     // Search Filter (PO Number)
                     const matchSearch = !sSearch || (po.po_no || '').toLowerCase().includes(sSearch);
                     
                     // Vendor Filter
-                    const matchVendor = sVendor === 'All Vendors' || (po.vendor_name || '') === sVendor;
+                    const matchVendor = sVendor === 'All Vendors' || (po.supplier_name || '') === sVendor;
                     
                     // Status Filter
+=======
+                    const matchVendor = sVendor === 'All Vendors' || (po.vendor_name || '') === sVendor;
+>>>>>>> 90d5df3ed6464a9be9e0a477693ee24e69a98caa
                     const matchStatus = sStatus === 'All' || (po.status || '').toLowerCase().includes(sStatus.toLowerCase());
                     
                     // Date Filter
