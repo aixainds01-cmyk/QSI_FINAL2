@@ -29,101 +29,50 @@
             color: #374151;
             border-bottom: 1px solid #e5e7eb;
         }
-
-        /* Popover Styles */
-        .popover-menu {
-            display: flex;
-            flex-direction: column;
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border-radius: 0.5rem;
-            padding: 0.25rem;
-            z-index: 9999;
-            min-width: 160px;
-        }
-
-        .popover-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            width: 100%;
-            padding: 0.6rem 1rem;
-            font-size: 0.875rem;
-            color: #374151;
-            text-align: left;
-            transition: background-color 0.15s;
-        }
-
-        .popover-item:hover {
-            background-color: #f3f4f6;
-        }
-
-        .popover-item.text-red-600:hover {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
     </style>
 </head>
 
 <body>
     <div class="flex h-screen overflow-hidden">
-        <aside
-            class="w-64 bg-gray-800 text-white flex-shrink-0 hidden md:flex flex-col shadow-lg transition-all duration-300"
-            id="sidebar">
+        <aside class="w-64 bg-gray-800 text-white flex-shrink-0 hidden md:flex flex-col shadow-lg transition-all duration-300" id="sidebar">
             <div class="p-6 text-2xl font-bold border-b border-gray-700 flex justify-between items-center">
                 <span><i class="mr-2 text-indigo-400"></i> QSI</span>
-                <button id="close-sidebar" class="md:hidden text-gray-400 hover:text-white"><i
-                        class="fas fa-times"></i></button>
+                <button id="close-sidebar" class="md:hidden text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
             <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-                <a href="../../dashboard_with_login.html"
-                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <a href="../../dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-chart-pie mr-3 w-6 text-center"></i>Dashboard
                 </a>
 
                 <div>
-                    <button id="documents-dropdown-btn"
-                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
-                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3 w-6 text-center"></i>Sales
-                            Documents</span>
-                        <i id="dropdown-icon"
-                            class="fas fa-chevron-down transform transition-transform duration-200 text-xs"></i>
+                    <button id="documents-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3 w-6 text-center"></i>Sales Documents</span>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200 text-xs"></i>
                     </button>
-                    <div id="documents-dropdown-content"
-                        class="pl-8 pt-1 space-y-1 hidden bg-gray-900 bg-opacity-50 rounded-md mt-1">
-                        <a href="../../quotation/home_quotation.html"
-                            class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Quotation</a>
-                        <a href="../../saleorder/home_sales_order.html"
-                            class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Sales Order</a>
-                        <a href="../../invoice/home_invoice.html"
-                            class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Invoice</a>
-                        <a href="../../credit_note.html"
-                            class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Credit Note</a>
+                    <div id="documents-dropdown-content" class="pl-8 pt-1 space-y-1 hidden bg-gray-900 bg-opacity-50 rounded-md mt-1">
+                        <a href="../../quotation/home_quotation.html" class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="../../saleorder/home_sales_order.html" class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="../../invoice/home_invoice.html" class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="../../credit_note.html" class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Credit Note</a>
                     </div>
                 </div>
 
                 <div>
-                     <button id="purchases-dropdown-btn"
-                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                     <button id="purchases-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
                         <span class="flex items-center"><i class="fas fa-shopping-cart mr-3 w-6 text-center"></i>Purchases</span>
-                        <i id="purchases-dropdown-icon"
-                            class="fas fa-chevron-down transform transition-transform duration-200 text-xs"></i>
+                        <i id="purchases-dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200 text-xs"></i>
                     </button>
-                    <div id="purchases-dropdown-content"
-                        class="pl-8 pt-1 space-y-1 hidden bg-gray-900 bg-opacity-50 rounded-md mt-1">
+                    <div id="purchases-dropdown-content" class="pl-8 pt-1 space-y-1 hidden bg-gray-900 bg-opacity-50 rounded-md mt-1">
                          </div>
                 </div>
 
-                <a href="../../settings.html"
-                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <a href="../../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-cog mr-3 w-6 text-center"></i>Settings
                 </a>
             </nav>
         </aside>
 
-        <div
-            class="fixed top-0 left-0 w-full bg-gray-800 text-white p-4 flex justify-between items-center md:hidden z-50">
+        <div class="fixed top-0 left-0 w-full bg-gray-800 text-white p-4 flex justify-between items-center md:hidden z-50">
             <span class="text-xl font-bold">QSI</span>
             <button id="mobile-menu-btn"><i class="fas fa-bars text-xl"></i></button>
         </div>
@@ -134,8 +83,7 @@
                     <h1 class="text-3xl font-bold text-gray-800 flex items-center">
                         Purchase Orders
                     </h1>
-                    <a href="create_purchase_order.html"
-                        class="bg-purple-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-purple-700 transition duration-200 shadow-sm flex items-center">
+                    <a href="create_purchase_order.html" class="bg-purple-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-purple-700 transition duration-200 shadow-sm flex items-center">
                         <i class="fas fa-plus mr-2"></i> Create New
                     </a>
                 </div>
@@ -144,12 +92,8 @@
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative">
 
                 <div class="flex items-center space-x-4 border-b pb-4 mb-4">
-                    <button id="tab-active"
-                        class="px-3 py-1.5 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-md transition-colors">Active
-                        Orders</button>
-                    <button id="tab-deleted"
-                        class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md transition-colors">Deleted
-                        / Cancelled</button>
+                    <button id="tab-active" class="px-3 py-1.5 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-md transition-colors">Active Orders</button>
+                    <button id="tab-deleted" class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md transition-colors">Deleted / Cancelled</button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 border rounded-lg bg-gray-50 items-end">
@@ -157,8 +101,7 @@
                     <div>
                         <label for="filter-search" class="block text-sm font-medium text-gray-700 mb-1">Search PO Number</label>
                         <div class="relative">
-                            <input type="text" id="filter-search" placeholder="Search PO..."
-                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <input type="text" id="filter-search" placeholder="Search PO..." class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
@@ -167,8 +110,7 @@
 
                     <div>
                         <label for="filter-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select id="filter-status"
-                            class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <select id="filter-status" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option value="All">All Statuses</option>
                             <option value="Draft">Draft</option>
                             <option value="Pending">Pending</option>
@@ -179,8 +121,7 @@
 
                     <div>
                         <label for="filter-vendor" class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
-                        <select id="filter-vendor"
-                            class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <select id="filter-vendor" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option>All Vendors</option>
                         </select>
                     </div>
@@ -188,22 +129,17 @@
                     <div class="flex gap-2">
                         <div class="flex-grow">
                             <label for="filter-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                            <input type="date" id="filter-date"
-                                class="block w-full border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <input type="date" id="filter-date" class="block w-full border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                         </div>
-                        <button id="clear-filters-btn"
-                            class="mb-[2px] px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition duration-200"
-                            title="Clear Filters">
+                        <button id="clear-filters-btn" class="mb-[2px] px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition duration-200" title="Clear Filters">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
                 </div>
 
-                <div id="bulk-action-bar"
-                    class="hidden mb-4 bg-indigo-50 border border-indigo-200 rounded-lg p-3 flex justify-between items-center shadow-sm transition-all duration-300">
+                <div id="bulk-action-bar" class="hidden mb-4 bg-indigo-50 border border-indigo-200 rounded-lg p-3 flex justify-between items-center shadow-sm transition-all duration-300">
                     <div class="flex items-center space-x-4">
-                        <button id="bulk-action-close"
-                            class="text-indigo-400 hover:text-indigo-700 transition-colors p-1">
+                        <button id="bulk-action-close" class="text-indigo-400 hover:text-indigo-700 transition-colors p-1">
                             <i class="fas fa-times text-lg"></i>
                         </button>
                         <span class="text-indigo-900 font-bold text-lg">
@@ -213,15 +149,13 @@
 
                     <div class="flex gap-3">
                         <div id="bulk-actions-active" class="hidden">
-                            <button id="bulk-action-cancel"
-                                class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded-md shadow-sm transition-colors text-sm flex items-center">
+                            <button id="bulk-action-cancel" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded-md shadow-sm transition-colors text-sm flex items-center">
                                 <i class="fas fa-ban mr-2"></i> Delete
                             </button>
                         </div>
 
                         <div id="bulk-actions-deleted" class="hidden flex gap-2">
-                            <button id="bulk-action-delete-perm"
-                                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-4 rounded-md shadow-sm transition-colors text-sm flex items-center">
+                            <button id="bulk-action-delete-perm" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-4 rounded-md shadow-sm transition-colors text-sm flex items-center">
                                 <i class="fas fa-trash-alt mr-2"></i> Delete Permanently
                             </button>
                         </div>
@@ -233,8 +167,7 @@
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th class="table-header-cell w-10 text-center">
-                                    <input type="checkbox" id="select-all-checkbox"
-                                        class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer">
+                                    <input type="checkbox" id="select-all-checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer">
                                 </th>
                                 <th class="table-header-cell">PO Number</th>
                                 <th class="table-header-cell">Date</th>
@@ -249,8 +182,7 @@
                             <tr>
                                 <td class="table-body-cell text-center" colspan="8">
                                     <div class="flex justify-center items-center p-4">
-                                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600">
-                                        </div>
+                                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
                                         <span class="ml-2 text-gray-500">Loading orders...</span>
                                     </div>
                                 </td>
@@ -265,8 +197,8 @@
             </div>
         </main>
     </div>
-    <div id="payment-modal"
-        class="fixed inset-0 z-[60] hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
+
+    <div id="payment-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
         <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h3 class="text-xl font-bold text-gray-800">Record Vendor Payment</h3>
@@ -279,26 +211,20 @@
                 <input type="hidden" id="pay-po-id">
 
                 <div class="bg-gray-50 p-3 rounded text-sm space-y-2">
-                    <div class="flex justify-between"><span>PO Number:</span> <span id="pay-po-no"
-                            class="font-semibold"></span></div>
-                    <div class="flex justify-between"><span>Vendor:</span> <span id="pay-vendor"
-                            class="font-semibold"></span></div>
-                    <div class="flex justify-between border-t pt-1 mt-1"><span>Total:</span> <span id="pay-total"
-                            class="font-semibold"></span></div>
-                    <div class="flex justify-between text-red-600 font-bold"><span>Pending:</span> <span
-                            id="pay-pending"></span></div>
+                    <div class="flex justify-between"><span>PO Number:</span> <span id="pay-po-no" class="font-semibold"></span></div>
+                    <div class="flex justify-between"><span>Vendor:</span> <span id="pay-vendor" class="font-semibold"></span></div>
+                    <div class="flex justify-between border-t pt-1 mt-1"><span>Total:</span> <span id="pay-total" class="font-semibold"></span></div>
+                    <div class="flex justify-between text-red-600 font-bold"><span>Pending:</span> <span id="pay-pending"></span></div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Amount</label>
-                    <input type="number" id="pay-amount-input" step="0.01" required
-                        class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="number" id="pay-amount-input" step="0.01" required class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Date</label>
-                    <input type="date" id="pay-date-input" required
-                        class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="date" id="pay-date-input" required class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
 
                 <div>
@@ -313,16 +239,12 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Notes</label>
-                    <textarea id="pay-notes-input" rows="2"
-                        class="mt-1 w-full border border-gray-300 rounded-md p-2"></textarea>
+                    <textarea id="pay-notes-input" rows="2" class="mt-1 w-full border border-gray-300 rounded-md p-2"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 mt-6">
-                    <button type="button" id="cancel-payment-btn"
-                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Cancel</button>
-                    <button type="submit" id="save-payment-btn"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Record
-                        Payment</button>
+                    <button type="button" id="cancel-payment-btn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" id="save-payment-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Record Payment</button>
                 </div>
             </form>
         </div>
@@ -339,13 +261,14 @@
             // Elements
             const tbody = document.getElementById('po-table-body');
             const filterStatus = document.getElementById('filter-status');
-            const filterVendor = document.getElementById('filter-vendor'); // Vendor Dropdown
+            const filterVendor = document.getElementById('filter-vendor');
             const filterDate = document.getElementById('filter-date');
             const tabActive = document.getElementById('tab-active');
             const tabDeleted = document.getElementById('tab-deleted');
             const selectAllCheckbox = document.getElementById('select-all-checkbox');
             const filterSearch = document.getElementById('filter-search');
             const clearFiltersBtn = document.getElementById('clear-filters-btn');
+            
             const bulkActionBar = document.getElementById('bulk-action-bar');
             const bulkActionCount = document.getElementById('bulk-action-count');
             
@@ -353,6 +276,7 @@
             const bulkActionClose = document.getElementById('bulk-action-close');
             const bulkActionsActive = document.getElementById('bulk-actions-active');
             const bulkActionsDeleted = document.getElementById('bulk-actions-deleted');
+            const bulkActionDeletePerm = document.getElementById('bulk-action-delete-perm'); // ADDED THIS
 
             // Payment Modal Elements
             const paymentModal = document.getElementById('payment-modal');
@@ -418,11 +342,10 @@
                 return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Draft</span>`;
             }
 
-            // --- LOAD VENDORS DIRECTLY (New Logic) ---
+            // --- LOAD VENDORS DIRECTLY ---
             async function loadVendors() {
                 if (!filterVendor) return;
                 try {
-                    // Try /vend first, fallback to /vendors
                     let vendors;
                     try {
                         vendors = await safeFetch(`${API_BASE_URL}/vend`);
@@ -431,12 +354,10 @@
                         vendors = await safeFetch(`${API_BASE_URL}/vendors`);
                     }
 
-                    // Reset Dropdown
                     filterVendor.innerHTML = '<option value="All Vendors">All Vendors</option>';
                     
                     if (Array.isArray(vendors)) {
                         vendors.forEach(v => {
-                            // Normalize Name
                             const name = v.vendor_name || v.supplier_name || v.name || "Unknown";
                             const opt = document.createElement('option');
                             opt.value = name; 
@@ -446,7 +367,6 @@
                     }
                 } catch (err) {
                     console.error("Error loading vendors for filter:", err);
-                    // Just in case, add a fallback option if API fails
                     filterVendor.innerHTML += '<option disabled>Error loading vendors</option>';
                 }
             }
@@ -456,8 +376,6 @@
                 try {
                     const data = await safeFetch(API_URL);
                     allPurchaseOrders = Array.isArray(data) ? data : [];
-                    
-                    // We DO NOT populate vendors from orders anymore. We use loadVendors()
                     applyFilters();
                 } catch (err) {
                     if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">Error: ${err.message}</td></tr>`;
@@ -483,17 +401,9 @@
 
                 filtered = filtered.filter(po => {
                     const vName = getVendorName(po);
-                    
-                    // Match Search
                     const matchSearch = !sSearch || (po.po_no || '').toLowerCase().includes(sSearch);
-                    
-                    // Match Vendor (Compare Strings)
                     const matchVendor = sVendor === 'All Vendors' || vName === sVendor;
-                    
-                    // Match Status
                     const matchStatus = sStatus === 'All' || (po.status || '').toLowerCase().includes(sStatus.toLowerCase());
-                    
-                    // Match Date
                     const matchDate = !sDate || (po.po_date && po.po_date.startsWith(sDate));
 
                     return matchSearch && matchVendor && matchStatus && matchDate;
@@ -735,8 +645,54 @@
             setupDropdown('documents-dropdown-btn', 'documents-dropdown-content', 'dropdown-icon');
             setupDropdown('purchases-dropdown-btn', 'purchases-dropdown-content', 'purchases-dropdown-icon');
 
+            // --- BULK DELETE PERMANENTLY LOGIC (ADDED HERE) ---
+            if (bulkActionDeletePerm) {
+                bulkActionDeletePerm.addEventListener('click', async () => {
+                    // 1. Get Selected IDs
+                    const selectedCheckboxes = document.querySelectorAll('.po-checkbox:checked');
+                    const idsToDelete = Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
+
+                    if (idsToDelete.length === 0) return;
+
+                    // 2. Confirmation
+                    if (!confirm(`Are you sure you want to permanently delete ${idsToDelete.length} orders? This cannot be undone.`)) {
+                        return;
+                    }
+
+                    // 3. UI Loading
+                    const originalText = bulkActionDeletePerm.innerHTML;
+                    bulkActionDeletePerm.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                    bulkActionDeletePerm.disabled = true;
+
+                    try {
+                        // 4. API Call
+                        const deletePromises = idsToDelete.map(id => 
+                            safeFetch(`${API_URL}/${id}`, { method: 'DELETE' })
+                        );
+
+                        await Promise.all(deletePromises);
+
+                        // 5. Success
+                        alert('Selected orders deleted permanently.');
+                        
+                        // Reset Selection
+                        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                        fetchOrders(); 
+                        
+                    } catch (error) {
+                        console.error("Bulk delete error:", error);
+                        alert('Failed to delete: ' + error.message);
+                    } finally {
+                        // 6. Reset UI
+                        bulkActionDeletePerm.innerHTML = originalText;
+                        bulkActionDeletePerm.disabled = false;
+                        updateSelectionUI(); 
+                    }
+                });
+            }
+
             // --- EXECUTE ON LOAD ---
-            loadVendors(); // <-- NEW CALL
+            loadVendors();
             // --- BULK ACTION HANDLERS ---
             const bulkCancelBtn = document.getElementById('bulk-action-cancel');
             const bulkDeletePermBtn = document.getElementById('bulk-action-delete-perm');
@@ -818,4 +774,3 @@
 </body>
 
 </html>
-
