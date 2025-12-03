@@ -338,9 +338,8 @@
 
             // Elements
             const tbody = document.getElementById('po-table-body');
-            const totalCountSpan = document.getElementById('total-count'); // Ensure this ID exists in HTML or remove check
             const filterStatus = document.getElementById('filter-status');
-            const filterVendor = document.getElementById('filter-vendor');
+            const filterVendor = document.getElementById('filter-vendor'); // Vendor Dropdown
             const filterDate = document.getElementById('filter-date');
             const tabActive = document.getElementById('tab-active');
             const tabDeleted = document.getElementById('tab-deleted');
@@ -349,6 +348,8 @@
             const clearFiltersBtn = document.getElementById('clear-filters-btn');
             const bulkActionBar = document.getElementById('bulk-action-bar');
             const bulkActionCount = document.getElementById('bulk-action-count');
+            
+            // Bulk Action Buttons
             const bulkActionClose = document.getElementById('bulk-action-close');
             const bulkActionsActive = document.getElementById('bulk-actions-active');
             const bulkActionsDeleted = document.getElementById('bulk-actions-deleted');
@@ -359,7 +360,6 @@
             const payPoNo = document.getElementById('pay-po-no');
             const payVendor = document.getElementById('pay-vendor');
             const payTotal = document.getElementById('pay-total');
-            const payAlreadyPaid = document.getElementById('pay-already-paid');
             const payPending = document.getElementById('pay-pending');
             const payAmountInput = document.getElementById('pay-amount-input');
             const payDateInput = document.getElementById('pay-date-input');
@@ -368,6 +368,7 @@
             let allPurchaseOrders = [];
             let displayedPurchaseOrders = [];
 
+            // --- AUTH & FETCH HELPERS ---
             function getAuthHeaders() {
                 const token = localStorage.getItem("token");
                 return token ? { 'Authorization': `Bearer ${token}` } : null;
@@ -406,6 +407,7 @@
                 return id;
             }
 
+            // --- STATUS BADGE ---
             function statusBadge(status) {
                 const s = (status || 'draft').toLowerCase();
                 if (s.includes('receiv') || s === 'paid') return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Received / Paid</span>`;
@@ -416,46 +418,57 @@
                 return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Draft</span>`;
             }
 
-           async function fetchOrders() {
+            // --- LOAD VENDORS DIRECTLY (New Logic) ---
+            async function loadVendors() {
+                if (!filterVendor) return;
                 try {
-                    const data = await safeFetch(API_URL);
+                    // Try /vend first, fallback to /vendors
+                    let vendors;
+                    try {
+                        vendors = await safeFetch(`${API_BASE_URL}/vend`);
+                    } catch (e) {
+                        console.warn("Fallback to /vendors");
+                        vendors = await safeFetch(`${API_BASE_URL}/vendors`);
+                    }
+
+                    // Reset Dropdown
+                    filterVendor.innerHTML = '<option value="All Vendors">All Vendors</option>';
                     
-                    console.log("🔥 FULL DATA:", data);
-                    if(data.length > 0) {
-                        console.log("👉 First Order Vendor Info:", {
-                            supplier_name: data[0].supplier_name,
-                            vendor_name: data[0].vendor_name,
-                            supplier_obj: data[0].supplier
+                    if (Array.isArray(vendors)) {
+                        vendors.forEach(v => {
+                            // Normalize Name
+                            const name = v.vendor_name || v.supplier_name || v.name || "Unknown";
+                            const opt = document.createElement('option');
+                            opt.value = name; 
+                            opt.textContent = name;
+                            filterVendor.appendChild(opt);
                         });
                     }
-                    // ---------------------------------------------
+                } catch (err) {
+                    console.error("Error loading vendors for filter:", err);
+                    // Just in case, add a fallback option if API fails
+                    filterVendor.innerHTML += '<option disabled>Error loading vendors</option>';
+                }
+            }
 
+            // --- LOAD ORDERS ---
+            async function fetchOrders() {
+                try {
+                    const data = await safeFetch(API_URL);
                     allPurchaseOrders = Array.isArray(data) ? data : [];
-                    populateVendorFilter();
+                    
+                    // We DO NOT populate vendors from orders anymore. We use loadVendors()
                     applyFilters();
                 } catch (err) {
                     if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">Error: ${err.message}</td></tr>`;
                 }
             }
 
-            // ✅ FIX 1: Check for BOTH supplier_name AND vendor_name
             function getVendorName(po) {
                 return po.supplier_name || po.vendor_name || 'Unknown Supplier';
             }
 
-            function populateVendorFilter() {
-                if (!filterVendor) return;
-                // Use the helper function to get names
-                const vendors = new Set(allPurchaseOrders.map(po => getVendorName(po)));
-                filterVendor.innerHTML = '<option>All Vendors</option>';
-                Array.from(vendors).sort().forEach(v => {
-                    const opt = document.createElement('option');
-                    opt.value = v;
-                    opt.textContent = v;
-                    filterVendor.appendChild(opt);
-                });
-            }
-
+            // --- FILTER LOGIC ---
             function applyFilters() {
                 let filtered = allPurchaseOrders.filter(po => {
                     const status = (po.status || '').toLowerCase();
@@ -469,10 +482,18 @@
                 const sDate = filterDate ? filterDate.value : '';
 
                 filtered = filtered.filter(po => {
-                    const vName = getVendorName(po); // Use helper
+                    const vName = getVendorName(po);
+                    
+                    // Match Search
                     const matchSearch = !sSearch || (po.po_no || '').toLowerCase().includes(sSearch);
+                    
+                    // Match Vendor (Compare Strings)
                     const matchVendor = sVendor === 'All Vendors' || vName === sVendor;
+                    
+                    // Match Status
                     const matchStatus = sStatus === 'All' || (po.status || '').toLowerCase().includes(sStatus.toLowerCase());
+                    
+                    // Match Date
                     const matchDate = !sDate || (po.po_date && po.po_date.startsWith(sDate));
 
                     return matchSearch && matchVendor && matchStatus && matchDate;
@@ -482,10 +503,9 @@
                 renderTable();
             }
 
+            // --- RENDER TABLE ---
             function renderTable() {
-                const countElem = document.getElementById('bulk-action-count'); // Or any count element
-                // if (totalCountSpan) totalCountSpan.textContent = displayedPurchaseOrders.length;
-                
+                const countElem = document.getElementById('bulk-action-count');
                 if (!tbody) return;
                 tbody.innerHTML = '';
 
@@ -501,8 +521,6 @@
                     const totalAmt = po.total || 0;
                     const paidAmt = po.paid_amount || 0;
                     const pendingAmt = Math.max(0, totalAmt - paidAmt);
-                    
-                    // ✅ FIX 2: Check multiple fields for Sub Total
                     const subTotal = po.sub_total || po.subTotal || 0;
                     const vendorName = getVendorName(po);
 
@@ -553,7 +571,8 @@
                 tbody.querySelectorAll('.po-checkbox').forEach(cb => cb.addEventListener('change', updateSelectionUI));
                 tbody.querySelectorAll('.action-open').forEach(btn => btn.addEventListener('click', () => window.location.href = `view_purchase_order.html?id=${btn.dataset.id}`));
                 tbody.querySelectorAll('.action-edit').forEach(btn => btn.addEventListener('click', () => window.location.href = `edit_purchase_order.html?id=${btn.dataset.id}`));
-
+                
+                // Cancel Action
                 tbody.querySelectorAll('.action-cancel').forEach(btn => btn.addEventListener('click', async () => {
                     if (!confirm("Cancel this order?")) return;
                     try {
@@ -565,13 +584,12 @@
                     } catch (e) { alert(e.message); }
                 }));
 
+                // Pay Action
                 tbody.querySelectorAll('.action-payment').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const d = e.currentTarget.dataset;
-                        const rawId = d.id;
-                        if (!rawId || rawId === "undefined") return;
                         openPaymentModal({
-                            id: rawId,
+                            id: d.id,
                             po_no: d.poNo,
                             vendor: d.vendor,
                             total: parseFloat(d.total),
@@ -581,6 +599,7 @@
                 });
             }
 
+            // --- MODAL FUNCTIONS ---
             function openPaymentModal(data) {
                 if (!paymentModal) return;
                 CURRENT_PO_ID = data.id;
@@ -588,7 +607,6 @@
                 if (payVendor) payVendor.textContent = data.vendor || 'Unknown';
                 const pending = data.total - data.paid;
                 if (payTotal) payTotal.textContent = formatCurrency(data.total);
-                if (payAlreadyPaid) payAlreadyPaid.textContent = formatCurrency(data.paid);
                 if (payPending) payPending.textContent = formatCurrency(pending);
                 if (payAmountInput) {
                     payAmountInput.value = pending.toFixed(2);
@@ -607,6 +625,7 @@
                 if (paymentForm) paymentForm.reset();
             }
 
+            // --- INITIALIZATION ---
             if (paymentForm) {
                 paymentForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -639,14 +658,14 @@
                 });
             }
 
-            const closeBtn = document.getElementById('close-payment-modal');
-            if (closeBtn) closeBtn.addEventListener('click', closePaymentModal);
-            const cancelBtn = document.getElementById('cancel-payment-btn');
-            if (cancelBtn) cancelBtn.addEventListener('click', closePaymentModal);
+            // Close Modals
+            document.getElementById('close-payment-modal')?.addEventListener('click', closePaymentModal);
+            document.getElementById('cancel-payment-btn')?.addEventListener('click', closePaymentModal);
 
+            // Sidebar & Tabs
             const sidebar = document.getElementById('sidebar');
-            const mobileBtn = document.getElementById('mobile-menu-btn');
-            if (mobileBtn) mobileBtn.addEventListener('click', () => sidebar.classList.remove('hidden'));
+            document.getElementById('mobile-menu-btn')?.addEventListener('click', () => sidebar.classList.remove('hidden'));
+            document.getElementById('close-sidebar')?.addEventListener('click', () => sidebar.classList.add('hidden'));
 
             if (tabActive) tabActive.addEventListener('click', () => { currentTab = 'active'; updateTabUI(); applyFilters(); });
             if (tabDeleted) tabDeleted.addEventListener('click', () => { currentTab = 'deleted'; updateTabUI(); applyFilters(); });
@@ -661,6 +680,7 @@
                 }
             }
 
+            // Bulk Actions
             if (selectAllCheckbox) selectAllCheckbox.addEventListener('change', e => {
                 tbody.querySelectorAll('.po-checkbox').forEach(cb => cb.checked = e.target.checked);
                 updateSelectionUI();
@@ -673,38 +693,28 @@
                     bulkActionBar.classList.remove('hidden');
                     if (bulkActionCount) bulkActionCount.textContent = count;
                     if (currentTab === 'active') {
-                        if (bulkActionsActive) bulkActionsActive.classList.remove('hidden');
-                        if (bulkActionsDeleted) bulkActionsDeleted.classList.add('hidden');
+                        bulkActionsActive?.classList.remove('hidden');
+                        bulkActionsDeleted?.classList.add('hidden');
                     } else {
-                        if (bulkActionsActive) bulkActionsActive.classList.add('hidden');
-                        if (bulkActionsDeleted) bulkActionsDeleted.classList.remove('hidden');
+                        bulkActionsActive?.classList.add('hidden');
+                        bulkActionsDeleted?.classList.remove('hidden');
                     }
                 } else {
                     bulkActionBar.classList.add('hidden');
                 }
             }
 
-            const closeBulk = document.getElementById('bulk-action-close');
-            if (closeBulk) closeBulk.addEventListener('click', () => {
+            document.getElementById('bulk-action-close')?.addEventListener('click', () => {
                 if (selectAllCheckbox) selectAllCheckbox.checked = false;
                 tbody.querySelectorAll('.po-checkbox').forEach(cb => cb.checked = false);
                 updateSelectionUI();
             });
 
-            const setupDropdown = (btnId, contentId, iconId) => {
-                const btn = document.getElementById(btnId);
-                const content = document.getElementById(contentId);
-                const icon = document.getElementById(iconId);
-                if (btn) btn.addEventListener('click', () => { content.classList.toggle('hidden'); icon.classList.toggle('rotate-180'); });
-            };
-            setupDropdown('documents-dropdown-btn', 'documents-dropdown-content', 'dropdown-icon');
-            setupDropdown('purchases-dropdown-btn', 'purchases-dropdown-content', 'purchases-dropdown-icon');
-
+            // Filters
             if (filterStatus) filterStatus.addEventListener('change', applyFilters);
             if (filterVendor) filterVendor.addEventListener('change', applyFilters);
             if (filterDate) filterDate.addEventListener('change', applyFilters);
             if (filterSearch) filterSearch.addEventListener('input', applyFilters);
-            
             if (clearFiltersBtn) {
                 clearFiltersBtn.addEventListener('click', () => {
                     if (filterSearch) filterSearch.value = '';
@@ -715,9 +725,97 @@
                 });
             }
 
+            // Dropdowns
+            const setupDropdown = (btnId, contentId, iconId) => {
+                const btn = document.getElementById(btnId);
+                const content = document.getElementById(contentId);
+                const icon = document.getElementById(iconId);
+                if (btn) btn.addEventListener('click', () => { content.classList.toggle('hidden'); icon.classList.toggle('rotate-180'); });
+            };
+            setupDropdown('documents-dropdown-btn', 'documents-dropdown-content', 'dropdown-icon');
+            setupDropdown('purchases-dropdown-btn', 'purchases-dropdown-content', 'purchases-dropdown-icon');
+
+            // --- EXECUTE ON LOAD ---
+            loadVendors(); // <-- NEW CALL
+            // --- BULK ACTION HANDLERS ---
+            const bulkCancelBtn = document.getElementById('bulk-action-cancel');
+            const bulkDeletePermBtn = document.getElementById('bulk-action-delete-perm');
+
+            // 1. Active Tab - Soft Delete (Cancel Order)
+            if (bulkCancelBtn) {
+                bulkCancelBtn.addEventListener('click', async () => {
+                    const selected = Array.from(tbody.querySelectorAll('.po-checkbox:checked'));
+                    if (selected.length === 0) return;
+                    
+                    if (!confirm(`Are you sure you want to delete ${selected.length} orders?`)) return;
+
+                    // Loading Effect
+                    const originalText = bulkCancelBtn.innerHTML;
+                    bulkCancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    bulkCancelBtn.disabled = true;
+
+                    try {
+                        // Loop through and update status to Cancelled
+                        const promises = selected.map(cb => {
+                            const id = cb.dataset.id;
+                            return safeFetch(`${API_URL}/${id}/status`, {
+                                method: 'PUT',
+                                body: JSON.stringify({ status: 'Cancelled' })
+                            });
+                        });
+
+                        await Promise.all(promises);
+                        
+                        // Refresh & Reset
+                        await fetchOrders();
+                        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                        updateSelectionUI();
+                        
+                    } catch (err) {
+                        alert('Error processing action: ' + err.message);
+                    } finally {
+                        bulkCancelBtn.innerHTML = originalText;
+                        bulkCancelBtn.disabled = false;
+                    }
+                });
+            }
+
+            // 2. Deleted Tab - Hard Delete (Permanent)
+            if (bulkDeletePermBtn) {
+                bulkDeletePermBtn.addEventListener('click', async () => {
+                    const selected = Array.from(tbody.querySelectorAll('.po-checkbox:checked'));
+                    if (selected.length === 0) return;
+
+                    if (!confirm(`Permanently delete ${selected.length} orders? This cannot be undone.`)) return;
+
+                    const originalText = bulkDeletePermBtn.innerHTML;
+                    bulkDeletePermBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                    bulkDeletePermBtn.disabled = true;
+
+                    try {
+                        const promises = selected.map(cb => {
+                            const id = cb.dataset.id;
+                            return safeFetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                        });
+
+                        await Promise.all(promises);
+                        
+                        await fetchOrders();
+                        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                        updateSelectionUI();
+                        
+                    } catch (err) {
+                        alert('Error deleting: ' + err.message);
+                    } finally {
+                        bulkDeletePermBtn.innerHTML = originalText;
+                        bulkDeletePermBtn.disabled = false;
+                    }
+                });
+            }
             fetchOrders();
         });
     </script>
 </body>
 
 </html>
+
