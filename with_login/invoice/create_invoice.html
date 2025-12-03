@@ -485,6 +485,77 @@
        margin-top: 64px; /* height of the fixed header */
      }
     }
+    /* Autocomplete dropdown styles */
+.autocomplete-container {
+    position: relative;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+}
+
+.autocomplete-dropdown.show {
+    display: block;
+}
+
+.autocomplete-item {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    font-size: 0.875rem;
+}
+
+.autocomplete-item:hover {
+    background-color: #f3f4f6;
+}
+
+.autocomplete-item.selected {
+    background-color: #e0e7ff;
+}
+
+.autocomplete-item-main {
+    font-weight: 500;
+    color: #374151;
+}
+
+.autocomplete-item-sub {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.125rem;
+}
+
+.autocomplete-not-found {
+    padding: 0.5rem 0.75rem;
+    color: #dc2626;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.autocomplete-loading {
+    padding: 0.5rem 0.75rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.item-validation-error {
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
+}
     </style>
 </head>
 
@@ -1237,37 +1308,232 @@
 
 
             function createItemRow() {
-                const row = document.createElement("div");
-                row.className = "item-row space-y-2 p-2 border rounded";
-                row.innerHTML = `
-                            <div class="grid grid-cols-12 gap-2 items-center">
-                                <input class="col-span-4 item-name input-field" placeholder="Item Name" required>
-                                <input type="number" class="col-span-2 quantity input-field text-right"  placeholder="0" min="0" required>
-                                <input type="text" class="col-span-2 rate input-field text-right"  placeholder="0" required>
-                                <span class="col-span-3 amount text-right">₹0.00</span>
-                                <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                            <textarea class="description input-field col-span-12" rows="2" placeholder="Item description"></textarea>
-                `;
+    const row = document.createElement("div");
+    row.className = "item-row space-y-2 p-2 border rounded";
+    row.innerHTML = `
+        <div class="grid grid-cols-12 gap-2 items-center">
+            <div class="col-span-4 autocomplete-container">
+                <input class="item-name input-field" placeholder="Type to search items..." required autocomplete="off">
+                <div class="autocomplete-dropdown"></div>
+                <span class="item-validation-error" style="display: none;"></span>
+            </div>
+            <input type="number" class="col-span-2 quantity input-field text-right" placeholder="0" min="0" required>
+            <input type="text" class="col-span-2 rate input-field text-right" placeholder="0" required>
+            <span class="col-span-3 amount text-right">₹0.00</span>
+            <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <textarea class="description input-field col-span-12" rows="2" placeholder="Item description"></textarea>
+    `;
 
-                const qtyEl = row.querySelector(".quantity");
-                const rateEl = row.querySelector(".rate");
-                const deleteBtn = row.querySelector(".delete-item-btn");
+    const itemNameInput = row.querySelector(".item-name");
+    const dropdown = row.querySelector(".autocomplete-dropdown");
+    const validationError = row.querySelector(".item-validation-error");
+    const qtyEl = row.querySelector(".quantity");
+    const rateEl = row.querySelector(".rate");
+    const descEl = row.querySelector(".description");
+    const deleteBtn = row.querySelector(".delete-item-btn");
 
-                const onChange = () => updateRowAmount(row);
-                qtyEl?.addEventListener("input", onChange);
-                rateEl?.addEventListener("input", onChange);
+    let allItems = [];
+    let selectedItemIndex = -1;
+    let itemValidated = false;
 
-                deleteBtn?.addEventListener("click", () => {
-                    row.remove();
-                    updateTotals();
-                });
+    // Fetch items from API
+    async function fetchItems() {
+        try {
+            const response = await safeFetch(`${API_BASE_URL}/items`, { method: 'GET' });
+            allItems = Array.isArray(response) ? response : [];
+            return allItems;
+        } catch (err) {
+            console.error('Error fetching items:', err);
+            return [];
+        }
+    }
 
-                itemsContainer.appendChild(row);
-                updateRowAmount(row);
+    // Filter items based on search
+    function filterItems(searchTerm) {
+        if (!searchTerm) return [];
+        const term = searchTerm.toLowerCase().trim();
+        return allItems.filter(item => {
+            const name = (item.item_name || '').toLowerCase();
+            const code = (item.item_code || '').toLowerCase();
+            const category = (item.category || '').toLowerCase();
+            return name.includes(term) || code.includes(term) || category.includes(term);
+        });
+    }
+
+    // Show dropdown with items
+    function showDropdown(items, searchTerm) {
+        dropdown.innerHTML = '';
+        
+        if (items.length === 0) {
+            dropdown.innerHTML = `
+                <div class="autocomplete-not-found">
+                    <i class="fas fa-exclamation-circle mr-1"></i>
+                    Item not found in inventory
+                </div>
+            `;
+            dropdown.classList.add('show');
+            itemValidated = false;
+            validationError.textContent = 'Item not found in inventory';
+            validationError.style.display = 'block';
+            return;
+        }
+
+        validationError.style.display = 'none';
+        
+        items.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-item';
+            div.dataset.index = index;
+            
+            const price = item.unit_price || 0;
+            const stock = item.stock_quantity || 0;
+            const code = item.item_code || '';
+            
+            div.innerHTML = `
+                <div class="autocomplete-item-main">${item.item_name}</div>
+                <div class="autocomplete-item-sub">
+                    ${code ? `Code: ${code} | ` : ''}
+                    Price: ₹${price.toFixed(2)} | 
+                    Stock: ${stock}
+                    ${item.category ? ` | ${item.category}` : ''}
+                </div>
+            `;
+            
+            div.addEventListener('click', () => selectItem(item));
+            dropdown.appendChild(div);
+        });
+        
+        dropdown.classList.add('show');
+        selectedItemIndex = -1;
+    }
+
+    // Hide dropdown
+    function hideDropdown() {
+        dropdown.classList.remove('show');
+        selectedItemIndex = -1;
+    }
+
+    // Select an item from dropdown
+    function selectItem(item) {
+        itemNameInput.value = item.item_name;
+        rateEl.value = item.unit_price || 0;
+        if (item.description) {
+            descEl.value = item.description;
+        }
+        
+        itemValidated = true;
+        validationError.style.display = 'none';
+        hideDropdown();
+        
+        // Focus on quantity field
+        qtyEl.focus();
+        
+        updateRowAmount(row);
+    }
+
+    // Keyboard navigation
+    function handleKeyNavigation(e) {
+        const items = dropdown.querySelectorAll('.autocomplete-item');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedItemIndex = Math.min(selectedItemIndex + 1, items.length - 1);
+            updateSelection(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedItemIndex = Math.max(selectedItemIndex - 1, -1);
+            updateSelection(items);
+        } else if (e.key === 'Enter' && selectedItemIndex >= 0) {
+            e.preventDefault();
+            items[selectedItemIndex]?.click();
+        } else if (e.key === 'Escape') {
+            hideDropdown();
+        }
+    }
+
+    function updateSelection(items) {
+        items.forEach((item, index) => {
+            item.classList.toggle('selected', index === selectedItemIndex);
+        });
+        
+        if (selectedItemIndex >= 0) {
+            items[selectedItemIndex]?.scrollIntoView({ block: 'nearest' });
+        }
+    }
+
+    // Input event - search as user types
+    let searchTimeout;
+    itemNameInput.addEventListener('input', async (e) => {
+        const searchTerm = e.target.value.trim();
+        itemValidated = false;
+        
+        clearTimeout(searchTimeout);
+        
+        if (!searchTerm) {
+            hideDropdown();
+            validationError.style.display = 'none';
+            return;
+        }
+
+        // Show loading
+        dropdown.innerHTML = '<div class="autocomplete-loading">Searching...</div>';
+        dropdown.classList.add('show');
+
+        searchTimeout = setTimeout(async () => {
+            if (allItems.length === 0) {
+                await fetchItems();
             }
+            
+            const filtered = filterItems(searchTerm);
+            showDropdown(filtered, searchTerm);
+        }, 300); // Debounce 300ms
+    });
+
+    // Focus - load items if not loaded
+    itemNameInput.addEventListener('focus', async () => {
+        if (allItems.length === 0) {
+            dropdown.innerHTML = '<div class="autocomplete-loading">Loading items...</div>';
+            dropdown.classList.add('show');
+            await fetchItems();
+            hideDropdown();
+        }
+    });
+
+    // Keyboard navigation
+    itemNameInput.addEventListener('keydown', handleKeyNavigation);
+
+    // Click outside to close
+    document.addEventListener('click', (e) => {
+        if (!row.contains(e.target)) {
+            hideDropdown();
+        }
+    });
+
+    // Validation on blur
+    itemNameInput.addEventListener('blur', () => {
+        setTimeout(() => {
+            if (!itemValidated && itemNameInput.value.trim()) {
+                validationError.textContent = 'Please select an item from the list';
+                validationError.style.display = 'block';
+            }
+        }, 200);
+    });
+
+    const onChange = () => updateRowAmount(row);
+    qtyEl?.addEventListener("input", onChange);
+    rateEl?.addEventListener("input", onChange);
+
+    deleteBtn?.addEventListener("click", () => {
+        row.remove();
+        updateTotals();
+    });
+
+    itemsContainer.appendChild(row);
+    updateRowAmount(row);
+}
 
             function updateRowAmount(row) {
                 try {
@@ -1400,57 +1666,39 @@ function collectInvoiceData() {
                 }
 
                 rows.forEach((row, index) => {
-                    const nameEl = row.querySelector('.item-name');
-                    const qtyEl = row.querySelector('.quantity');
-                    const rateEl = row.querySelector('.rate');
+    const nameEl = row.querySelector('.item-name');
+    const qtyEl = row.querySelector('.quantity');
+    const rateEl = row.querySelector('.rate');
+    const validationError = row.querySelector('.item-validation-error');
 
-                    const nameVal = nameEl?.value.trim() || '';
-                    const qtyVal = qtyEl?.value.trim() || '';
-                    const rateVal = rateEl?.value.trim() || '';
+    const nameVal = nameEl?.value.trim() || '';
+    const qtyVal = qtyEl?.value.trim() || '';
+    const rateVal = rateEl?.value.trim() || '';
 
-                    // Helper for inline errors
-                    const addInlineError = (el, msg) => {
-                        if (!el) return;
-                        const small = document.createElement('small');
-                        small.className = 'error-text text-red-500 text-xs block mt-1';
-                        small.textContent = msg;
-                        el.insertAdjacentElement('afterend', small);
-                    };
+    // Helper for inline errors
+    const addInlineError = (el, msg) => {
+        if (!el) return;
+        const small = document.createElement('small');
+        small.className = 'error-text text-red-500 text-xs block mt-1';
+        small.textContent = msg;
+        el.insertAdjacentElement('afterend', small);
+    };
 
-                    // 🧾 Item Name check
-                    if (!nameVal) {
-                        addInlineError(nameEl, "Required");
-                        messages.push(`Item ${index + 1}: Missing item name.`);
-                        if (!firstInvalidEl) firstInvalidEl = nameEl;
-                        isValid = false;
-                    }
+    // 🧾 Item Name check
+    if (!nameVal) {
+        addInlineError(nameEl, "Required");
+        messages.push(`Item ${index + 1}: Missing item name.`);
+        if (!firstInvalidEl) firstInvalidEl = nameEl;
+        isValid = false;
+    } else if (validationError && validationError.style.display !== 'none') {
+        // Item not validated from API
+        messages.push(`Item ${index + 1}: Please select a valid item from inventory.`);
+        if (!firstInvalidEl) firstInvalidEl = nameEl;
+        isValid = false;
+    }
 
-                    // 🔢 Quantity check
-                    if (!qtyVal) {
-                        addInlineError(qtyEl, "Required");
-                        messages.push(`Item ${index + 1}: Missing quantity.`);
-                        if (!firstInvalidEl) firstInvalidEl = qtyEl;
-                        isValid = false;
-                    } else if (!/^\d+(\.\d+)?$/.test(qtyVal)) {
-                        addInlineError(qtyEl, "Invalid format");
-                        messages.push(`Item ${index + 1}: Invalid quantity format.`);
-                        if (!firstInvalidEl) firstInvalidEl = qtyEl;
-                        isValid = false;
-                    }
-
-                    // 💰 Rate check
-                    if (!rateVal) {
-                        addInlineError(rateEl, "Required");
-                        messages.push(`Item ${index + 1}: Missing rate.`);
-                        if (!firstInvalidEl) firstInvalidEl = rateEl;
-                        isValid = false;
-                    } else if (!/^\d+(\.\d+)?$/.test(rateVal)) {
-                        addInlineError(rateEl, "Invalid format");
-                        messages.push(`Item ${index + 1}: Invalid rate format.`);
-                        if (!firstInvalidEl) firstInvalidEl = rateEl;
-                        isValid = false;
-                    }
-                });
+    // ... rest of validation
+});
 
                 if (!isValid) {
                     showAlert(messages.join("\n"), "error", 6000);
