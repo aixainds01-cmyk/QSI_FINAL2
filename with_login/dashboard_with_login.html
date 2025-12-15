@@ -38,11 +38,43 @@
                 margin-top: 64px;
             }
         }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
 <body class="bg-gray-50">
-    <div class="flex">
+    <!-- Loading Overlay - Shows while checking authentication -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading...</p>
+        </div>
+    </div>
+
+    <div id="main-app" class="flex hidden">
         <!-- Left Sidebar Navigation -->
         <header
             class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
@@ -71,7 +103,7 @@
             </div>
             <nav class="flex-1 p-4 space-y-2">
                 <a href="dashboard_with_login.html"
-                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 bg-gray-700">
                     <i class="fas fa-chart-pie mr-3"></i>Dashboard
                 </a>
                 <div>
@@ -92,6 +124,10 @@
                         <a href="credit_note.html"
                             class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit
                             note</a>
+                        <a href="invoice/payment_receipt.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payment Receipt</a>
+                        <a href="invoice/payment_history.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payment History</a>
                     </div>
                 </div>
                 <div>
@@ -113,15 +149,17 @@
                             Notes</a>
                         <a href="payout.html"
                             class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payout</a>
+                            <a href="parchase/bill.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Bills</a>
                     </div>
                 </div>
                 <a href="manage-clients.html"
                     class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
                     <i class="fas fa-users mr-3"></i>Manage Clients
                 </a>
-                 <a href="item_management.html"
+                <a href="item_management.html"
                     class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
-                    <i class="fas fa-users mr-3"></i>Manage Items
+                    <i class="fas fa-boxes mr-3"></i>Manage Items
                 </a>
                 <a href="settings.html"
                     class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
@@ -171,7 +209,7 @@
                             <i class="fas fa-box-open text-2xl text-yellow-600"></i>
                         </div>
                         <h2 class="text-xl font-bold text-gray-800">Create Sales Orders</h2>
-                        <p class="mt-2 text-gray-500">Generate a professional Sales order for your clients quickly .</p>
+                        <p class="mt-2 text-gray-500">Generate a professional Sales order for your clients quickly.</p>
                     </a>
 
                     <!-- Create New Invoice Card -->
@@ -214,6 +252,36 @@
                         <h2 class="text-xl font-bold text-gray-800">Manage Invoices</h2>
                         <p class="mt-2 text-gray-500">Review, resend, and manage invoices for your customers.</p>
                     </a>
+
+                    <!-- Payment History Card -->
+                    <a href="invoice/payment_history.html"
+                        class="card block p-6 bg-white rounded-xl shadow-md border border-gray-200">
+                        <div class="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-4">
+                            <i class="fas fa-history text-2xl text-purple-600"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Payment History</h2>
+                        <p class="mt-2 text-gray-500">Track all payments received and pending balances.</p>
+                    </a>
+
+                    <!-- Record Payment Card -->
+                    <a href="invoice/payment_receipt.html"
+                        class="card block p-6 bg-white rounded-xl shadow-md border border-gray-200">
+                        <div class="flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-full mb-4">
+                            <i class="fas fa-receipt text-2xl text-emerald-600"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Record Payment</h2>
+                        <p class="mt-2 text-gray-500">Record payments against invoices and generate receipts.</p>
+                    </a>
+
+                    <!-- Manage Clients Card -->
+                    <a href="manage-clients.html"
+                        class="card block p-6 bg-white rounded-xl shadow-md border border-gray-200">
+                        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
+                            <i class="fas fa-users text-2xl text-blue-600"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Manage Clients</h2>
+                        <p class="mt-2 text-gray-500">Add, edit and manage your client database.</p>
+                    </a>
                 </div>
             </main>
         </div>
@@ -248,32 +316,69 @@
     </div>
 
     <script>
-    // ------------------------------
+    // ======================================
+    // 🔐 AUTHENTICATION CHECK - RUNS FIRST
+    // ======================================
+    (function checkAuth() {
+        const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+        
+        // If no token, redirect to login
+        if (!token) {
+            window.location.replace('../index.html');
+            return;
+        }
+
+        // Clear browser history and prevent back navigation to login page
+        // This replaces the current history entry with this page
+        if (window.history && window.history.pushState) {
+            // Push a new state to prevent going back
+            window.history.pushState(null, null, window.location.href);
+            
+            // Listen for back button press
+            window.addEventListener('popstate', function(event) {
+                // Check if still authenticated
+                const currentToken = localStorage.getItem('token') || localStorage.getItem('auth_token');
+                if (currentToken) {
+                    // If authenticated, push state again to prevent going back
+                    window.history.pushState(null, null, window.location.href);
+                } else {
+                    // If not authenticated, go to login
+                    window.location.replace('../index.html');
+                }
+            });
+        }
+
+        // Show the main app and hide loading
+        document.getElementById('loading-overlay').style.display = 'none';
+        document.getElementById('main-app').classList.remove('hidden');
+    })();
+
+    // ======================================
     // 📌 MOBILE SIDEBAR TOGGLE
-    // ------------------------------
+    // ======================================
     const menuToggle = document.getElementById("menu-toggle");
     const sidebar = document.getElementById("sidebar");
     const backdrop = document.getElementById("menu-backdrop");
 
-    menuToggle.addEventListener("click", () => {
+    menuToggle?.addEventListener("click", () => {
         sidebar.classList.toggle("-translate-x-full");
         backdrop.classList.toggle("hidden");
     });
 
-    backdrop.addEventListener("click", () => {
+    backdrop?.addEventListener("click", () => {
         sidebar.classList.add("-translate-x-full");
         backdrop.classList.add("hidden");
     });
 
-    // ------------------------------
+    // ======================================
     // 📌 SIDEBAR DROPDOWN FUNCTIONALITY
-    // ------------------------------
+    // ======================================
     // Sales Documents Dropdown
     const documentsDropdownBtn = document.getElementById("documents-dropdown-btn");
     const documentsDropdownContent = document.getElementById("documents-dropdown-content");
     const dropdownIcon = document.getElementById("dropdown-icon");
 
-    documentsDropdownBtn.addEventListener("click", () => {
+    documentsDropdownBtn?.addEventListener("click", () => {
         documentsDropdownContent.classList.toggle("hidden");
         dropdownIcon.classList.toggle("rotate-180");
     });
@@ -283,14 +388,14 @@
     const purchasesDropdownContent = document.getElementById("purchases-dropdown-content");
     const purchasesDropdownIcon = document.getElementById("purchases-dropdown-icon");
 
-    purchasesDropdownBtn.addEventListener("click", () => {
+    purchasesDropdownBtn?.addEventListener("click", () => {
         purchasesDropdownContent.classList.toggle("hidden");
         purchasesDropdownIcon.classList.toggle("rotate-180");
     });
 
-    // ------------------------------
+    // ======================================
     // 📌 BUSINESS LOGO + LOGOUT PANEL
-    // ------------------------------
+    // ======================================
     (function () {
         const desktopAvatarBtn = document.getElementById('desktop-avatar-btn');
         const desktopAvatarImg = document.getElementById('desktop-avatar-img');
@@ -362,25 +467,37 @@
             }
         });
 
-        logoutConfirm.addEventListener("click", () => {
+        logoutConfirm?.addEventListener("click", () => {
             logoutModal.classList.add("hidden");
             logoutConfirmModal.classList.remove("hidden");
             logoutConfirmModal.classList.add("flex");
         });
 
-        confirmCancel.addEventListener("click", () => {
+        confirmCancel?.addEventListener("click", () => {
             logoutConfirmModal.classList.add("hidden");
             logoutConfirmModal.classList.remove("flex");
         });
 
-        confirmOk.addEventListener("click", () => {
+        // ======================================
+        // 🔐 LOGOUT - CLEAR ALL AND REDIRECT
+        // ======================================
+        confirmOk?.addEventListener("click", () => {
+            // Clear all authentication data
             localStorage.removeItem('auth_token');
             localStorage.removeItem('auth_scheme');
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
-            window.location.href = '../index.html';
+            
+            // Clear session storage as well
+            sessionStorage.clear();
+            
+            // Use replace to prevent back navigation to authenticated pages
+            window.location.replace('../index.html');
         });
 
+        // ======================================
+        // 📌 LIVE DATE & TIME
+        // ======================================
         function updateDateTime() {
             const el = document.getElementById('live-datetime');
             if (!el) return;
@@ -395,6 +512,32 @@
 
         fetchCompanyDetails();
     })();
+
+    // ======================================
+    // 🔐 VISIBILITY CHANGE - CHECK AUTH
+    // ======================================
+    // Re-check authentication when user returns to the tab
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.replace('../index.html');
+            }
+        }
+    });
+
+    // ======================================
+    // 🔐 STORAGE EVENT - LOGOUT SYNC
+    // ======================================
+    // If user logs out in another tab, redirect this tab too
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'token' || event.key === 'auth_token') {
+            if (!event.newValue) {
+                // Token was removed, redirect to login
+                window.location.replace('../index.html');
+            }
+        }
+    });
     </script>
 
 </body>

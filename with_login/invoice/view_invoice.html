@@ -36,6 +36,10 @@
             transition: all 0.2s ease;
             border: 1px solid transparent;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .btn-primary {
@@ -66,6 +70,15 @@
             background-color: #059669;
         }
 
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+
         .alert {
             padding: 1rem;
             border-radius: 0.5rem;
@@ -73,21 +86,21 @@
         }
 
         .alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
+            background-color: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
         }
 
         .alert-error {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
         }
 
         .alert-info {
-            background-color: #d1ecf1;
-            border-color: #bee5eb;
-            color: #0c5460;
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
         }
 
         /* Read-only badge */
@@ -103,6 +116,42 @@
             gap: 0.25rem;
         }
 
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            gap: 0.25rem;
+        }
+
+        .status-paid {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .status-partial {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        .status-pending {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .status-overdue {
+            background-color: #fecaca;
+            color: #7f1d1d;
+            border: 1px solid #dc2626;
+        }
+
         /* Read-only display field styles */
         .display-field {
             background-color: #f3f4f6;
@@ -112,6 +161,8 @@
             font-size: 0.875rem;
             color: #374151;
             min-height: 38px;
+            display: flex;
+            align-items: center;
         }
 
         .display-field-lg {
@@ -137,7 +188,7 @@
         }
 
         .items-table th {
-            padding: 0.75rem;
+            padding: 0.75rem 1rem;
             text-align: left;
             font-weight: 600;
             font-size: 0.875rem;
@@ -145,6 +196,7 @@
 
         .items-table th:nth-child(1) {
             width: 5%;
+            text-align: center;
         }
 
         .items-table th:nth-child(3),
@@ -163,9 +215,15 @@
         }
 
         .items-table td {
-            padding: 0.75rem;
+            padding: 0.875rem 1rem;
             font-size: 0.875rem;
             color: #374151;
+        }
+
+        .items-table td:nth-child(1) {
+            text-align: center;
+            color: #6b7280;
+            font-weight: 500;
         }
 
         .items-table td:nth-child(3),
@@ -180,37 +238,35 @@
             margin-top: 0.25rem;
         }
 
-        /* Status badge */
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 9999px;
-            text-transform: uppercase;
+        /* Totals section */
+        .totals-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
         }
 
-        .status-paid {
-            background-color: #d1fae5;
-            color: #065f46;
-            border: 1px solid #10b981;
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
         }
 
-        .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
-            border: 1px solid #f59e0b;
-        }
-
-        .status-overdue {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #ef4444;
+        .totals-row.highlight {
+            border-top: 2px solid #111827;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
         }
 
         @media (max-width: 768px) {
             #main-content {
                 margin-top: 64px;
+            }
+
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
             }
         }
 
@@ -261,8 +317,12 @@
                             class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
                         <a href="home_invoice.html"
                             class="block py-2 px-4 rounded transition duration-200 bg-gray-700 text-sm">Invoice</a>
+                        <a href="payment_receipt.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payment Receipt</a>
+                        <a href="payment_history.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Payment History</a>
                         <a href="../credit_note.html"
-                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit Note</a>
                     </div>
                     <div>
                         <button id="purchases-dropdown-btn"
@@ -296,23 +356,33 @@
                 <!-- View Invoice Page -->
                 <div id="view-invoice-page">
                     <main class="form-container">
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="flex items-center gap-4">
+                        <!-- Header -->
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+                            <div class="flex flex-wrap items-center gap-3">
                                 <h1 class="text-3xl font-bold text-gray-800">View Invoice</h1>
                                 <span class="readonly-badge">
                                     <i class="fas fa-eye"></i> Read Only
                                 </span>
-                                <span id="payment-status-badge" class="status-badge status-pending hidden">Pending</span>
+                                <span id="payment-status-badge" class="status-badge status-pending hidden">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>
                             </div>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <a href="home_invoice.html" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left mr-2"></i> Back to List
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span class="hidden sm:inline">Back to List</span>
                                 </a>
                                 <button id="edit-invoice-btn" class="btn btn-success">
-                                    <i class="fas fa-edit mr-2"></i> Edit
+                                    <i class="fas fa-edit"></i>
+                                    <span class="hidden sm:inline">Edit</span>
                                 </button>
+                                <a id="record-payment-btn" href="#" class="btn btn-warning hidden">
+                                    <i class="fas fa-plus"></i>
+                                    <span class="hidden sm:inline">Record Payment</span>
+                                </a>
                                 <button id="download-pdf-btn" class="btn btn-primary">
-                                    <i class="fas fa-download mr-2"></i> Download PDF
+                                    <i class="fas fa-download"></i>
+                                    <span class="hidden sm:inline">Download PDF</span>
                                 </button>
                             </div>
                         </div>
@@ -322,27 +392,27 @@
                         <div class="form-section space-y-6">
                             <!-- Invoice Info -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <div class="grid grid-cols-3 gap-2 items-center mb-4">
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-3 gap-2 items-center">
                                         <label class="text-gray-600 text-sm font-medium">Invoice No.</label>
                                         <div id="invoice-no" class="display-field col-span-2">-</div>
                                     </div>
 
-                                    <div class="grid grid-cols-3 gap-2 items-center mb-4">
+                                    <div class="grid grid-cols-3 gap-2 items-center">
                                         <label class="text-gray-600 text-sm font-medium">Invoice Date</label>
                                         <div id="invoice-date" class="display-field col-span-2">-</div>
                                     </div>
 
-                                    <div class="grid grid-cols-3 gap-2 items-center mb-4">
+                                    <div class="grid grid-cols-3 gap-2 items-center">
                                         <label class="text-gray-600 text-sm font-medium">Due Date</label>
                                         <div id="due-date" class="display-field col-span-2">-</div>
                                     </div>
                                 </div>
                                 <div id="logo-container"
-                                    class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center bg-gray-50">
-                                    <img id="logo-preview" src="" alt="Business Logo" class="max-w-[150px] max-h-[70px] object-contain hidden" />
+                                    class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center bg-gray-50 min-h-[120px]">
+                                    <img id="logo-preview" src="" alt="Business Logo" class="max-w-[150px] max-h-[80px] object-contain hidden" />
                                     <div id="logo-placeholder" class="text-gray-400">
-                                        <i class="fas fa-image text-2xl mb-2"></i>
+                                        <i class="fas fa-image text-3xl mb-2"></i>
                                         <span class="block text-sm">No Logo</span>
                                     </div>
                                 </div>
@@ -352,14 +422,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- From (Company) -->
                                 <div class="border rounded-lg p-4 space-y-3 bg-gray-50">
-                                    <h3 class="font-semibold text-gray-700">
-                                        From <span class="text-gray-400 text-sm">(Your Details)</span>
+                                    <h3 class="font-semibold text-gray-700 flex items-center gap-2">
+                                        <i class="fas fa-building text-indigo-500"></i>
+                                        From <span class="text-gray-400 text-sm font-normal">(Your Details)</span>
                                     </h3>
                                     <div>
                                         <label class="text-sm font-medium text-gray-600">Business Name</label>
                                         <div id="businessName" class="display-field mt-1">-</div>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-2">
+                                    <div class="grid grid-cols-2 gap-3">
                                         <div>
                                             <label class="text-sm font-medium text-gray-600">City</label>
                                             <div id="business_city" class="display-field mt-1">-</div>
@@ -373,14 +444,15 @@
 
                                 <!-- To (Client) -->
                                 <div class="border rounded-lg p-4 space-y-3 bg-gray-50">
-                                    <h3 class="font-semibold text-gray-700">
-                                        Billed To <span class="text-gray-400 text-sm">(Client's Details)</span>
+                                    <h3 class="font-semibold text-gray-700 flex items-center gap-2">
+                                        <i class="fas fa-user text-green-500"></i>
+                                        Billed To <span class="text-gray-400 text-sm font-normal">(Client's Details)</span>
                                     </h3>
                                     <div>
                                         <label class="text-sm font-medium text-gray-600">Client Name</label>
                                         <div id="client-name" class="display-field mt-1">-</div>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-2">
+                                    <div class="grid grid-cols-2 gap-3">
                                         <div>
                                             <label class="text-sm font-medium text-gray-600">City</label>
                                             <div id="client-city" class="display-field mt-1">-</div>
@@ -394,8 +466,13 @@
                             </div>
 
                             <!-- Items Table -->
-                            <div class="p-4 rounded-lg border shadow-sm">
-                                <h3 class="font-semibold text-gray-700 mb-4">Items</h3>
+                            <div class="border rounded-lg shadow-sm overflow-hidden">
+                                <div class="bg-gray-100 px-4 py-3 border-b">
+                                    <h3 class="font-semibold text-gray-700 flex items-center gap-2">
+                                        <i class="fas fa-list text-indigo-500"></i>
+                                        Items
+                                    </h3>
+                                </div>
                                 <div class="overflow-x-auto">
                                     <table class="items-table">
                                         <thead>
@@ -415,67 +492,72 @@
                             </div>
 
                             <!-- Totals Section -->
-                            <div class="w-full flex justify-end mt-4">
-                                <div class="w-96 p-4 rounded-lg border bg-gray-50 shadow-sm space-y-3">
-                                    <div class="flex justify-between items-center">
+                            <div class="flex justify-end">
+                                <div class="w-full md:w-96 totals-card">
+                                    <div class="totals-row">
                                         <span class="text-gray-600">Subtotal</span>
                                         <span class="font-semibold text-gray-800" id="sub_total">₹0.00</span>
                                     </div>
 
-                                    <div class="flex justify-between items-center">
+                                    <div class="totals-row">
                                         <span class="text-gray-600">Tax (<span id="tax-percentage">0</span>%)</span>
                                         <span class="font-semibold text-gray-800" id="tax">₹0.00</span>
                                     </div>
 
-                                    <div class="flex justify-between items-center">
+                                    <div class="totals-row">
                                         <span class="text-gray-600">Round Off</span>
                                         <span class="font-semibold text-gray-800" id="round_off">₹0.00</span>
                                     </div>
 
-                                    <div class="flex justify-between items-center border-t border-gray-300 pt-2">
+                                    <div class="totals-row border-t border-gray-300 pt-2 mt-1">
                                         <span class="font-bold text-gray-800">Total</span>
                                         <span class="font-bold text-gray-800" id="total">₹0.00</span>
                                     </div>
 
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-green-600 font-medium">Paid Amount</span>
+                                    <div class="totals-row">
+                                        <span class="text-green-600 font-medium flex items-center gap-1">
+                                            <i class="fas fa-check-circle"></i> Paid Amount
+                                        </span>
                                         <span class="font-semibold text-green-600" id="paid_amount">₹0.00</span>
                                     </div>
 
-                                    <div class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
+                                    <div class="totals-row highlight">
                                         <span class="font-bold text-lg text-gray-800">Balance Due</span>
-                                        <span class="font-bold text-lg text-red-600" id="balance_due">₹0.00</span>
+                                        <span class="font-bold text-lg" id="balance_due">₹0.00</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Terms & Conditions (only shown if data exists) -->
                             <div id="terms-section" class="hidden">
-                                <h3 class="font-semibold text-gray-700 mb-2">
-                                    <i class="fas fa-file-contract mr-2"></i>Terms & Conditions
+                                <h3 class="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-file-contract text-indigo-500"></i>
+                                    Terms & Conditions
                                 </h3>
                                 <div id="terms-content" class="display-field-lg">-</div>
                             </div>
 
                             <!-- Notes (only shown if data exists) -->
                             <div id="notes-section" class="hidden">
-                                <h3 class="font-semibold text-gray-700 mb-2">
-                                    <i class="fas fa-sticky-note mr-2"></i>Notes
+                                <h3 class="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-sticky-note text-yellow-500"></i>
+                                    Notes
                                 </h3>
                                 <div id="notes-content" class="display-field-lg">-</div>
                             </div>
 
                             <!-- Signatory (only shown if data exists) -->
                             <div id="signatory-section" class="hidden">
-                                <h3 class="font-semibold text-gray-700 mb-2">
-                                    <i class="fas fa-signature mr-2"></i>Authorized Signatory
+                                <h3 class="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-signature text-purple-500"></i>
+                                    Authorized Signatory
                                 </h3>
-                                <div class="border rounded-lg p-4 bg-gray-50 inline-block">
-                                    <div id="signatory-image-display" class="hidden mb-2">
+                                <div class="border rounded-lg p-4 bg-gray-50 inline-block min-w-[200px]">
+                                    <div id="signatory-image-display" class="hidden mb-3 flex justify-center">
                                         <img id="signatory-image" src="" alt="Signature" class="max-h-16 object-contain">
                                     </div>
                                     <div id="signatory-name-display" class="text-center">
-                                        <div class="border-t border-gray-400 pt-2 mt-4 w-48">
+                                        <div class="border-t border-gray-400 pt-2 w-full">
                                             <span id="signatory-name" class="font-medium text-gray-700"></span>
                                         </div>
                                     </div>
@@ -494,7 +576,6 @@
                         border: 1px solid #e5e7eb;
                         max-width: 800px;
                         margin: 0 auto;
-                        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
                     ">
                         <!-- Header -->
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
@@ -554,12 +635,12 @@
                                     <span id="pdf-total" style="font-weight: 600;"></span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; color: #059669;">
-                                    <span>Amount Paid</span>
+                                    <span>Paid Amount</span>
                                     <span id="pdf-paid-amount"></span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; padding-top: 12px; margin-top: 8px; border-top: 2px solid #111827; font-weight: bold; font-size: 16px;">
                                     <span>Balance Due</span>
-                                    <span id="pdf-balance-due" style="color: #dc2626;"></span>
+                                    <span id="pdf-balance-due"></span>
                                 </div>
                             </div>
                         </div>
@@ -590,12 +671,24 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // ======================================
+            // 🔐 AUTHENTICATION CHECK
+            // ======================================
+            (function checkAuth() {
+                const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+                if (!token) {
+                    window.location.replace('../../index.html');
+                    return;
+                }
+            })();
+
             const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
             const COMPANY_API_URL = `${API_BASE_URL}/companies`;
             const INVOICE_API_URL = `${API_BASE_URL}/invoic`;
 
             const alertContainer = document.getElementById("alert-container");
             const editInvoiceBtn = document.getElementById("edit-invoice-btn");
+            const recordPaymentBtn = document.getElementById("record-payment-btn");
             const downloadPdfBtn = document.getElementById("download-pdf-btn");
             const menuToggle = document.getElementById("menu-toggle");
             const sidebar = document.getElementById("sidebar");
@@ -624,16 +717,17 @@
             // === Utility Functions ===
             function showAlert(message, type = "success", duration = 5000) {
                 if (!alertContainer) return;
+                const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
                 const alertDiv = document.createElement("div");
                 alertDiv.className = `alert alert-${type}`;
-                alertDiv.textContent = message;
+                alertDiv.innerHTML = `<i class="fas fa-${icon} mr-2"></i>${message}`;
                 alertContainer.innerHTML = '';
                 alertContainer.appendChild(alertDiv);
                 setTimeout(() => alertDiv.remove(), duration);
             }
 
             function getAuthHeaders() {
-                const token = localStorage.getItem("token");
+                const token = localStorage.getItem("token") || localStorage.getItem("auth_token");
                 return token ? { 'Authorization': `Bearer ${token}` } : null;
             }
 
@@ -687,6 +781,10 @@
                 });
             }
 
+            function formatCurrency(amount) {
+                return `₹${(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+
             // === Load Company Details ===
             async function loadCompany() {
                 try {
@@ -721,41 +819,50 @@
 
                 // Invoice Info
                 document.getElementById("invoice-no").textContent = invoice.invoice_no || invoice._id || "-";
-                document.getElementById("invoice-date").textContent = formatDate(invoice.date);
+                document.getElementById("invoice-date").textContent = formatDate(invoice.date || invoice.invoice_date);
                 document.getElementById("due-date").textContent = formatDate(invoice.due_date);
 
-                // Payment Status Badge
-                const statusBadge = document.getElementById("payment-status-badge");
+                // Calculate totals
                 const total = invoice.total || 0;
                 const paidAmount = invoice.paid_amount || 0;
                 const balanceDue = total - paidAmount;
 
+                // Payment Status Badge
+                const statusBadge = document.getElementById("payment-status-badge");
                 if (statusBadge) {
-                    statusBadge.classList.remove("hidden");
+                    statusBadge.classList.remove("hidden", "status-paid", "status-partial", "status-pending", "status-overdue");
+                    
                     if (balanceDue <= 0) {
-                        statusBadge.textContent = "Paid";
-                        statusBadge.className = "status-badge status-paid";
+                        statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> Paid';
+                        statusBadge.classList.add("status-paid");
+                    } else if (paidAmount > 0) {
+                        statusBadge.innerHTML = '<i class="fas fa-clock"></i> Partial';
+                        statusBadge.classList.add("status-partial");
                     } else {
                         const dueDate = new Date(invoice.due_date);
                         const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        
                         if (dueDate < today) {
-                            statusBadge.textContent = "Overdue";
-                            statusBadge.className = "status-badge status-overdue";
+                            statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Overdue';
+                            statusBadge.classList.add("status-overdue");
                         } else {
-                            statusBadge.textContent = "Pending";
-                            statusBadge.className = "status-badge status-pending";
+                            statusBadge.innerHTML = '<i class="fas fa-clock"></i> Pending';
+                            statusBadge.classList.add("status-pending");
                         }
                     }
                 }
 
-                // Client Info
-                const clientName = invoice.to?.client_name || "-";
-                const clientCity = invoice.to?.address?.city || invoice.to?.address?.['city/town'] || "-";
-                const clientState = invoice.to?.address?.state || "-";
+                // Show/hide record payment button based on balance
+                if (balanceDue > 0) {
+                    recordPaymentBtn.href = `payment_receipt.html?invoice_id=${INVOICE_ID}`;
+                    recordPaymentBtn.classList.remove("hidden");
+                }
 
-                document.getElementById("client-name").textContent = clientName;
-                document.getElementById("client-city").textContent = clientCity;
-                document.getElementById("client-state").textContent = clientState;
+                // Client Info
+                document.getElementById("client-name").textContent = invoice.to?.client_name || "-";
+                document.getElementById("client-city").textContent = invoice.to?.address?.city || invoice.to?.address?.['city/town'] || "-";
+                document.getElementById("client-state").textContent = invoice.to?.address?.state || "-";
 
                 // Tax Percentage
                 document.getElementById("tax-percentage").textContent = invoice.tax_percentage || 0;
@@ -770,17 +877,17 @@
                         tr.innerHTML = `
                             <td>${index + 1}</td>
                             <td>
-                                <div class="font-medium">${escapeHtml(item.item_name)}</div>
+                                <div class="font-medium text-gray-800">${escapeHtml(item.item_name)}</div>
                                 ${item.description ? `<div class="item-description">${escapeHtml(item.description)}</div>` : ''}
                             </td>
                             <td>${item.quantity || 0}</td>
-                            <td>₹${(item.rate || 0).toFixed(2)}</td>
-                            <td>₹${(item.amount || 0).toFixed(2)}</td>
+                            <td>${formatCurrency(item.rate || 0)}</td>
+                            <td class="font-medium">${formatCurrency(item.amount || 0)}</td>
                         `;
                         tbody.appendChild(tr);
                     });
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-4">No items found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-8"><i class="fas fa-inbox text-2xl mb-2 block"></i>No items found</td></tr>';
                 }
 
                 // Totals
@@ -788,21 +895,25 @@
                 const tax = invoice.tax || 0;
                 const roundOff = invoice.round_off || 0;
 
-                document.getElementById("sub_total").textContent = `₹${subtotal.toFixed(2)}`;
-                document.getElementById("tax").textContent = `₹${tax.toFixed(2)}`;
-                document.getElementById("round_off").textContent = `₹${roundOff.toFixed(2)}`;
-                document.getElementById("total").textContent = `₹${Math.round(total)}`;
-                document.getElementById("paid_amount").textContent = `₹${paidAmount.toFixed(2)}`;
-                document.getElementById("balance_due").textContent = `₹${Math.round(balanceDue)}`;
-
-                // Change balance due color based on value
+                document.getElementById("sub_total").textContent = formatCurrency(subtotal);
+                document.getElementById("tax").textContent = formatCurrency(tax);
+                document.getElementById("round_off").textContent = formatCurrency(roundOff);
+                document.getElementById("total").textContent = formatCurrency(total);
+                document.getElementById("paid_amount").textContent = formatCurrency(paidAmount);
+                
                 const balanceDueEl = document.getElementById("balance_due");
+                balanceDueEl.textContent = formatCurrency(balanceDue);
+                
+                // Color the balance due based on value
                 if (balanceDue <= 0) {
                     balanceDueEl.classList.remove("text-red-600");
                     balanceDueEl.classList.add("text-green-600");
                     if (balanceDue === 0) {
-                        balanceDueEl.textContent = "₹0 (Paid)";
+                        balanceDueEl.textContent = "₹0.00 (Paid)";
                     }
+                } else {
+                    balanceDueEl.classList.remove("text-green-600");
+                    balanceDueEl.classList.add("text-red-600");
                 }
 
                 // Terms & Conditions
@@ -844,7 +955,7 @@
 
                 // Invoice details
                 document.getElementById("pdf-inv-no").textContent = invoice.invoice_no || "-";
-                document.getElementById("pdf-inv-date").textContent = formatDate(invoice.date);
+                document.getElementById("pdf-inv-date").textContent = formatDate(invoice.date || invoice.invoice_date);
                 document.getElementById("pdf-due-date").textContent = formatDate(invoice.due_date);
 
                 // From address
@@ -874,8 +985,8 @@
                     tr.innerHTML = `
                         <td style="padding: 12px 4px; font-size: 14px;">${escapeHtml(item.item_name)}${item.description ? `<br><span style="font-size: 12px; color: #6b7280;">${escapeHtml(item.description)}</span>` : ''}</td>
                         <td style="padding: 12px 4px; font-size: 14px; text-align: right;">${item.quantity || 0}</td>
-                        <td style="padding: 12px 4px; font-size: 14px; text-align: right;">₹${(item.rate || 0).toFixed(2)}</td>
-                        <td style="padding: 12px 4px; font-size: 14px; text-align: right;">₹${(item.amount || 0).toFixed(2)}</td>
+                        <td style="padding: 12px 4px; font-size: 14px; text-align: right;">${formatCurrency(item.rate || 0)}</td>
+                        <td style="padding: 12px 4px; font-size: 14px; text-align: right;">${formatCurrency(item.amount || 0)}</td>
                     `;
                     pdfTbody.appendChild(tr);
                 });
@@ -885,13 +996,16 @@
                 const paidAmount = invoice.paid_amount || 0;
                 const balanceDue = total - paidAmount;
 
-                document.getElementById("pdf-subtotal").textContent = `₹${(invoice.sub_total || 0).toFixed(2)}`;
+                document.getElementById("pdf-subtotal").textContent = formatCurrency(invoice.sub_total || 0);
                 document.getElementById("pdf-tax-rate").textContent = invoice.tax_percentage || 0;
-                document.getElementById("pdf-tax").textContent = `₹${(invoice.tax || 0).toFixed(2)}`;
-                document.getElementById("pdf-round-off").textContent = `₹${(invoice.round_off || 0).toFixed(2)}`;
-                document.getElementById("pdf-total").textContent = `₹${Math.round(total)}`;
-                document.getElementById("pdf-paid-amount").textContent = `₹${paidAmount.toFixed(2)}`;
-                document.getElementById("pdf-balance-due").textContent = `₹${Math.round(balanceDue)}`;
+                document.getElementById("pdf-tax").textContent = formatCurrency(invoice.tax || 0);
+                document.getElementById("pdf-round-off").textContent = formatCurrency(invoice.round_off || 0);
+                document.getElementById("pdf-total").textContent = formatCurrency(total);
+                document.getElementById("pdf-paid-amount").textContent = formatCurrency(paidAmount);
+                
+                const pdfBalanceDue = document.getElementById("pdf-balance-due");
+                pdfBalanceDue.textContent = formatCurrency(balanceDue);
+                pdfBalanceDue.style.color = balanceDue > 0 ? '#dc2626' : '#059669';
 
                 // Terms
                 if (invoice.terms_and_condition) {
@@ -940,6 +1054,8 @@
                 }
 
                 try {
+                    showAlert("Generating PDF...", "info", 2000);
+
                     // Show the section temporarily for rendering
                     pdfSection.classList.remove("hidden");
                     pdfSection.style.position = "absolute";
@@ -979,6 +1095,7 @@
                         heightLeft -= pageHeight;
                     }
 
+                    // Generate filename
                     let clientName = invoiceData?.to?.client_name || "Client";
                     clientName = clientName.replace(/[^a-zA-Z0-9-_ ]/g, "").trim().replace(/\s+/g, "_");
                     const invNo = invoiceData?.invoice_no || "Invoice";
