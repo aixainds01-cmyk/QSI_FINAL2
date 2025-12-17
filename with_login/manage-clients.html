@@ -352,7 +352,7 @@
             const modalTitle = document.getElementById('modal-title'); // Added
             const editingClientIdInput = document.getElementById('editingClientId'); // Added
 
-            const API_BASE_URL = 'http://Aixains-Mac-mini.local:8000/api'; // Added for consistency
+            const API_BASE_URL = 'http://192.168.1.12:8000/api'; // Added for consistency
 const menuToggle = document.getElementById("menu-toggle");
 const sidebar = document.getElementById("sidebar");
 const menuBackdrop = document.getElementById("menu-backdrop");
@@ -540,7 +540,7 @@ if (menuToggle && sidebar && menuBackdrop) {
                     console.error('Failed to fetch clients:', error);
                     let errorMessage;
                     if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
-                        errorMessage = "Could not connect to the API server. Please ensure your backend server at 'http://Aixains-Mac-mini.local:8000' is running and that its CORS policy allows requests from this page.";
+                        errorMessage = "Could not connect to the API server. Please ensure your backend server at 'http://192.168.1.12:8000' is running and that its CORS policy allows requests from this page.";
                     } else {
                         errorMessage = `An error occurred: ${error.message}`;
                     }
