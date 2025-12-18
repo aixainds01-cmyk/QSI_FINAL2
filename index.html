@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Login - QSI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
@@ -13,144 +13,142 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
-
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <style>
       body {
         font-family: "Inter", sans-serif;
-        background-color: #f9fafb;
+        background-color: #f3f4f6;
       }
       .login-container {
-        max-width: 420px;
+        max-width: 440px;
         width: 100%;
       }
-      .form-section {
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
+      .form-card {
+        background: white;
+        border-radius: 8px;
         padding: 2.5rem;
-        background-color: white;
-        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
-          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
       }
       .input-field {
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        padding: 0.75rem 1rem;
-        transition: all 0.2s ease;
         width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
         font-size: 0.875rem;
+        transition: all 0.15s ease;
       }
       .input-field:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
         outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
       }
       .btn {
-        padding: 0.75rem 1rem;
-        border-radius: 0.375rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        border: 1px solid transparent;
         width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
         font-size: 0.875rem;
+        transition: all 0.15s ease;
         cursor: pointer;
+        border: none;
       }
-      .btn:disabled {
+      .btn-primary {
+        background-color: #6366f1;
+        color: white;
+      }
+      .btn-primary:hover:not(:disabled) {
+        background-color: #4f46e5;
+      }
+      .btn-primary:disabled {
         background-color: #a5b4fc;
         cursor: not-allowed;
       }
-      .btn-primary {
-        background-color: #4f46e5;
-        color: white;
-      }
-      .btn-primary:hover {
-        background-color: #4338ca;
-      }
-      .btn-link {
-        color: #4f46e5;
-        font-weight: 500;
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        font-size: 0.875rem;
-      }
-      .btn-link:hover {
-        text-decoration: underline;
-      }
-      .btn-social {
-        background-color: #ffffff;
+      .btn-outline {
+        background-color: white;
+        border: 1px solid #e5e7eb;
         color: #374151;
-        border: 1px solid #d1d5db;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
       }
-      .btn-social:hover {
+      .btn-outline:hover {
         background-color: #f9fafb;
+        border-color: #d1d5db;
       }
-      .btn-social svg {
-        width: 1.25rem;
-        height: 1.25rem;
+      .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 1.5rem 0;
       }
-      #google-login-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+      .divider::before,
+      .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .divider span {
+        padding: 0 1rem;
+        color: #9ca3af;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+      .link-text {
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .link-text:hover {
+        color: #4f46e5;
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body class="min-h-screen flex items-center justify-center p-4">
     <script>
+      // Facebook SDK
       window.fbAsyncInit = function () {
         FB.init({
-          appId: "1605405084177718", // Your App ID
+          appId: "1605405084177718",
           cookie: true,
           xfbml: true,
           version: "v18.0",
         });
-        FB.AppEvents.logPageView();
       };
 
       (function (d, s, id) {
-        var js,
-          fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-          return;
-        }
-        js = d.createElement(s);
-        js.id = id;
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
         js.src = "https://connect.facebook.net/en_US/sdk.js";
         fjs.parentNode.insertBefore(js, fjs);
       })(document, "script", "facebook-jssdk");
     </script>
 
     <div class="login-container">
+      <!-- Header -->
       <div class="text-center mb-8">
-        <h1
-          class="text-3xl font-bold text-gray-800 flex items-center justify-center"
-        >
-          QSI
-        </h1>
+        <h1 class="text-4xl font-bold text-gray-900">QSI</h1>
       </div>
 
-      <div class="form-section">
+      <!-- Login Card -->
+      <div class="form-card">
         <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold text-gray-800">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">
             Login in to your account
           </h2>
-          <p class="text-sm text-gray-500 mt-2">
+          <p class="text-sm text-gray-600">
             Welcome back! Please enter your details.
           </p>
         </div>
 
-        <form id="login-form" class="space-y-6">
+        <!-- Email/Password Form -->
+        <form id="login-form" class="space-y-4">
           <div>
-            <label
-              for="email"
-              class="block text-sm font-medium text-gray-700 mb-2"
-            >
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">
               Email
             </label>
             <input
@@ -164,14 +162,11 @@
           </div>
 
           <div>
-            <div class="flex justify-between items-center mb-2">
-              <label
-                for="password"
-                class="block text-sm font-medium text-gray-700"
-              >
+            <div class="flex justify-between items-center mb-1.5">
+              <label for="password" class="block text-sm font-medium text-gray-700">
                 Password
               </label>
-              <button type="button" class="btn-link">Forgot password?</button>
+              <a href="#" class="text-xs link-text">Forgot password?</a>
             </div>
             <input
               type="password"
@@ -183,62 +178,51 @@
             />
           </div>
 
-          <div>
-            <button type="submit" class="btn btn-primary mt-2">Login</button>
-          </div>
+          <button type="submit" class="btn btn-primary mt-6">
+            Login
+          </button>
         </form>
 
-        <div class="relative flex py-5 items-center">
-          <div class="flex-grow border-t border-gray-300"></div>
-          <span class="flex-shrink mx-4 text-gray-400 text-sm font-medium"
-            >OR CONTINUE WITH</span
-          >
-          <div class="flex-grow border-t border-gray-300"></div>
+        <!-- Divider -->
+        <div class="divider">
+          <span>OR CONTINUE WITH</span>
         </div>
 
-        <div class="space-y-4">
-          <button type="button" id="google-login-btn" class="btn btn-social">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <path
-                fill="#FFC107"
-                d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
-              ></path>
-              <path
-                fill="#FF3D00"
-                d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
-              ></path>
-              <path
-                fill="#4CAF50"
-                d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.223,0-9.657-3.657-11.303-8.354l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
-              ></path>
-              <path
-                fill="#1976D2"
-                d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C39.904,36.338,44,30.835,44,24C44,22.659,43.862,21.35,43.611,20.083z"
-              ></path>
+        <!-- Social Login Buttons -->
+        <div class="space-y-3">
+          <button type="button" id="google-login-btn" class="btn btn-outline">
+            <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+              <g fill="none" fill-rule="evenodd">
+                <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+              </g>
             </svg>
             Continue with Google
           </button>
-          <button type="button" id="facebook-login-btn" class="btn btn-social">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path
-                fill="#1877F2"
-                d="M22,12c0-5.52-4.48-10-10-10S2,6.48,2,12c0,4.84,3.44,8.87,8,9.8V15H8v-3h2V9.5C10,7.57,11.57,6,13.5,6H16v3h-1.5c-1.38,0-1.5,0.62-1.5,1.5V12h3l-0.5,3h-2.5v6.8C18.56,20.87,22,16.84,22,12z"
-              />
+
+          <button type="button" id="facebook-login-btn" class="btn btn-outline">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
             </svg>
             Continue with Facebook
           </button>
         </div>
+
+        <!-- Skip Link -->
         <div class="text-center mt-6">
-          <a href="without_login/dashboard_without_login.html" class="btn-link"
-            >Or Skip for now</a
-          >
+          <a href="without_login/dashboard_without_login.html" class="text-sm link-text">
+            Or Skip for now
+          </a>
         </div>
       </div>
 
+      <!-- Sign Up Link -->
       <div class="text-center mt-6">
         <p class="text-sm text-gray-600">
           Don't have an account?
-          <a href="./signup/sign_up.html" class="btn-link font-semibold">
+          <a href="./signup/sign_up.html" class="link-text font-semibold">
             Sign up
           </a>
         </p>
@@ -248,134 +232,146 @@
     <script>
 document.addEventListener("DOMContentLoaded", function () {
   const loginForm = document.getElementById("login-form");
-  const submitButton = document.querySelector('#login-form button[type="submit"]');
-
-  const API_BASE = "http://82.112.227.39:8000/api";
-
-  // -------------------------
-  // EMAIL + PASSWORD LOGIN
-  // -------------------------
-  loginForm.addEventListener("submit", async function (e) {
-  e.preventDefault();
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  if (!email || !password) {
-    alert("Please enter both email and password.");
-    return;
-  }
-
-  submitButton.disabled = true;
-  submitButton.textContent = "Verifying...";
-
-  try {
-    const response = await fetch(`${API_BASE}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    // ✅ Check if response is JSON
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      throw new Error("Server returned non-JSON response. Is the backend running?");
-    }
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || "Invalid credentials.");
-    }
-
-    if (result.token && result.user && result.user._id) {
-      localStorage.setItem("token", result.token);
-      localStorage.setItem("userId", result.user._id);
-      localStorage.setItem("email", result.user.email || "");
-      localStorage.setItem("phone", result.user.phone || "");
-      
-      alert("Login Successful!");
-
-      if (result.has_company_details) {
-        window.location.href = "with_login/dashboard_with_login.html";
-      } else {
-        window.location.href = "signup/businessDetails.html";
-      }
-    } else {
-      throw new Error("Server response missing token or user data.");
-    }
-  } catch (err) {
-    console.error("Login error:", err);
-    alert(`Login Failed: ${err.message}`);
-  } finally {
-    submitButton.disabled = false;
-    submitButton.textContent = "Login";
-  }
-});
-
-  // -------------------------
-  // GOOGLE LOGIN
-  // -------------------------
-  // -------------------------
-// GOOGLE LOGIN (Fix for load timing)
-// -------------------------
-const googleBtn = document.getElementById("google-login-btn");
-let googleTokenClient;
-
-// Wait until Google API is ready
-function initializeGoogleLogin() {
-  if (typeof google === "undefined" || !google.accounts?.oauth2) {
-    // If script not yet loaded, try again in 200ms
-    setTimeout(initializeGoogleLogin, 200);
-    return;
-  }
-
-  googleTokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: "345844221969-mtpp4nslbprtuu53f9bcsuh1kaaanjht.apps.googleusercontent.com",
-    scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
-    callback: async (tokenResponse) => {
-      if (tokenResponse?.access_token) {
-        try {
-          const googleUser = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-          }).then((res) => res.json());
-
-          await handleSocialLoginSuccess("Google", googleUser);
-        } catch (err) {
-          console.error("Google login failed:", err);
-          alert("Google login failed. Please try again.");
-        }
-      }
-    },
-  });
-
-  // ✅ Enable the button only after initialization
-  googleBtn.disabled = false;
-  googleBtn.classList.remove("opacity-50", "cursor-not-allowed");
-
-  googleBtn.addEventListener("click", () => {
-    googleTokenClient.requestAccessToken();
-  });
-}
-
-// Initially disable until Google script loads
-googleBtn.disabled = true;
-googleBtn.classList.add("opacity-50", "cursor-not-allowed");
-
-// Start initialization check
-initializeGoogleLogin();
-
-  // -------------------------
-  // FACEBOOK LOGIN
-  // -------------------------
+  const submitButton = loginForm.querySelector('button[type="submit"]');
+  const googleBtn = document.getElementById("google-login-btn");
   const facebookBtn = document.getElementById("facebook-login-btn");
 
+  const API_BASE = "http://82.112.227.39/api";
+
+  // ========================================
+  // EMAIL/PASSWORD LOGIN
+  // ========================================
+  loginForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      alert("Please enter both email and password.");
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Verifying...";
+
+    try {
+      const response = await fetch(`${API_BASE}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Invalid credentials");
+      }
+
+      if (result.token && result.user && result.user._id) {
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("userId", result.user._id);
+        localStorage.setItem("email", result.user.email || "");
+        localStorage.setItem("phone", result.user.phone || "");
+
+        alert("Login Successful!");
+
+        if (result.has_company_details) {
+          window.location.href = "with_login/dashboard_with_login.html";
+        } else {
+          window.location.href = "signup/businessDetails.html";
+        }
+      } else {
+        throw new Error("Invalid server response");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert(`Login Failed: ${err.message}`);
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Login";
+    }
+  });
+
+  // ========================================
+  // GOOGLE LOGIN
+  // ========================================
+  let googleTokenClient;
+
+  function initializeGoogleLogin() {
+    if (typeof google === "undefined" || !google.accounts?.oauth2) {
+      setTimeout(initializeGoogleLogin, 200);
+      return;
+    }
+
+    googleTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: "345844221969-mtpp4nslbprtuu53f9bcsuh1kaaanjht.apps.googleusercontent.com",
+      scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
+      callback: async (tokenResponse) => {
+        if (tokenResponse?.access_token) {
+          try {
+            googleBtn.disabled = true;
+            googleBtn.innerHTML = '<span>Signing in...</span>';
+
+            const googleUser = await fetch(
+              "https://www.googleapis.com/oauth2/v3/userinfo",
+              { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
+            ).then((res) => res.json());
+
+            await handleSocialLogin("Google", googleUser);
+          } catch (err) {
+            console.error("Google login failed:", err);
+            alert("Google login failed. Please try again.");
+            googleBtn.disabled = false;
+            googleBtn.innerHTML = `
+              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                <g fill="none" fill-rule="evenodd">
+                  <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+                  <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                </g>
+              </svg>
+              Continue with Google
+            `;
+          }
+        }
+      },
+    });
+
+    googleBtn.disabled = false;
+    googleBtn.addEventListener("click", () => {
+      googleTokenClient.requestAccessToken();
+    });
+  }
+
+  googleBtn.disabled = true;
+  initializeGoogleLogin();
+
+  // ========================================
+  // FACEBOOK LOGIN
+  // ========================================
   facebookBtn.addEventListener("click", () => {
     FB.login(
       (response) => {
         if (response.authResponse) {
-          FB.api("/me", { fields: "name,email" }, (fbUser) => {
-            handleSocialLoginSuccess("Facebook", fbUser);
+          facebookBtn.disabled = true;
+          facebookBtn.innerHTML = '<span>Signing in...</span>';
+
+          FB.api("/me", { fields: "name,email" }, async (fbUser) => {
+            try {
+              await handleSocialLogin("Facebook", fbUser);
+            } catch (err) {
+              console.error("Facebook login failed:", err);
+              alert("Facebook login failed. Please try again.");
+              facebookBtn.disabled = false;
+              facebookBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Continue with Facebook
+              `;
+            }
           });
         }
       },
@@ -383,11 +379,11 @@ initializeGoogleLogin();
     );
   });
 
-  // -------------------------
-  // GENERIC SOCIAL LOGIN HANDLER
-  // -------------------------
-  async function handleSocialLoginSuccess(provider, userData) {
-    console.log(`${provider} login success:`, userData);
+  // ========================================
+  // SOCIAL LOGIN HANDLER
+  // ========================================
+  async function handleSocialLogin(provider, userData) {
+    console.log(`${provider} login:`, userData);
 
     const payload = {
       email: userData.email,
@@ -411,32 +407,29 @@ initializeGoogleLogin();
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Social login failed.");
+        throw new Error(result.message || "Social login failed");
       }
 
       if (result.token && result.user && result.user._id) {
-  // ✅ Store all required info
-  localStorage.setItem("token", result.token);
-  localStorage.setItem("userId", result.user._id);
-  localStorage.setItem("email", result.user.email || "");
-  localStorage.setItem("phone", result.user.phone || "");
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("userId", result.user._id);
+        localStorage.setItem("email", result.user.email || "");
+        localStorage.setItem("phone", result.user.phone || "");
 
-  if (result.has_company_details) {
-    window.location.href = "with_login/dashboard_with_login.html";
-  } else {
-    window.location.href = "signup/businessDetails.html";
-  }
-}
- else {
-        throw new Error("Social login response missing token or user data.");
+        if (result.has_company_details) {
+          window.location.href = "with_login/dashboard_with_login.html";
+        } else {
+          window.location.href = "signup/businessDetails.html";
+        }
+      } else {
+        throw new Error("Invalid server response");
       }
     } catch (err) {
-      console.error("Social login error:", err);
-      alert(`Login Failed: ${err.message}`);
+      console.error(`${provider} login error:`, err);
+      throw err;
     }
   }
 });
 </script>
-
   </body>
 </html>

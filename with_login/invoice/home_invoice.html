@@ -225,10 +225,10 @@
             let allInvoices = []; // This will hold the master list for the current view
 
 const DOC_TYPE = 'invoices';  // Changed to 'invoices' (plural) to match URL_TYPE_MAP
-const ACTIVE_API_URL = `http://82.112.227.39:8000/api/invoic`;  // Keep as 'invoic' for active
-const ARCHIVE_API_URL = `http://82.112.227.39:8000/api/archive/${DOC_TYPE}`;  // Will use 'invoices'
-const DELETED_API_URL = `http://82.112.227.39:8000/api/deleted/${DOC_TYPE}`;
-//const DELETED_API_URL = `http://82.112.227.39:8000/api/deleted/invoices`;
+const ACTIVE_API_URL = `http://82.112.227.39/api/invoic`;  // Keep as 'invoic' for active
+const ARCHIVE_API_URL = `http://82.112.227.39/api/archive/${DOC_TYPE}`;  // Will use 'invoices'
+const DELETED_API_URL = `http://82.112.227.39/api/deleted/${DOC_TYPE}`;
+//const DELETED_API_URL = `http://82.112.227.39/api/deleted/invoices`;
 
 
             const menuToggle = document.getElementById("menu-toggle");
@@ -762,7 +762,7 @@ function wireUpActions() {
                 
                 fetchAndRenderInvoices();
             }
-const PAYMENT_API_URL = 'http://82.112.227.39:8000/api/payments';
+const PAYMENT_API_URL = 'http://82.112.227.39/api/payments';
 let currentInvoiceForPayment = null;
 
 // Modal elements
