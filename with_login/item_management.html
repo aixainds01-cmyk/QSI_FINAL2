@@ -365,7 +365,7 @@
             const modalTitle = document.getElementById('modal-title');
             const editingItemIdInput = document.getElementById('editingItemId');
 
-            const API_BASE_URL = 'http://192.168.1.12:8000/api';
+            const API_BASE_URL = 'http://82.112.227.39:8000/api';
             const menuToggle = document.getElementById("menu-toggle");
             const sidebar = document.getElementById("sidebar");
             const menuBackdrop = document.getElementById("menu-backdrop");
@@ -546,7 +546,7 @@
                     console.error('Failed to fetch items:', error);
                     let errorMessage;
                     if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
-                        errorMessage = "Could not connect to the API server. Please ensure your backend server at 'http://192.168.1.12:8000' is running and that its CORS policy allows requests from this page.";
+                        errorMessage = "Could not connect to the API server. Please ensure your backend server at 'http://82.112.227.39:8000' is running and that its CORS policy allows requests from this page.";
                     } else {
                         errorMessage = `An error occurred: ${error.message}`;
                     }
