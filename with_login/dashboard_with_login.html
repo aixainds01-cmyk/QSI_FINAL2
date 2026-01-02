@@ -5,464 +5,344 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QSI Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1a1a2e;
-            color: #e0e0e0;
-        }
-
-        /* Dark theme sidebar */
-        .sidebar {
-            background-color: #16213e;
-        }
-
-        .sidebar-link {
-            color: #9ca3af;
-            transition: all 0.2s;
-        }
-
-        .sidebar-link:hover {
-            background-color: #1f3460;
-            color: #fff;
-        }
-
-        .sidebar-link.active {
-            background-color: #3b82f6;
-            color: white;
-        }
-
-        .sidebar-section-title {
-            color: #6b7280;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.75rem 1rem 0.5rem;
-        }
-
-        /* Dashboard cards */
-        .dashboard-card {
-            background-color: #1e2a4a;
-            border-radius: 0.5rem;
-            border: 1px solid #2d3a5c;
-        }
-
-        .chart-container {
-            background-color: #1e2a4a;
-            border-radius: 0.5rem;
-            border: 1px solid #2d3a5c;
-        }
-
-        /* Progress bar */
-        .progress-bar-bg {
-            background-color: #2d3a5c;
-            height: 6px;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.5s ease;
-        }
-
-        .progress-green {
-            background: linear-gradient(90deg, #10b981, #34d399);
-        }
-
-        .progress-orange {
-            background: linear-gradient(90deg, #f59e0b, #fbbf24);
-        }
-
-        /* User profile at bottom */
-        .user-profile {
-            background-color: #1f3460;
-            border-top: 1px solid #2d3a5c;
-        }
-
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #1a1a2e;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #3b4a6b;
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4b5a7b;
-        }
-
-        /* Loading overlay */
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: #1a1a2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .loading-spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid #2d3a5c;
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            #main-content {
-                margin-top: 64px;
-            }
-        }
-
-        /* Fiscal year badge */
-        .fiscal-badge {
-            background-color: #2d3a5c;
-            color: #9ca3af;
-            font-size: 0.7rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-        }
-    </style>
+    
+    <!-- QSI Unified Styles -->
+    <link rel="stylesheet" href="qsi-styles.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay">
+    <div id="loading-overlay" class="qsi-loading-overlay">
         <div class="text-center">
-            <div class="loading-spinner mx-auto mb-4"></div>
-            <p class="text-gray-400">Loading...</p>
+            <div class="qsi-spinner"></div>
+            <p class="qsi-loading-text">Loading...</p>
         </div>
     </div>
 
-    <div id="main-app" class="flex min-h-screen hidden">
+    <div id="main-app" class="qsi-app hidden">
         <!-- Mobile Header -->
-        <header class="bg-[#16213e] text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
-            <div class="flex items-center space-x-3">
-                <button id="menu-toggle" class="text-white focus:outline-none">
-                    <i class="fas fa-bars text-xl"></i>
+        <header class="qsi-mobile-header">
+            <div class="flex items-center gap-3">
+                <button id="menu-toggle" class="qsi-menu-toggle">
+                    <i class="fas fa-bars"></i>
                 </button>
-                <span class="text-lg font-bold">QSI</span>
+                <span class="qsi-mobile-header-title">QSI</span>
             </div>
         </header>
 
-        <!-- BACKDROP for mobile -->
-        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+        <!-- Backdrop for mobile -->
+        <div id="menu-backdrop" class="qsi-backdrop"></div>
 
-        <!-- SIDEBAR -->
-        <aside id="sidebar" class="sidebar w-56 h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col overflow-y-auto">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="qsi-sidebar collapsed">
             <!-- Search -->
-            <div class="p-3">
-                <div class="relative">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"></i>
-                    <input type="text" placeholder="Search" class="w-full bg-[#1a1a2e] border border-[#2d3a5c] rounded-md py-2 pl-9 pr-3 text-sm text-gray-300 placeholder-gray-500 focus:outline-none focus:border-blue-500">
+            <div class="qsi-sidebar-search">
+                <div style="position: relative;">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Search">
                 </div>
             </div>
 
-            <nav class="flex-1 px-2">
+            <!-- Navigation -->
+            <nav class="qsi-sidebar-nav">
                 <!-- Dashboard -->
-                <a href="dashboard_with_login.html" class="sidebar-link active flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-th-large mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Dashboard</span>
+                <a href="dashboard_with_login.html" class="qsi-sidebar-link active">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
                 </a>
 
                 <!-- Banking -->
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-university mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Banking</span>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-university"></i>
+                    <span>Banking</span>
                 </a>
 
                 <!-- Items Section -->
-                <div class="sidebar-section-title">Items</div>
-                <a href="item_management.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-cube mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Items</span>
+                <div class="qsi-sidebar-section">Items</div>
+                <a href="item_management.html" class="qsi-sidebar-link">
+                    <i class="fas fa-cube"></i>
+                    <span>Items</span>
                 </a>
 
                 <!-- Sales Section -->
-                <div class="sidebar-section-title">Sales</div>
-                <a href="manage-clients.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-users mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Customers</span>
+                <div class="qsi-sidebar-section">Sales</div>
+                <a href="manage-clients.html" class="qsi-sidebar-link">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
                 </a>
-                <a href="quotation/home_quotation.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-file-alt mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Quotes</span>
+                <a href="quotation/home_quotation.html" class="qsi-sidebar-link">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Quotes</span>
                 </a>
-                <a href="saleorder/home_sales_order.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-shopping-cart mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Sales Orders</span>
+                <a href="saleorder/home_sales_order.html" class="qsi-sidebar-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Sales Orders</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-truck mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Delivery Challans</span>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-truck"></i>
+                    <span>Delivery Challans</span>
                 </a>
-                <a href="invoice/home_invoice.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-file-invoice mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Invoices</span>
+                <a href="invoice/home_invoice.html" class="qsi-sidebar-link">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Invoices</span>
                 </a>
-                <a href="invoice/payment_history.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-hand-holding-usd mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Payments Received</span>
+                <a href="invoice/payment_history.html" class="qsi-sidebar-link">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Payments Received</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-redo mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Recurring Invoices</span>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-redo"></i>
+                    <span>Recurring Invoices</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-receipt mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Credit Notes</span>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-receipt"></i>
+                    <span>Credit Notes</span>
                 </a>
 
                 <!-- Purchases Section -->
-                <div class="sidebar-section-title">Purchases</div>
-                <a href="parchase/vendor/vendors_leads.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-store mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Vendors</span>
+                <div class="qsi-sidebar-section">Purchases</div>
+                <a href="parchase/vendor/vendors_leads.html" class="qsi-sidebar-link">
+                    <i class="fas fa-store"></i>
+                    <span>Vendors</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-money-bill-wave mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Expenses</span>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Expenses</span>
                 </a>
-                <a href="parchase/parchase_order/home_purchase_orders.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-file-invoice-dollar mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Purchase Orders</span>
+                <a href="parchase/parchase_order/home_purchase_orders.html" class="qsi-sidebar-link">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Purchase Orders</span>
                 </a>
-                <a href="parchase/home_bills.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-file-alt mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Bills</span>
+                <a href="parchase/home_bills.html" class="qsi-sidebar-link">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Bills</span>
                 </a>
-                <a href="payout.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-credit-card mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Payments Made</span>
+                <a href="payout.html" class="qsi-sidebar-link">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Payments Made</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-tags mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Vendor Credits</span>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-tags"></i>
+                    <span>Vendor Credits</span>
                 </a>
 
                 <!-- Time Tracking Section -->
-                <div class="sidebar-section-title">Time Tracking</div>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-project-diagram mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Projects</span>
+                <div class="qsi-sidebar-section">Time Tracking</div>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Projects</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-clock mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Timesheets</span>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-clock"></i>
+                    <span>Timesheets</span>
                 </a>
 
                 <!-- Others Section -->
-                <div class="sidebar-section-title">Others</div>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-folder mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Documents</span>
+                <div class="qsi-sidebar-section">Others</div>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-folder"></i>
+                    <span>Documents</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-chart-bar mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Reports</span>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
                 </a>
-                <a href="settings.html" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-cog mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Settings</span>
+                <a href="settings.html" class="qsi-sidebar-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center py-2 px-3 rounded-md mb-1">
-                    <i class="fas fa-bell mr-3 text-sm w-5"></i>
-                    <span class="text-sm">Notifications</span>
+                <a href="#" class="qsi-sidebar-link">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
                 </a>
             </nav>
 
-            <!-- User Profile at Bottom -->
-            <div class="user-profile p-3 flex items-center gap-3 cursor-pointer" id="user-profile-btn">
-                <img id="user-avatar" src="https://placehold.co/40x40/3b82f6/ffffff?text=U" alt="User" class="w-9 h-9 rounded-full">
-                <div class="flex-1 min-w-0">
-                    <p id="user-name" class="text-sm font-medium text-white truncate">User</p>
-                    <p id="user-email" class="text-xs text-gray-400 truncate">user@email.com</p>
+            <!-- User Profile -->
+            <div class="qsi-sidebar-profile" id="user-profile-btn">
+                <img id="user-avatar" src="https://placehold.co/40x40/3b82f6/ffffff?text=U" alt="User">
+                <div class="qsi-sidebar-profile-info">
+                    <p id="user-name" class="qsi-sidebar-profile-name">User</p>
+                    <p id="user-email" class="qsi-sidebar-profile-email">user@email.com</p>
                 </div>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <div id="main-content" class="flex-1 overflow-y-auto">
-            <main class="p-6">
+        <div class="qsi-main">
+            <main class="qsi-content">
                 <!-- Top Row: Receivables & Payables -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="qsi-grid qsi-grid-cols-1 lg:qsi-grid-cols-2 mb-6">
                     <!-- Total Receivables -->
-                    <div class="dashboard-card p-5">
-                        <h2 class="text-lg font-semibold text-white mb-4">Total Receivables</h2>
-                        <p class="text-sm text-gray-400 mb-3">Total Unpaid Invoices <span id="total-unpaid-invoices" class="text-white">₹0.00</span></p>
+                    <div class="qsi-card">
+                        <h2 class="qsi-card-title">Total Receivables</h2>
+                        <p class="text-sm text-muted mb-3">
+                            Total Unpaid Invoices <span id="total-unpaid-invoices" class="text-white">₹0.00</span>
+                        </p>
                         
-                        <div class="progress-bar-bg mb-4">
-                            <div id="receivables-progress" class="progress-bar-fill progress-green" style="width: 0%"></div>
+                        <div class="qsi-progress mb-4">
+                            <div id="receivables-progress" class="qsi-progress-bar qsi-progress-success" style="width: 0%"></div>
                         </div>
                         
                         <div class="flex justify-between">
                             <div>
-                                <p class="text-xs text-green-400 mb-1">Current</p>
-                                <p id="receivables-current" class="text-xl font-bold text-white">₹0.00</p>
+                                <p class="qsi-stat-label qsi-stat-label-success">Current</p>
+                                <p id="receivables-current" class="qsi-stat-value">₹0.00</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-xs text-orange-400 mb-1 flex items-center justify-end gap-1">
-                                    Overdue <i class="fas fa-chevron-down text-[10px]"></i>
+                                <p class="qsi-stat-label qsi-stat-label-warning flex items-center justify-end gap-1">
+                                    Overdue <i class="fas fa-chevron-down text-xs"></i>
                                 </p>
-                                <p id="receivables-overdue" class="text-xl font-bold text-white">₹0.00</p>
+                                <p id="receivables-overdue" class="qsi-stat-value">₹0.00</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Total Payables -->
-                    <div class="dashboard-card p-5">
-                        <h2 class="text-lg font-semibold text-white mb-4">Total Payables</h2>
-                        <p class="text-sm text-gray-400 mb-3">Total Unpaid Bills <span id="total-unpaid-bills" class="text-white">₹0.00</span></p>
+                    <div class="qsi-card">
+                        <h2 class="qsi-card-title">Total Payables</h2>
+                        <p class="text-sm text-muted mb-3">
+                            Total Unpaid Bills <span id="total-unpaid-bills" class="text-white">₹0.00</span>
+                        </p>
                         
-                        <div class="progress-bar-bg mb-4">
-                            <div id="payables-progress" class="progress-bar-fill progress-orange" style="width: 0%"></div>
+                        <div class="qsi-progress mb-4">
+                            <div id="payables-progress" class="qsi-progress-bar qsi-progress-warning" style="width: 0%"></div>
                         </div>
                         
                         <div class="flex justify-between">
                             <div>
-                                <p class="text-xs text-green-400 mb-1">Current</p>
-                                <p id="payables-current" class="text-xl font-bold text-white">₹0.00</p>
+                                <p class="qsi-stat-label qsi-stat-label-success">Current</p>
+                                <p id="payables-current" class="qsi-stat-value">₹0.00</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-xs text-orange-400 mb-1 flex items-center justify-end gap-1">
-                                    Overdue <i class="fas fa-chevron-down text-[10px]"></i>
+                                <p class="qsi-stat-label qsi-stat-label-warning flex items-center justify-end gap-1">
+                                    Overdue <i class="fas fa-chevron-down text-xs"></i>
                                 </p>
-                                <p id="payables-overdue" class="text-xl font-bold text-white">₹0.00</p>
+                                <p id="payables-overdue" class="qsi-stat-value">₹0.00</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Cash Flow Chart -->
-                <div class="chart-container p-5 mb-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold text-white">Cash Flow</h2>
-                        <span class="fiscal-badge flex items-center gap-1">
-                            This Fiscal Year <i class="fas fa-info-circle text-gray-500"></i>
+                <div class="qsi-card mb-6">
+                    <div class="qsi-card-header">
+                        <h2 class="qsi-card-title">Cash Flow</h2>
+                        <span class="qsi-card-badge">
+                            This Fiscal Year <i class="fas fa-info-circle ml-1"></i>
                         </span>
                     </div>
                     
                     <div class="flex flex-col lg:flex-row gap-6">
-                        <div class="flex-1" style="min-height: 250px;">
+                        <div class="flex-1 qsi-chart-container">
                             <canvas id="cashFlowChart"></canvas>
                         </div>
-                        <div class="lg:w-48 space-y-4">
-                            <div>
-                                <p class="text-xs text-gray-400 mb-1">Cash as on <span id="cash-start-date">01/04/2025</span></p>
-                                <p id="cash-start" class="text-xl font-bold text-white">₹0.00</p>
+                        <div style="min-width: 180px;">
+                            <div class="mb-4">
+                                <p class="qsi-stat-label">Cash as on <span id="cash-start-date">01/04/2025</span></p>
+                                <p id="cash-start" class="qsi-stat-value">₹0.00</p>
+                            </div>
+                            <div class="mb-4">
+                                <p class="qsi-stat-label qsi-stat-label-success">Incoming</p>
+                                <p id="cash-incoming" class="qsi-stat-value">₹0.00</p>
+                            </div>
+                            <div class="mb-4">
+                                <p class="qsi-stat-label qsi-stat-label-warning">Outgoing</p>
+                                <p id="cash-outgoing" class="qsi-stat-value">₹0.00</p>
                             </div>
                             <div>
-                                <p class="text-xs text-green-400 mb-1">Incoming</p>
-                                <p id="cash-incoming" class="text-xl font-bold text-white">₹0.00</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-orange-400 mb-1">Outgoing</p>
-                                <p id="cash-outgoing" class="text-xl font-bold text-white">₹0.00</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-400 mb-1">Cash as on <span id="cash-end-date">31/03/2026</span></p>
-                                <p id="cash-end" class="text-xl font-bold text-white">₹0.00</p>
+                                <p class="qsi-stat-label">Cash as on <span id="cash-end-date">31/03/2026</span></p>
+                                <p id="cash-end" class="qsi-stat-value">₹0.00</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Bottom Row: Income & Expense + Top Expenses -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="qsi-grid qsi-grid-cols-1 lg:qsi-grid-cols-2 mb-6">
                     <!-- Income & Expense -->
-                    <div class="chart-container p-5">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold text-white">Income & Expense</h2>
-                            <span class="fiscal-badge flex items-center gap-1">
-                                This Fiscal Year <span class="text-xs text-gray-500 ml-1">Accrual</span> <i class="fas fa-info-circle text-gray-500"></i>
+                    <div class="qsi-card">
+                        <div class="qsi-card-header">
+                            <h2 class="qsi-card-title">Income & Expense</h2>
+                            <span class="qsi-card-badge">
+                                This Fiscal Year <span class="text-xs ml-1">Accrual</span> <i class="fas fa-info-circle ml-1"></i>
                             </span>
                         </div>
                         
-                        <div style="min-height: 220px;">
+                        <div class="qsi-chart-container" style="min-height: 220px;">
                             <canvas id="incomeExpenseChart"></canvas>
                         </div>
                         
-                        <div class="flex justify-between mt-4 pt-4 border-t border-[#2d3a5c]">
+                        <div class="flex justify-between mt-4 pt-4 border-t">
                             <div>
-                                <p class="text-xs text-green-400 mb-1">Total Income</p>
-                                <p id="total-income" class="text-xl font-bold text-white">₹0.00</p>
+                                <p class="qsi-stat-label qsi-stat-label-success">Total Income</p>
+                                <p id="total-income" class="qsi-stat-value">₹0.00</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-xs text-red-400 mb-1">Total Expense</p>
-                                <p id="total-expense" class="text-xl font-bold text-white">₹0.00</p>
+                                <p class="qsi-stat-label qsi-stat-label-danger">Total Expense</p>
+                                <p id="total-expense" class="qsi-stat-value">₹0.00</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Top Expenses -->
-                    <div class="chart-container p-5">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold text-white">Top Expenses</h2>
-                            <span class="fiscal-badge flex items-center gap-1">
-                                This Fiscal Year <i class="fas fa-info-circle text-gray-500"></i>
+                    <div class="qsi-card">
+                        <div class="qsi-card-header">
+                            <h2 class="qsi-card-title">Top Expenses</h2>
+                            <span class="qsi-card-badge">
+                                This Fiscal Year <i class="fas fa-info-circle ml-1"></i>
                             </span>
                         </div>
                         
-                        <div id="top-expenses-container" class="flex items-center justify-center" style="min-height: 220px;">
-                            <div class="text-center text-gray-500">
-                                <i class="fas fa-receipt text-4xl mb-3 opacity-50"></i>
-                                <p>No Expense recorded for this fiscal year</p>
+                        <div id="top-expenses-container" class="qsi-chart-container flex items-center justify-center" style="min-height: 220px;">
+                            <div class="qsi-empty-state p-6">
+                                <i class="fas fa-receipt qsi-empty-state-icon"></i>
+                                <p class="qsi-empty-state-title">No Expenses</p>
+                                <p class="qsi-empty-state-text m-0">No expense recorded for this fiscal year</p>
                             </div>
                         </div>
                         
-                        <div id="top-expenses-list" class="hidden space-y-3">
+                        <div id="top-expenses-list" class="hidden">
                             <!-- Expenses will be populated here -->
                         </div>
                     </div>
                 </div>
 
                 <!-- Quick Actions Row -->
-                <div class="mt-6">
-                    <h2 class="text-lg font-semibold text-white mb-4">Quick Actions</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        <a href="invoice/create_invoice.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
-                            <i class="fas fa-plus-circle text-2xl text-blue-400 mb-2"></i>
-                            <p class="text-sm text-gray-300">New Invoice</p>
+                <div>
+                    <h2 class="qsi-card-title mb-4">Quick Actions</h2>
+                    <div class="qsi-grid qsi-grid-cols-2 md:qsi-grid-cols-4 lg:qsi-grid-cols-6">
+                        <a href="invoice/create_invoice.html" class="qsi-quick-action">
+                            <i class="fas fa-plus-circle qsi-quick-action-icon text-info"></i>
+                            <span class="qsi-quick-action-text">New Invoice</span>
                         </a>
-                        <a href="quotation/create_quotation.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
-                            <i class="fas fa-file-alt text-2xl text-green-400 mb-2"></i>
-                            <p class="text-sm text-gray-300">New Quote</p>
+                        <a href="quotation/create_quotation.html" class="qsi-quick-action">
+                            <i class="fas fa-file-alt qsi-quick-action-icon text-success"></i>
+                            <span class="qsi-quick-action-text">New Quote</span>
                         </a>
-                        <a href="invoice/payment_receipt.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
-                            <i class="fas fa-hand-holding-usd text-2xl text-emerald-400 mb-2"></i>
-                            <p class="text-sm text-gray-300">Record Payment</p>
+                        <a href="invoice/payment_receipt.html" class="qsi-quick-action">
+                            <i class="fas fa-hand-holding-usd qsi-quick-action-icon" style="color: #34d399;"></i>
+                            <span class="qsi-quick-action-text">Record Payment</span>
                         </a>
-                        <a href="parchase/parchase_order/home_purchase_orders.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
-                            <i class="fas fa-shopping-bag text-2xl text-yellow-400 mb-2"></i>
-                            <p class="text-sm text-gray-300">New PO</p>
+                        <a href="parchase/parchase_order/home_purchase_orders.html" class="qsi-quick-action">
+                            <i class="fas fa-shopping-bag qsi-quick-action-icon text-warning"></i>
+                            <span class="qsi-quick-action-text">New PO</span>
                         </a>
-                        <a href="parchase/home_bills.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
-                            <i class="fas fa-file-invoice-dollar text-2xl text-orange-400 mb-2"></i>
-                            <p class="text-sm text-gray-300">New Bill</p>
+                        <a href="parchase/home_bills.html" class="qsi-quick-action">
+                            <i class="fas fa-file-invoice-dollar qsi-quick-action-icon" style="color: #fb923c;"></i>
+                            <span class="qsi-quick-action-text">New Bill</span>
                         </a>
-                        <a href="manage-clients.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
-                            <i class="fas fa-user-plus text-2xl text-purple-400 mb-2"></i>
-                            <p class="text-sm text-gray-300">Add Customer</p>
+                        <a href="manage-clients.html" class="qsi-quick-action">
+                            <i class="fas fa-user-plus qsi-quick-action-icon" style="color: #a78bfa;"></i>
+                            <span class="qsi-quick-action-text">Add Customer</span>
                         </a>
                     </div>
                 </div>
@@ -471,27 +351,34 @@
     </div>
 
     <!-- Logout Modal -->
-    <div id="logout-modal" class="fixed hidden z-50 bg-[#1e2a4a] rounded-lg shadow-xl border border-[#2d3a5c] p-4" style="bottom: 70px; left: 16px; width: 220px;">
-        <div class="flex items-center gap-3 mb-3 pb-3 border-b border-[#2d3a5c]">
-            <img id="modal-avatar" src="https://placehold.co/40x40/3b82f6/ffffff?text=U" class="w-10 h-10 rounded-full" alt="User">
-            <div class="flex-1 min-w-0">
-                <p id="modal-name" class="text-sm font-medium text-white truncate">User</p>
-                <p id="modal-email" class="text-xs text-gray-400 truncate">user@email.com</p>
+    <div id="logout-modal" class="hidden" style="position: fixed; bottom: 70px; left: 16px; width: 220px; z-index: 1050;">
+        <div class="qsi-card p-4">
+            <div class="flex items-center gap-3 mb-3 pb-3 border-b">
+                <img id="modal-avatar" src="https://placehold.co/40x40/3b82f6/ffffff?text=U" class="w-10 h-10 rounded-full" alt="User">
+                <div class="flex-1 min-w-0">
+                    <p id="modal-name" class="text-sm font-medium text-white truncate">User</p>
+                    <p id="modal-email" class="text-xs text-muted truncate">user@email.com</p>
+                </div>
             </div>
+            <button id="logout-btn" class="qsi-btn qsi-btn-danger w-full">
+                <i class="fas fa-sign-out-alt"></i> Log out
+            </button>
         </div>
-        <button id="logout-btn" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors">
-            <i class="fas fa-sign-out-alt mr-2"></i>Log out
-        </button>
     </div>
 
     <!-- Logout Confirmation Modal -->
-    <div id="logout-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-60">
-        <div class="bg-[#1e2a4a] rounded-lg shadow-xl border border-[#2d3a5c] max-w-sm w-full p-6 mx-4">
-            <h3 class="text-lg font-semibold text-white mb-2">Confirm Sign Out</h3>
-            <p class="text-sm text-gray-400 mb-4">Are you sure you want to log out?</p>
-            <div class="flex justify-end gap-3">
-                <button id="confirm-cancel" class="px-4 py-2 bg-[#2d3a5c] hover:bg-[#3d4a6c] text-white rounded-md text-sm transition-colors">Cancel</button>
-                <button id="confirm-ok" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm transition-colors">Log Out</button>
+    <div id="logout-confirm-modal" class="qsi-modal-backdrop">
+        <div class="qsi-modal" style="max-width: 24rem;">
+            <div class="qsi-modal-header">
+                <h3 class="qsi-modal-title">Confirm Sign Out</h3>
+                <button id="confirm-close" class="qsi-modal-close">&times;</button>
+            </div>
+            <div class="qsi-modal-body">
+                <p class="text-muted m-0">Are you sure you want to log out?</p>
+            </div>
+            <div class="qsi-modal-footer">
+                <button id="confirm-cancel" class="qsi-btn qsi-btn-secondary">Cancel</button>
+                <button id="confirm-ok" class="qsi-btn qsi-btn-danger">Log Out</button>
             </div>
         </div>
     </div>
@@ -527,7 +414,7 @@
     // ======================================
     // 📊 DASHBOARD DATA & CHARTS
     // ======================================
-    const API_BASE_URL = "https://api.fornowauto.com/api";
+    const API_BASE_URL = "http://Aixains-Mac-mini.local:8000/api";
 
     function getAuthHeaders() {
         const token = localStorage.getItem("token") || localStorage.getItem("auth_token");
@@ -557,20 +444,28 @@
     let cashFlowChart, incomeExpenseChart;
 
     function initCharts() {
+        const chartColors = {
+            primary: '#3b82f6',
+            success: '#10b981',
+            danger: '#ef4444',
+            border: '#2d3a5c',
+            text: '#9ca3af'
+        };
+
         // Cash Flow Chart
         const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
         cashFlowChart = new Chart(cashFlowCtx, {
             type: 'line',
             data: {
-                labels: ['Apr 2025', 'May 2025', 'Jun 2025', 'Jul 2025', 'Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025', 'Jan 2026', 'Feb 2026', 'Mar 2026'],
+                labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
                 datasets: [{
                     label: 'Cash Flow',
                     data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    borderColor: '#3b82f6',
+                    borderColor: chartColors.primary,
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     tension: 0.4,
                     fill: true,
-                    pointBackgroundColor: '#3b82f6',
+                    pointBackgroundColor: chartColors.primary,
                     pointBorderColor: '#fff',
                     pointRadius: 4,
                     pointHoverRadius: 6
@@ -579,18 +474,16 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
                     x: {
-                        grid: { color: '#2d3a5c' },
-                        ticks: { color: '#9ca3af', font: { size: 10 } }
+                        grid: { color: chartColors.border },
+                        ticks: { color: chartColors.text, font: { size: 10 } }
                     },
                     y: {
-                        grid: { color: '#2d3a5c' },
+                        grid: { color: chartColors.border },
                         ticks: { 
-                            color: '#9ca3af',
+                            color: chartColors.text,
                             font: { size: 10 },
                             callback: function(value) {
                                 if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
@@ -607,18 +500,18 @@
         incomeExpenseChart = new Chart(incomeExpenseCtx, {
             type: 'bar',
             data: {
-                labels: ['Apr 2025', 'Jun 2025', 'Aug 2025', 'Oct 2025', 'Dec 2025', 'Feb 2026'],
+                labels: ['Apr', 'Jun', 'Aug', 'Oct', 'Dec', 'Feb'],
                 datasets: [
                     {
                         label: 'Income',
                         data: [0, 0, 0, 0, 0, 0],
-                        backgroundColor: '#10b981',
+                        backgroundColor: chartColors.success,
                         borderRadius: 4
                     },
                     {
                         label: 'Expense',
                         data: [0, 0, 0, 0, 0, 0],
-                        backgroundColor: '#ef4444',
+                        backgroundColor: chartColors.danger,
                         borderRadius: 4
                     }
                 ]
@@ -626,18 +519,16 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
                     x: {
                         grid: { display: false },
-                        ticks: { color: '#9ca3af', font: { size: 10 } }
+                        ticks: { color: chartColors.text, font: { size: 10 } }
                     },
                     y: {
-                        grid: { color: '#2d3a5c' },
+                        grid: { color: chartColors.border },
                         ticks: { 
-                            color: '#9ca3af',
+                            color: chartColors.text,
                             font: { size: 10 },
                             callback: function(value) {
                                 if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
@@ -736,7 +627,7 @@
             console.error("Error loading bills:", err);
         }
 
-        // Load Company Info for User Profile
+        // Load Company Info
         try {
             const companies = await safeFetch(`${API_BASE_URL}/companies`, { method: "GET" });
             const companyList = Array.isArray(companies) ? companies : [];
@@ -770,13 +661,13 @@
     const backdrop = document.getElementById("menu-backdrop");
 
     menuToggle?.addEventListener("click", () => {
-        sidebar.classList.toggle("-translate-x-full");
-        backdrop.classList.toggle("hidden");
+        sidebar.classList.toggle("collapsed");
+        backdrop.classList.toggle("active");
     });
 
     backdrop?.addEventListener("click", () => {
-        sidebar.classList.add("-translate-x-full");
-        backdrop.classList.add("hidden");
+        sidebar.classList.add("collapsed");
+        backdrop.classList.remove("active");
     });
 
     // ======================================
@@ -787,6 +678,7 @@
     const logoutBtn = document.getElementById('logout-btn');
     const logoutConfirmModal = document.getElementById('logout-confirm-modal');
     const confirmCancel = document.getElementById('confirm-cancel');
+    const confirmClose = document.getElementById('confirm-close');
     const confirmOk = document.getElementById('confirm-ok');
 
     userProfileBtn?.addEventListener('click', () => {
@@ -803,14 +695,15 @@
 
     logoutBtn?.addEventListener('click', () => {
         logoutModal.classList.add('hidden');
-        logoutConfirmModal.classList.remove('hidden');
-        logoutConfirmModal.classList.add('flex');
+        logoutConfirmModal.classList.add('active');
     });
 
-    confirmCancel?.addEventListener('click', () => {
-        logoutConfirmModal.classList.add('hidden');
-        logoutConfirmModal.classList.remove('flex');
-    });
+    function closeConfirmModal() {
+        logoutConfirmModal.classList.remove('active');
+    }
+
+    confirmCancel?.addEventListener('click', closeConfirmModal);
+    confirmClose?.addEventListener('click', closeConfirmModal);
 
     confirmOk?.addEventListener('click', () => {
         localStorage.removeItem('auth_token');
