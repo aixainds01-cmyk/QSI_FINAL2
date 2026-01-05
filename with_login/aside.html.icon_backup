@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QSI Sidebar Component</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Mobile Header Styles */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background-color: #1f2937;
+            color: white;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            z-index: 40;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 767px) {
+            .mobile-header {
+                display: flex;
+            }
+
+            #main-content {
+                margin-top: 64px;
+            }
+        }
+
+        /* Menu Backdrop */
+        .menu-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            display: none;
+        }
+
+        .menu-backdrop.show {
+            display: block;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            scrollbar-width: thin;
+            scrollbar-color: #4b5563 #1f2937;
+        }
+
+        #sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 3px;
+        }
+
+        /* Active nav link styling */
+        .nav-link.active {
+            background-color: #4338ca !important;
+            color: white !important;
+        }
+
+        /* Dropdown rotation animation */
+        .dropdown-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown-icon.rotate {
+            transform: rotate(180deg);
+        }
+
+        /* Hover effects */
+        .nav-link:hover,
+        .dropdown-btn:hover {
+            background-color: #374151;
+        }
+
+        /* User section hover */
+        #logout-btn:hover {
+            color: #f87171;
+        }
+    </style>
+    <link rel="stylesheet" href="../js/theme-force.css">
+    <!-- Global Theme Manager -->
+    <script src="../js/theme-manager.js"></script>
+</head>
+<body>
+    <!-- Mobile Header -->
+    <header id="mobile-header" class="mobile-header">
+        <div class="flex items-center space-x-3">
+            <button id="menu-toggle" class="text-white focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            <span class="text-xl font-bold">QSI</span>
+        </div>
+    </header>
+
+    <!-- Menu Backdrop for Mobile -->
+    <div id="menu-backdrop" class="menu-backdrop"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+
+        <!-- Logo/Brand Section -->
+        <div class="p-6 text-2xl font-bold border-b border-gray-700 flex items-center">
+            <i class="fas fa-cube mr-3 text-indigo-400"></i> QSI
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            
+            <!-- Dashboard -->
+            <a href="dashboard_with_login.html" id="nav-dashboard"
+                class="nav-link flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <i class="fas fa-chart-pie mr-3 w-5 text-center"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <!-- Sales Documents Dropdown -->
+            <div class="nav-dropdown">
+                <button id="documents-dropdown-btn"
+                    class="dropdown-btn w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                    <span class="flex items-center">
+                        <i class="fas fa-file-invoice mr-3 w-5 text-center"></i>
+                        <span>Sales Documents</span>
+                    </span>
+                    <i id="documents-dropdown-icon" class="fas fa-chevron-down dropdown-icon"></i>
+                </button>
+                <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                    <a href="quotation/home_quotation.html" id="nav-quotation"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-file-alt mr-2 w-4 text-center text-gray-400"></i>
+                        Quotation
+                    </a>
+                    <a href="saleorder/home_sales_order.html" id="nav-sales-order"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-clipboard-list mr-2 w-4 text-center text-gray-400"></i>
+                        Sales Order
+                    </a>
+                    <a href="invoice/home_invoice.html" id="nav-invoice"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-file-invoice-dollar mr-2 w-4 text-center text-gray-400"></i>
+                        Invoice
+                    </a>
+                    <a href="credit_note.html" id="nav-credit-note"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-receipt mr-2 w-4 text-center text-gray-400"></i>
+                        Credit Note
+                    </a>
+                </div>
+            </div>
+
+            <!-- Purchases Dropdown -->
+            <div class="nav-dropdown">
+                <button id="purchases-dropdown-btn"
+                    class="dropdown-btn w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                    <span class="flex items-center">
+                        <i class="fas fa-shopping-cart mr-3 w-5 text-center"></i>
+                        <span>Purchases</span>
+                    </span>
+                    <i id="purchases-dropdown-icon" class="fas fa-chevron-down dropdown-icon"></i>
+                </button>
+                <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                    <a href="parchase/vendor/vendors_leads.html" id="nav-vendors-leads"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-user-tie mr-2 w-4 text-center text-gray-400"></i>
+                        Vendors Leads
+                    </a>
+                    <a href="parchase/vendors&suppliers/vendors_suppliers.html" id="nav-vendors-suppliers"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-truck mr-2 w-4 text-center text-gray-400"></i>
+                        Vendors & Suppliers
+                    </a>
+                    <a href="parchase/purchases&expenses/purchases_expenses_home.html" id="nav-purchases-expenses"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-money-bill-wave mr-2 w-4 text-center text-gray-400"></i>
+                        Purchases & Expenses
+                    </a>
+                    <a href="parchase/parchase_order/home_purchase_orders.html" id="nav-purchase-orders"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-shopping-bag mr-2 w-4 text-center text-gray-400"></i>
+                        Purchase Orders
+                    </a>
+                    <a href="parchase/payout receipts/home_payout_receipts.html" id="nav-payout-receipts"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-hand-holding-usd mr-2 w-4 text-center text-gray-400"></i>
+                        Payout Receipts
+                    </a>
+                    <a href="parchase/debit_notes/home_debit_notes.html" id="nav-debit-notes"
+                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                        <i class="fas fa-file-invoice mr-2 w-4 text-center text-gray-400"></i>
+                        Debit Notes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Manage Clients -->
+            <a href="manage-clients.html" id="nav-manage-clients"
+                class="nav-link flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <i class="fas fa-users mr-3 w-5 text-center"></i>
+                <span>Manage Clients</span>
+            </a>
+
+            <!-- Settings -->
+            <a href="settings.html" id="nav-settings"
+                class="nav-link flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <i class="fas fa-cog mr-3 w-5 text-center"></i>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+        <!-- User Section at Bottom -->
+        <div class="p-4 border-t border-gray-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-white"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate" id="sidebar-username">User</p>
+                    <p class="text-xs text-gray-400 truncate" id="sidebar-email">user@example.com</p>
+                </div>
+                <button id="logout-btn" class="text-gray-400 hover:text-red-400 transition-colors" title="Logout">
+                    <i class="fas fa-sign-out-alt text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- JavaScript -->
+    <script>
+    (function() {
+        'use strict';
+
+        // ===== DOM Elements =====
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuBackdrop = document.getElementById('menu-backdrop');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Dropdown elements
+        const documentsDropdownBtn = document.getElementById('documents-dropdown-btn');
+        const documentsDropdownContent = document.getElementById('documents-dropdown-content');
+        const documentsDropdownIcon = document.getElementById('documents-dropdown-icon');
+
+        const purchasesDropdownBtn = document.getElementById('purchases-dropdown-btn');
+        const purchasesDropdownContent = document.getElementById('purchases-dropdown-content');
+        const purchasesDropdownIcon = document.getElementById('purchases-dropdown-icon');
+
+        // ===== Mobile Menu Toggle =====
+        if (menuToggle && sidebar && menuBackdrop) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('-translate-x-full');
+                menuBackdrop.classList.toggle('show');
+            });
+
+            menuBackdrop.addEventListener('click', function() {
+                sidebar.classList.add('-translate-x-full');
+                menuBackdrop.classList.remove('show');
+            });
+        }
+
+        // ===== Dropdown Toggle Function =====
+        function toggleDropdown(btn, content, icon) {
+            if (btn && content && icon) {
+                btn.addEventListener('click', function() {
+                    content.classList.toggle('hidden');
+                    icon.classList.toggle('rotate');
+                });
+            }
+        }
+
+        // Initialize dropdowns
+        toggleDropdown(documentsDropdownBtn, documentsDropdownContent, documentsDropdownIcon);
+        toggleDropdown(purchasesDropdownBtn, purchasesDropdownContent, purchasesDropdownIcon);
+
+        // ===== Set Active Page =====
+        function setActivePage() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(function(link) {
+                const href = link.getAttribute('href');
+                if (href && currentPath.includes(href.replace('.html', '').replace('./', ''))) {
+                    link.classList.add('active');
+
+                    // If inside a dropdown, open the dropdown
+                    const parentDropdown = link.closest('.nav-dropdown');
+                    if (parentDropdown) {
+                        const dropdownContent = parentDropdown.querySelector('[id$="-dropdown-content"]');
+                        const dropdownIcon = parentDropdown.querySelector('.dropdown-icon');
+                        if (dropdownContent) {
+                            dropdownContent.classList.remove('hidden');
+                        }
+                        if (dropdownIcon) {
+                            dropdownIcon.classList.add('rotate');
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== Set Active Page by ID (Manual) =====
+        // Call this function to manually set active page: setActiveById('nav-invoice')
+        window.setActiveById = function(navId) {
+            // Remove existing active classes
+            document.querySelectorAll('.nav-link.active').forEach(function(el) {
+                el.classList.remove('active');
+            });
+
+            const navItem = document.getElementById(navId);
+            if (navItem) {
+                navItem.classList.add('active');
+
+                // If inside a dropdown, open the dropdown
+                const parentDropdown = navItem.closest('.nav-dropdown');
+                if (parentDropdown) {
+                    const dropdownContent = parentDropdown.querySelector('[id$="-dropdown-content"]');
+                    const dropdownIcon = parentDropdown.querySelector('.dropdown-icon');
+                    if (dropdownContent) {
+                        dropdownContent.classList.remove('hidden');
+                    }
+                    if (dropdownIcon) {
+                        dropdownIcon.classList.add('rotate');
+                    }
+                }
+            }
+        };
+
+        // ===== Load User Info =====
+        function loadUserInfo() {
+            try {
+                const userName = localStorage.getItem('userName') || 'User';
+                const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+
+                const usernameEl = document.getElementById('sidebar-username');
+                const emailEl = document.getElementById('sidebar-email');
+
+                if (usernameEl) usernameEl.textContent = userName;
+                if (emailEl) emailEl.textContent = userEmail;
+            } catch (e) {
+                console.warn('Could not load user info:', e);
+            }
+        }
+
+        // ===== Logout Function =====
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                // Clear auth tokens
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userEmail');
+
+                // Redirect to login page
+                window.location.href = 'login.html';
+            });
+        }
+
+        // ===== Adjust Link Paths Based on Page Depth =====
+        // This function adjusts all sidebar links based on current page location
+        window.adjustSidebarPaths = function(basePath) {
+            if (!basePath) return;
+
+            const links = sidebar.querySelectorAll('a[href]');
+            links.forEach(function(link) {
+                const href = link.getAttribute('href');
+                // Don't modify absolute URLs, anchors, or already adjusted paths
+                if (href.startsWith('http') || href.startsWith('#') || href.startsWith('/') || href.startsWith(basePath)) {
+                    return;
+                }
+                link.setAttribute('href', basePath + href);
+            });
+        };
+
+        // ===== Close Sidebar on Link Click (Mobile) =====
+        const allNavLinks = sidebar.querySelectorAll('.nav-link');
+        allNavLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 768) {
+                    sidebar.classList.add('-translate-x-full');
+                    menuBackdrop.classList.remove('show');
+                }
+            });
+        });
+
+        // ===== Initialize =====
+        setActivePage();
+        loadUserInfo();
+
+        // ===== Expose Global API =====
+        window.QSISidebar = {
+            setActive: window.setActiveById,
+            adjustPaths: window.adjustSidebarPaths,
+            open: function() {
+                sidebar.classList.remove('-translate-x-full');
+                menuBackdrop.classList.add('show');
+            },
+            close: function() {
+                sidebar.classList.add('-translate-x-full');
+                menuBackdrop.classList.remove('show');
+            },
+            toggle: function() {
+                sidebar.classList.toggle('-translate-x-full');
+                menuBackdrop.classList.toggle('show');
+            }
+        };
+
+        console.log('QSI Sidebar initialized successfully');
+
+    })();
+    </script>
+    
+</body>
+</html>

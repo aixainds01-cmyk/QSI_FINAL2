@@ -26,17 +26,238 @@
         .alert-success { background-color: #d4edda; color: #155724; }
         .alert-error { background-color: #f8d7da; color: #721c24; }
     </style>
+    <link rel="stylesheet" href="../../../js/fix-icons.css">
+    <link rel="stylesheet" href="../../../js/theme-force.css">
+    <link rel="stylesheet" href="../../../js/professional-sidebar.css">
+    <!-- Global Theme Manager -->
+    <script src="../../../js/theme-manager.js"></script>
 </head>
 
 <body>
     <div class="flex min-h-screen">
-        <aside id="sidebar" class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 flex flex-col shadow-lg z-50">
-            <div class="p-6 text-2xl font-bold border-b border-gray-700">QSI</div>
-            <nav class="flex-1 p-4 space-y-2">
-                <a href="../../dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded hover:bg-gray-700"><i class="fas fa-chart-pie mr-3"></i>Dashboard</a>
-                <a href="home_purchase_orders.html" class="flex items-center py-2.5 px-4 rounded hover:bg-gray-700"><i class="fas fa-shopping-cart mr-3"></i>Purchase Orders</a>
-            </nav>
-        </aside>
+        <!-- UNIFIED PROFESSIONAL SIDEBAR - QSI Application -->
+<aside id="sidebar" class="sidebar">
+    <!-- Logo Section -->
+    <div class="sidebar-logo">
+        <h1 class="logo-text">QSI</h1>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="sidebar-search">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Search..." class="search-input" id="sidebarSearch">
+        </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+        <!-- Dashboard -->
+        <a href="../../../dashboard_with_login.html" class="sidebar-link" data-page="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <!-- Sales Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">SALES DOCUMENTS</div>
+        </div>
+
+        <a href="../../../quotation/home_quotation.html" class="sidebar-link" data-page="quotation">
+            <i class="fas fa-file-alt"></i>
+            <span>Quotations</span>
+        </a>
+
+        <a href="../../../saleorder/home_sales_order.html" class="sidebar-link" data-page="salesorder">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Sales Orders</span>
+        </a>
+
+        <a href="../../../invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
+            <i class="fas fa-file-invoice"></i>
+            <span>Invoices</span>
+        </a>
+
+        <a href="../../../credit_note.html" class="sidebar-link" data-page="creditnote">
+            <i class="fas fa-receipt"></i>
+            <span>Credit Notes</span>
+        </a>
+
+        <!-- Purchase Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">PURCHASE DOCUMENTS</div>
+        </div>
+
+        <a href="../../../parchase/vendor/vendor_leads.html" class="sidebar-link" data-page="vendor">
+            <i class="fas fa-store"></i>
+            <span>Vendors</span>
+        </a>
+
+        <a href="../../../parchase/parchase_order/home_purchase_order.html" class="sidebar-link" data-page="purchaseorder">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Purchase Orders</span>
+        </a>
+
+        <a href="../../../parchase/bills.html" class="sidebar-link" data-page="bills">
+            <i class="fas fa-file-invoice"></i>
+            <span>Bills</span>
+        </a>
+
+        <a href="../../../parchase/debit_note/debit_note.html" class="sidebar-link" data-page="debitnote">
+            <i class="fas fa-sticky-note"></i>
+            <span>Debit Notes</span>
+        </a>
+
+        <!-- Other Sections -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">MANAGEMENT</div>
+        </div>
+
+        <a href="../../../payout.html" class="sidebar-link" data-page="payout">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payouts</span>
+        </a>
+
+        <a href="../../../manage-clients.html" class="sidebar-link" data-page="client">
+            <i class="fas fa-users"></i>
+            <span>Clients</span>
+        </a>
+
+        <a href="../../../item_management.html" class="sidebar-link" data-page="items">
+            <i class="fas fa-cube"></i>
+            <span>Items</span>
+        </a>
+
+        <a href="../../../settings.html" class="sidebar-link" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <!-- User Profile Section -->
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">User</div>
+                <div class="user-email" id="sidebarUserEmail">user@qsi.com</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<!-- Sidebar Toggle Button (Mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Mobile Backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<script>
+// Sidebar functionality
+(function() {
+    'use strict';
+
+    // Set active link based on current page
+    function setActiveLink() {
+        const currentPath = window.location.pathname;
+        const links = document.querySelectorAll('.sidebar-link');
+
+        links.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+
+            // Check if current page matches link
+            if (href && (currentPath.includes(href.replace('../', '')) || currentPath.includes(href))) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // Mobile sidebar toggle
+    function initMobileToggle() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (!sidebar || !toggle || !backdrop) return;
+
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+            backdrop.classList.toggle('backdrop-active');
+            document.body.classList.toggle('sidebar-mobile-open');
+        });
+
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('sidebar-open');
+            backdrop.classList.remove('backdrop-active');
+            document.body.classList.remove('sidebar-mobile-open');
+        });
+    }
+
+    // Search functionality
+    function initSearch() {
+        const searchInput = document.getElementById('sidebarSearch');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const links = document.querySelectorAll('.sidebar-link');
+
+            links.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                const parent = link.closest('.sidebar-nav');
+
+                if (text.includes(query) || query === '') {
+                    link.style.display = 'flex';
+                } else {
+                    link.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Load user info
+    function loadUserInfo() {
+        const userNameEl = document.getElementById('sidebarUserName');
+        const userEmailEl = document.getElementById('sidebarUserEmail');
+
+        // Get from localStorage or session
+        const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || 'User';
+        const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || 'user@qsi.com';
+
+        if (userNameEl) userNameEl.textContent = userName;
+        if (userEmailEl) userEmailEl.textContent = userEmail;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        setActiveLink();
+        initMobileToggle();
+        initSearch();
+        loadUserInfo();
+    });
+
+    // Handle logout
+    window.handleLogout = function() {
+        if (confirm('Are you sure you want to logout?')) {
+            // Clear session data
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // Redirect to login
+            window.location.href = '../index.html';
+        }
+    };
+})();
+</script>
+
 
         <div id="main-content" class="flex-1 overflow-y-auto">
             <div class="w-full max-w-5xl mx-auto p-6">

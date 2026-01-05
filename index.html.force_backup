@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - QSI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="js/qsi-styles.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="js/theme-overrides.css">
+    <!-- Global Theme Manager -->
+    <script src="js/theme-manager.js"></script>
+
+
+  </head>
+  <body class="min-h-screen flex items-center justify-center p-4">
+    <script>
+      // Facebook SDK
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId: "1605405084177718",
+          cookie: true,
+          xfbml: true,
+          version: "v18.0",
+        });
+      };
+
+      (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, "script", "facebook-jssdk");
+    </script>
+
+    <div class="qsi-container">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900">QSI</h1>
+      </div>
+
+      <!-- Login Card -->
+      <div class="form-card">
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">
+            Login in to your account
+          </h2>
+          <p class="text-sm text-gray-600">
+            Welcome back! Please enter your details.
+          </p>
+        </div>
+
+        <!-- Email/Password Form -->
+        <form id="login-form" class="space-y-4">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="input-field"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label for="password" class="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <a href="#" class="text-xs link-text">Forgot password?</a>
+            </div>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="input-field"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button type="submit" class="qsi-btnbtn-primary mt-6">
+            Login
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span>OR CONTINUE WITH</span>
+        </div>
+
+        <!-- Social Login Buttons -->
+        <div class="space-y-3">
+          <button type="button" id="google-login-btn" class="btn btn-outline">
+            <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+              <g fill="none" fill-rule="evenodd">
+                <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+              </g>
+            </svg>
+            Continue with Google
+          </button>
+
+          <button type="button" id="facebook-login-btn" class="btn btn-outline">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Continue with Facebook
+          </button>
+        </div>
+
+        <!-- Skip Link -->
+        <div class="text-center mt-6">
+          <a href="without_login/dashboard_without_login.html" class="text-sm link-text">
+            Or Skip for now
+          </a>
+        </div>
+      </div>
+
+      <!-- Sign Up Link -->
+      <div class="text-center mt-6">
+        <p class="text-sm text-gray-600">
+          Don't have an account?
+          <a href="./signup/sign_up.html" class="link-text font-semibold">
+            Sign up
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const loginForm = document.getElementById("login-form");
+  const submitButton = loginForm.querySelector('button[type="submit"]');
+  const googleBtn = document.getElementById("google-login-btn");
+  const facebookBtn = document.getElementById("facebook-login-btn");
+
+  const API_BASE = "https://api.fornowauto.com/api";
+
+  // ========================================
+  // EMAIL/PASSWORD LOGIN
+  // ========================================
+  loginForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      alert("Please enter both email and password.");
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Verifying...";
+
+    try {
+      const response = await fetch(`${API_BASE}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Invalid credentials");
+      }
+
+      if (result.token && result.user && result.user._id) {
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("userId", result.user._id);
+        localStorage.setItem("email", result.user.email || "");
+        localStorage.setItem("phone", result.user.phone || "");
+
+        alert("Login Successful!");
+
+        if (result.has_company_details) {
+          window.location.href = "with_login/dashboard_with_login.html";
+        } else {
+          window.location.href = "signup/businessDetails.html";
+        }
+      } else {
+        throw new Error("Invalid server response");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert(`Login Failed: ${err.message}`);
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Login";
+    }
+  });
+
+  // ========================================
+  // GOOGLE LOGIN
+  // ========================================
+  let googleTokenClient;
+
+  function initializeGoogleLogin() {
+    if (typeof google === "undefined" || !google.accounts?.oauth2) {
+      setTimeout(initializeGoogleLogin, 200);
+      return;
+    }
+
+    googleTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: "345844221969-mtpp4nslbprtuu53f9bcsuh1kaaanjht.apps.googleusercontent.com",
+      scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
+      callback: async (tokenResponse) => {
+        if (tokenResponse?.access_token) {
+          try {
+            googleBtn.disabled = true;
+            googleBtn.innerHTML = '<span>Signing in...</span>';
+
+            const googleUser = await fetch(
+              "https://www.googleapis.com/oauth2/v3/userinfo",
+              { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
+            ).then((res) => res.json());
+
+            await handleSocialLogin("Google", googleUser);
+          } catch (err) {
+            console.error("Google login failed:", err);
+            alert("Google login failed. Please try again.");
+            googleBtn.disabled = false;
+            googleBtn.innerHTML = `
+              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                <g fill="none" fill-rule="evenodd">
+                  <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+                  <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                </g>
+              </svg>
+              Continue with Google
+            `;
+          }
+        }
+      },
+    });
+
+    googleBtn.disabled = false;
+    googleBtn.addEventListener("click", () => {
+      googleTokenClient.requestAccessToken();
+    });
+  }
+
+  googleBtn.disabled = true;
+  initializeGoogleLogin();
+
+  // ========================================
+  // FACEBOOK LOGIN
+  // ========================================
+  facebookBtn.addEventListener("click", () => {
+    FB.login(
+      (response) => {
+        if (response.authResponse) {
+          facebookBtn.disabled = true;
+          facebookBtn.innerHTML = '<span>Signing in...</span>';
+
+          FB.api("/me", { fields: "name,email" }, async (fbUser) => {
+            try {
+              await handleSocialLogin("Facebook", fbUser);
+            } catch (err) {
+              console.error("Facebook login failed:", err);
+              alert("Facebook login failed. Please try again.");
+              facebookBtn.disabled = false;
+              facebookBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Continue with Facebook
+              `;
+            }
+          });
+        }
+      },
+      { scope: "public_profile,email" }
+    );
+  });
+
+  // ========================================
+  // SOCIAL LOGIN HANDLER
+  // ========================================
+  async function handleSocialLogin(provider, userData) {
+    console.log(`${provider} login:`, userData);
+
+    const payload = {
+      email: userData.email,
+      username: userData.name,
+      provider,
+      providerId: userData.sub || userData.id,
+    };
+
+    if (!payload.email) {
+      alert("Could not retrieve email from social provider.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/google-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Social login failed");
+      }
+
+      if (result.token && result.user && result.user._id) {
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("userId", result.user._id);
+        localStorage.setItem("email", result.user.email || "");
+        localStorage.setItem("phone", result.user.phone || "");
+
+        if (result.has_company_details) {
+          window.location.href = "with_login/dashboard_with_login.html";
+        } else {
+          window.location.href = "signup/businessDetails.html";
+        }
+      } else {
+        throw new Error("Invalid server response");
+      }
+    } catch (err) {
+      console.error(`${provider} login error:`, err);
+      throw err;
+    }
+  }
+});
+</script>
+  </body>
+</html>

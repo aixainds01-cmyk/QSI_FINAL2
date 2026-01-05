@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Sales Order</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .form-container {
+            max-width: 960px;
+            margin: 2rem auto;
+        }
+
+        .form-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            background-color: white;
+        }
+
+        .input-field {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            font-size: 0.875rem;
+        }
+
+        .input-field:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+
+        .btn {
+            padding: 0.625rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .btn-small {
+            padding: .25rem .5rem;
+            font-size: .75rem;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-primary:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-link {
+            color: #4f46e5;
+            font-weight: 500;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        .item-table-header {
+            background-color: #4338ca;
+            color: white;
+        }
+
+        .item-row {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+
+        /* Autocomplete dropdown styles */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 0.375rem 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+        }
+
+        .autocomplete-dropdown.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            font-size: 0.875rem;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .autocomplete-item.selected {
+            background-color: #e0e7ff;
+        }
+
+        .autocomplete-item-main {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .autocomplete-item-sub {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.125rem;
+        }
+
+        .autocomplete-not-found {
+            padding: 0.5rem 0.75rem;
+            color: #dc2626;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .autocomplete-loading {
+            padding: 0.5rem 0.75rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .item-validation-error {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        /* Selected client display */
+        .selected-client-info {
+            background-color: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .selected-client-info .client-name {
+            font-weight: 600;
+            color: #166534;
+        }
+
+        .selected-client-info .client-details {
+            font-size: 0.75rem;
+            color: #4b5563;
+        }
+
+        /* Sales Order Preview Styles */
+        .sales-order-container {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding: 40px;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            max-width: 800px;
+            margin: 2rem auto;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .sales-order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .logo-container img {
+            max-width: 150px;
+            max-height: 70px;
+            object-fit: contain;
+        }
+
+        .sales-order-details {
+            text-align: right;
+        }
+
+        .sales-order-details h1 {
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .sales-order-details p {
+            margin: 0;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .address-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .address-section h2 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .address-section p {
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .items-table thead {
+            border-bottom: 2px solid #d1d5db;
+        }
+
+        .items-table th {
+            text-align: left;
+            padding: 8px 4px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+
+        .items-table th:nth-child(2),
+        .items-table th:nth-child(3),
+        .items-table th:nth-child(4) {
+            text-align: right;
+        }
+
+        .items-table tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .items-table td {
+            padding: 12px 4px;
+            font-size: 14px;
+        }
+
+        .items-table td:nth-child(2),
+        .items-table td:nth-child(3),
+        .items-table td:nth-child(4) {
+            text-align: right;
+        }
+
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        .totals-table {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .totals-table div {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .totals-table .total-amount {
+            font-weight: bold;
+            font-size: 16px;
+            color: #111827;
+            border-top: 2px solid #d1d5db;
+            margin-top: 8px;
+            padding-top: 12px;
+        }
+
+        .sales-order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .notes-terms {
+            max-width: 60%;
+        }
+
+        .signature-section {
+            text-align: center;
+            width: 200px;
+        }
+
+        .signature-image-space {
+            height: 60px;
+            margin-bottom: 8px;
+        }
+
+        .signature-image-space img {
+            max-height: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+
+        .signature-line {
+            border-top: 1px solid #6b7280;
+            padding-top: 4px;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .bottom-button-container {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 1rem 0;
+            border-top: 2px solid #e5e7eb;
+            margin-top: 2rem;
+            z-index: 10;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 64px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../../js/fix-icons.css">
+    <link rel="stylesheet" href="../../js/theme-force.css">
+    <!-- Global Theme Manager -->
+    <script src="../../js/theme-manager.js"></script>
+</head>
+
+<body>
+    <div class="flex min-h-screen">
+        <!-- Mobile Header -->
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <span class="text-xl font-bold">QSI</span>
+            </div>
+        </header>
+
+        <!-- BACKDROP for mobile -->
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar"
+            class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class="mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="../dashboard_with_login.html"
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-chart-pie mr-3"></i>Dashboard
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn"
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200 rotate-180"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1">
+                        <a href="../quotation/home_quotation.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="home_sales_order.html"
+                            class="block py-2 px-4 rounded transition duration-200 bg-gray-700 text-sm">Sales Order</a>
+                        <a href="../invoice/home_invoice.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="../credit_note.html"
+                            class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                    </div>
+                    <div>
+                        <button id="purchases-dropdown-btn"
+                            class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                            <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
+                            <i id="purchases-dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                        </button>
+                        <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                            <a href="../parchase/vendor/vendors_leads.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
+                            <a href="../parchase/parchase_order/home_purchase_orders.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
+                            <a href="../parchase/debit notes/debit_notes.html"
+                                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
+                        </div>
+                    </div>
+                </div>
+                <a href="../manage-clients.html"
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Manage Clients
+                </a>
+                <a href="../settings.html"
+                    class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+            </nav>
+        </aside>
+
+        <div id="main-content" class="flex-1 overflow-y-auto">
+            <div class="w-full max-w-5xl mx-auto p-6">
+                <div id="edit-sales-order-page">
+                    <main class="form-container">
+                        <form id="sales-order-form">
+                            <div class="flex justify-between items-center mb-6">
+                                <h1 class="text-3xl font-bold text-gray-800">Edit Sales Order</h1>
+                                <div class="flex items-center space-x-2">
+                                    <button id="update-btn" type="submit" class="btn btn-primary flex items-center">
+                                        Update
+                                        <span id="save-btn-loading" class="loading hidden ml-2"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="alert-container"></div>
+
+                            <div class="form-section space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                            <label for="sales-order-no" class="text-gray-600 text-sm">Sales Order No.</label>
+                                            <input type="text" id="sales-order-no" class="input-field col-span-2 bg-gray-100" readonly />
+                                        </div>
+
+                                        <div class="grid grid-cols-3 gap-2 items-center mb-2">
+                                            <label for="sales-order-date" class="text-gray-600 text-sm">Sales Order Date</label>
+                                            <input type="date" id="sales-order-date" class="input-field col-span-2" />
+                                        </div>
+                                    </div>
+                                    <div id="logo-uploader"
+                                        class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-50 relative">
+                                        <div id="logo-preview-container" class="hidden absolute inset-0 p-2">
+                                            <img id="logo-preview" src="" alt="Business Logo Preview" class="object-contain w-full h-full" />
+                                        </div>
+                                        <div id="logo-placeholder">
+                                            <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                            <span class="text-indigo-600 font-semibold">Add Business Logo</span>
+                                        </div>
+                                        <input type="file" id="logo-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/png, image/jpeg" />
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="border rounded-lg p-4 space-y-2">
+                                        <h3 class="font-semibold text-gray-700">
+                                            From <span class="text-gray-400 text-sm">(Your Details)</span>
+                                        </h3>
+                                        <div>
+                                            <label for="businessName" class="text-sm font-medium text-gray-600">Business Name</label>
+                                            <input type="text" id="businessName" class="input-field" required readonly />
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label for="business_city" class="text-sm font-medium text-gray-600">City</label>
+                                                <input type="text" id="business_city" class="input-field" required readonly />
+                                            </div>
+                                            <div>
+                                                <label for="business_country" class="text-sm font-medium text-gray-600">Country</label>
+                                                <input type="text" id="business_country" class="input-field" required readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-700 mb-2">
+                                            Billed To <span class="text-gray-400 text-sm">(Client's Details)</span>
+                                        </h3>
+
+                                        <!-- Client Search Autocomplete -->
+                                        <div class="autocomplete-container">
+                                            <input type="text" id="client-search" class="input-field" placeholder="Search client by name or city..." autocomplete="off">
+                                            <div id="client-dropdown" class="autocomplete-dropdown"></div>
+                                        </div>
+                                        <input type="hidden" id="selected-client-id" />
+
+                                        <!-- Selected Client Display -->
+                                        <div id="selected-client-info" class="selected-client-info hidden">
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <div class="client-name" id="selected-client-name"></div>
+                                                    <div class="client-details" id="selected-client-details"></div>
+                                                </div>
+                                                <button type="button" id="clear-client-btn" class="text-red-500 hover:text-red-700">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <button type="button" id="add-new-client-btn"
+                                            class="w-full text-center text-indigo-600 font-semibold py-2 border-2 border-dashed rounded-lg hover:bg-indigo-50 text-sm mt-2">
+                                            + Add New Client
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-span-2 p-4 rounded-lg border shadow-sm">
+                                    <div class="item-table-header grid grid-cols-12 gap-2 p-3 rounded-t-lg text-sm border-b">
+                                        <h4 class="col-span-4 font-semibold">Item</h4>
+                                        <h4 class="col-span-2 font-semibold text-center">Quantity</h4>
+                                        <h4 class="col-span-2 font-semibold text-center">Rate</h4>
+                                        <h4 class="col-span-3 font-semibold text-right">Amount</h4>
+                                        <h4 class="col-span-1 text-center">--</h4>
+                                    </div>
+
+                                    <div id="items-container" class="space-y-2 py-2"></div>
+
+                                    <div class="pt-2">
+                                        <button type="button" id="add-item-btn" class="btn-link">
+                                            <i class="fas fa-plus mr-1"></i> Add New Line
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="w-full flex justify-end mt-4">
+                                    <div class="w-80 p-4 rounded-lg border bg-white shadow-sm space-y-3">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">Subtotal</span>
+                                            <span class="font-semibold text-gray-800" id="sub_total">₹0.00</span>
+                                        </div>
+
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600 flex items-center">
+                                                Tax (
+                                                <input type="number" id="tax-percentage" min="0" max="100"
+                                                    class="w-16 mx-1 border rounded text-right text-sm px-2 py-1"
+                                                    value="0" placeholder="0" />%)
+                                            </span>
+                                            <span class="font-semibold text-gray-800" id="tax">₹0.00</span>
+                                        </div>
+
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">Round Off</span>
+                                            <span class="font-semibold text-gray-800" id="round_off">₹0.00</span>
+                                        </div>
+
+                                        <div class="flex justify-between items-center border-t-2 border-black pt-2 mt-2">
+                                            <span class="font-bold text-lg text-gray-800">Total (INR)</span>
+                                            <span class="font-bold text-lg text-gray-800" id="total">₹0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col md:flex-row gap-6 mt-6">
+                                    <div class="flex-1 space-y-4">
+                                        <div class="w-full overflow-x-auto">
+                                            <div class="flex flex-nowrap gap-2 mb-4 whitespace-nowrap">
+                                                <button type="button" id="terms-toggle-btn" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="terms">+ Terms & Conditions</button>
+                                                <button type="button" id="notes-toggle-btn" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="notes">+ Notes</button>
+                                                <button type="button" id="signatory-toggle-btn" class="toggle-btn px-3 py-1 bg-gray-100 rounded hover:bg-gray-200" data-target="signature-box">+ Authorised Signatory</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Terms & Conditions -->
+                                        <div id="terms" class="hidden mt-2">
+                                            <label class="block text-sm font-medium text-gray-700">Terms & Conditions</label>
+                                            <textarea id="terms-input" class="w-full border rounded p-2 mt-1" rows="3">THANK YOU!</textarea>
+                                        </div>
+
+                                        <!-- Notes -->
+                                        <div id="notes" class="hidden mt-2">
+                                            <label class="block text-sm font-medium text-gray-700">Notes</label>
+                                            <textarea id="notes-input" class="w-full border rounded p-2 mt-1" rows="3">Thanks For Business With Us</textarea>
+                                        </div>
+
+                                        <!-- Signatory Section -->
+                                        <div id="signature-box" class="hidden mt-2 border rounded-lg p-4 bg-gray-50">
+                                            <div class="flex items-center justify-between mb-3 border-b pb-3">
+                                                <div class="flex items-center gap-4">
+                                                    <label class="flex items-center gap-2 cursor-pointer">
+                                                        <input type="radio" name="signatory_type" value="text" class="form-radio" checked>
+                                                        <span class="text-sm font-medium">Enter Name</span>
+                                                    </label>
+                                                    <label class="flex items-center gap-2 cursor-pointer">
+                                                        <input type="radio" name="signatory_type" value="image" class="form-radio">
+                                                        <span class="text-sm font-medium">Upload Signature</span>
+                                                    </label>
+                                                </div>
+                                                <button type="button" id="clear-signatory-btn" class="text-red-500 hover:text-red-700 text-sm flex items-center gap-1" title="Clear Signatory">
+                                                    <i class="fas fa-trash"></i> Clear
+                                                </button>
+                                            </div>
+
+                                            <div id="signatory-text-container" class="space-y-2">
+                                                <div class="flex gap-2 items-center">
+                                                    <select id="signatory-select" class="input-field flex-grow">
+                                                        <option value="">Select Signatory</option>
+                                                        <option value="add_new">-- Add New Signatory --</option>
+                                                    </select>
+                                                    <button type="button" id="remove-selected-signatory-btn" class="text-red-500 hover:text-red-700 p-2 hidden" title="Remove selected signatory">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                                <div id="add-signatory-container" class="hidden flex gap-2 items-center">
+                                                    <input id="new-signatory-input" class="input-field flex-grow" placeholder="Enter New Signatory Name">
+                                                    <button type="button" id="save-signatory-btn" class="btn btn-primary btn-small">Save</button>
+                                                    <button type="button" id="cancel-add-signatory-btn" class="btn btn-secondary btn-small">Cancel</button>
+                                                </div>
+                                            </div>
+
+                                            <div id="signatory-image-container" class="hidden space-y-2">
+                                                <div class="flex gap-2 items-center">
+                                                    <input type="file" id="signatory-image-input" class="input-field flex-grow" accept="image/png, image/jpeg">
+                                                    <button type="button" id="remove-signatory-image-btn" class="text-red-500 hover:text-red-700 p-2 hidden" title="Remove signature image">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                                <div id="signatory-image-preview"
+                                                    class="mt-2 border border-dashed rounded-lg p-2 h-24 flex items-center justify-center bg-white text-gray-400 relative">
+                                                    <span>Signature Preview</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </main>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Modal -->
+    <div id="client-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
+        <div id="client-modal-backdrop" class="absolute inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm"></div>
+        <div id="client-modal-panel" class="relative w-full max-w-2xl mx-4">
+            <div class="bg-white rounded-lg p-6 shadow-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">Create New Client</h2>
+                    <button id="client-modal-close" class="text-gray-500 hover:text-gray-800">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+                <form id="client-form" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-600">Business Name*</label>
+                            <input name="client_name" type="text" required class="input-field mt-1" placeholder="Business Name (Required)">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">Client Industry</label>
+                            <select name="client_industry" class="input-field mt-1">
+                                <option value="">-Select an Industry-</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Retail">Retail</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">Client Type</label>
+                            <select name="client_type" class="input-field mt-1">
+                                <option value="customer">Customer</option>
+                                <option value="supplier">Supplier</option>
+                                <option value="partner">Partner</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">Select Country*</label>
+                            <select name="country" required class="input-field mt-1">
+                                <option>India</option>
+                                <option>United States</option>
+                                <option>United Kingdom</option>
+                                <option>Canada</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">State / Province</label>
+                            <select name="state" class="input-field mt-1">
+                                <option>Select State / Province</option>
+                                <option>California</option>
+                                <option>New York</option>
+                                <option>Tamil Nadu</option>
+                                <option>Ontario</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">City/Town</label>
+                            <input name="city" type="text" class="input-field mt-1" placeholder="City/Town Name">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600">Postal Code / Zip Code</label>
+                            <input name="pincode" type="text" class="input-field mt-1" placeholder="Postal Code / Zip Code">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">GSTIN (Optional)</label>
+                        <input name="gstin" type="text" class="input-field mt-1" placeholder="12AABCU9603R1ZV">
+                    </div>
+                    <div class="border-t pt-4 flex justify-end space-x-3">
+                        <button type="button" id="client-modal-cancel" class="btn-secondary btn">Cancel</button>
+                        <button type="submit" class="btn-primary btn">Save Client</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const API_BASE_URL = "https://api.fornowauto.com/api";
+        const CLIENT_API_URL = `${API_BASE_URL}/clients`;
+        const COMPANY_API_URL = `${API_BASE_URL}/companies`;
+        const SALES_ORDER_API_URL = `${API_BASE_URL}/sales-order`;
+        const ITEMS_API_URL = `${API_BASE_URL}/items`;
+        const SIGNATORY_STORAGE_KEY = 'qsi_saved_signatories';
+        const SIGNATURE_IMAGE_STORAGE_KEY = 'qsi_saved_signature_image';
+        
+        let COMPANY_ID = null;
+        let allItems = [];
+        let allClients = [];
+
+        // Get Sales Order ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const SALES_ORDER_ID = urlParams.get("id");
+
+        if (!SALES_ORDER_ID) {
+            alert("No Sales Order ID provided. Redirecting to list.");
+            window.location.href = "home_sales_order.html";
+            return;
+        }
+
+        // DOM Elements
+        const salesOrderForm = document.getElementById("sales-order-form");
+        const itemsContainer = document.getElementById("items-container");
+        const addItemBtn = document.getElementById("add-item-btn");
+        const taxPercentageInput = document.getElementById("tax-percentage");
+        const updateBtn = document.getElementById("update-btn");
+        const saveBtnLoading = document.getElementById("save-btn-loading");
+        const alertContainer = document.getElementById("alert-container");
+        const menuToggle = document.getElementById("menu-toggle");
+        const sidebar = document.getElementById("sidebar");
+        const menuBackdrop = document.getElementById("menu-backdrop");
+
+        // Client search elements
+        const clientSearchInput = document.getElementById("client-search");
+        const clientDropdown = document.getElementById("client-dropdown");
+        const selectedClientIdInput = document.getElementById("selected-client-id");
+        const selectedClientInfo = document.getElementById("selected-client-info");
+        const selectedClientName = document.getElementById("selected-client-name");
+        const selectedClientDetails = document.getElementById("selected-client-details");
+        const clearClientBtn = document.getElementById("clear-client-btn");
+
+        // Toggle buttons
+        const termsToggleBtn = document.getElementById("terms-toggle-btn");
+        const notesToggleBtn = document.getElementById("notes-toggle-btn");
+        const signatoryToggleBtn = document.getElementById("signatory-toggle-btn");
+
+        // Mobile menu toggle
+        if (menuToggle && sidebar && menuBackdrop) {
+            menuToggle.addEventListener("click", () => {
+                sidebar.classList.toggle("-translate-x-full");
+                menuBackdrop.classList.toggle("hidden");
+            });
+            menuBackdrop.addEventListener("click", () => {
+                sidebar.classList.add("-translate-x-full");
+                menuBackdrop.classList.add("hidden");
+            });
+        }
+
+        // ===== HELPER FUNCTIONS =====
+        function setLoading(isLoading) {
+            if (updateBtn) updateBtn.disabled = isLoading;
+            if (saveBtnLoading) saveBtnLoading.classList.toggle("hidden", !isLoading);
+        }
+
+        function showAlert(message, type = "success", duration = 5000) {
+            if (!alertContainer) return;
+            const alertDiv = document.createElement("div");
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), duration);
+        }
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem("token");
+            return token ? { 'Authorization': `Bearer ${token}` } : null;
+        }
+
+        async function safeFetch(url, opts = {}) {
+            const headers = Object.assign({}, opts.headers || {});
+            const authHeaders = getAuthHeaders();
+            if (!authHeaders) {
+                alert("Authentication token not found. Please log in.");
+                window.location.href = '../../index.html';
+                throw new Error("Authentication token not found.");
+            }
+            Object.assign(headers, authHeaders);
+            if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
+                headers["Content-Type"] = "application/json";
+            }
+            try {
+                const res = await fetch(url, { ...opts, headers });
+                const text = await res.text();
+                let data;
+                try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        alert("Session expired. Please log in again.");
+                        localStorage.removeItem('token');
+                        window.location.href = '../../index.html';
+                        throw new Error("Session expired");
+                    }
+                    throw new Error(data?.message || res.statusText || "Request failed");
+                }
+                return data;
+            } catch (err) {
+                console.error(err);
+                throw err;
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[m]);
+        }
+
+        // ===== DATA LOADING =====
+        async function loadCompany() {
+            try {
+                const companies = await safeFetch(COMPANY_API_URL, { method: "GET" });
+                if (Array.isArray(companies) && companies.length > 0) {
+                    const company = companies[0];
+                    COMPANY_ID = company._id || company.id || null;
+                    document.getElementById("businessName").value = company.company_name || "";
+                    document.getElementById("business_city").value = company.address?.city || "";
+                    document.getElementById("business_country").value = company.address?.country || "";
+                    if (company.logo) {
+                        document.getElementById("logo-preview").src = company.logo;
+                        document.getElementById("logo-preview-container").classList.remove("hidden");
+                        document.getElementById("logo-placeholder").classList.add("hidden");
+                    }
+                }
+            } catch (err) {
+                showAlert("Could not load company details.", "error");
+            }
+        }
+
+        async function loadClients() {
+            try {
+                const response = await safeFetch(CLIENT_API_URL, { method: "GET" });
+                allClients = Array.isArray(response) ? response : [];
+                return allClients;
+            } catch (err) {
+                console.error("Error loading clients:", err);
+                return [];
+            }
+        }
+
+        async function loadItems() {
+            try {
+                const response = await safeFetch(ITEMS_API_URL, { method: "GET" });
+                allItems = Array.isArray(response) ? response : [];
+                return allItems;
+            } catch (err) {
+                console.error('Error fetching items:', err);
+                return [];
+            }
+        }
+
+        // ===== CLIENT AUTOCOMPLETE =====
+        function filterClients(searchTerm) {
+            if (!searchTerm) return [];
+            const term = searchTerm.toLowerCase().trim();
+            return allClients.filter(client => {
+                const name = (client.client_name || '').toLowerCase();
+                const city = (client.address?.city || client.address?.['city/town'] || '').toLowerCase();
+                return name.includes(term) || city.includes(term);
+            });
+        }
+
+        function showClientDropdown(clients) {
+            clientDropdown.innerHTML = '';
+            if (clients.length === 0) {
+                clientDropdown.innerHTML = '<div class="autocomplete-not-found">No clients found</div>';
+                clientDropdown.classList.add('show');
+                return;
+            }
+
+            clients.forEach(client => {
+                const div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                const city = client.address?.city || client.address?.['city/town'] || '';
+                div.innerHTML = `
+                    <div class="autocomplete-item-main">${escapeHtml(client.client_name)}</div>
+                    <div class="autocomplete-item-sub">${city ? `City: ${city}` : ''}</div>
+                `;
+                div.addEventListener('click', () => selectClient(client));
+                clientDropdown.appendChild(div);
+            });
+            clientDropdown.classList.add('show');
+        }
+
+        function hideClientDropdown() {
+            clientDropdown.classList.remove('show');
+        }
+
+        function selectClient(client) {
+            selectedClientIdInput.value = client._id || client.id;
+            clientSearchInput.value = '';
+            hideClientDropdown();
+
+            const city = client.address?.city || client.address?.['city/town'] || '';
+            const state = client.address?.state || '';
+            selectedClientName.textContent = client.client_name;
+            selectedClientDetails.textContent = [city, state].filter(Boolean).join(', ');
+            selectedClientInfo.classList.remove('hidden');
+        }
+
+        function clearClient() {
+            selectedClientIdInput.value = '';
+            clientSearchInput.value = '';
+            selectedClientInfo.classList.add('hidden');
+        }
+
+        let clientSearchTimeout;
+        clientSearchInput?.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            clearTimeout(clientSearchTimeout);
+            if (!searchTerm) {
+                hideClientDropdown();
+                return;
+            }
+            clientSearchTimeout = setTimeout(() => {
+                const filtered = filterClients(searchTerm);
+                showClientDropdown(filtered);
+            }, 300);
+        });
+
+        clientSearchInput?.addEventListener('focus', () => {
+            const searchTerm = clientSearchInput.value.trim();
+            if (searchTerm) {
+                const filtered = filterClients(searchTerm);
+                showClientDropdown(filtered);
+            }
+        });
+
+        clearClientBtn?.addEventListener('click', clearClient);
+
+        document.addEventListener('click', (e) => {
+            if (!clientSearchInput?.contains(e.target) && !clientDropdown?.contains(e.target)) {
+                hideClientDropdown();
+            }
+        });
+
+        // ===== SIGNATORY MANAGEMENT =====
+        function loadSignatories() {
+            const selectEl = document.getElementById('signatory-select');
+            const saved = JSON.parse(localStorage.getItem(SIGNATORY_STORAGE_KEY)) || [];
+            while (selectEl.options.length > 2) {
+                selectEl.remove(1);
+            }
+            saved.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                selectEl.insertBefore(opt, selectEl.options[selectEl.options.length - 1]);
+            });
+        }
+
+        function loadSignatureImage() {
+            const signatoryImagePreview = document.getElementById('signatory-image-preview');
+            const removeSignatoryImageBtn = document.getElementById('remove-signatory-image-btn');
+            const dataUrl = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
+            if (dataUrl) {
+                signatoryImagePreview.innerHTML = `<img src="${dataUrl}" class="max-h-full max-w-full object-contain">`;
+                removeSignatoryImageBtn?.classList.remove('hidden');
+            } else {
+                signatoryImagePreview.innerHTML = '<span>Signature Preview</span>';
+                removeSignatoryImageBtn?.classList.add('hidden');
+            }
+        }
+
+        // ===== ITEM ROW WITH AUTOCOMPLETE =====
+        function createItemRow(itemData = null) {
+            const row = document.createElement("div");
+            row.className = "item-row space-y-2 p-2 border rounded";
+            row.innerHTML = `
+                <div class="grid grid-cols-12 gap-2 items-center">
+                    <div class="col-span-4 autocomplete-container">
+                        <input class="item-name input-field" placeholder="Type to search items..." required autocomplete="off">
+                        <div class="autocomplete-dropdown"></div>
+                        <span class="item-validation-error" style="display: none;"></span>
+                    </div>
+                    <input type="number" class="col-span-2 quantity input-field text-right" placeholder="0" min="0" required>
+                    <input type="text" class="col-span-2 rate input-field text-right" placeholder="0" required>
+                    <span class="col-span-3 amount text-right">₹0.00</span>
+                    <button type="button" class="col-span-1 text-red-500 hover:text-red-700 delete-item-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <textarea class="description input-field col-span-12" rows="2" placeholder="Item description"></textarea>
+            `;
+
+            const itemNameInput = row.querySelector(".item-name");
+            const dropdown = row.querySelector(".autocomplete-dropdown");
+            const validationError = row.querySelector(".item-validation-error");
+            const qtyEl = row.querySelector(".quantity");
+            const rateEl = row.querySelector(".rate");
+            const descEl = row.querySelector(".description");
+            const deleteBtn = row.querySelector(".delete-item-btn");
+
+            let selectedItemIndex = -1;
+            let itemValidated = itemData ? true : false;
+
+            function filterItems(searchTerm) {
+                if (!searchTerm) return [];
+                const term = searchTerm.toLowerCase().trim();
+                return allItems.filter(item => {
+                    const name = (item.item_name || '').toLowerCase();
+                    const code = (item.item_code || '').toLowerCase();
+                    const category = (item.category || '').toLowerCase();
+                    return name.includes(term) || code.includes(term) || category.includes(term);
+                });
+            }
+
+            function showDropdown(items, searchTerm) {
+                dropdown.innerHTML = '';
+                if (items.length === 0 && searchTerm) {
+                    dropdown.innerHTML = `
+                        <div class="autocomplete-not-found">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            Item not found in inventory
+                        </div>
+                    `;
+                    dropdown.classList.add('show');
+                    itemValidated = false;
+                    validationError.textContent = 'Item not found in inventory';
+                    validationError.style.display = 'block';
+                    return;
+                }
+
+                validationError.style.display = 'none';
+
+                items.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'autocomplete-item';
+                    div.dataset.index = index;
+                    const price = item.unit_price || 0;
+                    const stock = item.stock_quantity || 0;
+                    const code = item.item_code || '';
+
+                    div.innerHTML = `
+                        <div class="autocomplete-item-main">${escapeHtml(item.item_name)}</div>
+                        <div class="autocomplete-item-sub">
+                            ${code ? `Code: ${code} | ` : ''}
+                            Price: ₹${price.toFixed(2)} | Stock: ${stock}
+                            ${item.category ? ` | ${item.category}` : ''}
+                        </div>
+                    `;
+                    div.addEventListener('click', () => selectItem(item));
+                    dropdown.appendChild(div);
+                });
+
+                dropdown.classList.add('show');
+                selectedItemIndex = -1;
+            }
+
+            function hideDropdown() {
+                dropdown.classList.remove('show');
+                selectedItemIndex = -1;
+            }
+
+            function selectItem(item) {
+                itemNameInput.value = item.item_name;
+                rateEl.value = item.unit_price || 0;
+                if (item.description) descEl.value = item.description;
+                itemValidated = true;
+                validationError.style.display = 'none';
+                hideDropdown();
+                qtyEl.focus();
+                updateRowAmount(row);
+            }
+
+            function handleKeyNavigation(e) {
+                const items = dropdown.querySelectorAll('.autocomplete-item');
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedItemIndex = Math.min(selectedItemIndex + 1, items.length - 1);
+                    updateSelection(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedItemIndex = Math.max(selectedItemIndex - 1, -1);
+                    updateSelection(items);
+                } else if (e.key === 'Enter' && selectedItemIndex >= 0) {
+                    e.preventDefault();
+                    items[selectedItemIndex]?.click();
+                } else if (e.key === 'Escape') {
+                    hideDropdown();
+                }
+            }
+
+            function updateSelection(items) {
+                items.forEach((item, index) => {
+                    item.classList.toggle('selected', index === selectedItemIndex);
+                });
+                if (selectedItemIndex >= 0) {
+                    items[selectedItemIndex]?.scrollIntoView({ block: 'nearest' });
+                }
+            }
+
+            let searchTimeout;
+            itemNameInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.trim();
+                itemValidated = false;
+                clearTimeout(searchTimeout);
+
+                if (!searchTerm) {
+                    hideDropdown();
+                    validationError.style.display = 'none';
+                    return;
+                }
+
+                dropdown.innerHTML = '<div class="autocomplete-loading">Searching...</div>';
+                dropdown.classList.add('show');
+
+                searchTimeout = setTimeout(() => {
+                    const filtered = filterItems(searchTerm);
+                    showDropdown(filtered, searchTerm);
+                }, 300);
+            });
+
+            itemNameInput.addEventListener('focus', () => {
+                const searchTerm = itemNameInput.value.trim();
+                if (searchTerm && allItems.length > 0) {
+                    const filtered = filterItems(searchTerm);
+                    showDropdown(filtered, searchTerm);
+                }
+            });
+
+            itemNameInput.addEventListener('keydown', handleKeyNavigation);
+
+            document.addEventListener('click', (e) => {
+                if (!row.contains(e.target)) {
+                    hideDropdown();
+                }
+            });
+
+            const onChange = () => updateRowAmount(row);
+            qtyEl.addEventListener("input", onChange);
+            rateEl.addEventListener("input", onChange);
+
+            deleteBtn.addEventListener("click", () => {
+                row.remove();
+                updateTotals();
+            });
+
+            itemsContainer.appendChild(row);
+
+            // Pre-fill data if provided
+            if (itemData) {
+                itemNameInput.value = itemData.item_name || '';
+                qtyEl.value = itemData.quantity || 0;
+                rateEl.value = itemData.rate || 0;
+                descEl.value = itemData.description || '';
+                updateRowAmount(row);
+            }
+
+            return row;
+        }
+
+        function updateRowAmount(row) {
+            const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+            const rate = parseFloat(row.querySelector(".rate").value) || 0;
+            const amt = qty * rate;
+            row.querySelector(".amount").textContent = `₹${amt.toFixed(2)}`;
+            updateTotals();
+        }
+
+        function updateTotals() {
+            let subtotal = 0;
+            document.querySelectorAll(".item-row").forEach(row => {
+                const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+                const rate = parseFloat(row.querySelector(".rate").value) || 0;
+                subtotal += qty * rate;
+            });
+
+            const taxP = parseFloat(taxPercentageInput?.value) || 0;
+            const tax = subtotal * (taxP / 100);
+            const totalBeforeRound = subtotal + tax;
+            const totalRounded = Math.round(totalBeforeRound);
+            const roundOff = totalRounded - totalBeforeRound;
+
+            document.getElementById("sub_total").textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById("tax").textContent = `₹${tax.toFixed(2)}`;
+            document.getElementById("round_off").textContent = `₹${roundOff.toFixed(2)}`;
+            document.getElementById("total").textContent = `₹${totalRounded}`;
+        }
+
+        // ===== POPULATE FORM FOR EDITING =====
+        function populateFormForEdit(salesOrder) {
+            if (!salesOrder) {
+                showAlert("Failed to populate form: No sales order data.", "error");
+                return;
+            }
+
+            // Sales Order Number (Readonly)
+            const soNoInput = document.getElementById("sales-order-no");
+            if (soNoInput) {
+                soNoInput.value = salesOrder.sales_order_number || salesOrder.sales_no || salesOrder._id || "N/A";
+            }
+
+            // Sales Order Date
+            const dateInput = document.getElementById("sales-order-date");
+            if (dateInput && salesOrder.sales_date) {
+                dateInput.value = salesOrder.sales_date.split('T')[0];
+            }
+
+            // Client - Show selected client
+            const clientId = salesOrder.to_client_id || salesOrder.to?._id;
+            if (clientId) {
+                selectedClientIdInput.value = clientId;
+                const clientName = salesOrder.to?.client_name || 'Selected Client';
+                const city = salesOrder.to?.address?.city || salesOrder.to?.address?.['city/town'] || '';
+                const state = salesOrder.to?.address?.state || '';
+                selectedClientName.textContent = clientName;
+                selectedClientDetails.textContent = [city, state].filter(Boolean).join(', ');
+                selectedClientInfo.classList.remove('hidden');
+            }
+
+            // Tax Percentage
+            if (taxPercentageInput) taxPercentageInput.value = salesOrder.tax_percentage || 0;
+
+            // Items
+            itemsContainer.innerHTML = "";
+            if (Array.isArray(salesOrder.items) && salesOrder.items.length > 0) {
+                salesOrder.items.forEach(item => createItemRow(item));
+            } else {
+                createItemRow();
+            }
+
+            // Terms & Conditions - show if has value
+            const termsInput = document.getElementById("terms-input");
+            const termsSection = document.getElementById("terms");
+            if (termsInput) termsInput.value = salesOrder.terms_and_condition || "";
+            if (salesOrder.terms_and_condition) {
+                termsSection?.classList.remove('hidden');
+                if (termsToggleBtn) termsToggleBtn.innerHTML = termsToggleBtn.innerHTML.replace('+', '-');
+            }
+
+            // Notes - show if has value
+            const notesInput = document.getElementById("notes-input");
+            const notesSection = document.getElementById("notes");
+            if (notesInput) notesInput.value = salesOrder.notes || "";
+            if (salesOrder.notes) {
+                notesSection?.classList.remove('hidden');
+                if (notesToggleBtn) notesToggleBtn.innerHTML = notesToggleBtn.innerHTML.replace('+', '-');
+            }
+
+            // Signatory - show if has value
+            const signatorySelect = document.getElementById("signatory-select");
+            const signatureBox = document.getElementById("signature-box");
+
+            if (salesOrder.signatory || salesOrder.signatory_image) {
+                signatureBox?.classList.remove('hidden');
+                if (signatoryToggleBtn) signatoryToggleBtn.innerHTML = signatoryToggleBtn.innerHTML.replace('+', '-');
+
+                if (salesOrder.signatory) {
+                    // Add signatory to saved list if not exists
+                    let saved = JSON.parse(localStorage.getItem(SIGNATORY_STORAGE_KEY)) || [];
+                    if (!saved.includes(salesOrder.signatory)) {
+                        saved.push(salesOrder.signatory);
+                        localStorage.setItem(SIGNATORY_STORAGE_KEY, JSON.stringify(saved));
+                        loadSignatories();
+                    }
+                    if (signatorySelect) signatorySelect.value = salesOrder.signatory;
+                    document.getElementById('remove-selected-signatory-btn')?.classList.remove('hidden');
+                }
+
+                if (salesOrder.signatory_image) {
+                    localStorage.setItem(SIGNATURE_IMAGE_STORAGE_KEY, salesOrder.signatory_image);
+                    loadSignatureImage();
+                    // Switch to image mode
+                    document.querySelector('input[name="signatory_type"][value="image"]').checked = true;
+                    document.getElementById('signatory-text-container')?.classList.add('hidden');
+                    document.getElementById('signatory-image-container')?.classList.remove('hidden');
+                }
+            }
+
+            updateTotals();
+        }
+
+        // ===== DATA COLLECTION =====
+        function collectSalesOrderData() {
+            const items = [...document.querySelectorAll(".item-row")].map(row => {
+                const qty = parseFloat(row.querySelector(".quantity").value) || 0;
+                const rate = parseFloat(row.querySelector(".rate").value) || 0;
+                return {
+                    item_name: row.querySelector(".item-name").value.trim(),
+                    description: row.querySelector(".description").value.trim(),
+                    quantity: qty,
+                    rate: rate,
+                    amount: +(qty * rate).toFixed(2),
+                };
+            });
+
+            const subTotal = items.reduce((s, it) => s + it.amount, 0);
+            const taxP = parseFloat(taxPercentageInput?.value) || 0;
+            const tax = +(subTotal * (taxP / 100));
+            const totalBeforeRound = subTotal + tax;
+            const totalRounded = Math.round(totalBeforeRound);
+            const roundOff = totalRounded - totalBeforeRound;
+
+            const signatoryType = document.querySelector('input[name="signatory_type"]:checked')?.value;
+            let signatoryName = null;
+            let signatoryImage = null;
+
+            if (signatoryType === 'text') {
+                const selectEl = document.getElementById('signatory-select');
+                if (selectEl && selectEl.value && selectEl.value !== 'add_new') {
+                    signatoryName = selectEl.value;
+                }
+            } else {
+                signatoryImage = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
+            }
+
+            return {
+                sales_date: document.getElementById("sales-order-date")?.value || new Date().toISOString().slice(0, 10),
+                items,
+                sub_total: +subTotal.toFixed(2),
+                tax: +tax.toFixed(2),
+                round_off: +roundOff.toFixed(2),
+                total: totalRounded,
+                tax_percentage: taxP,
+                from_company_id: COMPANY_ID,
+                to_client_id: selectedClientIdInput?.value || "",
+                terms_and_condition: document.getElementById("terms-input")?.value.trim() || "",
+                notes: document.getElementById("notes-input")?.value.trim() || "",
+                signatory: signatoryName,
+                signatory_image: signatoryImage,
+            };
+        }
+
+        // ===== FORM SUBMISSION =====
+        salesOrderForm?.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            // Validation
+            if (!selectedClientIdInput?.value) {
+                showAlert("Please select a client.", "error");
+                return;
+            }
+
+            const rows = document.querySelectorAll('.item-row');
+            if (!rows.length) {
+                showAlert("Please add at least one item.", "error");
+                return;
+            }
+
+            try {
+                setLoading(true);
+                const data = collectSalesOrderData();
+                
+                await safeFetch(`${SALES_ORDER_API_URL}/${SALES_ORDER_ID}`, {
+                    method: "PUT",
+                    body: JSON.stringify(data),
+                });
+
+                showAlert("Sales order updated successfully!", "success");
+
+                setTimeout(() => {
+                    window.location.href = "home_sales_order.html";
+                }, 1000);
+
+            } catch (err) {
+                console.error(err);
+                showAlert("Error updating sales order: " + err.message, "error");
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // ===== TOGGLE BUTTONS =====
+        document.querySelectorAll(".toggle-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const targetId = btn.dataset.target;
+                const targetEl = document.getElementById(targetId);
+                if (!targetEl) return;
+                const isNowHidden = targetEl.classList.toggle("hidden");
+                if (isNowHidden) {
+                    btn.innerHTML = btn.innerHTML.replace("-", "+");
+                } else {
+                    btn.innerHTML = btn.innerHTML.replace("+", "-");
+                }
+            });
+        });
+
+        // ===== SIGNATORY LISTENERS =====
+        const signatoryTypeRadios = document.querySelectorAll('input[name="signatory_type"]');
+        const signatoryTextContainer = document.getElementById('signatory-text-container');
+        const signatoryImageContainer = document.getElementById('signatory-image-container');
+        const signatoryImageInput = document.getElementById('signatory-image-input');
+        const signatorySelect = document.getElementById('signatory-select');
+        const addSignatoryContainer = document.getElementById('add-signatory-container');
+        const newSignatoryInput = document.getElementById('new-signatory-input');
+        const saveSignatoryBtn = document.getElementById('save-signatory-btn');
+        const cancelSignatoryBtn = document.getElementById('cancel-add-signatory-btn');
+        const clearSignatoryBtn = document.getElementById('clear-signatory-btn');
+        const removeSelectedSignatoryBtn = document.getElementById('remove-selected-signatory-btn');
+        const removeSignatoryImageBtn = document.getElementById('remove-signatory-image-btn');
+
+        signatoryTypeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const isText = e.target.value === 'text';
+                signatoryTextContainer?.classList.toggle('hidden', !isText);
+                signatoryImageContainer?.classList.toggle('hidden', isText);
+            });
+        });
+
+        signatoryImageInput?.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const dataUrl = event.target.result;
+                localStorage.setItem(SIGNATURE_IMAGE_STORAGE_KEY, dataUrl);
+                loadSignatureImage();
+            };
+            reader.readAsDataURL(file);
+        });
+
+        signatorySelect?.addEventListener('change', () => {
+            if (signatorySelect.value === 'add_new') {
+                addSignatoryContainer?.classList.remove('hidden');
+                removeSelectedSignatoryBtn?.classList.add('hidden');
+                newSignatoryInput?.focus();
+            } else if (signatorySelect.value) {
+                addSignatoryContainer?.classList.add('hidden');
+                removeSelectedSignatoryBtn?.classList.remove('hidden');
+            } else {
+                addSignatoryContainer?.classList.add('hidden');
+                removeSelectedSignatoryBtn?.classList.add('hidden');
+            }
+        });
+
+        cancelSignatoryBtn?.addEventListener('click', () => {
+            addSignatoryContainer?.classList.add('hidden');
+            if (newSignatoryInput) newSignatoryInput.value = '';
+            if (signatorySelect) signatorySelect.value = '';
+            removeSelectedSignatoryBtn?.classList.add('hidden');
+        });
+
+        saveSignatoryBtn?.addEventListener('click', () => {
+            const newName = newSignatoryInput?.value.trim();
+            if (newName) {
+                let saved = JSON.parse(localStorage.getItem(SIGNATORY_STORAGE_KEY)) || [];
+                if (!saved.includes(newName)) {
+                    saved.push(newName);
+                    localStorage.setItem(SIGNATORY_STORAGE_KEY, JSON.stringify(saved));
+                }
+                loadSignatories();
+                if (signatorySelect) signatorySelect.value = newName;
+                addSignatoryContainer?.classList.add('hidden');
+                if (newSignatoryInput) newSignatoryInput.value = '';
+                removeSelectedSignatoryBtn?.classList.remove('hidden');
+            }
+        });
+
+        clearSignatoryBtn?.addEventListener('click', () => {
+            if (signatorySelect) signatorySelect.value = '';
+            addSignatoryContainer?.classList.add('hidden');
+            if (newSignatoryInput) newSignatoryInput.value = '';
+            removeSelectedSignatoryBtn?.classList.add('hidden');
+            localStorage.removeItem(SIGNATURE_IMAGE_STORAGE_KEY);
+            if (signatoryImageInput) signatoryImageInput.value = '';
+            const signatoryImagePreview = document.getElementById('signatory-image-preview');
+            if (signatoryImagePreview) {
+                signatoryImagePreview.innerHTML = '<span>Signature Preview</span>';
+            }
+            removeSignatoryImageBtn?.classList.add('hidden');
+            showAlert('Signatory cleared', 'success', 2000);
+        });
+
+        removeSelectedSignatoryBtn?.addEventListener('click', () => {
+            if (signatorySelect) signatorySelect.value = '';
+            removeSelectedSignatoryBtn?.classList.add('hidden');
+        });
+
+        removeSignatoryImageBtn?.addEventListener('click', () => {
+            localStorage.removeItem(SIGNATURE_IMAGE_STORAGE_KEY);
+            if (signatoryImageInput) signatoryImageInput.value = '';
+            const signatoryImagePreview = document.getElementById('signatory-image-preview');
+            if (signatoryImagePreview) {
+                signatoryImagePreview.innerHTML = '<span>Signature Preview</span>';
+            }
+            removeSignatoryImageBtn?.classList.add('hidden');
+            showAlert('Signature image removed', 'success', 2000);
+        });
+
+        // ===== CLIENT MODAL =====
+        const addNewClientBtn = document.getElementById("add-new-client-btn");
+        const clientModal = document.getElementById("client-modal");
+        const clientModalClose = document.getElementById("client-modal-close");
+        const clientModalCancel = document.getElementById("client-modal-cancel");
+        const clientForm = document.getElementById("client-form");
+
+        function openClientModal() { clientModal?.classList.remove("hidden"); }
+        function closeClientModal() { clientModal?.classList.add("hidden"); clientForm?.reset(); }
+
+        addNewClientBtn?.addEventListener("click", openClientModal);
+        clientModalClose?.addEventListener("click", closeClientModal);
+        clientModalCancel?.addEventListener("click", closeClientModal);
+        clientModal?.addEventListener("click", (e) => { if (e.target === clientModal) closeClientModal(); });
+
+        clientForm?.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const clientName = form.querySelector('[name="client_name"]')?.value?.trim();
+            if (!clientName) {
+                showAlert("Business Name is required", "error", 3000);
+                return;
+            }
+            const newClient = {
+                client_name: clientName,
+                client_industry: form.querySelector('[name="client_industry"]')?.value,
+                gst_in: form.querySelector('[name="gstin"]')?.value?.trim(),
+                client_type: form.querySelector('[name="client_type"]')?.value,
+                address: {
+                    "city/town": form.querySelector('[name="city"]')?.value?.trim(),
+                    state: form.querySelector('[name="state"]')?.value,
+                    country: form.querySelector('[name="country"]')?.value,
+                    pincode: form.querySelector('[name="pincode"]')?.value?.trim(),
+                },
+            };
+            try {
+                const data = await safeFetch(`${API_BASE_URL}/clients`, {
+                    method: "POST",
+                    body: JSON.stringify(newClient),
+                });
+                const savedClient = data.client || data;
+                allClients.push(savedClient);
+                selectClient(savedClient);
+                closeClientModal();
+                showAlert("Client saved.", "success", 3000);
+            } catch (err) {
+                showAlert("Could not save client: " + err.message, "error", 4000);
+            }
+        });
+
+        // ===== SIDEBAR DROPDOWNS =====
+        const dropdownBtn = document.getElementById("documents-dropdown-btn");
+        const dropdownContent = document.getElementById("documents-dropdown-content");
+        const dropdownIcon = document.getElementById("dropdown-icon");
+        dropdownBtn?.addEventListener("click", () => {
+            dropdownContent?.classList.toggle("hidden");
+            dropdownIcon?.classList.toggle("rotate-180");
+        });
+
+        document.getElementById('purchases-dropdown-btn')?.addEventListener('click', () => {
+            document.getElementById('purchases-dropdown-content')?.classList.toggle('hidden');
+            document.getElementById('purchases-dropdown-icon')?.classList.toggle('rotate-180');
+        });
+
+        addItemBtn?.addEventListener("click", () => createItemRow());
+        taxPercentageInput?.addEventListener("input", updateTotals);
+
+        // ===== INITIALIZE =====
+        (async function init() {
+            try {
+                showAlert("Loading sales order...", "info", 2000);
+
+                await loadCompany();
+                await loadClients();
+                await loadItems();
+                loadSignatories();
+                loadSignatureImage();
+
+                // Load Sales Order Data
+                const salesOrder = await safeFetch(`${SALES_ORDER_API_URL}/${SALES_ORDER_ID}`, { method: "GET" });
+                if (!salesOrder) {
+                    throw new Error("Sales order not found.");
+                }
+
+                populateFormForEdit(salesOrder);
+
+            } catch (err) {
+                console.error("Initialization failed:", err);
+                showAlert(`Error loading sales order: ${err.message}`, "error");
+            }
+        })();
+    });
+    </script>
+</body>
+
+</html>

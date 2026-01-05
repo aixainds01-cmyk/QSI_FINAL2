@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales Orders Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f8f9fa;
+      /* Lighter background */
+    }
+
+    .sidebar-link.active {
+      background-color: #4f46e5;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4f46e5;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .table-header-cell {
+      @apply px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+    }
+
+    .table-body-cell {
+      @apply px-4 py-4 text-sm;
+    }
+
+    tr.row-active {
+      position: relative;
+      z-index: 10;
+    }
+
+    @media (max-width: 768px) {
+      #main-content {
+        margin-top: 64px;
+        /* height of the fixed header */
+      }
+    }
+
+    #table-container.overflow-visible {
+      overflow: visible;
+    }
+  </style>
+    <link rel="stylesheet" href="../../js/theme-overrides.css">
+    <!-- Global Theme Manager -->
+    <script src="../../js/theme-manager.js"></script>
+</head>
+
+<body>
+  <div class="flex">
+    <header
+      class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+      <div class="flex items-center space-x-3">
+        <button id="menu-toggle" class="text-white focus:outline-none">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
+        <span class="text-xl font-bold">QSI</span>
+      </div>
+    </header>
+
+    <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+    <aside id="sidebar"
+      class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+      <div class="p-6 text-2xl font-bold border-b border-gray-700">
+        <i class="mr-2 text-indigo-400"></i> QSI
+      </div>
+      <nav class="flex-1 p-4 space-y-2">
+        <a href="../dashboard_with_login.html"
+          class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          <i class="fas fa-chart-pie mr-3"></i>Dashboard
+        </a>
+        <div>
+          <button id="documents-dropdown-btn"
+            class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+            <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+            <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
+          </button>
+          <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+            <a href="../quotation/home_quotation.html"
+              class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+            <a href="home_sales_order.html"
+              class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
+            <a href="../invoice/home_invoice.html"
+              class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+            <a href="../credit_note.html"
+              class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+          </div>
+          <div>
+            <button id="purchases-dropdown-btn"
+              class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+              <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
+              <i id="purchases-dropdown-icon"
+                class="fas fa-chevron-down transform transition-transform duration-200"></i>
+            </button>
+            <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+              <a href="../parchase/vendor/vendors_leads.html"
+                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
+              <a href="../parchase/parchase_order/home_purchase_orders.html"
+                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
+              <a href="../parchase/debit notes/debit_notes.html"
+                class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
+            </div>
+          </div>
+        </div>
+        <a href="../manage-clients.html"
+          class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          <i class="fas fa-users mr-3"></i>Manage Clients
+        </a>
+        <a href="../settings.html"
+          class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          <i class="fas fa-cog mr-3"></i>Settings
+        </a>
+      </nav>
+    </aside>
+
+    <div id="main-content" class="flex-1 overflow-y-auto p-8">
+      <header class="mb-8">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h1 class="text-4xl font-bold text-gray-800 flex items-center mb-2">
+              <i class="fas fa-file-invoice mr-3 text-indigo-600"></i>Sales Orders
+            </h1>
+            <p class="text-gray-500">Manage and track all your sales orders</p>
+          </div>
+          <a href="create_salesorder.html"
+            class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition duration-200 shadow-lg transform hover:scale-105">
+            <i class="fas fa-plus mr-2"></i> Create New Sales Order
+          </a>
+        </div>
+        <nav class="flex items-center space-x-6 border-b-2 border-gray-200">
+          <a href="#" class="py-3 text-sm font-semibold text-indigo-600 border-b-2 border-indigo-600">Overview</a>
+          <a href="suggestion_sales.html"
+            class="py-3 text-sm font-medium text-gray-600 hover:text-gray-900 transition">Suggested Sales Order</a>
+        </nav>
+      </header>
+
+      <!-- Replace your existing filter section with this updated UI -->
+
+      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div class="flex items-center space-x-4 border-b pb-4 mb-4">
+          <button id="active-orders-btn"
+            class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm">
+            <i class="fas fa-list mr-2"></i>Active Orders
+          </button>
+          <button id="deleted-orders-btn"
+            class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">
+            <i class="fas fa-trash-alt mr-2"></i>Deleted Sales Orders
+          </button>
+        </div>
+
+        <!-- Updated Filter Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border rounded-lg bg-gray-50">
+          <div>
+            <label for="filter-status" class="block text-sm font-medium text-gray-700 mb-1">
+              <i class="fas fa-filter mr-2 text-indigo-600"></i>Select Order Status
+            </label>
+            <select id="filter-status"
+              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+              <option>All</option>
+              <option>Pending</option>
+              <option>Approved</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-client" class="block text-sm font-medium text-gray-700 mb-1">
+              <i class="fas fa-user mr-2 text-indigo-600"></i>Select Client
+            </label>
+            <select id="filter-client"
+              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+              <option>All Clients</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-date" class="block text-sm font-medium text-gray-700 mb-1">
+              <i class="fas fa-calendar mr-2 text-indigo-600"></i>Select Date
+            </label>
+            <input type="date" id="filter-date" placeholder="mm/dd/yyyy"
+              class="mt-1 block w-full px-3 py-2 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+          </div>
+        </div>
+
+        <div id="selection-bar"
+          class="hidden flex items-center justify-between bg-indigo-50 border border-indigo-200 text-indigo-700 px-4 py-2 rounded-md mb-3 transition-all duration-300">
+          <div class="flex items-center gap-3">
+            <button id="close-selection-bar" class="text-gray-500 hover:text-gray-700 text-lg">
+              <i class="fas fa-times"></i>
+            </button>
+            <span id="selected-count" class="font-medium">0 selected</span>
+          </div>
+
+          <div class="flex gap-2">
+            <button id="delete-selected"
+              class="hidden bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-md">
+              <i class="fas fa-trash mr-2"></i> Delete Selected
+            </button>
+            <div id="deleted-view-buttons" class="hidden flex gap-2">
+              <button id="restore-selected"
+                class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-md">
+                <i class="fas fa-undo mr-2"></i> Restore
+              </button>
+              <button id="permanent-delete-selected"
+                class="bg-red-800 hover:bg-red-900 text-white text-sm font-medium px-4 py-2 rounded-md">
+                <i class="fas fa-exclamation-triangle mr-2"></i> Delete Permanently
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div id="table-container" class="overflow-x-auto rounded-lg">
+          <table class="min-w-full bg-white">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="table-header-cell w-12 text-center">
+                  <input type="checkbox" class="w-4 h-4 text-indigo-600 rounded" />
+                </th>
+                <th class="table-header-cell" style="min-width: 200px;">Order Details</th>
+                <th class="table-header-cell text-center">Status</th>
+                <th class="table-header-cell text-right">Subtotal</th>
+                <th class="table-header-cell text-right">Total</th>
+                <th class="table-header-cell text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sales-order-table-body" class="divide-y divide-gray-200">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const dropdownBtn = document.getElementById('documents-dropdown-btn');
+      const dropdownContent = document.getElementById('documents-dropdown-content');
+      const dropdownIcon = document.getElementById('dropdown-icon');
+      if (dropdownBtn) {
+        dropdownBtn.addEventListener('click', () => {
+          dropdownContent.classList.toggle('hidden');
+          dropdownIcon.classList.toggle('rotate-180');
+        });
+        document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
+          document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
+          document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
+        });
+      }
+
+      const API_BASE_URL = "https://api.fornowauto.com/api";
+      const tableBody = document.getElementById("sales-order-table-body");
+      const filterStatus = document.getElementById("filter-status");
+      const filterClient = document.getElementById("filter-client");
+      const filterDate = document.getElementById("filter-date");
+      const tableContainer = document.getElementById("table-container");
+      const selectAllCheckbox = document.querySelector("thead input[type='checkbox']");
+      let clientsMap = new Map();
+      let allSalesOrders = [];
+      let currentView = 'active';
+
+      const menuToggle = document.getElementById("menu-toggle");
+      const sidebar = document.getElementById("sidebar");
+      const menuBackdrop = document.getElementById("menu-backdrop");
+
+      if (menuToggle && sidebar && menuBackdrop) {
+        menuToggle.addEventListener("click", () => {
+          sidebar.classList.toggle("-translate-x-full");
+          menuBackdrop.classList.toggle("hidden");
+        });
+        menuBackdrop.addEventListener("click", () => {
+          sidebar.classList.add("-translate-x-full");
+          menuBackdrop.classList.add("hidden");
+        });
+      }
+
+      function getAuthHeaders() {
+        const token = localStorage.getItem('token');
+        if (token) return { 'Authorization': `Bearer ${token}` };
+        return null;
+      }
+
+      async function fetchJsonAndParse(url, opts = {}) {
+        opts.headers = opts.headers || {};
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) {
+          alert("Authentication token not found. Please log in.");
+          window.location.href = '../../index.html';
+          throw new Error("Authentication token not found.");
+        }
+        opts.headers = { ...opts.headers, ...authHeaders };
+        if (opts.body && typeof opts.body === 'string' && !opts.headers['Content-Type'])
+          opts.headers = { ...opts.headers, 'Content-Type': 'application/json' };
+
+        const response = await fetch(url, opts);
+        if (!response.ok) {
+          if (response.status === 401) {
+            alert("Authentication error or session expired. Please log in again.");
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            window.location.href = '../../index.html';
+            throw new Error("Session expired");
+          }
+          const errorText = await response.text().catch(() => response.statusText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        const type = response.headers.get('content-type') || '';
+        return type.includes('application/json') ? response.json() : response.text();
+      }
+
+      const formatCurrency = (amount) => `₹${Number(amount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      const getStatusBadge = (status) => {
+        const statuses = {
+          "Pending": "bg-yellow-100 text-yellow-800",
+          "Approved": "bg-green-100 text-green-800",
+          "Shipped": "bg-blue-100 text-blue-800",
+          "Delivered": "bg-green-100 text-green-800",
+          "Cancelled": "bg-red-100 text-red-800"
+        };
+        const normalizedStatus = (status || 'Pending').charAt(0).toUpperCase() + (status || 'Pending').slice(1);
+        return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statuses[normalizedStatus] || 'bg-gray-100'}"><i class="fas fa-circle text-xs mr-1" style="font-size: 6px;"></i>${normalizedStatus}</span>`;
+      };
+
+      function renderOrders(orders) {
+        tableBody.innerHTML = "";
+        if (orders.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-500 py-12"><i class="fas fa-inbox text-4xl mb-3 text-gray-400"></i><br>No sales orders found.</td></tr>`;
+          return;
+        }
+
+        orders.forEach(order => {
+          const clientName = order.to?.client_name || 'Unknown Client';
+          const soNumber = `${order.sales_no || ''}`;
+          const isApproved = (order.status || '').toLowerCase() === 'approved';
+
+          const row = document.createElement("tr");
+          row.className = "hover:bg-gray-50";
+          row.innerHTML = `
+      <td class="px-4 py-4 text-center whitespace-nowrap"><input type="checkbox" class="row-checkbox" data-id="${order._id}" /></td>
+      <td class="px-4 py-4">
+        <div class="font-semibold text-gray-800 break-words">${soNumber}</div>
+        <div class="text-xs text-gray-500 mt-0.5 break-words">To: ${clientName}</div>
+      </td>
+      <td class="px-4 py-4 text-center whitespace-nowrap">${getStatusBadge(order.status || 'Pending')}</td>
+      <td class="px-4 py-4 text-right font-semibold text-gray-800 tabular-nums whitespace-nowrap">${formatCurrency(order.subtotal || 0)}</td>
+      <td class="px-4 py-4 text-right font-semibold text-gray-800 tabular-nums whitespace-nowrap">${formatCurrency(order.total)}</td>
+      <td class="table-body-cell text-center">
+        <div class="flex justify-center items-center gap-4 text-gray-500 text-lg">
+          <button class="hover:text-indigo-600 open-order-btn action-btn" data-id="${order._id}" title="View">
+            <i class="fas fa-external-link-alt"></i>
+          </button>
+          <a href="edit_data_salesorder.html?id=${order._id}" class="hover:text-indigo-600 action-btn" title="Edit">
+            <i class="fas fa-pencil-alt"></i>
+          </a>
+          <div class="relative more-actions-container">
+            <button class="hover:text-indigo-600 more-actions-btn action-btn" title="More">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <div class="js-dropdown-menu absolute right-0 w-56 rounded-lg shadow-xl bg-white ring-1 ring-black ring-opacity-5 hidden z-20">
+              <div class="py-2">
+                ${!isApproved ? `
+                <button class="flex items-center gap-3 w-full px-4 py-3 text-sm text-indigo-700 hover:bg-indigo-50 transition convert-to-invoice-btn" data-id="${order._id}">
+                  <i class="fas fa-file-invoice w-5"></i>Convert to Invoice
+                </button>` : ''}
+                <button class="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-700 hover:bg-red-50 transition delete-order-btn" data-id="${order._id}">
+                  <i class="fas fa-trash w-5"></i>Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>`;
+          tableBody.appendChild(row);
+        });
+        setupCheckboxSync();
+      }
+
+      function renderDeletedOrders(orders) {
+        tableBody.innerHTML = "";
+        if (orders.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-gray-500 py-12"><i class="fas fa-inbox text-4xl mb-3 text-gray-400"></i><br>No deleted sales orders found.</td></tr>`;
+          return;
+        }
+
+        orders.forEach(order => {
+          const clientName = clientsMap.get(order.to_client_id) || "Unknown Client";
+          const soNumber = `SO-${order.so_number || order.sales_no || ''}`;
+          const row = document.createElement("tr");
+          row.className = "hover:bg-gray-50 transition";
+          row.innerHTML = `
+            <td class="table-body-cell text-center"><input type="checkbox" class="row-checkbox w-4 h-4 text-indigo-600 rounded" /></td>
+            <td class="table-body-cell">
+              <div class="font-semibold text-gray-800 text-base">${soNumber}</div>
+              <div class="text-xs text-gray-500 mt-1"><i class="fas fa-user-circle mr-1"></i>To: ${clientName}</div>
+              <div class="text-xs text-red-500 font-semibold mt-1"><i class="fas fa-trash-alt mr-1"></i>Deleted</div>
+            </td>
+            <td class="table-body-cell text-center">${getStatusBadge(order.status || 'Pending')}</td>
+            <td class="table-body-cell text-right font-bold text-gray-800 text-base">${formatCurrency(order.total)}</td>
+            <td class="table-body-cell text-center">
+              <div class="flex justify-center items-center gap-4 text-gray-500 text-lg">
+                <button class="hover:text-indigo-600 open-order-btn action-btn" data-id="${order.original_id}" title="View">
+                  <i class="fas fa-external-link-alt"></i>
+                </button>
+                <div class="relative more-actions-container">
+                  <button class="hover:text-indigo-600 more-actions-btn action-btn" title="More">
+                    <i class="fas fa-ellipsis-h"></i>
+                  </button>
+                  <div class="js-dropdown-menu absolute right-0 w-56 rounded-lg shadow-xl bg-white ring-1 ring-black ring-opacity-5 hidden z-20">
+                    <div class="py-2">
+                      <button class="flex items-center gap-3 w-full px-4 py-3 text-sm text-green-700 hover:bg-green-50 transition restore-order-btn" data-id="${order.original_id}">
+                        <i class="fas fa-undo w-5"></i>Restore
+                      </button>
+                      <button class="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-700 hover:bg-red-50 transition permanent-delete-order-btn" data-id="${order.original_id}">
+                        <i class="fas fa-trash w-5"></i>Permanent Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>`;
+          tableBody.appendChild(row);
+        });
+        setupCheckboxSync();
+      }
+
+      async function loadSalesOrders() {
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12"><div class="loader mx-auto"></div><p class="mt-4 text-gray-500">Loading orders...</p></td></tr>`;
+        const orders = await fetchJsonAndParse(`${API_BASE_URL}/sales-order`);
+        allSalesOrders = orders;
+        applyFilters();
+      }
+
+      async function loadDeletedSalesOrders() {
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12"><div class="loader mx-auto"></div><p class="mt-4 text-gray-500">Loading deleted orders...</p></td></tr>`;
+        const deletedOrders = await fetchJsonAndParse(`${API_BASE_URL}/deleted/sales-order`);
+        renderDeletedOrders(deletedOrders);
+      }
+
+      function applyFilters() {
+        let filteredOrders = [...allSalesOrders];
+        const selectedStatus = filterStatus.value;
+        const clientId = filterClient.value;
+        const selectedDate = filterDate.value;
+
+        if (selectedStatus && selectedStatus !== "All") {
+          filteredOrders = filteredOrders.filter(o => {
+            const orderStatus = (o.status || 'Pending').toLowerCase();
+            return orderStatus === selectedStatus.toLowerCase();
+          });
+        }
+
+        if (clientId && clientId !== "All Clients")
+          filteredOrders = filteredOrders.filter(o => (o.to_client_id || o.to?._id) === clientId);
+
+        if (selectedDate)
+          filteredOrders = filteredOrders.filter(o => (o.sales_date ? o.sales_date.split("T")[0] : null) === selectedDate);
+
+        renderOrders(filteredOrders);
+      }
+
+      filterStatus.addEventListener("change", applyFilters);
+      filterClient.addEventListener("change", applyFilters);
+      filterDate.addEventListener("change", applyFilters);
+
+      function setupCheckboxSync() {
+        const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+        if (!selectAllCheckbox) return;
+
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.addEventListener("change", () => {
+          rowCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+          updateNotificationBar();
+        });
+
+        rowCheckboxes.forEach(cb => {
+          cb.addEventListener("change", () => {
+            selectAllCheckbox.checked = [...rowCheckboxes].every(c => c.checked);
+            updateNotificationBar();
+          });
+        });
+      }
+
+      document.addEventListener('click', async (e) => {
+        const moreBtn = e.target.closest('.more-actions-btn');
+        const openBtn = e.target.closest('.open-order-btn');
+        const deleteBtn = e.target.closest('.delete-order-btn');
+        const restoreBtn = e.target.closest('.restore-order-btn');
+        const permanentDeleteBtn = e.target.closest('.permanent-delete-order-btn');
+        const convertBtn = e.target.closest('.convert-to-invoice-btn');
+
+        if (e.target.closest('#deleted-orders-btn')) {
+          currentView = 'deleted';
+          await loadDeletedSalesOrders();
+          return;
+        }
+
+        if (e.target.closest('#active-orders-btn')) {
+          currentView = 'active';
+          await loadSalesOrders();
+          return;
+        }
+
+        if (openBtn)
+          window.location.href = `view_data_salesorder.html?id=${openBtn.dataset.id}&view=true`;
+
+        if (convertBtn) {
+          const orderId = convertBtn.dataset.id;
+          const orderToConvert = allSalesOrders.find(order => order._id === orderId);
+
+          if (orderToConvert) {
+            // Update the sales order status to 'Approved' before converting
+            try {
+              await fetchJsonAndParse(`${API_BASE_URL}/sales-order/${orderId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Approved' })
+              });
+
+              // Navigate to create invoice page with sales order data
+              window.location.href = `../invoice/create_invoice.html?fromSalesOrder=${orderId}`;
+            } catch (error) {
+              alert('Could not update sales order status: ' + error.message);
+            }
+          } else {
+            alert('Could not find the sales order data to convert.');
+          }
+        }
+
+        if (deleteBtn) {
+          const id = deleteBtn.dataset.id;
+          if (confirm("Move to deleted items?"))
+            await fetchJsonAndParse(`${API_BASE_URL}/archive/sales-order/${id}`, { method: 'POST' });
+          await loadSalesOrders();
+        }
+
+        if (restoreBtn) {
+          const id = restoreBtn.dataset.id;
+          if (confirm("Restore this order?"))
+            await fetchJsonAndParse(`${API_BASE_URL}/deleted/sales-order/${id}`, { method: 'POST' });
+          await loadDeletedSalesOrders();
+        }
+
+        if (permanentDeleteBtn) {
+          const id = permanentDeleteBtn.dataset.id;
+          if (confirm("Permanently delete this order?"))
+            await fetchJsonAndParse(`${API_BASE_URL}/deleted/sales-order/${id}`, { method: 'DELETE' });
+          await loadDeletedSalesOrders();
+        }
+
+        if (moreBtn) {
+          const dropdown = moreBtn.nextElementSibling;
+          const isVisible = !dropdown.classList.contains('hidden');
+          document.querySelectorAll('.js-dropdown-menu').forEach(d => d.classList.add('hidden'));
+          if (!isVisible) dropdown.classList.remove('hidden');
+        } else if (!e.target.closest('.more-actions-container')) {
+          document.querySelectorAll('.js-dropdown-menu').forEach(d => d.classList.add('hidden'));
+        }
+      });
+
+      (async () => {
+        await fetchJsonAndParse(`${API_BASE_URL}/clients`).then(res => {
+          res.forEach(c => clientsMap.set(c._id, c.client_name || c.name));
+          filterClient.innerHTML = '<option>All Clients</option>';
+          res.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c._id;
+            opt.textContent = c.client_name || c.name;
+            filterClient.appendChild(opt);
+          });
+        });
+        await loadSalesOrders();
+      })();
+
+      const notificationBar = document.createElement('div');
+      notificationBar.id = 'custom-notification-bar';
+      notificationBar.className = "hidden flex justify-between items-center px-6 py-4 rounded-xl mb-6 shadow-lg";
+      notificationBar.innerHTML = `
+        <div class="flex items-center gap-4">
+          <button id="close-notification" class="text-blue-700 font-bold text-2xl focus:outline-none hover:text-blue-900 transition">&times;</button>
+          <span id="notification-text" class="font-semibold text-base"></span>
+        </div>
+        <div id="notification-actions" class="flex items-center gap-3"></div>
+      `;
+      const mainContent = document.querySelector("#table-container").parentElement;
+      mainContent.insertBefore(notificationBar, document.querySelector("#table-container"));
+
+      function updateNotificationBar() {
+        const selected = document.querySelectorAll(".row-checkbox:checked");
+        const count = selected.length;
+        const notifText = document.getElementById("notification-text");
+        const notifActions = document.getElementById("notification-actions");
+
+        if (count > 0) {
+          notifText.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${count} sales order${count > 1 ? 's' : ''} selected`;
+          notifActions.innerHTML = "";
+
+          if (currentView === "active") {
+            notifActions.innerHTML = `
+              <button id="delete-selected" class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-md">
+                <i class="fas fa-trash mr-2"></i>Delete Selected
+              </button>
+            `;
+          } else if (currentView === "deleted") {
+            notifActions.innerHTML = `
+              <button id="restore-selected" class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-md">
+                <i class="fas fa-undo mr-2"></i>Restore
+              </button>
+              <button id="perma-delete-selected" class="bg-red-800 hover:bg-red-900 text-white text-sm font-medium px-4 py-2 rounded-md">
+                <i class="fas fa-exclamation-triangle mr-2"></i>Delete Permanently
+              </button>
+            `;
+          }
+          notificationBar.classList.remove("hidden");
+        } else {
+          notificationBar.classList.add("hidden");
+        }
+      }
+
+      notificationBar.addEventListener("click", (e) => {
+        if (e.target.id === "close-notification") {
+          document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = false);
+          selectAllCheckbox.checked = false;
+          updateNotificationBar();
+        }
+      });
+
+      notificationBar.addEventListener("click", async (e) => {
+        const selectedIds = [...document.querySelectorAll(".row-checkbox:checked")]
+          .map(cb => cb.closest("tr").querySelector(".delete-order-btn, .restore-order-btn, .permanent-delete-order-btn, .open-order-btn")?.dataset.id)
+          .filter(Boolean);
+
+        if (e.target.id === "delete-selected" || e.target.closest('#delete-selected')) {
+          if (confirm("Move selected orders to deleted items?")) {
+            for (const id of selectedIds) {
+              await fetchJsonAndParse(`${API_BASE_URL}/archive/sales-order/${id}`, { method: 'POST' });
+            }
+            await loadSalesOrders();
+          }
+        }
+
+        if (e.target.id === "restore-selected" || e.target.closest('#restore-selected')) {
+          if (confirm("Restore selected orders?")) {
+            for (const id of selectedIds) {
+              await fetchJsonAndParse(`${API_BASE_URL}/deleted/sales-order/${id}`, { method: 'POST' });
+            }
+            await loadDeletedSalesOrders();
+          }
+        }
+
+        if (e.target.id === "perma-delete-selected" || e.target.closest('#perma-delete-selected')) {
+          if (confirm("Permanently delete selected orders?")) {
+            for (const id of selectedIds) {
+              await fetchJsonAndParse(`${API_BASE_URL}/deleted/sales-order/${id}`, { method: 'DELETE' });
+            }
+            await loadDeletedSalesOrders();
+          }
+        }
+        updateNotificationBar();
+      });
+
+      const activeOrdersBtn = document.getElementById('active-orders-btn');
+      const deletedOrdersBtn = document.getElementById('deleted-orders-btn');
+
+      deletedOrdersBtn.addEventListener('click', () => {
+        // Highlight deleted button
+        deletedOrdersBtn.classList.add('bg-indigo-600', 'text-white');
+        deletedOrdersBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+        // Unhighlight active button
+        activeOrdersBtn.classList.remove('bg-indigo-600', 'text-white');
+        activeOrdersBtn.classList.add('text-gray-600', 'hover:bg-gray-100');
+      });
+
+      activeOrdersBtn.addEventListener('click', () => {
+        // Highlight active button
+        activeOrdersBtn.classList.add('bg-indigo-600', 'text-white');
+        activeOrdersBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+        // Unhighlight deleted button
+        deletedOrdersBtn.classList.remove('bg-indigo-600', 'text-white');
+        deletedOrdersBtn.classList.add('text-gray-600', 'hover:bg-gray-100');
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,267 @@
+/*
+ * QSI Theme Overrides
+ * This file forces all pages to use the unified theme
+ * Load this AFTER all other CSS to ensure theme consistency
+ */
+
+/* ============================================
+   FORCE BODY BACKGROUND BASED ON THEME
+   ============================================ */
+body {
+    font-family: 'Inter', sans-serif !important;
+}
+
+.theme-light body,
+.theme-light {
+    background-color: var(--light-bg-secondary) !important;
+    color: var(--light-text-primary) !important;
+}
+
+.theme-dark body,
+.theme-dark {
+    background-color: var(--dark-bg-primary) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+/* ============================================
+   SIDEBAR - FORCE THEME COLORS
+   ============================================ */
+.theme-light aside,
+.theme-light .sidebar,
+.theme-light #sidebar {
+    background-color: #1f2937 !important;
+}
+
+.theme-dark aside,
+.theme-dark .sidebar,
+.theme-dark #sidebar {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+/* ============================================
+   MAIN CONTENT AREA
+   ============================================ */
+.theme-light #main-content,
+.theme-light .main-content {
+    background-color: var(--light-bg-secondary) !important;
+}
+
+.theme-dark #main-content,
+.theme-dark .main-content {
+    background-color: var(--dark-bg-primary) !important;
+}
+
+/* ============================================
+   CARDS - FORCE THEME COLORS
+   ============================================ */
+.theme-light .bg-white,
+.theme-light .card,
+.theme-light [class*="card"] {
+    background-color: #ffffff !important;
+    border-color: var(--light-border) !important;
+}
+
+.theme-dark .bg-white,
+.theme-dark .card,
+.theme-dark [class*="card"] {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+.theme-light table,
+.theme-light .table,
+.theme-light .data-table {
+    background-color: #ffffff !important;
+    color: var(--light-text-primary) !important;
+}
+
+.theme-dark table,
+.theme-dark .table,
+.theme-dark .data-table {
+    background-color: var(--dark-bg-card) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-light thead,
+.theme-light .bg-gray-50 {
+    background-color: #f9fafb !important;
+}
+
+.theme-dark thead,
+.theme-dark .bg-gray-50 {
+    background-color: var(--dark-bg-tertiary) !important;
+}
+
+/* ============================================
+   TEXT COLORS
+   ============================================ */
+.theme-light h1,
+.theme-light h2,
+.theme-light h3,
+.theme-light h4,
+.theme-light h5,
+.theme-light h6,
+.theme-light .text-gray-800,
+.theme-light .text-gray-900 {
+    color: var(--light-text-primary) !important;
+}
+
+.theme-dark h1,
+.theme-dark h2,
+.theme-dark h3,
+.theme-dark h4,
+.theme-dark h5,
+.theme-dark h6,
+.theme-dark .text-gray-800,
+.theme-dark .text-gray-900 {
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-light .text-gray-600,
+.theme-light .text-gray-500 {
+    color: var(--gray-600) !important;
+}
+
+.theme-dark .text-gray-600,
+.theme-dark .text-gray-500,
+.theme-dark .text-gray-400 {
+    color: var(--dark-text-muted) !important;
+}
+
+/* ============================================
+   INPUTS & FORMS
+   ============================================ */
+.theme-light input,
+.theme-light select,
+.theme-light textarea {
+    background-color: #ffffff !important;
+    border-color: var(--light-border) !important;
+    color: var(--light-text-primary) !important;
+}
+
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea {
+    background-color: var(--dark-bg-tertiary) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-secondary) !important;
+}
+
+.theme-dark input::placeholder,
+.theme-dark select::placeholder,
+.theme-dark textarea::placeholder {
+    color: var(--dark-text-disabled) !important;
+}
+
+/* ============================================
+   MODALS
+   ============================================ */
+.theme-light .modal,
+.theme-light [class*="modal-content"] {
+    background-color: #ffffff !important;
+    color: var(--light-text-primary) !important;
+}
+
+.theme-dark .modal,
+.theme-dark [class*="modal-content"] {
+    background-color: var(--dark-bg-card) !important;
+    color: var(--dark-text-primary) !important;
+    border-color: var(--dark-border) !important;
+}
+
+/* ============================================
+   DROPDOWN MENUS
+   ============================================ */
+.theme-light .dropdown-menu,
+.theme-light [class*="dropdown"] {
+    background-color: #ffffff !important;
+    border-color: var(--light-border) !important;
+}
+
+.theme-dark .dropdown-menu,
+.theme-dark [class*="dropdown"] {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+}
+
+/* ============================================
+   BORDERS
+   ============================================ */
+.theme-light .border,
+.theme-light .border-gray-200,
+.theme-light .border-gray-300 {
+    border-color: var(--light-border) !important;
+}
+
+.theme-dark .border,
+.theme-dark .border-gray-200,
+.theme-dark .border-gray-300,
+.theme-dark .border-gray-700 {
+    border-color: var(--dark-border) !important;
+}
+
+/* ============================================
+   OVERRIDE TAILWIND BG UTILITIES
+   ============================================ */
+.theme-light .bg-gray-100 {
+    background-color: #f3f4f6 !important;
+}
+
+.theme-dark .bg-gray-100 {
+    background-color: var(--dark-bg-tertiary) !important;
+}
+
+/* ============================================
+   LOADING SPINNERS
+   ============================================ */
+.theme-light .loader,
+.theme-light .loading-spinner {
+    border-color: var(--gray-200) !important;
+    border-top-color: var(--primary-500) !important;
+}
+
+.theme-dark .loader,
+.theme-dark .loading-spinner {
+    border-color: var(--dark-border) !important;
+    border-top-color: var(--primary-500) !important;
+}
+
+/* ============================================
+   EMPTY STATES
+   ============================================ */
+.theme-light .empty-state {
+    color: var(--gray-500) !important;
+}
+
+.theme-dark .empty-state {
+    color: var(--dark-text-muted) !important;
+}
+
+/* ============================================
+   FIX SPECIFIC TAILWIND CLASSES
+   ============================================ */
+.theme-dark .text-white {
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-light .bg-gray-800 {
+    background-color: #1f2937 !important;
+}
+
+.theme-dark .bg-gray-800 {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+/* ============================================
+   CHARTS (if using Chart.js or similar)
+   ============================================ */
+.theme-light .chart-container canvas {
+    background-color: transparent !important;
+}
+
+.theme-dark .chart-container canvas {
+    background-color: transparent !important;
+}

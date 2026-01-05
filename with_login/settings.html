@@ -2,146 +2,347 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings - QSI</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="../js/qsi-styles.css">
+  <link rel="stylesheet" href="../js/fix-icons.css">
+  <link rel="stylesheet" href="../js/theme-force.css">
+    <link rel="stylesheet" href="../js/professional-sidebar.css">
   <style>
-    body {
-      font-family: "Inter", sans-serif;
-      background-color: #f9fafb;
+    .settings-container {
+      max-width: 900px;
+      margin: 0 auto;
     }
 
-    .sidebar-link.active {
-      background: linear-gradient(90deg, #6366f1, #4f46e5);
-      color: #fff;
-      font-weight: 600;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 0.5rem 1rem; /* py-2 px-4 */
-      color: #000; /* text-black */
-      background-color: #f9fafb; /* bg-gray-50 */
-      border: 1px solid #d1d5db; /* border-gray-300 */
-      border-radius: 0.5rem; /* rounded-lg */
-      transition: all 0.2s ease-in-out;
-    }
-    .form-input:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12); /* approximate ring-indigo-500 */
-      border-color: transparent;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 0.875rem; /* text-sm */
-      font-weight: 500; /* font-medium */
-      color: #4b5563; /* text-gray-600 */
-      margin-bottom: 0.25rem; /* mb-1 */
-    }
-
-    .card {
-      background-color: #ffffff; /* bg-white */
-      padding: 1.5rem; /* p-6 */
-      border-radius: 0.75rem; /* rounded-xl */
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
-      border: 1px solid #e5e7eb; /* border-gray-200 */
-      color: inherit;
-      transition: all 0.2s ease-in-out;
-    }
-
-    /* Dark-mode helpers kept as classes (colors handled by utility classes in markup) */
-    .card.dark\:bg-gray-900 {
-      background-color: #111827;
-    }
-    .card.dark\:border-gray-700 {
-      border-color: #374151;
-    }
-    .card.dark\:text-gray-100 {
-      color: #f3f4f6;
+    .tab-button {
+      padding: 1rem 0.25rem;
+      border-bottom: 2px solid transparent;
+      font-size: 0.875rem;
+      font-weight: 500;
+      background: none;
+      cursor: pointer;
+      white-space: nowrap;
     }
 
     .tab-active {
-      border-bottom-color: #6366f1; /* border-indigo-500 */
-      color: #4f46e5; /* text-indigo-600 */
-      font-weight: 600; /* font-semibold */
+      border-bottom-color: var(--primary-500);
+      color: var(--primary-500);
+      font-weight: 600;
     }
 
     .tab-inactive {
-      border-bottom-color: transparent; /* border-transparent */
-      color: #6b7280; /* text-gray-500 */
-    }
-    .tab-inactive:hover {
-      color: #374151; /* hover:text-gray-700 */
-      border-bottom-color: #d1d5db; /* hover:border-gray-300 */
+      color: var(--gray-500);
     }
 
-    /* Toggle Switch */
-    .switch {
+    .tab-inactive:hover {
+      color: var(--gray-700);
+      border-bottom-color: var(--gray-300);
+    }
+
+    .theme-dark .tab-inactive {
+      color: var(--dark-text-muted);
+    }
+
+    .settings-card {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--gray-200);
+      margin-bottom: 1.5rem;
+    }
+
+    .theme-dark .settings-card {
+      background: var(--dark-bg-card);
+      border-color: var(--dark-border);
+    }
+
+    .settings-card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .theme-dark .settings-card-title {
+      color: var(--dark-text-primary);
+      border-color: var(--dark-border);
+    }
+
+    .settings-form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .settings-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .theme-dark .settings-label {
+      color: var(--dark-text-muted);
+    }
+
+    .settings-input {
+      width: 100%;
+      padding: 0.625rem 1rem;
+      font-size: 0.875rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 0.5rem;
+      background: #fff;
+      color: var(--gray-900);
+    }
+
+    .settings-input:focus {
+      outline: none;
+      border-color: var(--primary-500);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .theme-dark .settings-input {
+      background: var(--dark-bg-primary);
+      border-color: var(--dark-border);
+      color: var(--dark-text-secondary);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .main-content {
+        margin-top: 4rem;
+      }
+    }
+
+    .toggle-switch {
       position: relative;
       display: inline-block;
-      width: 40px;
-      height: 22px;
+      width: 44px;
+      height: 24px;
     }
 
-    .switch input {
+    .toggle-switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
 
-    .slider {
+    .toggle-slider {
       position: absolute;
       cursor: pointer;
       inset: 0;
-      background-color: #ccc;
-      transition: 0.4s;
-      border-radius: 20px;
+      background: var(--gray-300);
+      border-radius: 24px;
+      transition: 0.3s;
     }
 
-    .slider:before {
+    .toggle-slider:before {
       content: "";
       position: absolute;
-      height: 14px;
-      width: 14px;
-      left: 4px;
-      bottom: 4px;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
       background: white;
-      transition: 0.4s;
       border-radius: 50%;
+      transition: 0.3s;
     }
 
-    input:checked+.slider {
-      background-color: #4f46e5;
+    input:checked+.toggle-slider {
+      background: var(--primary-500);
     }
 
-    input:checked+.slider:before {
-      transform: translateX(18px);
+    input:checked+.toggle-slider:before {
+      transform: translateX(20px);
     }
 
-    /* Toast */
-    #toast {
-      transition: opacity 0.3s, transform 0.3s;
-      pointer-events: none;
+    .theme-option {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border: 2px solid var(--gray-200);
+      border-radius: 0.75rem;
+      cursor: pointer;
+      margin-bottom: 0.75rem;
     }
 
-    /* Modal transitions */
-    .modal-overlay {
-      transition: opacity 0.3s;
+    .theme-option:hover {
+      border-color: var(--primary-300);
+      background: var(--gray-50);
     }
 
-    .modal-panel {
-      transition: transform 0.3s, opacity 0.3s;
+    .theme-option.selected {
+      border-color: var(--primary-500);
+      background: var(--primary-50);
     }
 
-    /* Spinner */
+    .theme-dark .theme-option {
+      border-color: var(--dark-border);
+      background: var(--dark-bg-tertiary);
+    }
+
+    .theme-dark .theme-option.selected {
+      border-color: var(--primary-500);
+      background: rgba(99, 102, 241, 0.15);
+    }
+
+    .theme-option-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .theme-option-light .theme-option-icon {
+      background: linear-gradient(135deg, #f9fafb, #e5e7eb);
+      color: var(--gray-700);
+    }
+
+    .theme-option-dark .theme-option-icon {
+      background: linear-gradient(135deg, #1f2937, #111827);
+      color: #fff;
+    }
+
+    .theme-option-system .theme-option-icon {
+      background: linear-gradient(135deg, #f9fafb 50%, #1f2937 50%);
+      color: var(--primary-500);
+    }
+
+    .theme-option-info {
+      flex: 1;
+    }
+
+    .theme-option-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .theme-dark .theme-option-title {
+      color: var(--dark-text-primary);
+    }
+
+    .theme-option-description {
+      font-size: 0.8125rem;
+      color: var(--gray-500);
+    }
+
+    .theme-option-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: transparent;
+    }
+
+    .theme-option.selected .theme-option-check {
+      background: var(--primary-500);
+      border-color: var(--primary-500);
+      color: white;
+    }
+
+    .danger-zone {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+    }
+
+    .danger-zone-title {
+      color: var(--danger-600);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      opacity: 0;
+      transform: translateY(0.5rem);
+      transition: 0.3s;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-success {
+      background: var(--success-500);
+      color: white;
+    }
+
+    .toast-error {
+      background: var(--danger-500);
+      color: white;
+    }
+
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding-top: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .theme-dark .sticky-header {
+      background: var(--dark-bg-primary);
+    }
+
+    .theme-light .sticky-header {
+      background: var(--light-bg-secondary);
+    }
+
+    .bank-card {
+      border: 1px solid var(--gray-200);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .theme-dark .bank-card {
+      border-color: var(--dark-border);
+      background: var(--dark-bg-tertiary);
+    }
+
+    .logo-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 0.5rem;
+      object-fit: contain;
+      border: 1px solid var(--gray-200);
+      background: white;
+    }
+
     .btn-spinner {
-      border-top-color: transparent;
-      border-right-color: transparent;
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
       animation: spin 0.6s linear infinite;
     }
 
@@ -151,1789 +352,1065 @@
       }
     }
 
-    .sticky-header-tabs {
-      position: sticky;
-      top: -15px;
-      z-index: 20;
-      /* Ensures it stays on top of other content */
-      background-color: #030712;
-      /* Matches your dark background color */
-      padding-top: 2rem;
-      /* Adds some spacing above the header */
+    .settings-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1050;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
     }
 
-    .input-standard {
+    .settings-modal.active {
+      display: flex;
+    }
+
+    .settings-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .settings-modal-content {
+      position: relative;
+      background: #fff;
+      border-radius: 0.75rem;
       width: 100%;
-      border-radius: 0.375rem; /* rounded-md */
-      border: 1px solid #000000; /* black border */
-      background-color: #ffffff; /* white background */
-      padding: 0.5rem 1rem; /* px-4 py-2 */
-      color: #000000; /* black text */
-      transition: all 0.2s ease-in-out;
-    }
-    .input-standard::placeholder {
-      color: #6b7280; /* placeholder: gray */
-    }
-    .input-standard:focus {
-      border-color: #000000; /* keep border black on focus */
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.06); /* subtle focus */
-      outline: none;
+      max-width: 32rem;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    .select-standard {
-      width: 100%;
-      border-radius: 0.375rem; /* rounded-md */
-      border: 1px solid #000000; /* black border */
-      background-color: #ffffff; /* white background */
-      padding: 0.5rem 1rem;
-      color: #000000; /* black text */
-      transition: all 0.2s ease-in-out;
-    }
-    .select-standard:focus {
-      border-color: #000000;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
-      outline: none;
+    .theme-dark .settings-modal-content {
+      background: var(--dark-bg-card);
+      border: 1px solid var(--dark-border);
     }
 
-    /* Force inputs/selects/textarea inside cards (settings forms) to use white bg, black text and black border
-       This uses !important to override Tailwind utility classes already present in the markup. */
-    .card input[type="text"],
-    .card input[type="email"],
-    .card input[type="tel"],
-    .card input[type="url"],
-    .card input[type="password"],
-    .card input[type="number"],
-    .card input[type="file"],
-    .card select,
-    .card textarea,
-    .card .input-standard,
-    .card .select-standard {
-      background-color: #ffffff !important;
-      color: #000000 !important;
-      border: 1px solid #000000 !important;
+    .required {
+      color: var(--danger-500);
     }
 
-    .card input::placeholder,
-    .card textarea::placeholder {
-      color: #6b7280 !important;
+    .text-muted {
+      color: var(--gray-500);
     }
 
-    /* Make main card headings black (but avoid overriding danger/red headings)
-       Targets typical headings used: h2.text-xl.font-semibold and h3.text-md.font-semibold
-       Uses :not([class*="text-red"]) to skip headings already styled as red. */
-    .card h2.text-xl.font-semibold:not([class*="text-red"]) {
-      color: #000000 !important;
-    }
-    .card h3.text-md.font-semibold:not([class*="text-red"]) {
-      color: #000000 !important;
-    }
-    .card h3.font-medium:not([class*="text-red"]) {
-      color: #000000 !important;
+    .theme-dark .text-muted {
+      color: var(--dark-text-muted);
     }
 
-    .dropdown-content {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
+    .tabs-nav {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .dropdown-content.open {
-      max-height: 200px;
-      /* A height large enough for your links */
-      opacity: 1;
+    .tabs-nav::-webkit-scrollbar {
+      display: none;
     }
-    @media (max-width: 768px) {
-  #main-content {
-    margin-top: 64px; /* height of the fixed header */
-  }
-}
   </style>
+    <link rel="stylesheet" href="../js/fix-icons.css">
 </head>
 
-<body class="dark:bg-gray-950 dark:text-gray-100">
+<body class="theme-light">
   <div class="flex">
-    <!-- Left Sidebar Navigation -->
-    <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
-  <div class="flex items-center space-x-3">
-    <button id="menu-toggle" class="text-white focus:outline-none">
-      <i class="fas fa-bars text-2xl"></i>
-    </button>
-    <span class="text-xl font-bold">QSI</span>
-  </div>
-</header>
-
-
-<!-- ✅ BACKDROP for mobile -->
-<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
-
-<!-- ✅ SIDEBAR -->
-<aside id="sidebar"
-  class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
-      <div class="p-6 text-2xl font-bold border-b border-gray-700">
-          <i class=" mr-2 text-indigo-400"></i> QSI
+    <!-- Mobile Header -->
+    <header class="mobile-header" style="background: var(--dark-bg-secondary);">
+      <div class="flex items-center gap-3">
+        <button id="menu-toggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+        <span class="text-lg font-bold text-white">QSI</span>
       </div>
-      <nav class="flex-1 p-4 space-y-2">
-          <a href="dashboard_with_login.html"
-              class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
-              <i class="fas fa-chart-pie mr-3"></i>Dashboard
-          </a>
-          <div>
-              <button id="documents-dropdown-btn"
-                  class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
-                  <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
-                  <i id="dropdown-icon"
-                      class="fas fa-chevron-down transform transition-transform duration-200"></i>
-              </button>
-              <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 dropdown-content">
-                  <a href="quotation/home_quotation.html"
-                      class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
-                  <a href="saleorder/home_sales_order.html"
-                      class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales
-                      Order</a>
-                  <a href="invoice/home_invoice.html"
-                      class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
-                      <a href="credit_note.html"
-                    class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
-              </div>
-              <div>
-                  <button id="purchases-dropdown-btn"
-                      class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
-                      <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
-                      <i id="purchases-dropdown-icon"
-                          class="fas fa-chevron-down transform transition-transform duration-200"></i>
-                  </button>
-                  <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 dropdown-content">
-                      <a href="parchase/vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
-                        <a href="parchase/parchase_order/home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
-                      <a href="parchase/debit notes/debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
-                      </div>
-              </div>
-          </div>
-          <a href="manage-clients.html"
-              class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
-              <i class="fas fa-users mr-3"></i>Manage Clients
-          </a>
-          <a href="settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
-              <i class="fas fa-cog mr-3"></i>Settings
-          </a>
-      </nav>
-  </aside>
+    </header>
+    <div id="menu-backdrop" class="backdrop"></div>
 
-    <main class="flex-1 p-8">
-      <div class="sticky-header-tabs">
-        <header class="mb-4" id="settings-header">
-          <h1 class="text-3xl font-bold">Settings</h1>
-          <p class="text-gray-500 dark:text-gray-400">
-            Manage your account and preferences.
-          </p>
-        </header>
+    <!-- Sidebar -->
+    <!-- UNIFIED PROFESSIONAL SIDEBAR - QSI Application -->
+<aside id="sidebar" class="sidebar">
+    <!-- Logo Section -->
+    <div class="sidebar-logo">
+        <h1 class="logo-text">QSI</h1>
+    </div>
 
-        <div class="mb-8" id="tabs-container">
-          <div class="border-b border-gray-200 dark:border-gray-700">
-            <nav class="-mb-px flex space-x-8">
-              <button data-tab="profile" class="tab-button py-4 px-1 border-b-2 text-sm tab-active">
-                Profile
-              </button>
-              <button data-tab="business_details" class="tab-button py-4 px-1 border-b-2 text-sm tab-inactive">
-                Business Details
-              </button>
-              <button data-tab="bank_details" class="tab-button py-4 px-1 border-b-2 text-sm tab-inactive">
-  Bank Details
-</button>
-              <button data-tab="notifications" class="tab-button py-4 px-1 border-b-2 text-sm tab-inactive">
-                Notifications
-              </button>
-              <button data-tab="security" class="tab-button py-4 px-1 border-b-2 text-sm tab-inactive">
-                Security
-              </button>
-            </nav>
-          </div>
+    <!-- Search Bar -->
+    <div class="sidebar-search">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Search..." class="search-input" id="sidebarSearch">
         </div>
-      </div>
+    </div>
 
-      <div class="max-w-4xl mx-auto">
-        <section id="tab-content-profile" class="tab-content space-y-8">
-          <!-- Avatar removed per request -->
-          <div class="card">
-            <h2 class="text-xl font-semibold border-b pb-4 mb-6">
-              Personal Information
-            </h2>
-            <form id="profile-form" class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label for="fullName" class="form-label">Username</label>
-                  <input type="text" id="fullName"
-                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out" />
-                </div>
-                <div>
-                  <label for="email" class="form-label">Email</label>
-                  <input type="email" id="email"
-                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out disabled:opacity-50" />
-                </div>
-              </div>
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+        <!-- Dashboard -->
+        <a href="./dashboard_with_login.html" class="sidebar-link" data-page="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label for="personal_country" class="form-label">Country</label>
-                  <select id="personal_country"
-                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"></select>
-                </div>
-                <div>
-                  <label for="phone" class="form-label">Phone</label>
-                  <input type="tel" id="phone"
-                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out" />
-                </div>
-              </div>
+        <!-- Sales Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">SALES DOCUMENTS</div>
+        </div>
 
-              <div class="flex justify-end pt-4">
-                <button type="submit" id="save-profile-btn"
-                  class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md w-36 flex items-center justify-center">
-                  Save Changes
-                </button>
-              </div>
-            </form>
+        <a href="./quotation/home_quotation.html" class="sidebar-link" data-page="quotation">
+            <i class="fas fa-file-alt"></i>
+            <span>Quotations</span>
+        </a>
+
+        <a href="./saleorder/home_sales_order.html" class="sidebar-link" data-page="salesorder">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Sales Orders</span>
+        </a>
+
+        <a href="./invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
+            <i class="fas fa-file-invoice"></i>
+            <span>Invoices</span>
+        </a>
+
+        <a href="./credit_note.html" class="sidebar-link" data-page="creditnote">
+            <i class="fas fa-receipt"></i>
+            <span>Credit Notes</span>
+        </a>
+
+        <!-- Purchase Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">PURCHASE DOCUMENTS</div>
+        </div>
+
+        <a href="./parchase/vendor/vendor_leads.html" class="sidebar-link" data-page="vendor">
+            <i class="fas fa-store"></i>
+            <span>Vendors</span>
+        </a>
+
+        <a href="./parchase/parchase_order/home_purchase_order.html" class="sidebar-link" data-page="purchaseorder">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Purchase Orders</span>
+        </a>
+
+        <a href="./parchase/bills.html" class="sidebar-link" data-page="bills">
+            <i class="fas fa-file-invoice"></i>
+            <span>Bills</span>
+        </a>
+
+        <a href="./parchase/debit_note/debit_note.html" class="sidebar-link" data-page="debitnote">
+            <i class="fas fa-sticky-note"></i>
+            <span>Debit Notes</span>
+        </a>
+
+        <!-- Other Sections -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">MANAGEMENT</div>
+        </div>
+
+        <a href="./payout.html" class="sidebar-link" data-page="payout">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payouts</span>
+        </a>
+
+        <a href="./manage-clients.html" class="sidebar-link" data-page="client">
+            <i class="fas fa-users"></i>
+            <span>Clients</span>
+        </a>
+
+        <a href="./item_management.html" class="sidebar-link" data-page="items">
+            <i class="fas fa-cube"></i>
+            <span>Items</span>
+        </a>
+
+        <a href="./settings.html" class="sidebar-link" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <!-- User Profile Section -->
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">User</div>
+                <div class="user-email" id="sidebarUserEmail">user@qsi.com</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<!-- Sidebar Toggle Button (Mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Mobile Backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<script>
+// Sidebar functionality
+(function() {
+    'use strict';
+
+    // Set active link based on current page
+    function setActiveLink() {
+        const currentPath = window.location.pathname;
+        const links = document.querySelectorAll('.sidebar-link');
+
+        links.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+
+            // Check if current page matches link
+            if (href && (currentPath.includes(href.replace('../', '')) || currentPath.includes(href))) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // Mobile sidebar toggle
+    function initMobileToggle() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (!sidebar || !toggle || !backdrop) return;
+
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+            backdrop.classList.toggle('backdrop-active');
+            document.body.classList.toggle('sidebar-mobile-open');
+        });
+
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('sidebar-open');
+            backdrop.classList.remove('backdrop-active');
+            document.body.classList.remove('sidebar-mobile-open');
+        });
+    }
+
+    // Search functionality
+    function initSearch() {
+        const searchInput = document.getElementById('sidebarSearch');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const links = document.querySelectorAll('.sidebar-link');
+
+            links.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                const parent = link.closest('.sidebar-nav');
+
+                if (text.includes(query) || query === '') {
+                    link.style.display = 'flex';
+                } else {
+                    link.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Load user info
+    function loadUserInfo() {
+        const userNameEl = document.getElementById('sidebarUserName');
+        const userEmailEl = document.getElementById('sidebarUserEmail');
+
+        // Get from localStorage or session
+        const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || 'User';
+        const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || 'user@qsi.com';
+
+        if (userNameEl) userNameEl.textContent = userName;
+        if (userEmailEl) userEmailEl.textContent = userEmail;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        setActiveLink();
+        initMobileToggle();
+        initSearch();
+        loadUserInfo();
+    });
+
+    // Handle logout
+    window.handleLogout = function() {
+        if (confirm('Are you sure you want to logout?')) {
+            // Clear session data
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // Redirect to login
+            window.location.href = '../index.html';
+        }
+    };
+})();
+</script>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="settings-container">
+          <!-- Sticky Header -->
+          <div class="sticky-header">
+            <header class="mb-4">
+              <h1 class="text-2xl font-bold">Settings</h1>
+              <p class="text-muted text-sm">Manage your account and preferences.</p>
+            </header>
+            <div class="border-b" style="border-color: var(--gray-200);">
+              <nav class="tabs-nav flex gap-6">
+                <button data-tab="profile" class="tab-button tab-active">Profile</button>
+                <button data-tab="business" class="tab-button tab-inactive">Business</button>
+                <button data-tab="bank" class="tab-button tab-inactive">Bank</button>
+                <button data-tab="notifications" class="tab-button tab-inactive">Notifications</button>
+                <button data-tab="security" class="tab-button tab-inactive">Security</button>
+                <button data-tab="theme" class="tab-button tab-inactive">Theme</button>
+              </nav>
+            </div>
           </div>
-        </section>
 
-        <section id="tab-content-business_details" class="tab-content hidden space-y-8">
-          <div class="card">
-            <h2 class="text-xl font-semibold border-b border-gray-700 pb-4 mb-6">
-              <span style="color: #000;">Business Information</span>
-            </h2>
-            <form id="business-form" class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label for="businessName" class="form-label">Business Name <span class="text-red-500"></span></label>
-                    <input type="text" id="businessName" name="businessName"
-                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-black placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                    placeholder="e.g., Your Company LLC" required />
-                    <!-- Logo upload / preview -->
-                    <div class="mt-4 flex items-center space-x-4">
-                      <img id="business-logo-preview" src="https://placehold.co/80x80/ffffff/000000?text=Logo" alt="Logo preview" class="h-20 w-20 rounded object-contain border border-gray-200 bg-white" />
+          <!-- PROFILE TAB -->
+          <section id="tab-profile" class="tab-content">
+            <div class="settings-card">
+              <h2 class="settings-card-title">Personal Information</h2>
+              <form id="profile-form">
+                <div class="grid-2">
+                  <div class="settings-form-group">
+                    <label for="fullName" class="settings-label">Username</label>
+                    <input type="text" id="fullName" class="settings-input" placeholder="Your name">
+                  </div>
+                  <div class="settings-form-group">
+                    <label for="email" class="settings-label">Email</label>
+                    <input type="email" id="email" class="settings-input" placeholder="you@example.com">
+                  </div>
+                </div>
+                <div class="grid-2">
+                  <div class="settings-form-group">
+                    <label for="phone" class="settings-label">Phone</label>
+                    <input type="tel" id="phone" class="settings-input" placeholder="+91 9876543210">
+                  </div>
+                  <div class="settings-form-group">
+                    <label for="personal_country" class="settings-label">Country</label>
+                    <select id="personal_country" class="settings-input">
+                      <option value="">Select Country</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="flex justify-end mt-4">
+                  <button type="submit" id="save-profile-btn" class="btn btn-primary"
+                    style="width:auto;min-width:140px;">Save Changes</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- BUSINESS TAB -->
+          <section id="tab-business" class="tab-content hidden">
+            <div class="settings-card">
+              <h2 class="settings-card-title">Business Information</h2>
+              <form id="business-form">
+                <div class="grid-2">
+                  <div class="settings-form-group">
+                    <label for="businessName" class="settings-label">Business Name <span
+                        class="required">*</span></label>
+                    <input type="text" id="businessName" class="settings-input" placeholder="Your Company LLC" required>
+                    <div class="mt-4 flex items-center gap-4">
+                      <img id="business-logo-preview" src="https://placehold.co/80x80/f3f4f6/9ca3af?text=Logo"
+                        alt="Logo" class="logo-preview">
                       <div>
-                        <label class="form-label block">Company Logo</label>
-                        <input type="file" id="logo" name="logo" accept="image/png" class="mt-1" />
-                        <p class="text-xs text-gray-500 mt-2">PNG, Recommended 300x300.</p>
+                        <label class="settings-label">Company Logo</label>
+                        <input type="file" id="logo" accept="image/png,image/jpeg" class="text-sm">
+                        <p class="text-xs text-muted mt-1">PNG/JPG, 300x300 recommended</p>
                       </div>
                     </div>
                   </div>
-                <div>
-                  <label for="teamSize" class="form-label">Team Size <span class="text-red-500"></span></label>
-                  <select id="teamSize" name="teamSize"
-                    class="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-2 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                    required>
-                    <option value="">Select Team Size</option>
-                    <option value="1">Just Me (1)</option>
-                    <option value="2">2-5 members</option>
-                    <option value="6">6-10 members</option>
-                    <option value="11">11+ members</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label for="website" class="form-label">Website</label>
-                <input type="url" id="website" name="website"
-                  class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                  placeholder="https://www.your-website.com" />
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label for="business_phone" class="form-label">Phone Number <span class="text-red-500"></span></label>
-                  <input type="tel" id="business_phone" name="business_phone"
-                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                    placeholder="Include country code" required />
-                </div>
-                <div>
-                  <label for="business_email" class="form-label">Business Email <span
-                      class="text-red-500"></span></label>
-                  <input type="email" id="business_email" name="business_email"
-                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                    placeholder="contact@your-company.com" required />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label for="gst" class="form-label">GST Number (Optional)</label>
-                  <input type="text" id="gst" name="gst"
-                    class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                    placeholder="GST Number" />
-                </div>
-                <div>
-                  <label for="currency" class="form-label">Currency <span class="text-red-500"></span></label>
-                  <select id="currency" name="currency"
-                    class="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-2 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                    required>
-                    <option value="">Select Currency</option>
-                    <option value="INR">Indian Rupee (INR, ₹)</option>
-                    <option value="USD">US Dollar (USD, $)</option>
-                    <option value="EUR">Euro (EUR, €)</option>
-                    <option value="GBP">British Pound (GBP, £)</option>
-                    <option value="JPY">Japanese Yen (JPY, ¥)</option>
-                    <option value="AUD">Australian Dollar (AUD, A$)</option>
-                    <option value="CAD">Canadian Dollar (CAD, C$)</option>
-                    <option value="CHF">Swiss Franc (CHF, Fr)</option>
-                    <option value="CNY">Chinese Yuan (CNY, ¥)</option>
-                    <option value="AED">UAE Dirham (AED, د.إ)</option>
-                    <option value="SGD">Singapore Dollar (SGD, S$)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="pt-4 border-t border-gray-700">
-                <h3 class="text-md font-semibold text-gray-200">
-                  Business Address
-                </h3>
-                <div class="mt-4 space-y-6">
-                  <div>
-                    <label for="street" class="form-label">Street Address <span class="text-red-500"></span></label>
-                    <input type="text" id="street" name="street"
-                      class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                      required />
+                  <div class="settings-form-group">
+                    <label for="teamSize" class="settings-label">Team Size <span class="required">*</span></label>
+                    <select id="teamSize" class="settings-input" required>
+                      <option value="">Select Size</option>
+                      <option value="1">Just Me</option>
+                      <option value="2">2-5</option>
+                      <option value="6">6-10</option>
+                      <option value="11">11+</option>
+                    </select>
                   </div>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label for="city" class="form-label">City <span class="text-red-500"></span></label>
-                      <input type="text" id="city" name="city"
-                        class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                        required />
+                </div>
+                <div class="settings-form-group">
+                  <label for="website" class="settings-label">Website</label>
+                  <input type="url" id="website" class="settings-input" placeholder="https://your-website.com">
+                </div>
+                <div class="grid-2">
+                  <div class="settings-form-group">
+                    <label for="business_phone" class="settings-label">Phone <span class="required">*</span></label>
+                    <input type="tel" id="business_phone" class="settings-input" required>
+                  </div>
+                  <div class="settings-form-group">
+                    <label for="business_email" class="settings-label">Email <span class="required">*</span></label>
+                    <input type="email" id="business_email" class="settings-input" required>
+                  </div>
+                </div>
+                <div class="grid-2">
+                  <div class="settings-form-group">
+                    <label for="gst" class="settings-label">GST Number</label>
+                    <input type="text" id="gst" class="settings-input" placeholder="Optional">
+                  </div>
+                  <div class="settings-form-group">
+                    <label for="currency" class="settings-label">Currency <span class="required">*</span></label>
+                    <select id="currency" class="settings-input" required>
+                      <option value="">Select</option>
+                      <option value="INR">INR (₹)</option>
+                      <option value="USD">USD ($)</option>
+                      <option value="EUR">EUR (€)</option>
+                      <option value="GBP">GBP (£)</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="pt-4 mt-4 border-t" style="border-color:var(--gray-200);">
+                  <h3 class="font-semibold mb-4">Business Address</h3>
+                  <div class="settings-form-group">
+                    <label for="street" class="settings-label">Street <span class="required">*</span></label>
+                    <input type="text" id="street" class="settings-input" required>
+                  </div>
+                  <div class="grid-2">
+                    <div class="settings-form-group">
+                      <label for="city" class="settings-label">City <span class="required">*</span></label>
+                      <input type="text" id="city" class="settings-input" required>
                     </div>
-                    <div>
-                      <label for="state" class="form-label">State / Province <span class="text-red-500"></span></label>
-                      <input type="text" id="state" name="state"
-                        class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                        required />
+                    <div class="settings-form-group">
+                      <label for="state" class="settings-label">State <span class="required">*</span></label>
+                      <input type="text" id="state" class="settings-input" required>
                     </div>
                   </div>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label for="pincode" class="form-label">Pincode <span class="text-red-500"></span></label>
-                      <input type="text" id="pincode" name="pincode"
-                        class="w-full rounded-md border border-gray-600 bg-transparent px-4 py-2 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                        required />
+                  <div class="grid-2">
+                    <div class="settings-form-group">
+                      <label for="pincode" class="settings-label">Pincode <span class="required">*</span></label>
+                      <input type="text" id="pincode" class="settings-input" required>
                     </div>
-                    <div>
-                      <label for="business_country" class="form-label">Country <span
-                          class="text-red-500"></span></label>
-                      <select id="business_country" name="country"
-                        class="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-2 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-200 ease-in-out"
-                        required></select>
+                    <div class="settings-form-group">
+                      <label for="business_country" class="settings-label">Country <span
+                          class="required">*</span></label>
+                      <select id="business_country" class="settings-input" required>
+                        <option value="">Select</option>
+                      </select>
                     </div>
                   </div>
                 </div>
-              </div>
+                <div class="flex justify-end mt-4">
+                  <button type="submit" id="save-business-btn" class="btn btn-primary"
+                    style="width:auto;min-width:160px;">Update Business</button>
+                </div>
+              </form>
+            </div>
+          </section>
 
-              <div class="flex justify-end pt-4">
-                <button type="submit" id="submit-btn"
-                  class="bg-indigo-600 text-white font-bold py-5 rounded-lg hover:bg-indigo-700 transition shadow-md w-48 flex items-center justify-center p-4">
-                  Update Details
-                </button>
+          <!-- BANK TAB -->
+          <section id="tab-bank" class="tab-content hidden">
+            <div class="settings-card">
+              <div class="flex justify-between items-center mb-6">
+                <h2 class="settings-card-title" style="border:none;padding:0;margin:0;">Bank Accounts</h2>
+                <button id="add-bank-btn" class="btn btn-primary" style="width:auto;"><i
+                    class="fas fa-plus mr-2"></i>Add Bank</button>
               </div>
-            </form>
-          </div>
-        </section>
-<section id="tab-content-bank_details" class="tab-content hidden space-y-8">
-  <!-- Bank Accounts List -->
-  <div class="card">
-    <div class="flex justify-between items-center border-b pb-4 mb-6">
-      <h2 class="text-xl font-semibold" style="color: #000;">Bank Accounts</h2>
-      <button id="add-bank-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition shadow-md">
-        <i class="fas fa-plus mr-2"></i>Add Bank Account
-      </button>
-    </div>
-
-    <!-- Banks List Container -->
-    <div id="banks-list-container" class="space-y-4">
-      <!-- Bank cards will be dynamically inserted here -->
-      <div class="text-center py-8 text-gray-500">
-        <i class="fas fa-university text-4xl mb-2"></i>
-        <p>No bank accounts added yet.</p>
-      </div>
-    </div>
-  </div>
-</section>
-        <section id="tab-content-notifications" class="tab-content hidden space-y-8">
-          <div class="card">
-            <h2 class="text-xl font-semibold border-b pb-4 mb-6">
-              Notifications
-            </h2>
-            <div class="space-y-6 divide-y divide-gray-200 dark:divide-gray-700">
-              <div class="flex items-center justify-between pt-6">
-                <div>
-                  <h3 class="font-medium">Email Notifications</h3>
-                  <p class="text-sm text-gray-500">
-                    Receive emails about your account activity.
-                  </p>
+              <div id="banks-list">
+                <div class="empty-state">
+                  <i class="fas fa-university empty-state-icon"></i>
+                  <p class="empty-state-title">No bank accounts</p>
+                  <p class="empty-state-text">Add your first bank account.</p>
                 </div>
-                <label class="switch"><input type="checkbox" id="email-notifications-toggle" /><span
-                    class="slider"></span></label>
-              </div>
-              <div class="flex items-center justify-between pt-6">
-                <div>
-                  <h3 class="font-medium">New Order Alerts</h3>
-                  <p class="text-sm text-gray-500">
-                    Get notified when a new sales order is created.
-                  </p>
-                </div>
-                <label class="switch"><input type="checkbox" id="order-alerts-toggle" /><span
-                    class="slider"></span></label>
-              </div>
-              <div class="flex items-center justify-between pt-6">
-                <div>
-                  <h3 class="font-medium">Weekly Summary</h3>
-                  <p class="text-sm text-gray-500">
-                    Receive a weekly summary of sales activities.
-                  </p>
-                </div>
-                <label class="switch"><input type="checkbox" id="weekly-summary-toggle" /><span
-                    class="slider"></span></label>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section id="tab-content-security" class="tab-content hidden space-y-8">
-          <div class="card">
-            <h2 class="text-xl font-semibold border-b pb-4 mb-6">
-              Change Password
-            </h2>
-            <form id="password-form" class="space-y-6">
-              <div>
-                <label for="currentPassword" class="form-label">Current Password</label>
-                <div class="flex items-center gap-4">
-                  <div class="relative w-full">
-                    <input type="password" id="currentPassword"
-                      class="w-full rounded-xl border border-gray-500 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 px-4 py-3 shadow-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition duration-200 ease-in-out"
-                      required autocomplete="current-password" />
-                    <button type="button" id="togglePasswordBtn"
-                      class="absolute top-1/2 right-4 -translate-y-1/2 text-gray-400 hover:text-gray-200">
-                      <i id="togglePasswordIcon" class="fas fa-eye-slash"></i>
-                    </button>
-                  </div>
-                  <button type="button" id="verify-password-btn"
-                    class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition shadow-md w-36 flex items-center justify-center">
-                    Verify
-                  </button>
-                </div>
-              </div>
-
-              <div id="new-password-container" class="hidden space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+          <!-- NOTIFICATIONS TAB -->
+          <section id="tab-notifications" class="tab-content hidden">
+            <div class="settings-card">
+              <h2 class="settings-card-title">Notification Preferences</h2>
+              <div class="space-y-4">
+                <div class="flex items-center justify-between py-4 border-b" style="border-color:var(--gray-200);">
                   <div>
-                    <label for="newPassword" class="form-label">New Password</label>
-                    <input type="password" id="newPassword"
-                      class="w-full rounded-xl border border-gray-500 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 px-4 py-3 shadow-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition duration-200 ease-in-out"
-                      required autocomplete="new-password" />
+                    <h3 class="font-medium">Email Notifications</h3>
+                    <p class="text-sm text-muted">Receive emails about activity.</p>
                   </div>
+                  <label class="toggle-switch"><input type="checkbox" id="email-notifications"><span
+                      class="toggle-slider"></span></label>
+                </div>
+                <div class="flex items-center justify-between py-4 border-b" style="border-color:var(--gray-200);">
                   <div>
-                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
-                    <input type="password" id="confirmPassword"
-                      class="w-full rounded-xl border border-gray-500 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 px-4 py-3 shadow-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition duration-200 ease-in-out"
-                      required autocomplete="new-password" />
+                    <h3 class="font-medium">Order Alerts</h3>
+                    <p class="text-sm text-muted">Get notified on new orders.</p>
                   </div>
+                  <label class="toggle-switch"><input type="checkbox" id="order-alerts"><span
+                      class="toggle-slider"></span></label>
                 </div>
-                <div class="flex justify-end pt-4">
-                  <button type="submit" id="update-password-btn"
-                    class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md w-40 flex items-center justify-center">
-                    Update Password
-                  </button>
+                <div class="flex items-center justify-between py-4">
+                  <div>
+                    <h3 class="font-medium">Weekly Summary</h3>
+                    <p class="text-sm text-muted">Weekly activity summary.</p>
+                  </div>
+                  <label class="toggle-switch"><input type="checkbox" id="weekly-summary"><span
+                      class="toggle-slider"></span></label>
                 </div>
               </div>
-            </form>
-          </div>
-          <div class="card border-red-200 bg-red-50 dark:bg-red-900/30 p-5 rounded-xl">
-            <h2 class="text-xl font-semibold text-red-800 dark:text-red-400 mb-4">
-              Danger Zone
-            </h2>
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="font-medium text-red-700 dark:text-red-300">
-                  Delete Account
-                </h3>
-                <p class="text-sm text-red-600 dark:text-red-400">
-                  Your account will be deactivated and permanently deleted
-                  after 30 days.
-                </p>
-              </div>
-              <button id="delete-account-btn"
-                class="bg-red-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-red-700 transition">
-                Delete Account
-              </button>
             </div>
-          </div>
-        </section>
+          </section>
+
+          <!-- SECURITY TAB -->
+          <section id="tab-security" class="tab-content hidden">
+            <div class="settings-card">
+              <h2 class="settings-card-title">Change Password</h2>
+              <form id="password-form">
+                <div class="settings-form-group">
+                  <label for="currentPassword" class="settings-label">Current Password</label>
+                  <div class="flex gap-3">
+                    <input type="password" id="currentPassword" class="settings-input"
+                      placeholder="Enter current password">
+                    <button type="button" id="verify-password-btn" class="btn btn-secondary"
+                      style="width:auto;min-width:100px;">Verify</button>
+                  </div>
+                </div>
+                <div id="new-password-section" class="hidden">
+                  <div class="grid-2">
+                    <div class="settings-form-group">
+                      <label for="newPassword" class="settings-label">New Password</label>
+                      <input type="password" id="newPassword" class="settings-input">
+                    </div>
+                    <div class="settings-form-group">
+                      <label for="confirmPassword" class="settings-label">Confirm Password</label>
+                      <input type="password" id="confirmPassword" class="settings-input">
+                    </div>
+                  </div>
+                  <div class="flex justify-end mt-4">
+                    <button type="submit" id="update-password-btn" class="btn btn-primary"
+                      style="width:auto;min-width:160px;">Update Password</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="danger-zone">
+              <h2 class="danger-zone-title">Danger Zone</h2>
+              <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h3 class="font-medium" style="color:var(--danger-600);">Delete Account</h3>
+                  <p class="text-sm" style="color:var(--danger-500);">Permanently deleted after 30 days.</p>
+                </div>
+                <button id="delete-account-btn" class="btn btn-danger" style="width:auto;">Delete Account</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- THEME TAB -->
+          <section id="tab-theme" class="tab-content hidden">
+            <div class="settings-card">
+              <h2 class="settings-card-title">Appearance</h2>
+              <p class="text-sm text-muted mb-6">Choose your theme preference.</p>
+              <div id="theme-options">
+                <div class="theme-option theme-option-light" data-theme="light">
+                  <div class="theme-option-icon"><i class="fas fa-sun"></i></div>
+                  <div class="theme-option-info">
+                    <h3 class="theme-option-title">Light</h3>
+                    <p class="theme-option-description">Bright interface for daytime.</p>
+                  </div>
+                  <div class="theme-option-check"><i class="fas fa-check text-sm"></i></div>
+                </div>
+                <div class="theme-option theme-option-dark" data-theme="dark">
+                  <div class="theme-option-icon"><i class="fas fa-moon"></i></div>
+                  <div class="theme-option-info">
+                    <h3 class="theme-option-title">Dark</h3>
+                    <p class="theme-option-description">Easy on the eyes.</p>
+                  </div>
+                  <div class="theme-option-check"><i class="fas fa-check text-sm"></i></div>
+                </div>
+                <div class="theme-option theme-option-system" data-theme="system">
+                  <div class="theme-option-icon"><i class="fas fa-desktop"></i></div>
+                  <div class="theme-option-info">
+                    <h3 class="theme-option-title">System</h3>
+                    <p class="theme-option-description">Match device settings.</p>
+                  </div>
+                  <div class="theme-option-check"><i class="fas fa-check text-sm"></i></div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     </main>
   </div>
 
-  <div id="toast"
-    class="fixed bottom-5 right-5 bg-gray-900 text-white py-3 px-6 rounded-lg shadow-lg opacity-0 transform translate-y-2">
-    <p id="toast-message"></p>
+  <!-- Toast -->
+  <div id="toast" class="toast"><span id="toast-message"></span></div>
+
+  <!-- Bank Modal -->
+  <div id="bank-modal" class="settings-modal">
+    <div class="settings-modal-overlay" id="bank-modal-overlay"></div>
+    <div class="settings-modal-content">
+      <div class="p-5 border-b" style="border-color:var(--gray-200);">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-semibold" id="bank-modal-title">Add Bank Account</h3>
+          <button id="close-bank-modal" class="btn btn-ghost" style="width:auto;padding:0.5rem;"><i
+              class="fas fa-times"></i></button>
+        </div>
+      </div>
+      <form id="bank-form" class="p-5">
+        <input type="hidden" id="bank-id">
+        <div class="grid-2">
+          <div class="settings-form-group">
+            <label for="bank_name" class="settings-label">Bank Name <span class="required">*</span></label>
+            <input type="text" id="bank_name" class="settings-input" required>
+          </div>
+          <div class="settings-form-group">
+            <label for="account_holder" class="settings-label">Account Holder <span class="required">*</span></label>
+            <input type="text" id="account_holder" class="settings-input" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="settings-form-group">
+            <label for="account_number" class="settings-label">Account Number <span class="required">*</span></label>
+            <input type="text" id="account_number" class="settings-input" required>
+          </div>
+          <div class="settings-form-group">
+            <label for="ifsc_code" class="settings-label">IFSC Code <span class="required">*</span></label>
+            <input type="text" id="ifsc_code" class="settings-input" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="settings-form-group">
+            <label for="branch_name" class="settings-label">Branch</label>
+            <input type="text" id="branch_name" class="settings-input">
+          </div>
+          <div class="settings-form-group">
+            <label for="account_type" class="settings-label">Account Type</label>
+            <select id="account_type" class="settings-input">
+              <option value="">Select</option>
+              <option value="Savings">Savings</option>
+              <option value="Current">Current</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-form-group">
+          <label for="upi_id" class="settings-label">UPI ID</label>
+          <input type="text" id="upi_id" class="settings-input" placeholder="yourname@paytm">
+        </div>
+        <div class="flex justify-end gap-3 pt-4 border-t" style="border-color:var(--gray-200);">
+          <button type="button" id="cancel-bank-btn" class="btn btn-secondary" style="width:auto;">Cancel</button>
+          <button type="submit" id="save-bank-btn" class="btn btn-primary" style="width:auto;min-width:120px;">Save
+            Bank</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
-    <div id="delete-modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 modal-overlay"></div>
-    <div id="delete-modal-panel"
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md transform scale-95 modal-panel mx-4 opacity-0">
-      <div class="text-center">
-        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-          <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+  <!-- Delete Modal -->
+  <div id="delete-modal" class="settings-modal">
+    <div class="settings-modal-overlay" id="delete-modal-overlay"></div>
+    <div class="settings-modal-content" style="max-width:400px;">
+      <div class="p-6 text-center">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+          style="background:rgba(239,68,68,0.1);"><i class="fas fa-exclamation-triangle text-danger text-xl"></i></div>
+        <h3 class="text-lg font-semibold mb-2" id="delete-modal-title">Delete</h3>
+        <p class="text-sm text-muted mb-6" id="delete-modal-message">Are you sure?</p>
+        <div class="flex gap-3">
+          <button id="cancel-delete-btn" class="btn btn-secondary flex-1">Cancel</button>
+          <button id="confirm-delete-btn" class="btn btn-danger flex-1">Delete</button>
         </div>
-        <h3 class="text-lg leading-6 font-medium mt-5">Delete Account</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-          Are you sure? Your account will be scheduled for permanent deletion
-          in 30 days. You will be logged out immediately.
-        </p>
-      </div>
-      <div class="mt-6 grid grid-cols-2 gap-3">
-        <button id="confirm-delete-btn" class="w-full py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
-          Delete
-        </button>
-        <button id="cancel-delete-btn"
-          class="w-full py-2 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600">
-          Cancel
-        </button>
       </div>
     </div>
   </div>
-<div id="bank-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
-  <div id="bank-modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 modal-overlay"></div>
-  <div id="bank-modal-panel" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-2xl transform scale-95 modal-panel mx-4 opacity-0 max-h-[90vh] overflow-y-auto">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-semibold" id="bank-modal-title">Add Bank Account</h3>
-      <button id="close-bank-modal" class="text-gray-500 hover:text-gray-700">
-        <i class="fas fa-times text-xl"></i>
-      </button>
-    </div>
 
-    <form id="bank-form" class="space-y-4">
-      <input type="hidden" id="bank-id" />
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="bank_name" class="form-label">Bank Name <span class="text-red-500">*</span></label>
-          <input type="text" id="bank_name" class="input-standard" placeholder="e.g., State Bank of India" required />
-        </div>
-
-        <div>
-          <label for="account_holder" class="form-label">Account Holder Name <span class="text-red-500">*</span></label>
-          <input type="text" id="account_holder" class="input-standard" placeholder="Full name as per bank" required />
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="account_number" class="form-label">Account Number <span class="text-red-500">*</span></label>
-          <input type="text" id="account_number" class="input-standard" placeholder="Enter account number" required />
-        </div>
-
-        <div>
-          <label for="ifsc_code" class="form-label">IFSC Code <span class="text-red-500">*</span></label>
-          <input type="text" id="ifsc_code" class="input-standard" placeholder="e.g., SBIN0001234" required />
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="branch_name" class="form-label">Branch Name</label>
-          <input type="text" id="branch_name" class="input-standard" placeholder="Branch location" />
-        </div>
-
-        <div>
-          <label for="account_type" class="form-label">Account Type</label>
-          <select id="account_type" class="select-standard">
-            <option value="">Select Type</option>
-            <option value="Savings">Savings</option>
-            <option value="Current">Current</option>
-            <option value="Business">Business</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label for="upi_id" class="form-label">UPI ID</label>
-        <input type="text" id="upi_id" class="input-standard" placeholder="e.g., yourname@paytm" />
-        <p class="text-xs text-gray-500 mt-1">Used for generating QR codes on invoices</p>
-      </div>
-
-      <div class="flex justify-end gap-3 pt-4 border-t">
-        <button type="button" id="cancel-bank-btn" class="py-2 px-6 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600">
-          Cancel
-        </button>
-        <button type="submit" id="save-bank-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md w-36 flex items-center justify-center">
-          Save Bank
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Delete Bank Confirmation Modal -->
-<div id="delete-bank-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
-  <div id="delete-bank-modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 modal-overlay"></div>
-  <div id="delete-bank-modal-panel" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md transform scale-95 modal-panel mx-4 opacity-0">
-    <div class="text-center">
-      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-        <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
-      </div>
-      <h3 class="text-lg leading-6 font-medium mt-5">Delete Bank Account</h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-        Are you sure you want to delete this bank account? This action cannot be undone.
-      </p>
-    </div>
-    <div class="mt-6 grid grid-cols-2 gap-3">
-      <button id="confirm-delete-bank-btn" class="w-full py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
-        Delete
-      </button>
-      <button id="cancel-delete-bank-btn" class="w-full py-2 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600">
-        Cancel
-      </button>
-    </div>
-  </div>
-</div>
+  <!-- JAVASCRIPT -->
+  <!-- Global Theme Manager -->
+  <script src="../js/theme-manager.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-    
-      // =================================================
-      // SECTION 1: GLOBAL VARIABLES & DATA
-      // =================================================
-      let companyId = null;
-      const countries = [
-        { code: "IN", name: "India" },
-        { code: "US", name: "United States of America (USA)" },
-        { code: "GB", name: "United Kingdom" },
-        { code: "CA", name: "Canada" },
-        { code: "AU", name: "Australia" },
-        { code: "DE", name: "Germany" },
-        { code: "FR", name: "France" },
-        { code: "JP", name: "Japan" },
-        { code: "CN", name: "China" },
-        { code: "AE", name: "United Arab Emirates" },
-        { code: "SG", name: "Singapore" },
-        { code: "BR", name: "Brazil" },
-        { code: "CH", name: "Switzerland" },
-        { code: "NZ", name: "New Zealand" },
-      ];
+    document.addEventListener('DOMContentLoaded', () => {
+      const API_BASE = 'https://api.fornowauto.com/api';
+      let companyId = null, businessLogoBase64 = null, currentBankId = null, deleteTarget = null;
+      const countries = [{ code: "IN", name: "India" }, { code: "US", name: "United States" }, { code: "GB", name: "United Kingdom" }, { code: "CA", name: "Canada" }, { code: "AU", name: "Australia" }, { code: "AE", name: "UAE" }, { code: "SG", name: "Singapore" }];
 
-      // =================================================
-      // SECTION 2: ELEMENT SELECTORS
-      // =================================================
-      const getEl = (id) => document.getElementById(id);
+      const getEl = id => document.getElementById(id);
+      const getToken = () => localStorage.getItem('token') || localStorage.getItem('auth_token');
+      const getUserId = () => localStorage.getItem('userId');
 
-  // Profile
-  const fullNameInput = getEl("fullName");
-  const emailInput = getEl("email");
-  const phoneInput = getEl("phone");
-  const avatarPreview = getEl("avatar-preview"); // may be null now that avatar removed
-  const profileForm = getEl("profile-form");
-  const saveProfileBtn = getEl("save-profile-btn");
-
-  // Business
-  const businessForm = getEl("business-form");
-  const submitBtn = getEl("submit-btn");
-  const personalCountrySelect = getEl("personal_country");
-  const businessCountrySelect = getEl("business_country");
-  const logoInput = getEl("logo");
-  const businessLogoPreview = getEl("business-logo-preview");
-  let businessLogoBase64 = null;
-
-      // Password
-      const currentPasswordInput = getEl("currentPassword");
-      const verifyPasswordBtn = getEl("verify-password-btn");
-      const newPasswordContainer = getEl("new-password-container");
-      const updatePasswordBtn = getEl("update-password-btn");
-      const togglePasswordBtn = getEl("togglePasswordBtn");
-      const togglePasswordIcon = getEl("togglePasswordIcon");
-      const passwordForm = getEl("password-form");
-
-      // Notifications
-      const emailNotificationsToggle = getEl("email-notifications-toggle");
-      const orderAlertsToggle = getEl("order-alerts-toggle");
-      const weeklySummaryToggle = getEl("weekly-summary-toggle");
-
-      // Add this array right after the weeklySummaryToggle definition
-      const notificationToggles = [
-        emailNotificationsToggle,
-        orderAlertsToggle,
-        weeklySummaryToggle,
-      ];
-
-      // Delete modal
-      const deleteAccountBtn = getEl("delete-account-btn");
-      const deleteModal = getEl("delete-modal");
-      const deleteModalOverlay = getEl("delete-modal-overlay");
-      const deleteModalPanel = getEl("delete-modal-panel");
-      const confirmDeleteBtn = getEl("confirm-delete-btn");
-      const cancelDeleteBtn = getEl("cancel-delete-btn");
-
-      // Tabs
-      const tabButtons = document.querySelectorAll(".tab-button");
-      const tabContents = document.querySelectorAll(".tab-content");
-      const tabsContainer = document.getElementById("tabs-container");
-
-      // =================================================
-      // SECTION 3: HELPER FUNCTIONS
-      // =================================================
-
-      const menuToggle = document.getElementById("menu-toggle");
-const sidebar = document.getElementById("sidebar");
-const menuBackdrop = document.getElementById("menu-backdrop");
-
-if (menuToggle && sidebar && menuBackdrop) {
-  menuToggle.addEventListener("click", () => {
-    sidebar.classList.toggle("-translate-x-full");
-    menuBackdrop.classList.toggle("hidden");
-  });
-
-  menuBackdrop.addEventListener("click", () => {
-    sidebar.classList.add("-translate-x-full");
-    menuBackdrop.classList.add("hidden");
-  });
-}
-      function showToast(message) {
-        const toast = getEl("toast");
-        const toastMessage = getEl("toast-message");
-        toastMessage.textContent = message;
-        toast.classList.remove("opacity-0", "translate-y-2");
-        toast.classList.add("opacity-100", "translate-y-0");
-        setTimeout(() => {
-          toast.classList.remove("opacity-100", "translate-y-0");
-          toast.classList.add("opacity-0", "translate-y-2");
-        }, 3000);
+      function showToast(msg, type = 'success') {
+        const toast = getEl('toast'), toastMsg = getEl('toast-message');
+        toastMsg.textContent = msg;
+        toast.className = `toast toast-${type} show`;
+        setTimeout(() => toast.classList.remove('show'), 3000);
       }
 
-      // The FIXED function that shows the spinner
-      function setButtonLoading(button, isLoading, originalText = null) {
-        if (isLoading) {
-          // First, save the button's original text if we haven't already
-          if (!button.dataset.originalText) {
-            button.dataset.originalText = button.innerHTML;
-          }
-          // Now, show the spinner and disable the button
-          button.innerHTML = `<div class="w-5 h-5 border-2 border-white rounded-full btn-spinner mx-auto"></div>`;
-          button.disabled = true;
-        } else {
-          // Restore the original text and re-enable the button
-          button.innerHTML = originalText || button.dataset.originalText;
-          button.disabled = false;
-        }
+      function setLoading(btn, loading) {
+        if (loading) { btn.dataset.originalText = btn.innerHTML; btn.innerHTML = '<div class="btn-spinner"></div>'; btn.disabled = true; }
+        else { btn.innerHTML = btn.dataset.originalText || 'Submit'; btn.disabled = false; }
       }
 
-      function populateCountryDropdowns() {
-        [personalCountrySelect, businessCountrySelect].forEach((selectEl) => {
-          if (selectEl) {
-            selectEl.innerHTML = '<option value="">Select Country</option>';
-            countries.forEach((country) => {
-              const option = document.createElement("option");
-              option.value = country.code;
-              option.textContent = country.name;
-              selectEl.appendChild(option);
-            });
-          }
+      function populateCountries() {
+        [getEl('personal_country'), getEl('business_country')].forEach(sel => {
+          if (!sel) return;
+          sel.innerHTML = '<option value="">Select Country</option>';
+          countries.forEach(c => { const o = document.createElement('option'); o.value = c.code; o.textContent = c.name; sel.appendChild(o); });
         });
       }
 
-      // =================================================
-      // SECTION 4: DATA LOADING
-      // =================================================
-      // Replace your existing loadSettings function with this corrected one
+      // TABS
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.tab;
+          document.querySelectorAll('.tab-button').forEach(b => { b.classList.remove('tab-active'); b.classList.add('tab-inactive'); });
+          btn.classList.remove('tab-inactive'); btn.classList.add('tab-active');
+          document.querySelectorAll('.tab-content').forEach(c => { c.id === `tab-${tab}` ? c.classList.remove('hidden') : c.classList.add('hidden'); });
+          if (tab === 'bank') loadBanks();
+        });
+      });
 
-      async function loadSettings() {
+      // MOBILE SIDEBAR
+      const menuToggle = getEl('menu-toggle'), sidebar = getEl('sidebar'), backdrop = getEl('menu-backdrop');
+      menuToggle?.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); backdrop.classList.toggle('active'); });
+      backdrop?.addEventListener('click', () => { sidebar.classList.add('collapsed'); backdrop.classList.remove('active'); });
+
+      // LOAD PROFILE - Get user data from localStorage first, then try API
+      async function loadProfile() {
         try {
-          const userId = localStorage.getItem("userId");
-          const token = localStorage.getItem("token"); // 1. Get the token
+          const token = getToken(), userId = getUserId();
+          const storedEmail = localStorage.getItem('email') || '';
+          const storedPhone = localStorage.getItem('phone') || '';
 
-          if (!userId || !token) {
-            // 2. Check for both
-            window.location.href = "/login.html";
+          // Set from localStorage first
+          if (storedEmail) getEl('email').value = storedEmail;
+          if (storedPhone) getEl('phone').value = storedPhone;
+
+          if (!token || !userId) {
+            console.log('No token or userId, using localStorage data');
             return;
           }
 
-          const response = await fetch(
-            `https://api.fornowauto.com/api/register/${userId}`,
-            {
-              // 3. Add the headers object with the Authorization token
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          // Try to fetch from API
+          const res = await fetch(`${API_BASE}/register/${userId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
 
-          if (!response.ok) {
-            throw new Error("Failed to fetch user data.");
-          }
-          const userData = await response.json();
-          const user = Array.isArray(userData) ? userData[0] : userData;
-
-          if (!user) {
-            throw new Error("Received empty user data.");
-          }
-
-          fullNameInput.value = user.username || "";
-          emailInput.value = user.email || "";
-          phoneInput.value = user.phone || "";
-
-          // Set the country if it exists on the user profile
-          if (user.country) {
-            const country = countries.find((c) => c.name === user.country);
-            if (country) {
-              personalCountrySelect.value = country.code;
-            }
-          }
-        } catch (err) {
-          console.error("Error loading settings:", err);
-          showToast(err.message || "Could not load profile settings."); // Show a toast on error
-        }
-      }
-
-      async function loadBusinessDetails() {
-        try {
-          const token = localStorage.getItem("token");
-
-          if (!token) {
-            console.log("No token found, skipping business details load.");
+          if (!res.ok) {
+            console.log('Profile API returned:', res.status);
+            // If API fails, try to get data from companies API
             return;
           }
 
-          const response = await fetch(`https://api.fornowauto.com/api/companies`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const data = await res.json();
+          const user = Array.isArray(data) ? data[0] : data;
 
-          if (!response.ok) {
-            if (response.status === 404) {
-              console.log("No business details found for this user yet.");
-              return;
-            }
-            throw new Error("Could not fetch business details.");
-          }
-
-          const companies = await response.json();
-
-          if (companies.length > 0) {
-            const data = companies[0];
-            companyId = data._id;
-
-            getEl("businessName").value = data.company_name || "";
-            getEl("website").value = data.website || "";
-            getEl("business_phone").value = data.phone || "";
-            getEl("business_email").value = data.email || "";
-            getEl("gst").value = data.gst_no || "";
-            getEl("currency").value = data.currency || "";
-            // If a logo URL/base64 exists on backend, show preview and store
-            if (data.logo && businessLogoPreview) {
-              businessLogoPreview.src = data.logo;
-              businessLogoBase64 = data.logo;
-            }
-
-            // FIX: Add logic to select the correct range for team size
-            const teamSize = data.team_size;
-            const teamSizeSelect = getEl("teamSize");
-
-            const teamSizeNum = parseInt(teamSize, 10);
-
-            if (teamSizeNum >= 11) {
-              teamSizeSelect.value = "11";
-            } else if (teamSizeNum >= 6) {
-              teamSizeSelect.value = "6";
-            } else if (teamSizeNum >= 2) {
-              teamSizeSelect.value = "2";
-            } else if (teamSizeNum === 1) {
-              teamSizeSelect.value = "1";
-            }
-
-            if (data.address) {
-              getEl("street").value = data.address.street || "";
-              getEl("city").value = data.address.city || "";
-              getEl("state").value = data.address.state || "";
-              getEl("pincode").value = data.address.postalCode || "";
-              const country = countries.find(
-                (c) => c.name === data.address.country
-              );
-              if (country) {
-                getEl("business_country").value = country.code;
-              }
+          if (user) {
+            getEl('fullName').value = user.username || '';
+            getEl('email').value = user.email || storedEmail || '';
+            getEl('phone').value = user.phone || storedPhone || '';
+            getEl('sidebar-name').textContent = user.username || 'User';
+            getEl('sidebar-email').textContent = user.email || storedEmail || '';
+            if (user.country) {
+              const c = countries.find(x => x.name === user.country);
+              if (c) getEl('personal_country').value = c.code;
             }
           }
-        } catch (error) {
-          console.error("Failed to load business details:", error);
-          showToast(error.message);
+        } catch (e) {
+          console.error('Profile load error:', e);
+          // Still use localStorage data on error
+          const storedEmail = localStorage.getItem('email') || '';
+          if (storedEmail) {
+            getEl('email').value = storedEmail;
+            getEl('sidebar-email').textContent = storedEmail;
+          }
         }
       }
-      // =================================================
-      // SECTION 5: REUSABLE BUSINESS UPDATE
-      // =================================================
-      async function handleBusinessUpdate(showSuccessToast = true) {
-        const userId = localStorage.getItem("userId"); // Get the user ID
-        if (!companyId || !userId) {
-          throw new Error(
-            "Cannot update: Company or User details not loaded."
-          );
-        }
 
-        // (Your code for gathering the payload remains the same)
-        // ...
-
-        // **THE FIX:** The update URL must include the companyId AND the userId for authorization
-        const response = await fetch(
-          `https://api.fornowauto.com/api/companies/${companyId}?user_id=${userId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.message || "Business update failed");
-        }
-
-        if (showSuccessToast) {
-          showToast("Business details updated successfully!");
-        }
-      }
-      // =================================================
-      // SECTION 6: EVENT LISTENERS
-      // =================================================
-
-      // Tabs
-      tabButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const tab = button.dataset.tab;
-          tabButtons.forEach((btn) =>
-            btn.classList.replace("tab-active", "tab-inactive")
-          );
-          button.classList.replace("tab-inactive", "tab-active");
-          tabContents.forEach((content) => {
-            content.id === `tab-content-${tab}`
-              ? content.classList.remove("hidden")
-              : content.classList.add("hidden");
-          });
-          if (tab === "business_details") {
-            tabsContainer.classList.add("sticky-tabs");
-          } else {
-            tabsContainer.classList.remove("sticky-tabs");
-          }
-        });
-      });
-
-      // Avatar upload (with localStorage save/restore)
-      // Avatar elements were removed from the DOM; guard any usage.
-      const avatarUploadEl = getEl("avatar-upload");
-      const changePicBtn = getEl("change-pic-btn");
-      if (changePicBtn && avatarUploadEl && avatarPreview) {
-        changePicBtn.addEventListener("click", () => avatarUploadEl.click());
-        avatarUploadEl.addEventListener("change", function () {
-          if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const base64Image = e.target.result;
-              avatarPreview.src = base64Image;
-              const userId = localStorage.getItem("userId");
-              if (userId) {
-                localStorage.setItem(`avatar_${userId}`, base64Image);
-              }
-              showToast("Avatar updated successfully.");
-            };
-            reader.readAsDataURL(this.files[0]);
-          }
-        });
-      }
-
-      // Business logo upload: read to base64 and preview, include in payload as `logo` field
-      if (logoInput) {
-        logoInput.addEventListener("change", function () {
-          if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const base64Image = e.target.result;
-              businessLogoBase64 = base64Image;
-              if (businessLogoPreview) businessLogoPreview.src = base64Image;
-              showToast("Logo updated locally.");
-            };
-            reader.readAsDataURL(this.files[0]);
-          }
-        });
-      }
-
-      // Password verification & update
-      verifyPasswordBtn.addEventListener("click", async () => {
-        const currentPassword = currentPasswordInput.value;
-        const userId = localStorage.getItem("userId");
-        const token = localStorage.getItem("token"); // <-- 1. Get the token
-
-        if (!currentPassword || !userId) {
-          showToast("Please enter your current password.");
-          return;
-        }
-        // Check for the token as well
-        if (!token) {
-          showToast("Authentication error. Please log in again.");
-          return;
-        }
-
-        setButtonLoading(verifyPasswordBtn, true);
+      // LOAD BUSINESS
+      async function loadBusiness() {
         try {
-          const verifyResponse = await fetch(
-            `https://api.fornowauto.com/api/register/${userId}`,
-            {
-              method: "POST",
-              // 2. Add the headers object with Content-Type AND Authorization
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`, // <-- THE FIX IS HERE
-              },
-              body: JSON.stringify({ password: currentPassword }),
-            }
-          );
-          if (verifyResponse.ok) {
-            const result = await verifyResponse.json();
-            showToast(result.message || "Password verified successfully.");
-            currentPasswordInput.disabled = true;
-            verifyPasswordBtn.classList.add("hidden");
-            newPasswordContainer.classList.remove("hidden");
-          } else {
-            const result = await verifyResponse.json();
-            throw new Error(result.message || "Incorrect password.");
+          const token = getToken();
+          if (!token) return;
+          const res = await fetch(`${API_BASE}/companies`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) return;
+          const companies = await res.json();
+          if (!companies.length) return;
+          const data = companies[0];
+          companyId = data._id;
+          getEl('businessName').value = data.company_name || '';
+          getEl('website').value = data.website || '';
+          getEl('business_phone').value = data.phone || '';
+          getEl('business_email').value = data.email || '';
+          getEl('gst').value = data.gst_no || '';
+          getEl('currency').value = data.currency || '';
+          const ts = parseInt(data.team_size) || 0;
+          if (ts >= 11) getEl('teamSize').value = '11';
+          else if (ts >= 6) getEl('teamSize').value = '6';
+          else if (ts >= 2) getEl('teamSize').value = '2';
+          else if (ts === 1) getEl('teamSize').value = '1';
+          if (data.logo) { getEl('business-logo-preview').src = data.logo; businessLogoBase64 = data.logo; getEl('sidebar-avatar').src = data.logo; }
+          if (data.address) {
+            getEl('street').value = data.address.street || '';
+            getEl('city').value = data.address.city || '';
+            getEl('state').value = data.address.state || '';
+            getEl('pincode').value = data.address.postalCode || '';
+            const c = countries.find(x => x.name === data.address.country);
+            if (c) getEl('business_country').value = c.code;
           }
-        } catch (err) {
-          showToast(err.message || "Verification failed.");
-        } finally {
-          setButtonLoading(verifyPasswordBtn, false);
-        }
-      });
 
-      togglePasswordBtn.addEventListener("click", () => {
-        const isPassword = currentPasswordInput.type === "password";
-        currentPasswordInput.type = isPassword ? "text" : "password";
-        togglePasswordIcon.classList.toggle("fa-eye");
-        togglePasswordIcon.classList.toggle("fa-eye-slash");
-      });
+          // Also populate Profile tab fields from company data if empty
+          if (data.company_name && !getEl('fullName').value) {
+            getEl('fullName').value = data.company_name;
+          }
+          if (data.email && !getEl('email').value) {
+            getEl('email').value = data.email;
+          }
+          if (data.phone && !getEl('phone').value) {
+            getEl('phone').value = data.phone;
+          }
 
-      passwordForm.addEventListener("submit", async (e) => {
+          // Update sidebar
+          if (data.company_name) getEl('sidebar-name').textContent = data.company_name;
+          if (data.email) getEl('sidebar-email').textContent = data.email;
+        } catch (e) { console.error('Business load error:', e); }
+      }
+
+      // SAVE PROFILE
+      getEl('profile-form').addEventListener('submit', async e => {
         e.preventDefault();
-        const newPassword = getEl("newPassword").value;
-        const confirmPassword = getEl("confirmPassword").value;
-        if (newPassword !== confirmPassword) {
-          showToast("New passwords do not match.");
-          return;
-        }
-        setButtonLoading(updatePasswordBtn, true);
+        const btn = getEl('save-profile-btn');
+        setLoading(btn, true);
         try {
-          const userId = localStorage.getItem("userId");
-          const token = localStorage.getItem("token"); // 1. Get the token
+          const token = getToken(), userId = getUserId();
+          if (!token || !userId) throw new Error('Not authenticated');
 
-          if (!userId || !token) {
-            // 2. Check for both
-            throw new Error("No user ID found, please log in again.");
-          }
-
-          const payload = { password: newPassword };
-
-          const updateResponse = await fetch(
-            `https://api.fornowauto.com/api/register/${userId}`,
-            {
-              method: "PATCH", // ✅ FIX: Use PATCH as allowed by the backend
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`, // ✅ FIX: Add the authorization header
-              },
-              body: JSON.stringify(payload),
-            }
-          );
-
-          if (!updateResponse.ok) {
-            const errData = await updateResponse.json();
-            throw new Error(errData.message || "Password update failed.");
-          }
-          showToast("Password updated successfully!");
-          passwordForm.reset();
-          currentPasswordInput.disabled = false;
-          newPasswordContainer.classList.add("hidden");
-          verifyPasswordBtn.classList.remove("hidden");
-        } catch (err) {
-          console.error("Error updating password:", err);
-          showToast(err.message || "Could not update password.");
-        } finally {
-          setButtonLoading(updatePasswordBtn, false);
-        }
-      });
-      profileForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        setButtonLoading(saveProfileBtn, true);
-
-        try {
-          const userId = localStorage.getItem("userId");
-          const token = localStorage.getItem("token"); // <-- 1. GET THE TOKEN
-
-          if (!userId || !token) {
-            // <-- Check for the token too
-            throw new Error("User not authenticated. Please log in again.");
-          }
-
-          // PART 1: Update normal profile details
-          const profilePayload = {
-            username: fullNameInput.value,
-            email: emailInput.value,
-            phone: phoneInput.value,
+          const profileData = {
+            username: getEl('fullName').value,
+            email: getEl('email').value,
+            phone: getEl('phone').value
           };
 
-          const profileResponse = await fetch(
-            `https://api.fornowauto.com/api/register/${userId}`,
-            {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`, // <-- 2. ADD AUTHORIZATION HEADER HERE
-              },
-              body: JSON.stringify(profilePayload),
-            }
-          );
+          // Save to localStorage as backup
+          localStorage.setItem('email', profileData.email);
+          localStorage.setItem('phone', profileData.phone);
 
-          if (!profileResponse.ok) {
-            // More specific error message
-            const errData = await profileResponse.json();
-            throw new Error(
-              errData.message || "Could not update profile details."
-            );
-          }
-
-          // PART 2: Update the country and business details using the business API
-          if (companyId) {
-            const countryName =
-              countries.find((c) => c.code === personalCountrySelect.value)
-                ?.name || "";
-            const businessPayload = {
-              // This just ensures all business data is saved, not just country
-              company_name: getEl("businessName").value,
-              team_size: getEl("teamSize").value,
-              website: getEl("website").value,
-              phone: getEl("business_phone").value,
-              email: getEl("business_email").value,
-              gst_no: getEl("gst").value,
-              currency: getEl("currency").value,
-              address: {
-                street: getEl("street").value,
-                city: getEl("city").value,
-                state: getEl("state").value,
-                postalCode: getEl("pincode").value,
-                country: countryName, // This specifically updates the country
-              },
-            };
-
-            const companyResponse = await fetch(
-              `https://api.fornowauto.com/api/companies/${companyId}?user_id=${userId}`,
-              {
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`, // <-- 3. ADD AUTHORIZATION HEADER HERE TOO
-                },
-                body: JSON.stringify(businessPayload),
-              }
-            );
-            if (!companyResponse.ok) {
-              const errData = await companyResponse.json();
-              throw new Error(
-                errData.message || "Could not update business details."
-              );
-            }
-          }
-
-          showToast("Profile updated successfully!");
-          // Reload the page after 1 second to show the saved data
-          setTimeout(() => {
-            location.reload();
-          }, 1000);
-        } catch (err) {
-          console.error("Error saving profile:", err);
-          showToast(err.message); // Show the specific error from the backend
-          setButtonLoading(saveProfileBtn, false); // Stop loading ONLY on error
-        }
-      });
-
-      // Replace your existing 3 notification event listeners with this
-      notificationToggles.forEach((toggle) => {
-        if (toggle) {
-          toggle.addEventListener("change", (event) => {
-            const isEnabled = event.target.checked;
-            const toggleId = event.target.id;
-
-            // Save the current state (true or false) to localStorage
-            localStorage.setItem(toggleId, isEnabled);
-
-            // Determine the feature name for the toast message
-            let featureName = "";
-            if (toggleId === "email-notifications-toggle") {
-              featureName = "Email notifications";
-            } else if (toggleId === "order-alerts-toggle") {
-              featureName = "Order alerts";
-            } else if (toggleId === "weekly-summary-toggle") {
-              featureName = "Weekly summary";
-            }
-
-            showToast(
-              `${featureName} ${isEnabled ? "enabled" : "disabled"}.`
-            );
+          const res = await fetch(`${API_BASE}/register/${userId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(profileData)
           });
-        }
-      });
 
-      function loadNotificationSettings() {
-        notificationToggles.forEach((toggle) => {
-          if (toggle) {
-            // Get the saved state from localStorage (it will be a string 'true' or 'false')
-            const savedState = localStorage.getItem(toggle.id);
-
-            // Set the toggle's 'checked' property based on the saved state
-            // Defaults to false (unchecked) if no setting is found
-            toggle.checked = savedState === "true";
-          }
-        });
-      }
-
-      // Delete modal
-      function openDeleteModal() {
-        deleteModal.classList.remove("hidden");
-        deleteModal.classList.add("flex");
-        setTimeout(() => {
-          deleteModalOverlay.classList.replace("opacity-0", "opacity-50");
-          deleteModalPanel.classList.replace("scale-95", "scale-100");
-          deleteModalPanel.classList.replace("opacity-0", "opacity-100");
-        }, 10);
-      }
-      function closeDeleteModal() {
-        deleteModalOverlay.classList.replace("opacity-50", "opacity-0");
-        deleteModalPanel.classList.replace("scale-100", "scale-95");
-        deleteModalPanel.classList.replace("opacity-100", "opacity-0");
-        setTimeout(() => {
-          deleteModal.classList.add("hidden");
-          deleteModal.classList.remove("flex");
-        }, 300);
-      }
-      deleteAccountBtn.addEventListener("click", openDeleteModal);
-      cancelDeleteBtn.addEventListener("click", closeDeleteModal);
-      deleteModalOverlay.addEventListener("click", closeDeleteModal);
-
-      // ======================================================
-      // === 🚨 Account Deletion Scheduling Logic 🚨 ===
-      // ======================================================
-      async function scheduleAccountDeletion() {
-        const userId = localStorage.getItem("userId");
-        if (!userId) {
-          showToast("Action failed: User not found. Please log in again.");
-          return;
-        }
-
-        const originalButtonText = confirmDeleteBtn.innerHTML;
-        setButtonLoading(confirmDeleteBtn, true);
-
-        try {
-          const response = await fetch(
-            `https://api.fornowauto.com/api/register/schedule-deletion/${userId}`,
-            {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-            }
-          );
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(
-              errorData.message || "Failed to schedule account deletion."
-            );
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.message || `Server error: ${res.status}`);
           }
 
-          closeDeleteModal();
-          showToast("Account scheduled for deletion in 30 days.");
+          showToast('Profile updated!');
 
-          // Log the user out and redirect after a delay
-          setTimeout(() => {
-            localStorage.clear(); // Clear user ID, tokens, etc.
-            window.location.href = "/login.html"; // Or your login page
-          }, 3000);
-        } catch (error) {
-          showToast(error.message);
-          setButtonLoading(confirmDeleteBtn, false, originalButtonText);
+          // Update sidebar
+          getEl('sidebar-name').textContent = profileData.username || 'User';
+          getEl('sidebar-email').textContent = profileData.email;
+
+        } catch (e) {
+          console.error('Profile save error:', e);
+          showToast(e.message || 'Failed to save profile', 'error');
         }
-      }
+        finally { setLoading(btn, false); }
+      });
 
-      confirmDeleteBtn.addEventListener("click", scheduleAccountDeletion);
-
-      // === COUNTRY SYNC ===
-      function syncCountries(source, target) {
-        if (target.value !== source.value) {
-          target.value = source.value;
+      // LOGO UPLOAD
+      getEl('logo').addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = e => { businessLogoBase64 = e.target.result; getEl('business-logo-preview').src = businessLogoBase64; };
+          reader.readAsDataURL(this.files[0]);
         }
-      }
-
-      // Keep them in sync when a user makes a change
-      personalCountrySelect.addEventListener("change", () => {
-        syncCountries(personalCountrySelect, businessCountrySelect);
       });
 
-      businessCountrySelect.addEventListener("change", () => {
-        syncCountries(businessCountrySelect, personalCountrySelect);
-      });
-
-      // This function runs once after all data is loaded to sync the initial state
-      function initialCountrySync() {
-        // If the business dropdown has a value and the personal one doesn't, sync it.
-        if (businessCountrySelect.value && !personalCountrySelect.value) {
-          syncCountries(businessCountrySelect, personalCountrySelect);
-        }
-      }
-      // Keep them in sync when changed
-      personalCountrySelect.addEventListener("change", () => {
-        syncCountries(personalCountrySelect, businessCountrySelect);
-      });
-
-      businessCountrySelect.addEventListener("change", () => {
-        syncCountries(businessCountrySelect, personalCountrySelect);
-      });
-
-      // Initial sync after loading data
-      function initialCountrySync() {
-        if (!personalCountrySelect.value && businessCountrySelect.value) {
-          // If personal is empty, copy from business
-          syncCountries(businessCountrySelect, personalCountrySelect);
-        } else if (
-          personalCountrySelect.value &&
-          !businessCountrySelect.value
-        ) {
-          // If business is empty, copy from personal
-          syncCountries(personalCountrySelect, businessCountrySelect);
-        }
-      }
-
-      personalCountrySelect.addEventListener("change", () => {
-        syncCountries(personalCountrySelect, businessCountrySelect);
-      });
-
-      businessCountrySelect.addEventListener("change", () => {
-        syncCountries(businessCountrySelect, personalCountrySelect);
-      });
-
-      // Run once after data is loaded
-      function initialCountrySync() {
-        if (personalCountrySelect.value) {
-          syncCountries(personalCountrySelect, businessCountrySelect);
-        } else if (businessCountrySelect.value) {
-          syncCountries(businessCountrySelect, personalCountrySelect);
-        }
-      }
-
-      // Business form
-      businessForm.addEventListener("submit", async (e) => {
+      // SAVE BUSINESS
+      getEl('business-form').addEventListener('submit', async e => {
         e.preventDefault();
-        setButtonLoading(submitBtn, true);
+        const btn = getEl('save-business-btn');
+        setLoading(btn, true);
         try {
-          const userId = localStorage.getItem("userId");
-          if (!companyId || !userId)
-            throw new Error(
-              "Cannot update: Details not loaded or user not logged in."
-            );
-
-          const countryName =
-            countries.find((c) => c.code === businessCountrySelect.value)
-              ?.name || "";
-          const businessPayload = {
-            company_name: getEl("businessName").value,
-            team_size: getEl("teamSize").value,
-            website: getEl("website").value,
-            phone: getEl("business_phone").value,
-            email: getEl("business_email").value,
-            gst_no: getEl("gst").value,
-            currency: getEl("currency").value,
-            // include logo if selected/read
-            logo: businessLogoBase64,
-            address: {
-              street: getEl("street").value,
-              city: getEl("city").value,
-              state: getEl("state").value,
-              postalCode: getEl("pincode").value,
-              country: countryName,
-            },
+          const token = getToken(), userId = getUserId();
+          if (!token || !userId || !companyId) throw new Error('Cannot update');
+          const countryName = countries.find(c => c.code === getEl('business_country').value)?.name || '';
+          const payload = {
+            company_name: getEl('businessName').value, team_size: getEl('teamSize').value, website: getEl('website').value,
+            phone: getEl('business_phone').value, email: getEl('business_email').value, gst_no: getEl('gst').value,
+            currency: getEl('currency').value, logo: businessLogoBase64,
+            address: { street: getEl('street').value, city: getEl('city').value, state: getEl('state').value, postalCode: getEl('pincode').value, country: countryName }
           };
-
-          // ... inside businessForm.addEventListener
-          const token = localStorage.getItem("token"); // <-- 1. Get the token
-          if (!token) {
-            showToast("Authentication error. Please log in again.");
-            setButtonLoading(submitBtn, false);
-            return;
-          }
-
-          const response = await fetch(
-            `https://api.fornowauto.com/api/companies/${companyId}?user_id=${userId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`, // <-- 2. Add this line
-              },
-              body: JSON.stringify(businessPayload),
-            }
-          );
-
-          if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.message || "Business update failed");
-          }
-
-          showToast("Business details updated successfully!");
-          // THIS IS THE FIX: Reload the page after 1 second
-          setTimeout(() => {
-            location.reload();
-          }, 1000);
-        } catch (err) {
-          showToast(err.message);
-          setButtonLoading(submitBtn, false); // Stop loading ONLY on error
-        }
+          const res = await fetch(`${API_BASE}/companies/${companyId}?user_id=${userId}`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('Failed');
+          showToast('Business updated!');
+          loadBusiness();
+        } catch (e) { showToast(e.message, 'error'); }
+        finally { setLoading(btn, false); }
       });
-      // Sidebar Dropdown
-      const documentsDropdownBtn = getEl("documents-dropdown-btn");
-      const documentsDropdownContent = getEl("documents-dropdown-content");
-      const documentsDropdownIcon = getEl("dropdown-icon");
 
-      if (documentsDropdownBtn && documentsDropdownContent && documentsDropdownIcon) {
-        documentsDropdownBtn.addEventListener("click", () => {
-          documentsDropdownContent.classList.toggle("open");
-          // rotate the chevron using Tailwind's rotate class
-          documentsDropdownIcon.classList.toggle("rotate-180");
-        });
+      // BANK MANAGEMENT
+      const bankModal = getEl('bank-modal');
+      function openBankModal(isEdit = false, data = null) {
+        currentBankId = data?._id || null;
+        getEl('bank-modal-title').textContent = isEdit ? 'Edit Bank' : 'Add Bank';
+        if (isEdit && data) {
+          getEl('bank-id').value = data._id || '';
+          getEl('bank_name').value = data.bank_name || '';
+          getEl('account_holder').value = data.account_holder || '';
+          getEl('account_number').value = data.account_number || '';
+          getEl('ifsc_code').value = data.ifsc_code || '';
+          getEl('branch_name').value = data.branch_name || '';
+          getEl('account_type').value = data.account_type || '';
+          getEl('upi_id').value = data.upi_id || '';
+        } else { getEl('bank-form').reset(); }
+        bankModal.classList.add('active');
       }
+      function closeBankModal() { bankModal.classList.remove('active'); getEl('bank-form').reset(); currentBankId = null; }
+      getEl('add-bank-btn').addEventListener('click', () => openBankModal(false));
+      getEl('close-bank-modal').addEventListener('click', closeBankModal);
+      getEl('cancel-bank-btn').addEventListener('click', closeBankModal);
+      getEl('bank-modal-overlay').addEventListener('click', closeBankModal);
 
-      const purchasesDropdownBtn = getEl("purchases-dropdown-btn");
-      const purchasesDropdownContent = getEl("purchases-dropdown-content");
-      const purchasesDropdownIcon = getEl("purchases-dropdown-icon");
-
-      if (purchasesDropdownBtn && purchasesDropdownContent && purchasesDropdownIcon) {
-        purchasesDropdownBtn.addEventListener("click", () => {
-          purchasesDropdownContent.classList.toggle("open");
-          purchasesDropdownIcon.classList.toggle("rotate-180");
-        });
-      }
-
-      // =================================================
-      // SECTION 7: INIT
-      // =================================================
-      async function initializePage() {
-        // restore avatar if saved
-        // Restore avatar for the specific logged-in user
-        const userId = localStorage.getItem("userId");
-        if (userId) {
-          const savedAvatar = localStorage.getItem(`avatar_${userId}`);
-          if (savedAvatar) {
-            avatarPreview.src = savedAvatar;
-          }
-        }
-
-        populateCountryDropdowns();
-        if (saveProfileBtn)
-          saveProfileBtn.dataset.originalText = saveProfileBtn.innerHTML;
-        if (updatePasswordBtn)
-          updatePasswordBtn.dataset.originalText =
-            updatePasswordBtn.innerHTML;
-        if (verifyPasswordBtn)
-          verifyPasswordBtn.dataset.originalText =
-            verifyPasswordBtn.innerHTML;
-        if (submitBtn) submitBtn.dataset.originalText = submitBtn.innerHTML;
-
-        // Wait for both loading functions to complete before continuing
-        await Promise.all([loadSettings(), loadBusinessDetails()]);
-
-        loadNotificationSettings();
-
-        // Now that the data is guaranteed to be loaded, sync the dropdowns
-        initialCountrySync();
-      }
-      initializePage();
-      
-// ADD THIS JAVASCRIPT CODE to your existing <script> section
-// Place it inside the DOMContentLoaded event listener
-
-// ===== BANK DETAILS MANAGEMENT =====
-const BANK_API_URL = 'https://api.fornowauto.com/api/banks';
-let currentBankId = null;
-let bankToDelete = null;
-
-// Modal elements
-const bankModal = getEl('bank-modal');
-const bankModalOverlay = getEl('bank-modal-overlay');
-const bankModalPanel = getEl('bank-modal-panel');
-const bankModalTitle = getEl('bank-modal-title');
-const closeBankModalBtn = getEl('close-bank-modal');
-const addBankBtn = getEl('add-bank-btn');
-const cancelBankBtn = getEl('cancel-bank-btn');
-const bankForm = getEl('bank-form');
-const saveBankBtn = getEl('save-bank-btn');
-const banksListContainer = getEl('banks-list-container');
-
-// Delete modal
-const deleteBankModal = getEl('delete-bank-modal');
-const deleteBankModalOverlay = getEl('delete-bank-modal-overlay');
-const deleteBankModalPanel = getEl('delete-bank-modal-panel');
-const confirmDeleteBankBtn = getEl('confirm-delete-bank-btn');
-const cancelDeleteBankBtn = getEl('cancel-delete-bank-btn');
-
-// Open/Close Bank Modal
-function openBankModal(isEdit = false, bankData = null) {
-  currentBankId = bankData?._id || null;
-  bankModalTitle.textContent = isEdit ? 'Edit Bank Account' : 'Add Bank Account';
-  
-  if (isEdit && bankData) {
-    getEl('bank-id').value = bankData._id || '';
-    getEl('bank_name').value = bankData.bank_name || '';
-    getEl('account_holder').value = bankData.account_holder || '';
-    getEl('account_number').value = bankData.account_number || '';
-    getEl('ifsc_code').value = bankData.ifsc_code || '';
-    getEl('branch_name').value = bankData.branch_name || '';
-    getEl('account_type').value = bankData.account_type || '';
-    getEl('upi_id').value = bankData.upi_id || '';
-  } else {
-    bankForm.reset();
-  }
-  
-  bankModal.classList.remove('hidden');
-  bankModal.classList.add('flex');
-  setTimeout(() => {
-    bankModalOverlay.classList.replace('opacity-0', 'opacity-50');
-    bankModalPanel.classList.replace('scale-95', 'scale-100');
-    bankModalPanel.classList.replace('opacity-0', 'opacity-100');
-  }, 10);
-}
-
-function closeBankModal() {
-  bankModalOverlay.classList.replace('opacity-50', 'opacity-0');
-  bankModalPanel.classList.replace('scale-100', 'scale-95');
-  bankModalPanel.classList.replace('opacity-100', 'opacity-0');
-  setTimeout(() => {
-    bankModal.classList.add('hidden');
-    bankModal.classList.remove('flex');
-    bankForm.reset();
-    currentBankId = null;
-  }, 300);
-}
-
-// Open/Close Delete Modal
-function openDeleteBankModal(bankId) {
-  bankToDelete = bankId;
-  deleteBankModal.classList.remove('hidden');
-  deleteBankModal.classList.add('flex');
-  setTimeout(() => {
-    deleteBankModalOverlay.classList.replace('opacity-0', 'opacity-50');
-    deleteBankModalPanel.classList.replace('scale-95', 'scale-100');
-    deleteBankModalPanel.classList.replace('opacity-0', 'opacity-100');
-  }, 10);
-}
-
-function closeDeleteBankModal() {
-  deleteBankModalOverlay.classList.replace('opacity-50', 'opacity-0');
-  deleteBankModalPanel.classList.replace('scale-100', 'scale-95');
-  deleteBankModalPanel.classList.replace('opacity-100', 'opacity-0');
-  setTimeout(() => {
-    deleteBankModal.classList.add('hidden');
-    deleteBankModal.classList.remove('flex');
-    bankToDelete = null;
-  }, 300);
-}
-
-// Load banks
-async function loadBanks() {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.log('No token, skipping bank load');
-      return;
-    }
-
-    const response = await fetch(BANK_API_URL, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        banksListContainer.innerHTML = `
-          <div class="text-center py-8 text-gray-500">
-            <i class="fas fa-university text-4xl mb-2"></i>
-            <p>No bank accounts added yet.</p>
-          </div>
-        `;
-        return;
-      }
-      throw new Error('Failed to load banks');
-    }
-
-    const banks = await response.json();
-    
-    if (!banks || banks.length === 0) {
-      banksListContainer.innerHTML = `
-        <div class="text-center py-8 text-gray-500">
-          <i class="fas fa-university text-4xl mb-2"></i>
-          <p>No bank accounts added yet.</p>
-        </div>
-      `;
-      return;
-    }
-
-    banksListContainer.innerHTML = banks.map(bank => `
-      <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-        <div class="flex justify-between items-start">
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-2">
-              <i class="fas fa-university text-indigo-600"></i>
-              <h3 class="font-semibold text-lg" style="color: #000;">${bank.bank_name || 'N/A'}</h3>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-              <p><span class="text-gray-600">Account Holder:</span> <span class="font-medium" style="color: #000;">${bank.account_holder || 'N/A'}</span></p>
-              <p><span class="text-gray-600">Account Number:</span> <span class="font-medium" style="color: #000;">****${bank.account_number?.slice(-4) || 'N/A'}</span></p>
-              <p><span class="text-gray-600">IFSC Code:</span> <span class="font-medium" style="color: #000;">${bank.ifsc_code || 'N/A'}</span></p>
-              <p><span class="text-gray-600">Branch:</span> <span class="font-medium" style="color: #000;">${bank.branch_name || 'N/A'}</span></p>
-              ${bank.upi_id ? `<p><span class="text-gray-600">UPI ID:</span> <span class="font-medium" style="color: #000;">${bank.upi_id}</span></p>` : ''}
-              ${bank.account_type ? `<p><span class="text-gray-600">Type:</span> <span class="font-medium" style="color: #000;">${bank.account_type}</span></p>` : ''}
+      async function loadBanks() {
+        try {
+          const token = getToken();
+          if (!token) return;
+          const res = await fetch(`${API_BASE}/banks`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) { getEl('banks-list').innerHTML = '<div class="empty-state"><i class="fas fa-university empty-state-icon"></i><p class="empty-state-title">No bank accounts</p></div>'; return; }
+          const banks = await res.json();
+          if (!banks.length) { getEl('banks-list').innerHTML = '<div class="empty-state"><i class="fas fa-university empty-state-icon"></i><p class="empty-state-title">No bank accounts</p></div>'; return; }
+          getEl('banks-list').innerHTML = banks.map(b => `
+          <div class="bank-card">
+            <div class="flex justify-between items-start">
+              <div><div class="flex items-center gap-2 mb-2"><i class="fas fa-university text-primary"></i><h3 class="font-semibold">${b.bank_name || 'N/A'}</h3></div>
+              <div class="grid-2 text-sm"><p><span class="text-muted">Holder:</span> ${b.account_holder || 'N/A'}</p><p><span class="text-muted">A/C:</span> ****${(b.account_number || '').slice(-4)}</p><p><span class="text-muted">IFSC:</span> ${b.ifsc_code || 'N/A'}</p><p><span class="text-muted">Branch:</span> ${b.branch_name || 'N/A'}</p></div></div>
+              <div class="flex gap-2"><button class="btn btn-ghost edit-bank-btn" style="width:auto;padding:0.5rem;" data-bank='${JSON.stringify(b)}'><i class="fas fa-edit text-primary"></i></button><button class="btn btn-ghost delete-bank-btn" style="width:auto;padding:0.5rem;" data-id="${b._id}"><i class="fas fa-trash text-danger"></i></button></div>
             </div>
           </div>
-          <div class="flex gap-2 ml-4">
-            <button class="edit-bank-btn text-indigo-600 hover:text-indigo-800 p-2" data-bank='${JSON.stringify(bank)}'>
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="delete-bank-btn text-red-600 hover:text-red-800 p-2" data-bank-id="${bank._id}">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    `).join('');
+        `).join('');
+          document.querySelectorAll('.edit-bank-btn').forEach(btn => btn.addEventListener('click', () => openBankModal(true, JSON.parse(btn.dataset.bank))));
+          document.querySelectorAll('.delete-bank-btn').forEach(btn => btn.addEventListener('click', () => { deleteTarget = btn.dataset.id; getEl('delete-modal-title').textContent = 'Delete Bank'; getEl('delete-modal-message').textContent = 'Delete this bank account?'; getEl('delete-modal').classList.add('active'); }));
+        } catch (e) { console.error(e); }
+      }
 
-    // Attach event listeners to edit and delete buttons
-    document.querySelectorAll('.edit-bank-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const bankData = JSON.parse(e.currentTarget.dataset.bank);
-        openBankModal(true, bankData);
+      getEl('bank-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const btn = getEl('save-bank-btn');
+        setLoading(btn, true);
+        try {
+          const token = getToken();
+          if (!token) throw new Error('Not authenticated');
+          const payload = { bank_name: getEl('bank_name').value, account_holder: getEl('account_holder').value, account_number: getEl('account_number').value, ifsc_code: getEl('ifsc_code').value.toUpperCase(), branch_name: getEl('branch_name').value, account_type: getEl('account_type').value, upi_id: getEl('upi_id').value };
+          const isEdit = !!currentBankId;
+          const res = await fetch(isEdit ? `${API_BASE}/banks/${currentBankId}` : `${API_BASE}/banks`, {
+            method: isEdit ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('Failed');
+          showToast(isEdit ? 'Bank updated!' : 'Bank added!');
+          closeBankModal();
+          loadBanks();
+        } catch (e) { showToast(e.message, 'error'); }
+        finally { setLoading(btn, false); }
       });
-    });
 
-    document.querySelectorAll('.delete-bank-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const bankId = e.currentTarget.dataset.bankId;
-        openDeleteBankModal(bankId);
+      // DELETE MODAL
+      const deleteModal = getEl('delete-modal');
+      getEl('cancel-delete-btn').addEventListener('click', () => { deleteModal.classList.remove('active'); deleteTarget = null; });
+      getEl('delete-modal-overlay').addEventListener('click', () => { deleteModal.classList.remove('active'); deleteTarget = null; });
+      getEl('confirm-delete-btn').addEventListener('click', async () => {
+        if (!deleteTarget) return;
+        const btn = getEl('confirm-delete-btn');
+        setLoading(btn, true);
+        try {
+          const token = getToken();
+          if (deleteTarget === 'account') {
+            const res = await fetch(`${API_BASE}/register/schedule-deletion/${getUserId()}`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) throw new Error('Failed');
+            showToast('Account scheduled for deletion');
+            setTimeout(() => { localStorage.clear(); window.location.href = 'index.html'; }, 2000);
+          } else {
+            const res = await fetch(`${API_BASE}/banks/${deleteTarget}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) throw new Error('Failed');
+            showToast('Bank deleted!');
+            loadBanks();
+          }
+          deleteModal.classList.remove('active');
+          deleteTarget = null;
+        } catch (e) { showToast(e.message, 'error'); }
+        finally { setLoading(btn, false); }
       });
-    });
+      getEl('delete-account-btn').addEventListener('click', () => { deleteTarget = 'account'; getEl('delete-modal-title').textContent = 'Delete Account'; getEl('delete-modal-message').textContent = 'Your account will be deleted after 30 days.'; deleteModal.classList.add('active'); });
 
-  } catch (error) {
-    console.error('Error loading banks:', error);
-    showToast('Failed to load bank accounts');
-  }
-}
+      // PASSWORD
+      getEl('verify-password-btn').addEventListener('click', async () => {
+        const btn = getEl('verify-password-btn'), pwd = getEl('currentPassword').value;
+        if (!pwd) { showToast('Enter password', 'error'); return; }
+        setLoading(btn, true);
+        try {
+          const res = await fetch(`${API_BASE}/register/${getUserId()}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` }, body: JSON.stringify({ password: pwd }) });
+          if (!res.ok) throw new Error('Incorrect');
+          showToast('Verified!');
+          getEl('currentPassword').disabled = true;
+          btn.classList.add('hidden');
+          getEl('new-password-section').classList.remove('hidden');
+        } catch (e) { showToast(e.message, 'error'); }
+        finally { setLoading(btn, false); }
+      });
 
-// Save bank (Create or Update)
-bankForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  setButtonLoading(saveBankBtn, true);
+      getEl('password-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const newP = getEl('newPassword').value, confP = getEl('confirmPassword').value;
+        if (newP !== confP) { showToast('Passwords do not match', 'error'); return; }
+        const btn = getEl('update-password-btn');
+        setLoading(btn, true);
+        try {
+          const res = await fetch(`${API_BASE}/register/${getUserId()}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` }, body: JSON.stringify({ password: newP }) });
+          if (!res.ok) throw new Error('Failed');
+          showToast('Password updated!');
+          getEl('password-form').reset();
+          getEl('currentPassword').disabled = false;
+          getEl('verify-password-btn').classList.remove('hidden');
+          getEl('new-password-section').classList.add('hidden');
+        } catch (e) { showToast(e.message, 'error'); }
+        finally { setLoading(btn, false); }
+      });
 
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('Not authenticated');
+      // NOTIFICATIONS
+      ['email-notifications', 'order-alerts', 'weekly-summary'].forEach(id => {
+        const tog = getEl(id);
+        if (!tog) return;
+        tog.checked = localStorage.getItem(`qsi-${id}`) === 'true';
+        tog.addEventListener('change', e => { localStorage.setItem(`qsi-${id}`, e.target.checked); showToast(`${id.replace(/-/g, ' ')} ${e.target.checked ? 'enabled' : 'disabled'}`); });
+      });
 
-    const bankData = {
-      bank_name: getEl('bank_name').value.trim(),
-      account_holder: getEl('account_holder').value.trim(),
-      account_number: getEl('account_number').value.trim(),
-      ifsc_code: getEl('ifsc_code').value.trim().toUpperCase(),
-      branch_name: getEl('branch_name').value.trim(),
-      account_type: getEl('account_type').value,
-      upi_id: getEl('upi_id').value.trim()
-    };
+      // THEME - Using Global Theme Manager
+      const themeOptions = document.querySelectorAll('.theme-option');
 
-    const isEdit = !!currentBankId;
-    const url = isEdit ? `${BANK_API_URL}/${currentBankId}` : BANK_API_URL;
-    const method = isEdit ? 'PUT' : 'POST';
+      function setSelectedTheme(theme) {
+        themeOptions.forEach(o => o.classList.toggle('selected', o.dataset.theme === theme));
+      }
 
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(bankData)
-    });
+      // Get current theme from global manager
+      const savedTheme = window.QSITheme.get();
+      setSelectedTheme(savedTheme);
 
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.message || 'Failed to save bank account');
-    }
+      // Handle theme option clicks
+      themeOptions.forEach(o => o.addEventListener('click', () => {
+        const selectedTheme = o.dataset.theme;
 
-    showToast(isEdit ? 'Bank account updated successfully!' : 'Bank account added successfully!');
-    closeBankModal();
-    await loadBanks();
-  } catch (error) {
-    console.error('Error saving bank:', error);
-    showToast(error.message);
-  } finally {
-    setButtonLoading(saveBankBtn, false);
-  }
-});
+        // Use global theme manager to set theme
+        window.QSITheme.set(selectedTheme);
 
-// Delete bank
-confirmDeleteBankBtn.addEventListener('click', async () => {
-  if (!bankToDelete) return;
+        // Update UI
+        setSelectedTheme(selectedTheme);
 
-  setButtonLoading(confirmDeleteBankBtn, true);
+        // Show confirmation
+        const themeLabel = selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1);
+        showToast(`Theme changed to ${themeLabel}. This will apply to all pages.`);
+      }));
 
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('Not authenticated');
-
-    const response = await fetch(`${BANK_API_URL}/${bankToDelete}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.message || 'Failed to delete bank account');
-    }
-
-    showToast('Bank account deleted successfully!');
-    closeDeleteBankModal();
-    await loadBanks();
-  } catch (error) {
-    console.error('Error deleting bank:', error);
-    showToast(error.message);
-  } finally {
-    setButtonLoading(confirmDeleteBankBtn, false);
-  }
-});
-
-// Event Listeners
-addBankBtn.addEventListener('click', () => openBankModal(false));
-closeBankModalBtn.addEventListener('click', closeBankModal);
-cancelBankBtn.addEventListener('click', closeBankModal);
-bankModalOverlay.addEventListener('click', closeBankModal);
-
-cancelDeleteBankBtn.addEventListener('click', closeDeleteBankModal);
-deleteBankModalOverlay.addEventListener('click', closeDeleteBankModal);
-
-// Load banks when Bank Details tab is clicked
-tabButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    const tab = button.dataset.tab;
-    if (tab === 'bank_details') {
-      loadBanks();
-    }
-  });
-});
-
+      // INIT
+      populateCountries();
+      loadProfile();
+      loadBusiness();
     });
   </script>
-  
 </body>
 
 </html>

@@ -99,6 +99,11 @@
             color: #f87171;
         }
     </style>
+    <link rel="stylesheet" href="../js/fix-icons.css">
+    <link rel="stylesheet" href="../js/theme-force.css">
+    <link rel="stylesheet" href="../js/professional-sidebar.css">
+    <!-- Global Theme Manager -->
+    <script src="../js/theme-manager.js"></script>
 </head>
 <body>
     <!-- Mobile Header -->
@@ -115,134 +120,229 @@
     <div id="menu-backdrop" class="menu-backdrop"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar"
-        class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+    <!-- UNIFIED PROFESSIONAL SIDEBAR - QSI Application -->
+<aside id="sidebar" class="sidebar">
+    <!-- Logo Section -->
+    <div class="sidebar-logo">
+        <h1 class="logo-text">QSI</h1>
+    </div>
 
-        <!-- Logo/Brand Section -->
-        <div class="p-6 text-2xl font-bold border-b border-gray-700 flex items-center">
-            <i class="fas fa-cube mr-3 text-indigo-400"></i> QSI
+    <!-- Search Bar -->
+    <div class="sidebar-search">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Search..." class="search-input" id="sidebarSearch">
+        </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+        <!-- Dashboard -->
+        <a href="./dashboard_with_login.html" class="sidebar-link" data-page="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <!-- Sales Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">SALES DOCUMENTS</div>
         </div>
 
-        <!-- Navigation -->
-        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-            
-            <!-- Dashboard -->
-            <a href="dashboard_with_login.html" id="nav-dashboard"
-                class="nav-link flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
-                <i class="fas fa-chart-pie mr-3 w-5 text-center"></i>
-                <span>Dashboard</span>
-            </a>
+        <a href="./quotation/home_quotation.html" class="sidebar-link" data-page="quotation">
+            <i class="fas fa-file-alt"></i>
+            <span>Quotations</span>
+        </a>
 
-            <!-- Sales Documents Dropdown -->
-            <div class="nav-dropdown">
-                <button id="documents-dropdown-btn"
-                    class="dropdown-btn w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
-                    <span class="flex items-center">
-                        <i class="fas fa-file-invoice mr-3 w-5 text-center"></i>
-                        <span>Sales Documents</span>
-                    </span>
-                    <i id="documents-dropdown-icon" class="fas fa-chevron-down dropdown-icon"></i>
-                </button>
-                <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
-                    <a href="quotation/home_quotation.html" id="nav-quotation"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-file-alt mr-2 w-4 text-center text-gray-400"></i>
-                        Quotation
-                    </a>
-                    <a href="saleorder/home_sales_order.html" id="nav-sales-order"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-clipboard-list mr-2 w-4 text-center text-gray-400"></i>
-                        Sales Order
-                    </a>
-                    <a href="invoice/home_invoice.html" id="nav-invoice"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-file-invoice-dollar mr-2 w-4 text-center text-gray-400"></i>
-                        Invoice
-                    </a>
-                    <a href="credit_note.html" id="nav-credit-note"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-receipt mr-2 w-4 text-center text-gray-400"></i>
-                        Credit Note
-                    </a>
-                </div>
-            </div>
+        <a href="./saleorder/home_sales_order.html" class="sidebar-link" data-page="salesorder">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Sales Orders</span>
+        </a>
 
-            <!-- Purchases Dropdown -->
-            <div class="nav-dropdown">
-                <button id="purchases-dropdown-btn"
-                    class="dropdown-btn w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
-                    <span class="flex items-center">
-                        <i class="fas fa-shopping-cart mr-3 w-5 text-center"></i>
-                        <span>Purchases</span>
-                    </span>
-                    <i id="purchases-dropdown-icon" class="fas fa-chevron-down dropdown-icon"></i>
-                </button>
-                <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
-                    <a href="parchase/vendor/vendors_leads.html" id="nav-vendors-leads"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-user-tie mr-2 w-4 text-center text-gray-400"></i>
-                        Vendors Leads
-                    </a>
-                    <a href="parchase/vendors&suppliers/vendors_suppliers.html" id="nav-vendors-suppliers"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-truck mr-2 w-4 text-center text-gray-400"></i>
-                        Vendors & Suppliers
-                    </a>
-                    <a href="parchase/purchases&expenses/purchases_expenses_home.html" id="nav-purchases-expenses"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-money-bill-wave mr-2 w-4 text-center text-gray-400"></i>
-                        Purchases & Expenses
-                    </a>
-                    <a href="parchase/parchase_order/home_purchase_orders.html" id="nav-purchase-orders"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-shopping-bag mr-2 w-4 text-center text-gray-400"></i>
-                        Purchase Orders
-                    </a>
-                    <a href="parchase/payout receipts/home_payout_receipts.html" id="nav-payout-receipts"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-hand-holding-usd mr-2 w-4 text-center text-gray-400"></i>
-                        Payout Receipts
-                    </a>
-                    <a href="parchase/debit_notes/home_debit_notes.html" id="nav-debit-notes"
-                        class="nav-link block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
-                        <i class="fas fa-file-invoice mr-2 w-4 text-center text-gray-400"></i>
-                        Debit Notes
-                    </a>
-                </div>
-            </div>
+        <a href="./invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
+            <i class="fas fa-file-invoice"></i>
+            <span>Invoices</span>
+        </a>
 
-            <!-- Manage Clients -->
-            <a href="manage-clients.html" id="nav-manage-clients"
-                class="nav-link flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
-                <i class="fas fa-users mr-3 w-5 text-center"></i>
-                <span>Manage Clients</span>
-            </a>
+        <a href="./credit_note.html" class="sidebar-link" data-page="creditnote">
+            <i class="fas fa-receipt"></i>
+            <span>Credit Notes</span>
+        </a>
 
-            <!-- Settings -->
-            <a href="settings.html" id="nav-settings"
-                class="nav-link flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
-                <i class="fas fa-cog mr-3 w-5 text-center"></i>
-                <span>Settings</span>
-            </a>
-
-        </nav>
-
-        <!-- User Section at Bottom -->
-        <div class="p-4 border-t border-gray-700">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
-                    <i class="fas fa-user text-white"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium truncate" id="sidebar-username">User</p>
-                    <p class="text-xs text-gray-400 truncate" id="sidebar-email">user@example.com</p>
-                </div>
-                <button id="logout-btn" class="text-gray-400 hover:text-red-400 transition-colors" title="Logout">
-                    <i class="fas fa-sign-out-alt text-lg"></i>
-                </button>
-            </div>
+        <!-- Purchase Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">PURCHASE DOCUMENTS</div>
         </div>
-    </aside>
+
+        <a href="./parchase/vendor/vendor_leads.html" class="sidebar-link" data-page="vendor">
+            <i class="fas fa-store"></i>
+            <span>Vendors</span>
+        </a>
+
+        <a href="./parchase/parchase_order/home_purchase_order.html" class="sidebar-link" data-page="purchaseorder">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Purchase Orders</span>
+        </a>
+
+        <a href="./parchase/bills.html" class="sidebar-link" data-page="bills">
+            <i class="fas fa-file-invoice"></i>
+            <span>Bills</span>
+        </a>
+
+        <a href="./parchase/debit_note/debit_note.html" class="sidebar-link" data-page="debitnote">
+            <i class="fas fa-sticky-note"></i>
+            <span>Debit Notes</span>
+        </a>
+
+        <!-- Other Sections -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">MANAGEMENT</div>
+        </div>
+
+        <a href="./payout.html" class="sidebar-link" data-page="payout">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payouts</span>
+        </a>
+
+        <a href="./manage-clients.html" class="sidebar-link" data-page="client">
+            <i class="fas fa-users"></i>
+            <span>Clients</span>
+        </a>
+
+        <a href="./item_management.html" class="sidebar-link" data-page="items">
+            <i class="fas fa-cube"></i>
+            <span>Items</span>
+        </a>
+
+        <a href="./settings.html" class="sidebar-link" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <!-- User Profile Section -->
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">User</div>
+                <div class="user-email" id="sidebarUserEmail">user@qsi.com</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<!-- Sidebar Toggle Button (Mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Mobile Backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<script>
+// Sidebar functionality
+(function() {
+    'use strict';
+
+    // Set active link based on current page
+    function setActiveLink() {
+        const currentPath = window.location.pathname;
+        const links = document.querySelectorAll('.sidebar-link');
+
+        links.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+
+            // Check if current page matches link
+            if (href && (currentPath.includes(href.replace('../', '')) || currentPath.includes(href))) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // Mobile sidebar toggle
+    function initMobileToggle() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (!sidebar || !toggle || !backdrop) return;
+
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+            backdrop.classList.toggle('backdrop-active');
+            document.body.classList.toggle('sidebar-mobile-open');
+        });
+
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('sidebar-open');
+            backdrop.classList.remove('backdrop-active');
+            document.body.classList.remove('sidebar-mobile-open');
+        });
+    }
+
+    // Search functionality
+    function initSearch() {
+        const searchInput = document.getElementById('sidebarSearch');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const links = document.querySelectorAll('.sidebar-link');
+
+            links.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                const parent = link.closest('.sidebar-nav');
+
+                if (text.includes(query) || query === '') {
+                    link.style.display = 'flex';
+                } else {
+                    link.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Load user info
+    function loadUserInfo() {
+        const userNameEl = document.getElementById('sidebarUserName');
+        const userEmailEl = document.getElementById('sidebarUserEmail');
+
+        // Get from localStorage or session
+        const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || 'User';
+        const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || 'user@qsi.com';
+
+        if (userNameEl) userNameEl.textContent = userName;
+        if (userEmailEl) userEmailEl.textContent = userEmail;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        setActiveLink();
+        initMobileToggle();
+        initSearch();
+        loadUserInfo();
+    });
+
+    // Handle logout
+    window.handleLogout = function() {
+        if (confirm('Are you sure you want to logout?')) {
+            // Clear session data
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // Redirect to login
+            window.location.href = '../index.html';
+        }
+    };
+})();
+</script>
+
 
     <!-- JavaScript -->
     <script>

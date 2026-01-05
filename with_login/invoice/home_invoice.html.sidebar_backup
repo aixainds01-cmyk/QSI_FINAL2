@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .table-header-cell {
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4b5563;
+            background-color: #f9fafb;
+            text-align: left;
+        }
+
+        .table-body-cell {
+            padding: 1rem 1rem;
+            font-size: 0.875rem;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .view-btn.active {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+  #main-content {
+    margin-top: 64px; /* height of the fixed header */
+  }
+}
+    </style>
+    <link rel="stylesheet" href="../../js/fix-icons.css">
+    <link rel="stylesheet" href="../../js/theme-force.css">
+    <!-- Global Theme Manager -->
+    <script src="../../js/theme-manager.js"></script>
+</head>
+
+<body>
+    <div class="flex">
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+  <div class="flex items-center space-x-3">
+    <button id="menu-toggle" class="text-white focus:outline-none">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+    <span class="text-xl font-bold">QSI</span>
+  </div>
+</header>
+
+
+<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+<aside id="sidebar"
+  class="w-64 bg-gray-800 text-white h-screen fixed md:h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg"><div class="p-6 text-2xl font-bold border-b border-gray-700">
+            <i class=" mr-2 text-indigo-400"></i> QSI
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="../dashboard_with_login.html"
+                class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <i class="fas fa-chart-pie mr-3"></i>Dashboard
+            </a>
+            <div>
+                <button id="documents-dropdown-btn"
+                    class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                    <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                    <i id="dropdown-icon"
+                        class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                </button>
+                <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                    <a href="../quotation/home_quotation.html"
+                        class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                    <a href="../saleorder/home_sales_order.html"
+                        class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales
+                        Order</a>
+                    <a href="home_invoice.html"
+                        class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="../credit_note.html"
+                    class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                </div>
+                <div>
+                    <button id="purchases-dropdown-btn"
+                        class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
+                        <i id="purchases-dropdown-icon"
+                            class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="../parchase/vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
+                        <a href="../parchase/parchase_order/home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Purchase Orders</a>
+                        <a href="../parchase/debit notes/debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Debit Notes</a>
+                        </div>
+                </div>
+            </div>
+            <a href="../manage-clients.html"
+                class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <i class="fas fa-users mr-3"></i>Manage Clients
+            </a>
+            <a href="../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                <i class="fas fa-cog mr-3"></i>Settings
+            </a>
+        </nav>
+    </aside> 
+
+        <div class="flex-1 overflow-y-auto p-8">
+            <header class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">Invoice </h1>
+                    <a href="create_invoice.html"
+                        class="bg-pink-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-pink-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i> Create New Invoice
+                    </a>
+                </div>
+                <nav class="flex items-center space-x-6 border-b">
+                    <a href="#"
+                        class="py-2 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600">Overview</a>
+                      <a href="recurring_invoice.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Recrring Invoice</a>  
+                    <a href="suggestion_inv.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Suggested Invoice</a>
+                    
+                </nav>
+            </header>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex items-center space-x-4 border-b pb-4 mb-4">
+                    <button id="active-invoices-btn"
+                        class="view-btn px-3 py-1.5 text-sm font-semibold rounded-md active">Active Invoices</button>
+                    
+                    <button id="deleted-invoices-btn"
+                        class="view-btn px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">Deleted
+                        Invoices</button>
+                </div>
+              
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border rounded-lg bg-gray-50">
+                    <div>
+                        <label for="filter-status" class="text-sm font-medium text-gray-700">Select Invoice
+                            Status</label>
+                        <select id="filter-status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+    <option>All</option>
+    <option>Unpaid</option>
+    <option>Partially Paid</option>
+    <option>Paid</option>
+    <option>Sent</option>
+    <option>Draft</option>
+    <option>Overdue</option>
+</select>
+                    </div>
+                    <div>
+                        <label for="filter-client" class="text-sm font-medium text-gray-700">Select Client</label>
+                        <select id="filter-client"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option>All Clients</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-date" class="text-sm font-medium text-gray-700">Select date range</label>
+                        <input type="date" id="filter-date"
+                            class="mt-1 block w-full border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    </div>
+                </div>
+<div id="bulk-action-bar" class="hidden bg-indigo-100 border border-indigo-300 rounded-md p-3 my-4 flex justify-between items-center">
+                    <div>
+                        <button id="bulk-action-close" title="Clear selection" class="text-indigo-600 hover:text-indigo-800 mr-4 text-xl font-bold">&times;</button>
+                        <span id="bulk-action-count" class="font-semibold text-indigo-800">0 selected</span>
+                    </div>
+                    <div id="bulk-actions-active" class="hidden space-x-2">
+                        <button id="bulk-action-delete" class="text-sm bg-red-600 text-white font-semibold py-1 px-3 rounded-md hover:bg-red-700">
+                            <i class="fas fa-trash-alt mr-1"></i> Delete
+                        </button>
+                    </div>
+                    <div id="bulk-actions-deleted" class="hidden space-x-2">
+                        <button id="bulk-action-restore" class="text-sm bg-green-600 text-white font-semibold py-1 px-3 rounded-md hover:bg-green-700">
+                            <i class="fas fa-undo mr-1"></i> Restore
+                        </button>
+                        <button id="bulk-action-delete-perm" class="text-sm bg-red-800 text-white font-semibold py-1 px-3 rounded-md hover:bg-red-900">
+                            <i class="fas fa-trash-alt mr-1"></i> Permanently Delete
+                        </button>
+                    </div>
+                </div>
+                <table class="min-w-full bg-white">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="table-header-cell w-12"><input type="checkbox" id="select-all-checkbox"></th>
+                            <th class="table-header-cell">Invoice Details</th>
+                            <th class="table-header-cell">Status</th>
+                            <th class="table-header-cell">Sub Total</th>
+                            <th class="table-header-cell">Amount</th>
+                            <th class="table-header-cell">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoice-table-body" class="divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tbody = document.getElementById('invoice-table-body');
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            const filterClientSelect = document.getElementById('filter-client');
+            const filterDateInput = document.getElementById('filter-date');
+            const activeBtn = document.getElementById('active-invoices-btn');
+            const deletedBtn = document.getElementById('deleted-invoices-btn');
+
+            // --- NEW: Bulk Action Bar Elements ---
+            const bulkActionBar = document.getElementById('bulk-action-bar');
+            const bulkActionClose = document.getElementById('bulk-action-close');
+            const bulkActionCount = document.getElementById('bulk-action-count');
+            const bulkActionsActive = document.getElementById('bulk-actions-active');
+            const bulkActionsDeleted = document.getElementById('bulk-actions-deleted');
+            const bulkActionDelete = document.getElementById('bulk-action-delete');
+            const bulkActionRestore = document.getElementById('bulk-action-restore');
+            const bulkActionDeletePerm = document.getElementById('bulk-action-delete-perm');
+            // --- END NEW ---
+
+            let currentView = 'active';
+            let allInvoices = []; // This will hold the master list for the current view
+
+const DOC_TYPE = 'invoices';  // Changed to 'invoices' (plural) to match URL_TYPE_MAP
+const ACTIVE_API_URL = `https://api.fornowauto.com/api/invoic`;  // Keep as 'invoic' for active
+const ARCHIVE_API_URL = `https://api.fornowauto.com/api/archive/${DOC_TYPE}`;  // Will use 'invoices'
+const DELETED_API_URL = `https://api.fornowauto.com/api/deleted/${DOC_TYPE}`;
+//const DELETED_API_URL = `https://api.fornowauto.com/api/deleted/invoices`;
+
+
+            const menuToggle = document.getElementById("menu-toggle");
+            const sidebar = document.getElementById("sidebar");
+            const menuBackdrop = document.getElementById("menu-backdrop");
+
+            if (menuToggle && sidebar && menuBackdrop) {
+                menuToggle.addEventListener("click", () => {
+                    sidebar.classList.toggle("-translate-x-full");
+                    menuBackdrop.classList.toggle("hidden");
+                });
+
+                menuBackdrop.addEventListener("click", () => {
+                    sidebar.classList.add("-translate-x-full");
+                    menuBackdrop.classList.add("hidden");
+                });
+            }
+           function getAuthHeaders() {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    return { 'Authorization': `Bearer ${token}` };
+                }
+                return null; 
+            }
+
+            async function fetchJsonAndParse(url, opts = {}) {
+                opts.headers = opts.headers || {};
+                const authHeaders = getAuthHeaders(); 
+                if (!authHeaders) {
+                    alert("Authentication token not found. Please log in.");
+                    window.location.href = '../index.html';
+                    throw new Error("Authentication token not found.");
+                }
+                opts.headers = { ...opts.headers, ...getAuthHeaders() };
+                if (opts.body && !opts.headers['Content-Type']) {
+                    opts.headers['Content-Type'] = 'application/json';
+                }
+                const response = await fetch(url, opts);
+                if (!response.ok) {
+                    if (response.status === 401) alert("Authentication error. Please log in again.");
+                    const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                    throw new Error(`HTTP ${response.status}: ${errorData.message}`);
+                }
+                const text = await response.text();
+                return text ? JSON.parse(text) : {};
+            }
+
+            function getDocId(doc) {
+                return doc.original_id || doc._id || null;
+            }
+            function getInvoiceNumber(i) { return i.invoice_no || 'N/A'; }
+            function getClient(i) { return i.to?.client_name || 'Unknown Client'; }
+            function getStatus(i) { 
+    const status = (i.status || 'Unpaid').trim();
+    
+    // Normalize 'Unknown' to 'Unpaid'
+    if (status.toLowerCase() === 'unknown' || status === '') {
+        return 'Unpaid';
+    }
+    
+    return status; 
+}
+
+            function getSubTotal(i) { return i.sub_total ?? 0; }
+            function getAmount(i) { return i.total ?? 0; }
+            function formatCurrency(value) { return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(value) || 0); }
+            function escapeHtml(str) { return String(str).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;'); }
+
+      function statusBadge(status) {
+    const s = (status || 'unpaid').toLowerCase().trim();
+    
+    // ✅ Check for unpaid FIRST (before checking for 'paid')
+    if (s === 'unpaid') {
+        return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Unpaid</span>';
+    }
+    
+    // Check for partially paid
+    if (s === 'partially paid' || s === 'partial paid' || s.includes('partial')) {
+        return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Partially Paid</span>';
+    }
+    
+    // Check for fully paid (only after checking unpaid and partial)
+    if (s === 'paid') {
+        return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Paid</span>';
+    }
+    
+    // Check for sent/draft
+    if (s === 'sent' || s === 'draft') {
+        return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sent</span>';
+    }
+    
+    // Check for overdue
+    if (s === 'overdue') {
+        return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Overdue</span>';
+    }
+    
+    // Default to unpaid for any unknown status
+    return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Unpaid</span>';
+}
+            function showLoading() { tbody.innerHTML = `<tr><td class="table-body-cell text-center" colspan="6">Loading invoices...</td></tr>`; }
+            function showError(msg) { tbody.innerHTML = `<tr><td class="table-body-cell text-center text-red-600" colspan="6">Error: ${escapeHtml(msg)}</td></tr>`; }
+
+            function switchView(view) {
+    currentView = view;
+    [activeBtn, deletedBtn].forEach(btn => btn.classList.remove('active'));
+    if (view === 'active') activeBtn.classList.add('active');
+    else if (view === 'deleted') deletedBtn.classList.add('active');
+    
+    // Reset all filters
+    filterDateInput.value = '';
+    filterClientSelect.value = 'All Clients';
+    
+    // ✅ ADD THIS: Reset status filter
+    const filterStatus = document.getElementById('filter-status');
+    if (filterStatus) {
+        filterStatus.value = 'All';
+    }
+    
+    fetchAndRenderInvoices();
+    updateBulkActionBar(); 
+}
+            
+            function updateSelectAllState() {
+                const rowCheckboxes = tbody.querySelectorAll('input[type="checkbox"]');
+                const totalCheckboxes = rowCheckboxes.length;
+                const totalChecked = tbody.querySelectorAll('input[type="checkbox"]:checked').length;
+                
+                selectAllCheckbox.checked = totalCheckboxes > 0 && totalCheckboxes === totalChecked;
+                
+                // --- MODIFIED: Call bulk action updater ---
+                updateBulkActionBar();
+            }
+
+            // --- NEW: Function to show/hide bulk action bar ---
+            function updateBulkActionBar() {
+                const totalChecked = tbody.querySelectorAll('input[type="checkbox"]:checked').length;
+                
+                if (totalChecked > 0) {
+                    bulkActionBar.classList.remove('hidden');
+                    bulkActionCount.textContent = `${totalChecked} selected`;
+                    
+                    // Show correct buttons based on current view
+                    if (currentView === 'active') {
+                        bulkActionsActive.classList.remove('hidden');
+                        bulkActionsDeleted.classList.add('hidden');
+                    } else { // 'deleted' view
+                        bulkActionsActive.classList.add('hidden');
+                        bulkActionsDeleted.classList.remove('hidden');
+                    }
+                } else {
+                    bulkActionBar.classList.add('hidden');
+                }
+            }
+
+            // --- NEW: Function to clear selection ---
+            function clearSelection() {
+                selectAllCheckbox.checked = false;
+                tbody.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+                    cb.checked = false;
+                });
+                updateBulkActionBar();
+            }
+
+            // ===== REPLACE THE renderList FUNCTION in your existing code =====
+// Find the renderList function (around line 260) and replace it with this:
+
+function renderList(list) {
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = false;
+    }
+    
+    if (!list || list.length === 0) {
+        const selectedDate = filterDateInput.value;
+        const selectedClient = filterClientSelect.value;
+        
+        let msg = 'No invoices found in this view.';
+        if (selectedDate || selectedClient !== 'All Clients') {
+            msg = 'No invoices match the selected filters.';
+        }
+        tbody.innerHTML = `<tr><td class="table-body-cell text-center" colspan="6">${escapeHtml(msg)}</td></tr>`;
+    } else {
+        let html = '';
+        list.forEach(inv => {
+            // ✅ ADD THIS DEBUG LINE
+            console.log('Invoice:', inv.invoice_no, 'Status:', inv.status, 'Paid:', inv.paid_amount, 'Total:', inv.total);
+            
+            const id = escapeHtml(getDocId(inv));
+            const invoiceNo = escapeHtml(getInvoiceNumber(inv));
+            const client = escapeHtml(getClient(inv));
+            const status = escapeHtml(getStatus(inv));
+            const subtotal = formatCurrency(getSubTotal(inv));
+            const amount = formatCurrency(getAmount(inv));
+
+            let actionButtons = '';
+            if (currentView === 'active') {
+                // Calculate pending amount
+                const totalAmt = inv.total || 0;
+                const paidAmt = inv.paid_amount || 0;
+                const pendingAmt = totalAmt - paidAmt;
+                
+                // Store invoice ID separately for payment button
+                const paymentBtn = pendingAmt > 0 
+                    ? `<button class="hover:text-green-600 action-payment text-sm font-semibold" title="Record Payment" 
+                          data-invoice-id="${id}" 
+                          data-invoice-no="${escapeHtml(invoiceNo)}"
+                          data-client-name="${client}"
+                          data-total="${totalAmt}"
+                          data-paid="${paidAmt}">
+                          <i class="fas fa-dollar-sign mr-1"></i> Pay
+                        </button>`
+                    : `<span class="text-xs text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Paid</span>`;
+                
+                // Determine if edit button should be shown
+const statusLower = status.toLowerCase();
+const allowEdit = !(statusLower === "paid" || statusLower.includes("partial"));
+
+actionButtons = `
+    <button class="hover:text-indigo-600 action-open" title="Open" data-id="${id}">
+        <i class="fas fa-external-link-alt"></i>
+    </button>
+
+    ${allowEdit ? `
+        <button class="hover:text-indigo-600 action-edit" title="Edit" data-id="${id}">
+            <i class="fas fa-pencil-alt"></i>
+        </button>
+    ` : ''}
+
+    ${paymentBtn}
+
+    <div class="relative">
+        <button class="hover:text-indigo-600 action-more" title="More" data-id="${id}">
+            <i class="fas fa-ellipsis-h"></i>
+        </button>
+    </div>
+`;
+
+            } else { // Deleted view
+                actionButtons = `
+                <button class="hover:text-green-600 action-restore text-sm font-semibold" title="Restore Invoice" data-id="${id}">
+                    <i class="fas fa-undo mr-1"></i> Restore
+                </button>
+                <button class="hover:text-red-600 action-delete-perm text-sm font-semibold" title="Delete Permanently" data-id="${id}">
+                    <i class="fas fa-trash-alt mr-1"></i> Delete
+                </button>`;
+            }
+
+            html += `
+            <tr>
+                <td class="table-body-cell text-center"><input type="checkbox" data-id="${id}"></td>
+                <td class="table-body-cell">
+                    <div class="font-semibold">${invoiceNo}</div>
+                    <div class="text-xs text-gray-500">To: ${client}</div>
+                </td>
+                <td class="table-body-cell">${statusBadge(status)}</td>
+                <td class="table-body-cell">${subtotal}</td>
+                <td class="table-body-cell font-semibold">${amount}</td>
+                <td class="table-body-cell">
+                    <div class="flex items-center space-x-3 text-gray-500">${actionButtons}</div>
+                </td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+    
+    wireUpActions();
+    updateBulkActionBar();
+}
+// ===== UPDATED wireUpActions FUNCTION =====
+function wireUpActions() {
+    document.querySelectorAll('.popover-menu').forEach(m => m.remove());
+    document.querySelectorAll('.action-open').forEach(btn => btn.addEventListener('click', e => { 
+        window.location.href = `view_data_invoice.html?id=${encodeURIComponent(e.currentTarget.dataset.id)}`; 
+    }));
+    document.querySelectorAll('.action-edit').forEach(btn => btn.addEventListener('click', e => { 
+        window.location.href = `edit_data_invoice.html?id=${encodeURIComponent(e.currentTarget.dataset.id)}`; 
+    }));
+    
+    // Payment button - simplified approach using data attributes
+    document.querySelectorAll('.action-payment').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const button = e.currentTarget;
+            
+            // Create a simplified invoice object from data attributes
+            const invoiceData = {
+                _id: button.dataset.invoiceId,
+                invoice_no: button.dataset.invoiceNo,
+                to: {
+                    client_name: button.dataset.clientName
+                },
+                total: parseFloat(button.dataset.total),
+                paid_amount: parseFloat(button.dataset.paid)
+            };
+            
+            openPaymentModal(invoiceData);
+        });
+    });
+    
+    document.querySelectorAll('.action-more').forEach(btn => btn.addEventListener('click', e => { 
+        e.stopPropagation(); 
+        openMorePopover(e.currentTarget); 
+    }));
+    document.querySelectorAll('.action-restore').forEach(btn => btn.addEventListener('click', e => { 
+        handleRestore(e.currentTarget.dataset.id, e.currentTarget.closest('tr')); 
+    }));
+    document.querySelectorAll('.action-delete-perm').forEach(btn => btn.addEventListener('click', e => { 
+        handlePermanentDelete(e.currentTarget.dataset.id, e.currentTarget.closest('tr')); 
+    }));
+
+    const rowCheckboxes = tbody.querySelectorAll('input[type="checkbox"]');
+    rowCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('click', updateSelectAllState);
+    });
+}
+
+            function openMorePopover(buttonEl) {
+                closeAllPopovers();
+                const id = buttonEl.dataset.id;
+                const menu = document.createElement('div');
+                menu.className = 'popover-menu absolute right-0 w-48 py-1 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-20';
+                menu.innerHTML = `<button class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 delete-btn" data-id="${id}"><i class="fas fa-trash-alt fa-fw mr-2"></i>Delete Invoice</button>`;
+                buttonEl.parentElement.appendChild(menu);
+                menu.querySelector('.delete-btn').addEventListener('click', e => handleDelete(id, buttonEl.closest('tr')));
+                setTimeout(() => document.addEventListener('click', closeAllPopovers, { once: true }), 0);
+            }
+            function closeAllPopovers() { document.querySelectorAll('.popover-menu').forEach(menu => menu.remove()); }
+
+            // This is your existing function, unchanged
+            async function handleDelete(invoiceId, rowElement) {
+                const invoiceNum = getInvoiceNumber(allInvoices.find(inv => getDocId(inv) === invoiceId));
+                if (!confirm(`Are you sure you want to move invoice ${invoiceNum} to the deleted list?`)) return;
+
+                try {
+                    await fetchJsonAndParse(`${ARCHIVE_API_URL}/${encodeURIComponent(invoiceId)}`, {
+                        method: 'POST'
+                    });
+
+                    if (rowElement) rowElement.remove();
+                    allInvoices = allInvoices.filter(inv => getDocId(inv) !== invoiceId);
+                    applyFilters();
+                    alert('Invoice moved to deleted list.');
+                } catch (err) {
+                    alert('Failed to delete invoice: ' + err.message);
+                }
+            }
+
+
+            // This is your existing function, unchanged
+            async function handlePermanentDelete(invoiceId, rowElement) {
+                const invoiceNum = getInvoiceNumber(allInvoices.find(inv => getDocId(inv) === invoiceId));
+                if (!confirm(`PERMANENTLY DELETE invoice ${invoiceNum}?\nThis action cannot be undone.`)) return;
+                try {
+                    await fetchJsonAndParse(`${DELETED_API_URL}/${invoiceId}`, {
+                        method: 'DELETE'
+                    });
+
+                    rowElement.remove();
+                    allInvoices = allInvoices.filter(inv => getDocId(inv) !== invoiceId);
+                    applyFilters();
+                    alert('Invoice permanently deleted.');
+                } catch (err) {
+                    alert('Failed to permanently delete invoice: ' + err.message);
+                }
+            }
+
+            // This is your existing function, unchanged
+            async function handleRestore(invoiceId, rowElement) {
+                const invoiceNum = getInvoiceNumber(allInvoices.find(inv => getDocId(inv) === invoiceId));
+                if (!confirm(`Are you sure you want to restore invoice ${invoiceNum}?`)) return;
+                try {
+                    await fetchJsonAndParse(`${DELETED_API_URL}/${encodeURIComponent(invoiceId)}`, {
+                        method: 'POST'
+                    });
+                    rowElement.remove();
+                    allInvoices = allInvoices.filter(inv => getDocId(inv) !== invoiceId);
+                    applyFilters();
+                    alert('Invoice restored successfully.');
+                } catch (err) {
+                    alert('Failed to restore invoice: ' + err.message);
+                }
+            }
+
+            async function fetchAndRenderInvoices() {
+    showLoading();
+    const url = currentView === 'active' ? ACTIVE_API_URL : DELETED_API_URL;
+    
+    console.log('Fetching from URL:', url);  // DEBUG
+    console.log('Current view:', currentView);  // DEBUG
+    
+    try {
+        const list = await fetchJsonAndParse(url);
+        console.log('Received data:', list);  // DEBUG
+        allInvoices = Array.isArray(list) ? list : [];
+        populateClientFilter(allInvoices);
+        applyFilters();
+    } catch (err) {
+        console.error('Fetch error:', err);
+        showError(err.message || `Could not load ${currentView} invoices.`);
+    }
+}
+
+            function populateClientFilter(list) {
+                const currentClient = filterClientSelect.value;
+                
+                const clients = [...new Set(list.map(inv => getClient(inv)))];
+                clients.sort();
+                
+                filterClientSelect.innerHTML = '<option value="All Clients">All Clients</option>';
+                
+                clients.forEach(clientName => {
+                    if (clientName) {
+                        const option = document.createElement('option');
+                        option.value = clientName;
+                        option.textContent = escapeHtml(clientName);
+                        filterClientSelect.appendChild(option);
+                    }
+                });
+                
+                if (clients.includes(currentClient)) {
+                    filterClientSelect.value = currentClient;
+                }
+            }
+
+            function applyFilters() {
+    const selectedDate = filterDateInput.value;
+    const selectedClient = filterClientSelect.value;
+    const selectedStatus = document.getElementById('filter-status')?.value;
+
+    console.log('Applying filters - Status:', selectedStatus, 'Client:', selectedClient, 'Date:', selectedDate);
+
+    let filteredList = [...allInvoices];
+
+    if (selectedDate) {
+        filteredList = filteredList.filter(inv => {
+            return inv.date && inv.date.startsWith(selectedDate);
+        });
+    }
+
+    if (selectedClient && selectedClient !== 'All Clients') {
+        filteredList = filteredList.filter(inv => getClient(inv) === selectedClient);
+    }
+
+    if (selectedStatus && selectedStatus !== 'All') {
+        const beforeCount = filteredList.length;
+        filteredList = filteredList.filter(inv => {
+            const invStatus = (inv.status || 'Unpaid').toLowerCase().trim();
+            const filterStatus = selectedStatus.toLowerCase().trim();
+            
+            if (filterStatus === 'unpaid') {
+                return invStatus === 'unpaid';
+            }
+            if (filterStatus === 'paid') {
+                return invStatus === 'paid';
+            }
+            if (filterStatus === 'partially paid') {
+                return invStatus.includes('partial');
+            }
+            
+            return invStatus === filterStatus;
+        });
+        console.log(`Status filter: ${beforeCount} → ${filteredList.length} invoices`);
+    }
+
+    renderList(filteredList);
+}
+
+
+
+            // --- NEW: Pure API call functions for bulk actions ---
+            async function deleteInvoice(invoiceId) {
+                return fetchJsonAndParse(`${ARCHIVE_API_URL}/${encodeURIComponent(invoiceId)}`, { method: 'POST' });
+            }
+            async function restoreInvoice(invoiceId) {
+                return fetchJsonAndParse(`${DELETED_API_URL}/${encodeURIComponent(invoiceId)}`, { method: 'POST' });
+            }
+            async function deletePermInvoice(invoiceId) {
+                return fetchJsonAndParse(`${DELETED_API_URL}/${invoiceId}`, { method: 'DELETE' });
+            }
+
+            // --- NEW: Helper to get selected IDs ---
+            function getSelectedIds() {
+                const selected = [];
+                tbody.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+                    selected.push(cb.dataset.id);
+                });
+                return selected;
+            }
+
+            // --- NEW: Bulk action handlers ---
+            async function handleBulkDelete() {
+                const ids = getSelectedIds();
+                if (ids.length === 0) return;
+                if (!confirm(`Are you sure you want to move ${ids.length} invoice(s) to the deleted list?`)) return;
+
+                showLoading();
+                const promises = ids.map(id => deleteInvoice(id));
+                const results = await Promise.allSettled(promises);
+                
+                let successes = results.filter(r => r.status === 'fulfilled').length;
+                alert(`${successes} invoice(s) moved to deleted list.`);
+                
+                // Refresh the entire list from the server
+                fetchAndRenderInvoices();
+            }
+
+            async function handleBulkRestore() {
+                const ids = getSelectedIds();
+                if (ids.length === 0) return;
+                if (!confirm(`Are you sure you want to restore ${ids.length} invoice(s)?`)) return;
+
+                showLoading();
+                const promises = ids.map(id => restoreInvoice(id));
+                const results = await Promise.allSettled(promises);
+                
+                let successes = results.filter(r => r.status === 'fulfilled').length;
+                alert(`${successes} invoice(s) restored.`);
+                
+                fetchAndRenderInvoices();
+            }
+
+            async function handleBulkDeletePerm() {
+                const ids = getSelectedIds();
+                if (ids.length === 0) return;
+                if (!confirm(`PERMANENTLY DELETE ${ids.length} invoice(s)?\nThis action cannot be undone.`)) return;
+
+                showLoading();
+                const promises = ids.map(id => deletePermInvoice(id));
+                const results = await Promise.allSettled(promises);
+                
+                let successes = results.filter(r => r.status === 'fulfilled').length;
+                alert(`${successes} invoice(s) permanently deleted.`);
+                
+                fetchAndRenderInvoices();
+            }
+const PAYMENT_API_URL = 'https://api.fornowauto.com/api/payments';
+let currentInvoiceForPayment = null;
+
+// Modal elements
+const paymentModal = document.getElementById('payment-modal');
+const paymentModalOverlay = document.getElementById('payment-modal-overlay');
+const paymentModalPanel = document.getElementById('payment-modal-panel');
+const closePaymentModalBtn = document.getElementById('close-payment-modal');
+const cancelPaymentBtn = document.getElementById('cancel-payment-btn');
+const paymentForm = document.getElementById('payment-form');
+const savePaymentBtn = document.getElementById('save-payment-btn');
+
+// Form fields
+const paymentInvoiceId = document.getElementById('payment-invoice-id');
+const paymentInvoiceNo = document.getElementById('payment-invoice-no');
+const paymentClientName = document.getElementById('payment-client-name');
+const paymentTotalAmount = document.getElementById('payment-total-amount');
+const paymentPaidAmount = document.getElementById('payment-paid-amount');
+const paymentPendingAmount = document.getElementById('payment-pending-amount');
+const paymentAmountInput = document.getElementById('payment-amount-input');
+const paymentDateInput = document.getElementById('payment-date-input');
+const paymentMethodInput = document.getElementById('payment-method-input');
+const paymentNotesInput = document.getElementById('payment-notes-input');
+
+// Helper: Format currency
+function formatCurrencyDisplay(value) {
+    return new Intl.NumberFormat('en-IN', { 
+        style: 'currency', 
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(Number(value) || 0);
+}
+
+// Open Payment Modal
+function openPaymentModal(invoiceData) {
+    currentInvoiceForPayment = invoiceData;
+    
+    // Set invoice details
+    paymentInvoiceId.value = invoiceData._id || '';
+    paymentInvoiceNo.textContent = invoiceData.invoice_no || 'N/A';
+    paymentClientName.textContent = invoiceData.to?.client_name || 'Unknown Client';
+    
+    const totalAmount = invoiceData.total || 0;
+    const paidAmount = invoiceData.paid_amount || 0;
+    const pendingAmount = totalAmount - paidAmount;
+    
+    paymentTotalAmount.textContent = formatCurrencyDisplay(totalAmount);
+    paymentPaidAmount.textContent = formatCurrencyDisplay(paidAmount);
+    paymentPendingAmount.textContent = formatCurrencyDisplay(pendingAmount);
+    
+    // Set default values
+    paymentAmountInput.value = pendingAmount.toFixed(2);
+    paymentAmountInput.max = pendingAmount.toFixed(2);
+    paymentDateInput.value = new Date().toISOString().split('T')[0];
+    paymentMethodInput.value = 'Cash';
+    paymentNotesInput.value = '';
+    
+    // Show modal with animation
+    paymentModal.classList.remove('hidden');
+    paymentModal.classList.add('flex');
+    
+    // ✅ ADDED: Prevent background scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(() => {
+        paymentModalOverlay.classList.replace('opacity-0', 'opacity-50');
+        paymentModalPanel.classList.replace('scale-95', 'scale-100');
+        paymentModalPanel.classList.replace('opacity-0', 'opacity-100');
+    }, 10);
+}
+
+// Close Payment Modal
+function closePaymentModal() {
+    paymentModalOverlay.classList.replace('opacity-50', 'opacity-0');
+    paymentModalPanel.classList.replace('scale-100', 'scale-95');
+    paymentModalPanel.classList.replace('opacity-100', 'opacity-0');
+    setTimeout(() => {
+        paymentModal.classList.add('hidden');
+        paymentModal.classList.remove('flex');
+        
+        // ✅ ADDED: Restore background scrolling when modal is closed
+        document.body.style.overflow = '';
+
+        paymentForm.reset();
+        currentInvoiceForPayment = null;
+    }, 300);
+}
+
+// Validate payment amount
+if (paymentAmountInput) {
+    paymentAmountInput.addEventListener('input', function() {
+        const maxAmount = parseFloat(this.max);
+        const enteredAmount = parseFloat(this.value);
+        
+        if (enteredAmount > maxAmount) {
+            this.value = maxAmount.toFixed(2);
+            alert(`Payment amount cannot exceed pending amount of ${formatCurrencyDisplay(maxAmount)}`);
+        }
+        
+        if (enteredAmount < 0) {
+            this.value = 0;
+        }
+    });
+}
+
+// Handle Payment Form Submission
+if (paymentForm) {
+    paymentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const invoiceId = paymentInvoiceId.value;
+        const paymentAmount = parseFloat(paymentAmountInput.value);
+        const paymentDate = paymentDateInput.value;
+        const paymentMethod = paymentMethodInput.value;
+        const paymentNotes = paymentNotesInput.value.trim();
+        
+        if (!invoiceId || !paymentAmount || !paymentDate) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        // Disable button and show loading
+        const originalBtnText = savePaymentBtn.innerHTML;
+        savePaymentBtn.disabled = true;
+        savePaymentBtn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
+        
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('Not authenticated');
+            
+            const paymentData = {
+                invoice_id: invoiceId,
+                amount: paymentAmount,
+                payment_date: paymentDate,
+                payment_method: paymentMethod,
+                notes: paymentNotes
+            };
+            
+            const response = await fetch(PAYMENT_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(paymentData)
+            });
+            
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.message || 'Failed to record payment');
+            }
+            
+            const result = await response.json();
+            
+            alert(`Payment of ${formatCurrencyDisplay(paymentAmount)} recorded successfully!`);
+            closePaymentModal();
+            
+            // ✅ NOW THIS WORKS - fetchAndRenderInvoices is in the same scope
+            fetchAndRenderInvoices();
+            
+        } catch (error) {
+            console.error('Error recording payment:', error);
+            alert(`Error: ${error.message}`);
+        } finally {
+            savePaymentBtn.disabled = false;
+            savePaymentBtn.innerHTML = originalBtnText;
+        }
+    });
+}
+
+// Event Listeners for modal close
+if (closePaymentModalBtn) closePaymentModalBtn.addEventListener('click', closePaymentModal);
+if (cancelPaymentBtn) cancelPaymentBtn.addEventListener('click', closePaymentModal);
+if (paymentModalOverlay) paymentModalOverlay.addEventListener('click', closePaymentModal);
+
+
+        function init() {
+    const dropdownBtn = document.getElementById('documents-dropdown-btn');
+    const dropdownContent = document.getElementById('documents-dropdown-content');
+    const dropdownIcon = document.getElementById('dropdown-icon');
+
+    dropdownBtn.addEventListener('click', () => {
+        dropdownContent.classList.toggle('hidden');
+        dropdownIcon.classList.toggle('rotate-180');
+    });
+
+    document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
+        document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
+        document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
+    });
+
+    // 🔥 ADD THESE TWO LINES ↓↓↓
+    activeBtn.addEventListener('click', () => switchView('active'));
+    deletedBtn.addEventListener('click', () => switchView('deleted'));
+
+    filterDateInput.addEventListener('change', applyFilters);
+    filterClientSelect.addEventListener('change', applyFilters);
+
+    const filterStatus = document.getElementById('filter-status');
+    if (filterStatus) {
+        filterStatus.addEventListener('change', applyFilters);
+    }
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('click', () => {
+            const isChecked = selectAllCheckbox.checked;
+            const rowCheckboxes = tbody.querySelectorAll('input[type="checkbox"]');
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            updateBulkActionBar();
+        });
+    }
+
+    bulkActionClose.addEventListener('click', clearSelection);
+    bulkActionDelete.addEventListener('click', handleBulkDelete);
+    bulkActionRestore.addEventListener('click', handleBulkRestore);
+    bulkActionDeletePerm.addEventListener('click', handleBulkDeletePerm);
+
+    fetchAndRenderInvoices();
+}
+
+            init();
+        });
+    </script>
+    <div id="payment-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+  <div id="payment-modal-overlay" class="absolute inset-0 bg-gray-900 opacity-0 transition-opacity duration-300"></div>
+  
+  <div id="payment-modal-panel" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg transform scale-95 transition-transform duration-300 mx-4 opacity-0 relative z-10 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4 border-b pb-3">
+      <h3 class="text-xl font-semibold text-gray-800">Record Payment</h3>
+      <button id="close-payment-modal" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <form id="payment-form" class="space-y-4">
+      <input type="hidden" id="payment-invoice-id" />
+
+      <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Invoice Number:</span>
+          <span id="payment-invoice-no" class="font-semibold text-gray-800"></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Client:</span>
+          <span id="payment-client-name" class="font-semibold text-gray-800"></span>
+        </div>
+        <div class="flex justify-between border-t pt-2">
+          <span class="text-sm text-gray-600">Total Amount:</span>
+          <span id="payment-total-amount" class="font-semibold text-gray-800"></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Paid Amount:</span>
+          <span id="payment-paid-amount" class="font-semibold text-green-600"></span>
+        </div>
+        <div class="flex justify-between border-t pt-2">
+          <span class="text-sm font-medium text-gray-700">Pending Amount:</span>
+          <span id="payment-pending-amount" class="font-bold text-red-600 text-lg"></span>
+        </div>
+      </div>
+
+      <div>
+        <label for="payment-amount-input" class="block text-sm font-medium text-gray-700 mb-1">
+          Amount to Pay <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+          <input type="number" id="payment-amount-input" step="0.01" min="0" 
+            class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+            placeholder="0.00" required />
+        </div>
+        <p class="text-xs text-gray-500 mt-1">Enter the amount received from the customer</p>
+      </div>
+
+      <div>
+        <label for="payment-date-input" class="block text-sm font-medium text-gray-700 mb-1">
+          Payment Date <span class="text-red-500">*</span>
+        </label>
+        <input type="date" id="payment-date-input" 
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+          required />
+      </div>
+
+      <div>
+        <label for="payment-method-input" class="block text-sm font-medium text-gray-700 mb-1">
+          Payment Method
+        </label>
+        <select id="payment-method-input" 
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          <option value="Cash">Cash</option>
+          <option value="Bank Transfer">Bank Transfer</option>
+          <option value="UPI">UPI</option>
+          <option value="Cheque">Cheque</option>
+          <option value="Card">Card</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="payment-notes-input" class="block text-sm font-medium text-gray-700 mb-1">
+          Notes (Optional)
+        </label>
+        <textarea id="payment-notes-input" rows="2" 
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+          placeholder="Add any notes about this payment..."></textarea>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t">
+        <button type="button" id="cancel-payment-btn" 
+          class="py-2 px-6 bg-gray-100 rounded-md hover:bg-gray-200 transition">
+          Cancel
+        </button>
+        <button type="submit" id="save-payment-btn" 
+          class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md flex items-center justify-center min-w-[120px]">
+          Record Payment
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<style>
+/* Add this CSS for smooth animations */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.animate-spin {
+    animation: spin 0.6s linear infinite;
+}
+</style>
+</body>
+
+</html>

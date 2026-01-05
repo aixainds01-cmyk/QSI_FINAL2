@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recurring Invoices - QSI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .status-badge i {
+            font-size: 0.625rem;
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: -1rem;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 64px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../../js/theme-force.css">
+    <!-- Global Theme Manager -->
+    <script src="../../js/theme-manager.js"></script>
+</head>
+<body>
+    <div class="flex">
+        <!-- Mobile Header -->
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <span class="text-xl font-bold">QSI</span>
+            </div>
+        </header>
+
+        <!-- Backdrop -->
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class="mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="../dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-chart-pie mr-3"></i>Dashboard
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="../quotation/home_quotation.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="../saleorder/home_sales_order.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="home_invoice.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="../credit_note.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit note</a>
+                    </div>
+                </div>
+                <a href="../manage-clients.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Manage Clients
+                </a>
+                <a href="../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-8" id="main-content">
+            <header class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-sync-alt mr-3 text-indigo-600"></i>Recurring Invoices
+                    </h1>
+                    <button id="create-recurring-btn" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i> Create Recurring Invoice
+                    </button>
+                </div>
+                <nav class="flex items-center space-x-6 border-b">
+                    <a href="home_invoice.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Overview</a>
+                    <a href="#" class="py-2 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600">Recurring Invoices</a>
+                    <a href="suggestion_inv.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Suggested Invoice</a>
+                </nav>
+            </header>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Total Active</p>
+                            <p class="text-2xl font-bold text-gray-800" id="total-active">0</p>
+                        </div>
+                        <div class="bg-indigo-100 p-3 rounded-full">
+                            <i class="fas fa-sync text-indigo-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Next Due</p>
+                            <p class="text-lg font-bold text-gray-800" id="next-due">-</p>
+                        </div>
+                        <div class="bg-yellow-100 p-3 rounded-full">
+                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Paused</p>
+                            <p class="text-2xl font-bold text-gray-800" id="total-paused">0</p>
+                        </div>
+                        <div class="bg-orange-100 p-3 rounded-full">
+                            <i class="fas fa-pause text-orange-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Monthly Revenue</p>
+                            <p class="text-2xl font-bold text-gray-800" id="monthly-revenue">₹0</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <i class="fas fa-rupee-sign text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Status</label>
+                        <select id="filter-status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="all">All</option>
+                            <option value="active">Active</option>
+                            <option value="paused">Paused</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Client</label>
+                        <select id="filter-client" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="all">All Clients</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Frequency</label>
+                        <select id="filter-frequency" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="all">All</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="bi-weekly">Bi-Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recurring Invoices Container -->
+            <div id="recurring-container" class="space-y-4">
+                <!-- Recurring invoices will be dynamically loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden bg-white p-12 rounded-lg shadow-sm border border-gray-200 text-center">
+                <i class="fas fa-inbox text-gray-400 text-6xl mb-4"></i>
+                <p class="text-gray-600 text-lg mb-2">No recurring invoices found</p>
+                <p class="text-gray-500 text-sm">Create your first recurring invoice to get started</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="bg-white p-12 rounded-lg shadow-sm border border-gray-200 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">Loading recurring invoices...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
+                <h3 class="text-xl font-bold text-gray-800">Recurring Invoice Details</h3>
+                <button id="close-detail-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    ×
+                </button>
+            </div>
+            
+            <div id="detail-content" class="p-6">
+                <!-- Details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- PASTE JAVASCRIPT CODE HERE -->
+    <script>
+        (function() {
+    'use strict';
+
+    // Configuration
+    const BASE_URL = "https://api.fornowauto.com/api";
+
+    // DOM Elements
+    const sidebar = document.getElementById("sidebar");
+    const menuToggle = document.getElementById("menu-toggle");
+    const menuBackdrop = document.getElementById("menu-backdrop");
+    const dropdownBtn = document.getElementById("documents-dropdown-btn");
+    const dropdownContent = document.getElementById("documents-dropdown-content");
+    const dropdownIcon = document.getElementById("dropdown-icon");
+    const createBtn = document.getElementById("create-recurring-btn");
+
+    const recurringContainer = document.getElementById("recurring-container");
+    const emptyState = document.getElementById("empty-state");
+    const loadingState = document.getElementById("loading-state");
+
+    const filterStatus = document.getElementById("filter-status");
+    const filterClient = document.getElementById("filter-client");
+    const filterFrequency = document.getElementById("filter-frequency");
+
+    const totalActiveEl = document.getElementById("total-active");
+    const nextDueEl = document.getElementById("next-due");
+    const totalPausedEl = document.getElementById("total-paused");
+    const monthlyRevenueEl = document.getElementById("monthly-revenue");
+
+    const detailModal = document.getElementById("detail-modal");
+    const closeDetailModal = document.getElementById("close-detail-modal");
+    const detailContent = document.getElementById("detail-content");
+
+    // State
+    let allRecurringInvoices = [];
+    let allClients = [];
+    let generatedInvoicesMap = {};
+
+    // Auth Headers
+    function getAuthHeaders() {
+        const token = localStorage.getItem('token');
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+        };
+    }
+
+    // Safe Fetch with Auth
+    async function safeFetch(url, options = {}) {
+        try {
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    ...getAuthHeaders(),
+                    ...options.headers
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert("Session expired. Please login again.");
+                    window.location.href = '../../index.html';
+                    return null;
+                }
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Fetch error:', error);
+            return null;
+        }
+    }
+
+    // Sidebar Toggle
+    menuToggle?.addEventListener("click", () => {
+        sidebar.classList.toggle("-translate-x-full");
+        menuBackdrop.classList.toggle("hidden");
+    });
+
+    menuBackdrop?.addEventListener("click", () => {
+        sidebar.classList.add("-translate-x-full");
+        menuBackdrop.classList.add("hidden");
+    });
+
+    // Dropdown Toggle
+    dropdownBtn?.addEventListener("click", () => {
+        dropdownContent.classList.toggle("hidden");
+        dropdownIcon.classList.toggle("rotate-180");
+    });
+
+    // Create Recurring Invoice
+    createBtn?.addEventListener("click", () => {
+        // Redirect to create invoice page with recurring flag
+        window.location.href = 'home_invoice.html?action=create&recurring=true'; 
+    });
+
+    // Load All Data
+    async function loadAllData() {
+        showLoading(true);
+        await Promise.all([
+            loadClients(),
+            loadRecurringInvoices()
+        ]);
+        showLoading(false);
+    }
+
+    // Load Clients
+    async function loadClients() {
+        const data = await safeFetch(`${BASE_URL}/clients`);
+        if (data) {
+            allClients = data;
+            populateClientFilter();
+        }
+    }
+
+    // Populate Client Filter
+    function populateClientFilter() {
+        filterClient.innerHTML = '<option value="all">All Clients</option>';
+        allClients.forEach(client => {
+            const option = document.createElement('option');
+            option.value = client._id;
+            option.textContent = client.client_name || client.name || 'Unknown';
+            filterClient.appendChild(option);
+        });
+    }
+
+    // Load Recurring Invoices
+    async function loadRecurringInvoices() {
+        // 1. Fetch the recurring templates
+        const data = await safeFetch(`${BASE_URL}/recurring-invoices`);
+        if (data) {
+            allRecurringInvoices = data;
+            console.log("Recurring Templates Loaded:", allRecurringInvoices);
+            
+            // 2. Load generated invoices history for each recurring invoice
+            for (const recurring of allRecurringInvoices) {
+                await loadGeneratedInvoices(recurring._id);
+            }
+            
+            updateSummaryCards();
+            applyFilters();
+        }
+    }
+
+    // Load Generated Invoices for a Recurring Invoice
+    async function loadGeneratedInvoices(recurringId) {
+        // ✅ FIX: URL changed from /invoic to /invoice
+        const data = await safeFetch(`${BASE_URL}/invoic`); 
+        
+        if (data) {
+            // Filter invoices created from this recurring template
+            const generated = data.filter(inv => 
+                inv.created_from_recurring_id && inv.created_from_recurring_id === recurringId
+            );
+            generatedInvoicesMap[recurringId] = generated;
+        }
+    }
+
+    // Update Summary Cards
+    function updateSummaryCards() {
+        const activeCount = allRecurringInvoices.filter(r => r.is_active).length;
+        const pausedCount = allRecurringInvoices.filter(r => !r.is_active).length;
+
+        totalActiveEl.textContent = activeCount;
+        totalPausedEl.textContent = pausedCount;
+
+        // Find next due date
+        const activeDates = allRecurringInvoices
+            .filter(r => r.is_active && r.next_due_date)
+            .map(r => new Date(r.next_due_date))
+            .sort((a, b) => a - b);
+
+        if (activeDates.length > 0) {
+            nextDueEl.textContent = formatDate(activeDates[0]);
+        } else {
+            nextDueEl.textContent = '-';
+        }
+
+        // Calculate monthly revenue
+        const monthlyRev = allRecurringInvoices
+            .filter(r => r.is_active && r.frequency === 'monthly')
+            .reduce((sum, r) => sum + (r.total || 0), 0);
+
+        monthlyRevenueEl.textContent = `₹${monthlyRev.toFixed(0)}`;
+    }
+
+    // Apply Filters
+    function applyFilters() {
+        let filtered = [...allRecurringInvoices];
+
+        // Status filter
+        if (filterStatus.value !== 'all') {
+            if (filterStatus.value === 'active') {
+                filtered = filtered.filter(r => r.is_active);
+            } else if (filterStatus.value === 'paused') {
+                filtered = filtered.filter(r => !r.is_active);
+            }
+        }
+
+        // Client filter
+        if (filterClient.value !== 'all') {
+            filtered = filtered.filter(r => r.to_client_id === filterClient.value);
+        }
+
+        // Frequency filter
+        if (filterFrequency.value !== 'all') {
+            filtered = filtered.filter(r => r.frequency === filterFrequency.value);
+        }
+
+        renderRecurringInvoices(filtered);
+    }
+
+    // Render Recurring Invoices
+    function renderRecurringInvoices(invoices) {
+        recurringContainer.innerHTML = '';
+
+        if (invoices.length === 0) {
+            emptyState.classList.remove('hidden');
+            return;
+        }
+
+        emptyState.classList.add('hidden');
+
+        invoices.forEach(recurring => {
+            const card = createRecurringCard(recurring);
+            recurringContainer.appendChild(card);
+        });
+    }
+
+    // Create Recurring Card
+    function createRecurringCard(recurring) {
+        const generated = generatedInvoicesMap[recurring._id] || [];
+        const clientName = getClientName(recurring.to_client_id);
+
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden';
+
+        card.innerHTML = `
+            <div class="p-6 bg-gradient-to-r from-indigo-50 to-white border-b">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h3 class="text-xl font-bold text-gray-800">${clientName}</h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${
+                                recurring.is_active 
+                                    ? 'bg-green-100 text-green-700' 
+                                    : 'bg-red-100 text-red-700'
+                            }">
+                                ${recurring.is_active ? 'Active' : 'Paused'}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            <div>
+                                <p class="text-xs text-gray-600">Frequency</p>
+                                <p class="text-sm font-semibold capitalize">${recurring.frequency || 'Monthly'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-600">Next Invoice</p>
+                                <p class="text-sm font-semibold">${formatDate(recurring.next_due_date)}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-600">Amount</p>
+                                <p class="text-sm font-semibold">₹${(recurring.total || 0).toFixed(2)}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-600">Generated</p>
+                                <p class="text-sm font-semibold">${generated.length} invoices</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button 
+                            onclick="toggleRecurringStatus('${recurring._id}')"
+                            class="p-2 rounded-lg transition ${
+                                recurring.is_active
+                                    ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                                    : 'bg-green-100 text-green-700 hover:bg-green-200'
+                            }"
+                            title="${recurring.is_active ? 'Pause' : 'Activate'}"
+                        >
+                            <i class="fas fa-${recurring.is_active ? 'pause' : 'play'}"></i>
+                        </button>
+                        <button 
+                            onclick="viewRecurringDetails('${recurring._id}')"
+                            class="p-2 rounded-lg bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
+                            title="View Details"
+                        >
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button 
+                            onclick="deleteRecurring('${recurring._id}')"
+                            class="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
+                            title="Delete"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            ${generated.length > 0 ? `
+                <div class="p-6">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                        <i class="fas fa-calendar-alt"></i>
+                        Generated Invoices (${generated.length})
+                    </h4>
+                    <div class="space-y-3">
+                        ${generated.slice(0, 5).map(invoice => `
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex items-center gap-4">
+                                    <div class="bg-indigo-100 p-2 rounded">
+                                        <i class="fas fa-file-invoice text-indigo-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">${invoice.invoice_no}</p>
+                                        <p class="text-xs text-gray-600">${formatDate(invoice.date)}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-semibold text-gray-800">₹${(invoice.total || 0).toFixed(2)}</p>
+                                    <span class="text-xs px-2 py-1 rounded ${getStatusClass(invoice.status)}">
+                                        ${invoice.status || 'Unpaid'}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('')}
+                        
+                        ${generated.length > 5 ? `
+                            <button 
+                                onclick="viewAllGeneratedInvoices('${recurring._id}')"
+                                class="w-full py-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                            >
+                                View all ${generated.length} invoices →
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            ` : ''}
+        `;
+
+        return card;
+    }
+
+    // Get Client Name
+    function getClientName(clientId) {
+        const client = allClients.find(c => c._id === clientId);
+        return client?.client_name || client?.name || 'Unknown Client';
+    }
+
+    // Get Status Class
+    function getStatusClass(status) {
+        switch(status) {
+            case 'Paid':
+                return 'bg-green-100 text-green-700';
+            case 'Partially Paid':
+                return 'bg-yellow-100 text-yellow-700';
+            case 'Unpaid':
+                return 'bg-red-100 text-red-700';
+            default:
+                return 'bg-gray-100 text-gray-700';
+        }
+    }
+
+    // Format Date
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+
+    // Toggle Recurring Status
+    window.toggleRecurringStatus = async function(id) {
+        await safeFetch(`${BASE_URL}/recurring-invoices/${id}/toggle`, {
+            method: 'POST'
+        });
+        await loadRecurringInvoices();
+    };
+
+    // Delete Recurring
+    window.deleteRecurring = async function(id) {
+        if (!confirm('Are you sure you want to deactivate this recurring invoice?')) return;
+        
+        await safeFetch(`${BASE_URL}/recurring-invoices/${id}`, {
+            method: 'DELETE'
+        });
+        await loadRecurringInvoices();
+    };
+
+    // View Recurring Details
+    window.viewRecurringDetails = function(id) {
+        const recurring = allRecurringInvoices.find(r => r._id === id);
+        if (!recurring) return;
+
+        const clientName = getClientName(recurring.to_client_id);
+
+        detailContent.innerHTML = `
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-600">Client</p>
+                    <p class="text-base font-semibold">${clientName}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Status</p>
+                    <p class="text-base font-semibold">${recurring.is_active ? 'Active' : 'Paused'}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Frequency</p>
+                    <p class="text-base font-semibold capitalize">${recurring.frequency || 'Monthly'}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Amount</p>
+                    <p class="text-base font-semibold">₹${(recurring.total || 0).toFixed(2)}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Start Date</p>
+                    <p class="text-base font-semibold">${formatDate(recurring.start_date)}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Next Due</p>
+                    <p class="text-base font-semibold">${formatDate(recurring.next_due_date)}</p>
+                </div>
+            </div>
+            
+            ${recurring.notes ? `
+                <div class="mt-4">
+                    <p class="text-sm text-gray-600 mb-1">Notes</p>
+                    <p class="text-sm text-gray-800 bg-gray-50 p-3 rounded">${recurring.notes}</p>
+                </div>
+            ` : ''}
+
+            <div class="mt-6 pt-4 border-t">
+                <h4 class="text-sm font-semibold text-gray-700 mb-2">Items</h4>
+                <div class="space-y-2">
+                    ${(recurring.items || []).map(item => `
+                        <div class="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                            <span>${item.item_name}</span>
+                            <span class="font-semibold">₹${(item.amount || 0).toFixed(2)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        detailModal.classList.remove('hidden');
+    };
+
+    // View All Generated Invoices
+    window.viewAllGeneratedInvoices = function(recurringId) {
+        // Navigate to invoices page with filter
+        window.location.href = `home_invoice.html?recurring_id=${recurringId}`;
+    };
+
+    // Close Detail Modal
+    closeDetailModal?.addEventListener('click', () => {
+        detailModal.classList.add('hidden');
+    });
+
+    detailModal?.addEventListener('click', (e) => {
+        if (e.target === detailModal) {
+            detailModal.classList.add('hidden');
+        }
+    });
+
+    // Show/Hide Loading
+    function showLoading(show) {
+        if (show) {
+            loadingState.classList.remove('hidden');
+            recurringContainer.classList.add('hidden');
+            emptyState.classList.add('hidden');
+        } else {
+            loadingState.classList.add('hidden');
+            recurringContainer.classList.remove('hidden');
+        }
+    }
+
+    // Filter Event Listeners
+    filterStatus.addEventListener('change', applyFilters);
+    filterClient.addEventListener('change', applyFilters);
+    filterFrequency.addEventListener('change', applyFilters);
+
+    // Initialize
+    loadAllData();
+})();
+    </script>
+</body>
+</html>

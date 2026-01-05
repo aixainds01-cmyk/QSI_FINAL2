@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client Statement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .table-header-cell {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4b5563;
+            background-color: #f9fafb;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table-body-cell {
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 64px;
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="flex">
+        <!-- Mobile Header -->
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <span class="text-xl font-bold">QSI</span>
+            </div>
+        </header>
+
+        <!-- Backdrop -->
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-gray-800 text-white h-screen fixed md:sticky top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-lg">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class="mr-2 text-indigo-400"></i> QSI
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-chart-pie mr-3"></i>Dashboard
+                </a>
+                <div>
+                    <button id="documents-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3"></i>Sales Documents</span>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                        <a href="quotation/home_quotation.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="saleorder/home_sales_order.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="invoice/home_invoice.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="credit_note.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Credit Note</a>
+                    </div>
+                    <div>
+                        <button id="purchases-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                            <span class="flex items-center"><i class="fas fa-shopping-cart mr-3"></i>Purchases</span>
+                            <i id="purchases-dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                        </button>
+                        <div id="purchases-dropdown-content" class="pl-8 pt-2 space-y-1 hidden">
+                            <a href="parchase/vendor/vendors_leads.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">Vendors Leads</a>
+                            <a href="parchase/parchase_order/home_purchase_orders.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                                Purchase Orders
+                            </a>
+                            <a href="parchase/debit notes/debit_notes.html" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 text-sm">
+                                Debit Notes </a>
+                        </div>
+                    </div>
+                </div>
+                <a href="manage-clients.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Manage Clients
+                </a>
+                <a href="settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div id="main-content" class="flex-1 overflow-y-auto p-8">
+            <header class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="text-sm text-gray-500">
+                            <a href="manage-clients.html" class="hover:underline">Your Clients</a> &gt; Client Statement
+                        </p>
+                        <h1 id="client-name-header" class="text-3xl font-bold text-gray-800 mt-2">Client Statement</h1>
+                    </div>
+                    <button id="edit-client-btn" class="bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-pink-700 transition duration-200">
+                        <i class="fas fa-pencil-alt mr-2"></i>Edit Client
+                    </button>
+                </div>
+            </header>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Total Quotations</p>
+                            <p id="quotation-count" class="text-2xl font-bold text-blue-600">0</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <i class="fas fa-file-alt text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Total Sales Orders</p>
+                            <p id="salesorder-count" class="text-2xl font-bold text-purple-600">0</p>
+                        </div>
+                        <div class="bg-purple-100 p-3 rounded-full">
+                            <i class="fas fa-shopping-cart text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Total Invoices</p>
+                            <p id="invoice-count" class="text-2xl font-bold text-green-600">0</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <i class="fas fa-file-invoice text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <div>
+                        <h2 id="client-name-sub-header" class="text-xl font-semibold">Client Documents</h2>
+                        <p id="statement-count" class="text-sm text-gray-600 mt-1">Loading...</p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="service-filter" class="text-sm font-medium text-gray-700 mr-2">Filter by type:</label>
+                    <select id="service-filter" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-3 py-2">
+                        <option value="all">All Documents</option>
+                        <option value="Quotation">Quotations</option>
+                        <option value="Sales Order">Sales Orders</option>
+                        <option value="Invoice">Invoices</option>
+                    </select>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="table-header-cell">Date</th>
+                                <th class="table-header-cell">Document Type</th>
+                                <th class="table-header-cell">Document No.</th>
+                                <th class="table-header-cell text-right">Sub Total</th>
+                                <th class="table-header-cell text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statement-table-body" class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get client info from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const clientId = urlParams.get('clientId');
+            const clientName = urlParams.get('clientName') || 'Client';
+
+            // Update UI with client name
+            document.getElementById('client-name-header').textContent = `${clientName} - Statement`;
+            document.getElementById('client-name-sub-header').textContent = clientName;
+
+            // Mobile menu
+            const menuToggle = document.getElementById("menu-toggle");
+            const sidebar = document.getElementById("sidebar");
+            const menuBackdrop = document.getElementById("menu-backdrop");
+
+            if (menuToggle && sidebar && menuBackdrop) {
+                menuToggle.addEventListener("click", () => {
+                    sidebar.classList.toggle("-translate-x-full");
+                    menuBackdrop.classList.toggle("hidden");
+                });
+
+                menuBackdrop.addEventListener("click", () => {
+                    sidebar.classList.add("-translate-x-full");
+                    menuBackdrop.classList.add("hidden");
+                });
+            }
+
+            // Dropdowns
+            const dropdownBtn = document.getElementById('documents-dropdown-btn');
+            const dropdownContent = document.getElementById('documents-dropdown-content');
+            const dropdownIcon = document.getElementById('dropdown-icon');
+            if (dropdownBtn) {
+                dropdownBtn.addEventListener('click', () => {
+                    dropdownContent.classList.toggle('hidden');
+                    dropdownIcon.classList.toggle('rotate-180');
+                });
+            }
+
+            const purchasesBtn = document.getElementById('purchases-dropdown-btn');
+            const purchasesContent = document.getElementById('purchases-dropdown-content');
+            const purchasesIcon = document.getElementById('purchases-dropdown-icon');
+            if (purchasesBtn) {
+                purchasesBtn.addEventListener('click', () => {
+                    purchasesContent.classList.toggle('hidden');
+                    purchasesIcon.classList.toggle('rotate-180');
+                });
+            }
+
+            // Edit client button
+            document.getElementById('edit-client-btn').addEventListener('click', () => {
+                window.location.href = `edit-client.html?clientId=${encodeURIComponent(clientId || '')}`;
+            });
+
+            // API setup
+            const API_BASE = 'https://api.fornowauto.com/api';
+            const tableBody = document.getElementById('statement-table-body');
+            const serviceFilter = document.getElementById('service-filter');
+            const statementCount = document.getElementById('statement-count');
+
+            let allTransactions = [];
+
+            // Auth headers
+            function getAuthHeaders() {
+                const token = localStorage.getItem('token');
+                return token ? { 'Authorization': `Bearer ${token}` } : null;
+            }
+
+            // Fetch with auth
+            async function fetchWithAuth(url) {
+                const headers = getAuthHeaders();
+                if (!headers) {
+                    alert("Please log in to view client statements.");
+                    window.location.href = '/login.html';
+                    throw new Error("Not authenticated");
+                }
+
+                const response = await fetch(url, { headers });
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        alert("Session expired. Please log in again.");
+                        localStorage.removeItem('token');
+                        window.location.href = '/login.html';
+                        throw new Error("Session expired");
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            }
+
+            // Format currency
+            const formatCurrency = (amount) => {
+                return `₹${Number(amount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            };
+
+            // Format date
+            const formatDate = (dateStr) => {
+                if (!dateStr) return '—';
+                try {
+                    return new Date(dateStr).toLocaleDateString('en-IN', { 
+                        day: '2-digit', 
+                        month: 'short', 
+                        year: 'numeric' 
+                    });
+                } catch {
+                    return dateStr;
+                }
+            };
+
+            // Render transactions
+            function renderTransactions(transactions) {
+                tableBody.innerHTML = '';
+
+                if (!transactions || transactions.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="table-body-cell text-center py-10 text-gray-500">
+                                No documents found for this client.
+                            </td>
+                        </tr>`;
+                    statementCount.textContent = 'Showing 0 documents';
+                    return;
+                }
+
+                statementCount.textContent = `Showing ${transactions.length} document${transactions.length !== 1 ? 's' : ''}`;
+
+                transactions.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    
+                    const typeClass = item.doc_type === 'Quotation' ? 'text-blue-600' : 
+                                     item.doc_type === 'Sales Order' ? 'text-purple-600' : 
+                                     'text-green-600';
+                    
+                    row.innerHTML = `
+                        <td class="table-body-cell">${formatDate(item.date)}</td>
+                        <td class="table-body-cell">
+                            <span class="font-medium ${typeClass}">${item.doc_type}</span>
+                        </td>
+                        <td class="table-body-cell">
+                            <span class="font-semibold text-gray-800">${item.doc_no || '—'}</span>
+                        </td>
+                        <td class="table-body-cell text-right">${formatCurrency(item.subtotal)}</td>
+                        <td class="table-body-cell text-right font-semibold">${formatCurrency(item.total)}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Update summary cards
+            function updateSummary(quotations, salesOrders, invoices) {
+                document.getElementById('quotation-count').textContent = quotations;
+                document.getElementById('salesorder-count').textContent = salesOrders;
+                document.getElementById('invoice-count').textContent = invoices;
+            }
+
+            // Load client data
+            async function loadClientData() {
+                if (!clientId) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="table-body-cell text-center py-10 text-red-500">
+                                No Client ID provided. Please select a client from the Manage Clients page.
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="table-body-cell text-center py-10">
+                            <div class="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                            <p class="text-gray-500 mt-2">Loading client documents...</p>
+                        </td>
+                    </tr>`;
+
+                try {
+                    // Fetch all document types
+                    const [quotations, salesOrders, invoices] = await Promise.all([
+                        fetchWithAuth(`${API_BASE}/quotation`),
+                        fetchWithAuth(`${API_BASE}/sales-order`),
+                        fetchWithAuth(`${API_BASE}/invoic`)
+                    ]);
+
+                    // Filter by client ID and transform to common format
+                    const transactions = [];
+
+                    // Process Quotations
+                    (Array.isArray(quotations) ? quotations : []).forEach(q => {
+                        if (q.to_client_id === clientId || q.to?._id === clientId) {
+                            transactions.push({
+                                doc_type: 'Quotation',
+                                date: q.quotation_date || q.date,
+                                doc_no: q.quotation_no || q.number,
+                                subtotal: q.sub_total || 0,
+                                total: q.total || 0,
+                                _sortDate: new Date(q.quotation_date || q.date || 0).getTime()
+                            });
+                        }
+                    });
+
+                    // Process Sales Orders
+                    (Array.isArray(salesOrders) ? salesOrders : []).forEach(so => {
+                        if (so.to_client_id === clientId || so.to?._id === clientId) {
+                            transactions.push({
+                                doc_type: 'Sales Order',
+                                date: so.sales_date || so.date,
+                                doc_no: so.sales_no || so.number,
+                                subtotal: so.sub_total || 0,
+                                total: so.total || 0,
+                                _sortDate: new Date(so.sales_date || so.date || 0).getTime()
+                            });
+                        }
+                    });
+
+                    // Process Invoices
+                    (Array.isArray(invoices) ? invoices : []).forEach(inv => {
+                        if (inv.to_client_id === clientId || inv.to?._id === clientId) {
+                            transactions.push({
+                                doc_type: 'Invoice',
+                                date: inv.date,
+                                doc_no: inv.invoice_no || inv.number,
+                                subtotal: inv.sub_total || 0,
+                                total: inv.total || 0,
+                                _sortDate: new Date(inv.date || 0).getTime()
+                            });
+                        }
+                    });
+
+                    // Sort by date (newest first)
+                    transactions.sort((a, b) => b._sortDate - a._sortDate);
+
+                    // Store for filtering
+                    allTransactions = transactions;
+
+                    // Update summary
+                    const quotCount = transactions.filter(t => t.doc_type === 'Quotation').length;
+                    const soCount = transactions.filter(t => t.doc_type === 'Sales Order').length;
+                    const invCount = transactions.filter(t => t.doc_type === 'Invoice').length;
+                    updateSummary(quotCount, soCount, invCount);
+
+                    // Render all transactions
+                    renderTransactions(allTransactions);
+
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="table-body-cell text-center py-10 text-red-500">
+                                Error loading client statements: ${error.message}
+                            </td>
+                        </tr>`;
+                }
+            }
+
+            // Filter functionality
+            serviceFilter.addEventListener('change', (e) => {
+                const selectedType = e.target.value;
+                
+                if (selectedType === 'all') {
+                    renderTransactions(allTransactions);
+                } else {
+                    const filtered = allTransactions.filter(t => t.doc_type === selectedType);
+                    renderTransactions(filtered);
+                }
+            });
+
+            // Load data
+            loadClientData();
+        });
+    </script>
+</body>
+
+</html>

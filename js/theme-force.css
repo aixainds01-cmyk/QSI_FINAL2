@@ -1,0 +1,680 @@
+/*
+ * QSI SUPER FORCE THEME
+ * This file FORCES all pages to have EXACTLY the same UI
+ * - Same background colors
+ * - Same font family, size, color
+ * - Same sidebar theme and icons
+ * - All pages change when theme is changed in Settings
+ */
+
+/* ============================================
+   FORCE FONT FAMILY ON EVERYTHING
+   ============================================ */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* ============================================
+   FORCE BODY BACKGROUND AND TEXT
+   ============================================ */
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.theme-light,
+.theme-light body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.theme-dark,
+.theme-dark body {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* ============================================
+   FORCE MAIN CONTENT AREA
+   ============================================ */
+.theme-light .main-content,
+.theme-light #main-content,
+.theme-light .flex-1 {
+    background-color: #f5f5f5 !important;
+}
+
+.theme-dark .main-content,
+.theme-dark #main-content,
+.theme-dark .flex-1 {
+    background-color: #1a1a1a !important;
+}
+
+/* ============================================
+   FORCE SIDEBAR - EXACT SAME ON ALL PAGES
+   ============================================ */
+/* Note: Sidebar styling now primarily controlled by professional-sidebar.css */
+/* Keep these for backwards compatibility and theme enforcement */
+
+.theme-light aside,
+.theme-light .sidebar,
+.theme-light #sidebar {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+.theme-dark aside,
+.theme-dark .sidebar,
+.theme-dark #sidebar {
+    background-color: #0a0a0a !important;
+    color: #ffffff !important;
+}
+
+/* Sidebar links */
+.sidebar-link,
+aside a,
+.sidebar a,
+#sidebar a {
+    color: #dddddd !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+
+/* Make non-hover sidebar links more visible */
+.theme-light aside a,
+.theme-light .sidebar a,
+.theme-light #sidebar a,
+.theme-light .sidebar-link {
+    color: #e0e0e0 !important;
+}
+
+.theme-dark aside a,
+.theme-dark .sidebar a,
+.theme-dark #sidebar a,
+.theme-dark .sidebar-link {
+    color: #dddddd !important;
+}
+
+.theme-light .sidebar-link:hover,
+.theme-light aside a:hover,
+.theme-light .sidebar a:hover,
+.theme-light #sidebar a:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.theme-dark .sidebar-link:hover,
+.theme-dark aside a:hover,
+.theme-dark .sidebar a:hover,
+.theme-dark #sidebar a:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.theme-light .sidebar-link.active,
+.theme-light aside a.active,
+.theme-light .sidebar a.active,
+.theme-light #sidebar a.active {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+.theme-dark .sidebar-link.active,
+.theme-dark aside a.active,
+.theme-dark .sidebar a.active,
+.theme-dark #sidebar a.active {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+/* Sidebar icons - FORCE SAME SIZE */
+.sidebar-link i,
+aside a i,
+.sidebar a i,
+#sidebar a i {
+    font-size: 1.125rem !important;
+    width: 1.5rem !important;
+    margin-right: 0.75rem !important;
+}
+
+/* Sidebar sections */
+.sidebar-section,
+.sidebar-section-title {
+    color: #999999 !important;
+    font-size: 0.7rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    padding: 1rem 1rem 0.5rem !important;
+    font-weight: 700 !important;
+    margin-top: 0.5rem !important;
+}
+
+/* Sidebar section titles - More visible */
+.theme-light .sidebar-section,
+.theme-light .sidebar-section-title,
+.theme-light aside .text-gray-400,
+.theme-light aside .text-gray-500 {
+    color: #aaaaaa !important;
+}
+
+.theme-dark .sidebar-section,
+.theme-dark .sidebar-section-title,
+.theme-dark aside .text-gray-400,
+.theme-dark aside .text-gray-500 {
+    color: #999999 !important;
+}
+
+/* ============================================
+   FORCE HEADINGS - SAME SIZE ON ALL PAGES
+   ============================================ */
+.theme-light h1,
+.theme-light h2,
+.theme-light h3,
+.theme-light h4,
+.theme-light h5,
+.theme-light h6 {
+    color: #000000 !important;
+}
+
+.theme-dark h1,
+.theme-dark h2,
+.theme-dark h3,
+.theme-dark h4,
+.theme-dark h5,
+.theme-dark h6 {
+    color: #ffffff !important;
+}
+
+h1, .text-4xl {
+    font-size: 2.25rem !important;
+    line-height: 2.5rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 1rem !important;
+}
+
+h2, .text-3xl {
+    font-size: 1.875rem !important;
+    line-height: 2.25rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.875rem !important;
+}
+
+h3, .text-2xl {
+    font-size: 1.5rem !important;
+    line-height: 2rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.75rem !important;
+}
+
+h4, .text-xl {
+    font-size: 1.25rem !important;
+    line-height: 1.75rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+h5, .text-lg {
+    font-size: 1.125rem !important;
+    line-height: 1.75rem !important;
+    font-weight: 600 !important;
+}
+
+h6, .text-base {
+    font-size: 1rem !important;
+    line-height: 1.5rem !important;
+    font-weight: 600 !important;
+}
+
+/* ============================================
+   FORCE PARAGRAPH AND TEXT - SAME SIZE
+   ============================================ */
+p, .text-sm {
+    font-size: 0.875rem !important;
+    line-height: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.text-xs {
+    font-size: 0.75rem !important;
+    line-height: 1.25rem !important;
+}
+
+.theme-light p,
+.theme-light .text-gray-600,
+.theme-light .text-gray-500 {
+    color: #333333 !important;
+}
+
+.theme-dark p,
+.theme-dark .text-gray-600,
+.theme-dark .text-gray-500,
+.theme-dark .text-gray-400 {
+    color: #cccccc !important;
+}
+
+/* ============================================
+   FORCE CARDS - SAME STYLE ON ALL PAGES
+   ============================================ */
+.theme-light .card,
+.theme-light .bg-white,
+.theme-light [class*="card"] {
+    background-color: #ffffff !important;
+    border: 1px solid #dddddd !important;
+    border-radius: 0.75rem !important;
+    color: #000000 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    padding: 1.5rem !important;
+}
+
+.theme-dark .card,
+.theme-dark .bg-white,
+.theme-dark [class*="card"] {
+    background-color: #2a2a2a !important;
+    border: 1px solid #404040 !important;
+    border-radius: 0.75rem !important;
+    color: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    padding: 1.5rem !important;
+}
+
+/* ============================================
+   FORCE TABLES - SAME STYLE ON ALL PAGES
+   ============================================ */
+.theme-light table,
+.theme-light .table {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #dddddd !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
+}
+
+.theme-dark table,
+.theme-dark .table {
+    background-color: #2a2a2a !important;
+    color: #ffffff !important;
+    border: 1px solid #404040 !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
+}
+
+.theme-light thead,
+.theme-light .bg-gray-50 {
+    background-color: #f5f5f5 !important;
+}
+
+.theme-dark thead,
+.theme-dark .bg-gray-50 {
+    background-color: #1a1a1a !important;
+}
+
+.theme-light th {
+    color: #000000 !important;
+    font-weight: 700 !important;
+    font-size: 0.8125rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 1rem !important;
+    text-align: left !important;
+    border-bottom: 2px solid #000000 !important;
+}
+
+.theme-dark th {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 0.8125rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 1rem !important;
+    text-align: left !important;
+    border-bottom: 2px solid #ffffff !important;
+}
+
+.theme-light td {
+    padding: 0.875rem 1rem !important;
+    border-bottom: 1px solid #eeeeee !important;
+    color: #000000 !important;
+}
+
+.theme-dark td {
+    padding: 0.875rem 1rem !important;
+    border-bottom: 1px solid #333333 !important;
+    color: #ffffff !important;
+}
+
+.theme-light tr:hover {
+    background-color: #f9f9f9 !important;
+}
+
+.theme-dark tr:hover {
+    background-color: #333333 !important;
+}
+
+/* ============================================
+   FORCE INPUTS - SAME STYLE ON ALL PAGES
+   ============================================ */
+.theme-light input,
+.theme-light select,
+.theme-light textarea {
+    background-color: #ffffff !important;
+    border: 2px solid #cccccc !important;
+    color: #000000 !important;
+    padding: 0.625rem 0.875rem !important;
+    border-radius: 0.375rem !important;
+    font-size: 0.875rem !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: all 0.2s ease !important;
+}
+
+.theme-light input:focus,
+.theme-light select:focus,
+.theme-light textarea:focus {
+    outline: none !important;
+    border-color: #000000 !important;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea {
+    background-color: #2a2a2a !important;
+    border: 2px solid #555555 !important;
+    color: #ffffff !important;
+    padding: 0.625rem 0.875rem !important;
+    border-radius: 0.375rem !important;
+    font-size: 0.875rem !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: all 0.2s ease !important;
+}
+
+.theme-dark input:focus,
+.theme-dark select:focus,
+.theme-dark textarea:focus {
+    outline: none !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
+}
+
+.theme-light input::placeholder,
+.theme-light select::placeholder,
+.theme-light textarea::placeholder {
+    color: #999999 !important;
+}
+
+.theme-dark input::placeholder,
+.theme-dark select::placeholder,
+.theme-dark textarea::placeholder {
+    color: #888888 !important;
+}
+
+/* ============================================
+   FORCE BUTTONS - SAME STYLE ON ALL PAGES
+   ============================================ */
+.btn,
+button[class*="btn"] {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    padding: 0.625rem 1.25rem !important;
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    border: none !important;
+}
+
+.theme-light .btn-primary,
+.theme-light .bg-indigo-600,
+.theme-light .bg-purple-600 {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+.theme-light .btn-primary:hover,
+.theme-light .bg-indigo-600:hover,
+.theme-light .bg-purple-600:hover {
+    background-color: #333333 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+.theme-dark .btn-primary,
+.theme-dark .bg-indigo-600,
+.theme-dark .bg-purple-600 {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.theme-dark .btn-primary:hover,
+.theme-dark .bg-indigo-600:hover,
+.theme-dark .bg-purple-600:hover {
+    background-color: #cccccc !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.2) !important;
+}
+
+.theme-light .btn-secondary {
+    background-color: #f5f5f5 !important;
+    color: #000000 !important;
+    border: 2px solid #cccccc !important;
+}
+
+.theme-dark .btn-secondary {
+    background-color: #2a2a2a !important;
+    color: #ffffff !important;
+    border: 2px solid #555555 !important;
+}
+
+/* ============================================
+   FORCE MOBILE HEADER - SAME ON ALL PAGES
+   ============================================ */
+.mobile-header,
+header.fixed {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+.theme-dark .mobile-header,
+.theme-dark header.fixed {
+    background-color: #0f172a !important;
+}
+
+/* ============================================
+   FORCE BORDERS - SAME COLOR IN THEME
+   ============================================ */
+.theme-light .border,
+.theme-light [class*="border-gray"] {
+    border-color: #e5e7eb !important;
+}
+
+.theme-dark .border,
+.theme-dark [class*="border-gray"] {
+    border-color: #334155 !important;
+}
+
+/* ============================================
+   FORCE BADGES - SAME STYLE
+   ============================================ */
+.badge,
+[class*="badge"] {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    padding: 0.25rem 0.625rem !important;
+    border-radius: 9999px !important;
+}
+
+.badge-success,
+.bg-green-100 {
+    background-color: #d1fae5 !important;
+    color: #065f46 !important;
+}
+
+.badge-warning,
+.bg-yellow-100 {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+}
+
+.badge-danger,
+.bg-red-100 {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+}
+
+.theme-dark .badge-success,
+.theme-dark .bg-green-100 {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: #6ee7b7 !important;
+}
+
+.theme-dark .badge-warning,
+.theme-dark .bg-yellow-100 {
+    background-color: rgba(245, 158, 11, 0.2) !important;
+    color: #fbbf24 !important;
+}
+
+.theme-dark .badge-danger,
+.theme-dark .bg-red-100 {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: #fca5a5 !important;
+}
+
+/* ============================================
+   FORCE MODALS - SAME STYLE
+   ============================================ */
+.theme-light .modal,
+.theme-light [class*="modal"] {
+    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.theme-dark .modal,
+.theme-dark [class*="modal"] {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+/* ============================================
+   FORCE DROPDOWN MENUS - SAME STYLE
+   ============================================ */
+.theme-light .dropdown-menu,
+.theme-light [class*="dropdown"] {
+    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.theme-dark .dropdown-menu,
+.theme-dark [class*="dropdown"] {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+/* ============================================
+   OVERRIDE TAILWIND BACKGROUND UTILITIES
+   ============================================ */
+.theme-light .bg-gray-100 { background-color: #f3f4f6 !important; }
+.theme-light .bg-gray-200 { background-color: #e5e7eb !important; }
+.theme-light .bg-gray-800 { background-color: #1e293b !important; }
+
+.theme-dark .bg-gray-100 { background-color: #1e293b !important; }
+.theme-dark .bg-gray-200 { background-color: #334155 !important; }
+.theme-dark .bg-gray-800 { background-color: #0f172a !important; }
+
+/* ============================================
+   OVERRIDE TAILWIND TEXT UTILITIES
+   ============================================ */
+.theme-light .text-gray-800,
+.theme-light .text-gray-900 {
+    color: #111827 !important;
+}
+
+.theme-dark .text-gray-800,
+.theme-dark .text-gray-900,
+.theme-dark .text-white {
+    color: #f1f5f9 !important;
+}
+
+/* ============================================
+   FORCE LOADING STATES
+   ============================================ */
+.loader,
+.loading-spinner {
+    border: 4px solid #e5e7eb !important;
+    border-top-color: #6366f1 !important;
+    border-radius: 50% !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    animation: spin 1s linear infinite !important;
+}
+
+.theme-dark .loader,
+.theme-dark .loading-spinner {
+    border-color: #334155 !important;
+    border-top-color: #6366f1 !important;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   FORCE ICON SIZES - SAME EVERYWHERE
+   ============================================ */
+/* DO NOT override Font Awesome icons - keep them visible! */
+i.fas,
+i.far,
+i.fa,
+i.fab {
+    /* Icons should display properly */
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Sidebar icons */
+.sidebar-link i,
+aside a i,
+.sidebar a i,
+#sidebar a i {
+    font-size: 0.875rem !important;
+    width: 1.25rem !important;
+    text-align: center !important;
+}
+
+.fa-lg { font-size: 1.33em !important; }
+.fa-2x { font-size: 2em !important; }
+.fa-3x { font-size: 3em !important; }
+
+/* ============================================
+   FIX ANY REMAINING INCONSISTENCIES
+   ============================================ */
+.theme-light .content-wrapper,
+.theme-light .settings-container,
+.theme-light .container {
+    background-color: transparent !important;
+}
+
+.theme-dark .content-wrapper,
+.theme-dark .settings-container,
+.theme-dark .container {
+    background-color: transparent !important;
+}
+
+/* Remove any box shadows that might differ */
+.theme-light .shadow,
+.theme-light .shadow-sm,
+.theme-light .shadow-md {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+.theme-dark .shadow,
+.theme-dark .shadow-sm,
+.theme-dark .shadow-md {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+}

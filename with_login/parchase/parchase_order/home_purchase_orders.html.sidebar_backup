@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Orders - QSI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .table-header-cell {
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4b5563;
+            background-color: #f9fafb;
+            text-align: left;
+        }
+
+        .table-body-cell {
+            padding: 1rem 1rem;
+            font-size: 0.875rem;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+    </style>
+    <link rel="stylesheet" href="../../../js/fix-icons.css">
+    <link rel="stylesheet" href="../../../js/theme-force.css">
+    <!-- Global Theme Manager -->
+    <script src="../../../js/theme-manager.js"></script>
+</head>
+
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-64 bg-gray-800 text-white flex-shrink-0 hidden md:flex flex-col shadow-lg transition-all duration-300" id="sidebar">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700 flex justify-between items-center">
+                <span><i class="mr-2 text-indigo-400"></i> QSI</span>
+                <button id="close-sidebar" class="md:hidden text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <a href="../../dashboard_with_login.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-chart-pie mr-3 w-6 text-center"></i>Dashboard
+                </a>
+
+                <div>
+                    <button id="documents-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-file-invoice mr-3 w-6 text-center"></i>Sales Documents</span>
+                        <i id="dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200 text-xs"></i>
+                    </button>
+                    <div id="documents-dropdown-content" class="pl-8 pt-1 space-y-1 hidden bg-gray-900 bg-opacity-50 rounded-md mt-1">
+                        <a href="../../quotation/home_quotation.html" class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Quotation</a>
+                        <a href="../../saleorder/home_sales_order.html" class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Sales Order</a>
+                        <a href="../../invoice/home_invoice.html" class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Invoice</a>
+                        <a href="../../credit_note.html" class="block py-2 px-4 rounded hover:bg-gray-700 text-sm">Credit Note</a>
+                    </div>
+                </div>
+
+                <div>
+                     <button id="purchases-dropdown-btn" class="w-full flex justify-between items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-left">
+                        <span class="flex items-center"><i class="fas fa-shopping-cart mr-3 w-6 text-center"></i>Purchases</span>
+                        <i id="purchases-dropdown-icon" class="fas fa-chevron-down transform transition-transform duration-200 text-xs"></i>
+                    </button>
+                    <div id="purchases-dropdown-content" class="pl-8 pt-1 space-y-1 hidden bg-gray-900 bg-opacity-50 rounded-md mt-1">
+                         </div>
+                </div>
+
+                <a href="../../settings.html" class="flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3 w-6 text-center"></i>Settings
+                </a>
+            </nav>
+        </aside>
+
+        <div class="fixed top-0 left-0 w-full bg-gray-800 text-white p-4 flex justify-between items-center md:hidden z-50">
+            <span class="text-xl font-bold">QSI</span>
+            <button id="mobile-menu-btn"><i class="fas fa-bars text-xl"></i></button>
+        </div>
+
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 mt-14 md:mt-0">
+            <header class="mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                        Purchase Orders
+                    </h1>
+                    <a href="create_purchase_order.html" class="bg-purple-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-purple-700 transition duration-200 shadow-sm flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Create New
+                    </a>
+                </div>
+            </header>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative">
+
+                <div class="flex items-center space-x-4 border-b pb-4 mb-4">
+                    <button id="tab-active" class="px-3 py-1.5 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-md transition-colors">Active Orders</button>
+                    <button id="tab-deleted" class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md transition-colors">Deleted / Cancelled</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 border rounded-lg bg-gray-50 items-end">
+                    
+                    <div>
+                        <label for="filter-search" class="block text-sm font-medium text-gray-700 mb-1">Search PO Number</label>
+                        <div class="relative">
+                            <input type="text" id="filter-search" placeholder="Search PO..." class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="filter-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select id="filter-status" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="All">All Statuses</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Received">Received</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="filter-vendor" class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                        <select id="filter-vendor" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option>All Vendors</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <div class="flex-grow">
+                            <label for="filter-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                            <input type="date" id="filter-date" class="block w-full border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        </div>
+                        <button id="clear-filters-btn" class="mb-[2px] px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition duration-200" title="Clear Filters">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="bulk-action-bar" class="hidden mb-4 bg-indigo-50 border border-indigo-200 rounded-lg p-3 flex justify-between items-center shadow-sm transition-all duration-300">
+                    <div class="flex items-center space-x-4">
+                        <button id="bulk-action-close" class="text-indigo-400 hover:text-indigo-700 transition-colors p-1">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                        <span class="text-indigo-900 font-bold text-lg">
+                            <span id="bulk-action-count">0</span> selected
+                        </span>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <div id="bulk-actions-active" class="hidden">
+                            <button id="bulk-action-cancel" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded-md shadow-sm transition-colors text-sm flex items-center">
+                                <i class="fas fa-ban mr-2"></i> Delete
+                            </button>
+                        </div>
+
+                        <div id="bulk-actions-deleted" class="hidden flex gap-2">
+                            <button id="bulk-action-delete-perm" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-4 rounded-md shadow-sm transition-colors text-sm flex items-center">
+                                <i class="fas fa-trash-alt mr-2"></i> Delete Permanently
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto min-h-[300px]">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="table-header-cell w-10 text-center">
+                                    <input type="checkbox" id="select-all-checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer">
+                                </th>
+                                <th class="table-header-cell">PO Number</th>
+                                <th class="table-header-cell">Date</th>
+                                <th class="table-header-cell">Vendor</th>
+                                <th class="table-header-cell">Status</th>
+                                <th class="table-header-cell text-right">Sub Total</th>
+                                <th class="table-header-cell text-right">Total</th>
+                                <th class="table-header-cell text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="po-table-body" class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="table-body-cell text-center" colspan="8">
+                                    <div class="flex justify-center items-center p-4">
+                                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+                                        <span class="ml-2 text-gray-500">Loading orders...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
+                    <span id="showing-text">Showing all results</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="payment-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-xl font-bold text-gray-800">Record Vendor Payment</h3>
+                <button id="close-payment-modal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="payment-form" class="space-y-4">
+                <input type="hidden" id="pay-po-id">
+
+                <div class="bg-gray-50 p-3 rounded text-sm space-y-2">
+                    <div class="flex justify-between"><span>PO Number:</span> <span id="pay-po-no" class="font-semibold"></span></div>
+                    <div class="flex justify-between"><span>Vendor:</span> <span id="pay-vendor" class="font-semibold"></span></div>
+                    <div class="flex justify-between border-t pt-1 mt-1"><span>Total:</span> <span id="pay-total" class="font-semibold"></span></div>
+                    <div class="flex justify-between text-red-600 font-bold"><span>Pending:</span> <span id="pay-pending"></span></div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Amount</label>
+                    <input type="number" id="pay-amount-input" step="0.01" required class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Date</label>
+                    <input type="date" id="pay-date-input" required class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Method</label>
+                    <select id="pay-method-input" class="mt-1 w-full border border-gray-300 rounded-md p-2">
+                        <option>Bank Transfer</option>
+                        <option>Cash</option>
+                        <option>Cheque</option>
+                        <option>UPI</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Notes</label>
+                    <textarea id="pay-notes-input" rows="2" class="mt-1 w-full border border-gray-300 rounded-md p-2"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" id="cancel-payment-btn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" id="save-payment-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Record Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Update URL to match your server configuration
+            const API_BASE_URL = 'https://api.fornowauto.com/api';
+            const API_URL = `${API_BASE_URL}/purchase-orders`;
+
+            let CURRENT_PO_ID = null;
+
+            // Elements
+            const tbody = document.getElementById('po-table-body');
+            const filterStatus = document.getElementById('filter-status');
+            const filterVendor = document.getElementById('filter-vendor');
+            const filterDate = document.getElementById('filter-date');
+            const tabActive = document.getElementById('tab-active');
+            const tabDeleted = document.getElementById('tab-deleted');
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            const filterSearch = document.getElementById('filter-search');
+            const clearFiltersBtn = document.getElementById('clear-filters-btn');
+            
+            const bulkActionBar = document.getElementById('bulk-action-bar');
+            const bulkActionCount = document.getElementById('bulk-action-count');
+            
+            // Bulk Action Buttons
+            const bulkActionClose = document.getElementById('bulk-action-close');
+            const bulkActionsActive = document.getElementById('bulk-actions-active');
+            const bulkActionsDeleted = document.getElementById('bulk-actions-deleted');
+            const bulkActionDeletePerm = document.getElementById('bulk-action-delete-perm'); // ADDED THIS
+
+            // Payment Modal Elements
+            const paymentModal = document.getElementById('payment-modal');
+            const paymentForm = document.getElementById('payment-form');
+            const payPoNo = document.getElementById('pay-po-no');
+            const payVendor = document.getElementById('pay-vendor');
+            const payTotal = document.getElementById('pay-total');
+            const payPending = document.getElementById('pay-pending');
+            const payAmountInput = document.getElementById('pay-amount-input');
+            const payDateInput = document.getElementById('pay-date-input');
+
+            let currentTab = 'active';
+            let allPurchaseOrders = [];
+            let displayedPurchaseOrders = [];
+
+            // --- AUTH & FETCH HELPERS ---
+            function getAuthHeaders() {
+                const token = localStorage.getItem("token");
+                return token ? { 'Authorization': `Bearer ${token}` } : null;
+            }
+
+            async function safeFetch(url, opts = {}) {
+                const headers = Object.assign({}, opts.headers || {});
+                const authHeaders = getAuthHeaders();
+                if (authHeaders) Object.assign(headers, authHeaders);
+                if (opts.body && !(opts.body instanceof FormData) && !headers["Content-Type"]) {
+                    headers["Content-Type"] = "application/json";
+                }
+                try {
+                    const res = await fetch(url, Object.assign({}, opts, { headers }));
+                    if (!res.ok) {
+                        const errorData = await res.json().catch(() => ({}));
+                        throw new Error(errorData.message || res.statusText);
+                    }
+                    const text = await res.text();
+                    return text ? JSON.parse(text) : {};
+                } catch (error) {
+                    console.error("API Error:", error);
+                    throw error;
+                }
+            }
+
+            const formatCurrency = val => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(val) || 0);
+
+            function getCleanId(doc) {
+                if (!doc) return null;
+                let id = doc._id || doc.id || doc.original_id;
+                if (typeof id === 'object' && id !== null) {
+                    if (id.$oid) return id.$oid;
+                    return id.toString();
+                }
+                return id;
+            }
+
+            // --- STATUS BADGE ---
+            function statusBadge(status) {
+                const s = (status || 'draft').toLowerCase();
+                if (s.includes('receiv') || s === 'paid') return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Received / Paid</span>`;
+                if (s.includes('partial')) return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Partially Paid</span>`;
+                if (s.includes('approv')) return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Approved</span>`;
+                if (s.includes('pend')) return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>`;
+                if (s.includes('cancel') || s.includes('delete')) return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Cancelled</span>`;
+                return `<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Draft</span>`;
+            }
+
+            // --- LOAD VENDORS DIRECTLY ---
+            async function loadVendors() {
+                if (!filterVendor) return;
+                try {
+                    let vendors;
+                    try {
+                        vendors = await safeFetch(`${API_BASE_URL}/vend`);
+                    } catch (e) {
+                        console.warn("Fallback to /vendors");
+                        vendors = await safeFetch(`${API_BASE_URL}/vendors`);
+                    }
+
+                    filterVendor.innerHTML = '<option value="All Vendors">All Vendors</option>';
+                    
+                    if (Array.isArray(vendors)) {
+                        vendors.forEach(v => {
+                            const name = v.vendor_name || v.supplier_name || v.name || "Unknown";
+                            const opt = document.createElement('option');
+                            opt.value = name; 
+                            opt.textContent = name;
+                            filterVendor.appendChild(opt);
+                        });
+                    }
+                } catch (err) {
+                    console.error("Error loading vendors for filter:", err);
+                    filterVendor.innerHTML += '<option disabled>Error loading vendors</option>';
+                }
+            }
+
+            // --- LOAD ORDERS ---
+            async function fetchOrders() {
+                try {
+                    const data = await safeFetch(API_URL);
+                    allPurchaseOrders = Array.isArray(data) ? data : [];
+                    applyFilters();
+                } catch (err) {
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">Error: ${err.message}</td></tr>`;
+                }
+            }
+
+            function getVendorName(po) {
+                return po.supplier_name || po.vendor_name || 'Unknown Supplier';
+            }
+
+            // --- FILTER LOGIC ---
+            function applyFilters() {
+                let filtered = allPurchaseOrders.filter(po => {
+                    const status = (po.status || '').toLowerCase();
+                    const isDeleted = status.includes('cancel') || status.includes('delete');
+                    return currentTab === 'active' ? !isDeleted : isDeleted;
+                });
+
+                const sSearch = filterSearch ? filterSearch.value.trim().toLowerCase() : '';
+                const sVendor = filterVendor ? filterVendor.value : 'All Vendors';
+                const sStatus = filterStatus ? filterStatus.value : 'All';
+                const sDate = filterDate ? filterDate.value : '';
+
+                filtered = filtered.filter(po => {
+                    const vName = getVendorName(po);
+                    const matchSearch = !sSearch || (po.po_no || '').toLowerCase().includes(sSearch);
+                    const matchVendor = sVendor === 'All Vendors' || vName === sVendor;
+                    const matchStatus = sStatus === 'All' || (po.status || '').toLowerCase().includes(sStatus.toLowerCase());
+                    const matchDate = !sDate || (po.po_date && po.po_date.startsWith(sDate));
+
+                    return matchSearch && matchVendor && matchStatus && matchDate;
+                });
+
+                displayedPurchaseOrders = filtered;
+                renderTable();
+            }
+
+            // --- RENDER TABLE ---
+            function renderTable() {
+                const countElem = document.getElementById('bulk-action-count');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+
+                if (displayedPurchaseOrders.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">No orders found.</td></tr>`;
+                    return;
+                }
+
+                displayedPurchaseOrders.forEach(po => {
+                    const id = getCleanId(po);
+                    if (!id) return;
+
+                    const totalAmt = po.total || 0;
+                    const paidAmt = po.paid_amount || 0;
+                    const pendingAmt = Math.max(0, totalAmt - paidAmt);
+                    const subTotal = po.sub_total || po.subTotal || 0;
+                    const vendorName = getVendorName(po);
+
+                    let payButton = '';
+                    if (currentTab === 'active') {
+                        if (pendingAmt > 1) {
+                            payButton = `
+                            <button class="action-payment text-gray-400 hover:text-green-600 font-bold text-sm flex items-center gap-1 transition-colors" 
+                                    title="Pay Vendor"
+                                    data-id="${id}" 
+                                    data-po-no="${po.po_no}"
+                                    data-vendor="${vendorName}" 
+                                    data-total="${totalAmt}"
+                                    data-paid="${paidAmt}">
+                                <i class="fas fa-money-bill-wave"></i> Pay
+                            </button>`;
+                        } else {
+                            payButton = `<span class="text-xs text-green-600 font-bold flex items-center gap-1"><i class="fas fa-check-circle"></i> Paid</span>`;
+                        }
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-50 border-b transition-colors';
+                    tr.innerHTML = `
+                        <td class="table-body-cell text-center"><input type="checkbox" class="po-checkbox w-4 h-4 rounded text-indigo-600" data-id="${id}"></td>
+                        <td class="table-body-cell font-medium text-gray-800">${po.po_no}</td>
+                        <td class="table-body-cell text-gray-500 text-sm">${po.po_date || '-'}</td>
+                        <td class="table-body-cell font-medium text-gray-700">${vendorName}</td>
+                        <td class="table-body-cell">${statusBadge(po.status)}</td>
+                        <td class="table-body-cell text-right text-gray-600 font-medium">${formatCurrency(subTotal)}</td>
+                        <td class="table-body-cell text-right font-bold text-gray-800">${formatCurrency(totalAmt)}</td>
+                        <td class="table-body-cell">
+                            <div class="flex items-center justify-center space-x-3">
+                                <button class="text-gray-400 hover:text-indigo-600 action-open" data-id="${id}"><i class="fas fa-external-link-alt"></i></button>
+                                <button class="text-gray-400 hover:text-indigo-600 action-edit" data-id="${id}"><i class="fas fa-pencil-alt"></i></button>
+                                ${payButton}
+                                <button class="text-gray-400 hover:text-red-600 action-cancel" title="Cancel Order" data-id="${id}"><i class="fas fa-ban"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                attachEventHandlers();
+            }
+
+            function attachEventHandlers() {
+                tbody.querySelectorAll('.po-checkbox').forEach(cb => cb.addEventListener('change', updateSelectionUI));
+                tbody.querySelectorAll('.action-open').forEach(btn => btn.addEventListener('click', () => window.location.href = `view_purchase_order.html?id=${btn.dataset.id}`));
+                tbody.querySelectorAll('.action-edit').forEach(btn => btn.addEventListener('click', () => window.location.href = `edit_purchase_order.html?id=${btn.dataset.id}`));
+                
+                // Cancel Action
+                tbody.querySelectorAll('.action-cancel').forEach(btn => btn.addEventListener('click', async () => {
+                    if (!confirm("Cancel this order?")) return;
+                    try {
+                        await safeFetch(`${API_URL}/${btn.dataset.id}/status`, {
+                            method: 'PUT',
+                            body: JSON.stringify({ status: 'Cancelled' })
+                        });
+                        fetchOrders();
+                    } catch (e) { alert(e.message); }
+                }));
+
+                // Pay Action
+                tbody.querySelectorAll('.action-payment').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const d = e.currentTarget.dataset;
+                        openPaymentModal({
+                            id: d.id,
+                            po_no: d.poNo,
+                            vendor: d.vendor,
+                            total: parseFloat(d.total),
+                            paid: parseFloat(d.paid)
+                        });
+                    });
+                });
+            }
+
+            // --- MODAL FUNCTIONS ---
+            function openPaymentModal(data) {
+                if (!paymentModal) return;
+                CURRENT_PO_ID = data.id;
+                if (payPoNo) payPoNo.textContent = data.po_no;
+                if (payVendor) payVendor.textContent = data.vendor || 'Unknown';
+                const pending = data.total - data.paid;
+                if (payTotal) payTotal.textContent = formatCurrency(data.total);
+                if (payPending) payPending.textContent = formatCurrency(pending);
+                if (payAmountInput) {
+                    payAmountInput.value = pending.toFixed(2);
+                    payAmountInput.max = pending.toFixed(2);
+                }
+                if (payDateInput) payDateInput.value = new Date().toISOString().split('T')[0];
+                paymentModal.classList.remove('hidden');
+                paymentModal.classList.add('flex');
+            }
+
+            function closePaymentModal() {
+                if (!paymentModal) return;
+                paymentModal.classList.add('hidden');
+                paymentModal.classList.remove('flex');
+                CURRENT_PO_ID = null;
+                if (paymentForm) paymentForm.reset();
+            }
+
+            // --- INITIALIZATION ---
+            if (paymentForm) {
+                paymentForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!CURRENT_PO_ID) return;
+                    const btn = document.getElementById('save-payment-btn');
+                    const originalText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    const payload = {
+                        purchase_order_id: CURRENT_PO_ID,
+                        amount: parseFloat(payAmountInput.value),
+                        payment_date: payDateInput.value,
+                        payment_method: document.getElementById('pay-method-input').value,
+                        notes: document.getElementById('pay-notes-input').value
+                    };
+                    try {
+                        await safeFetch(`${API_BASE_URL}/vendor-payments`, {
+                            method: 'POST',
+                            body: JSON.stringify(payload)
+                        });
+                        alert('Payment recorded successfully!');
+                        closePaymentModal();
+                        fetchOrders();
+                    } catch (err) {
+                        alert('Failed: ' + err.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                });
+            }
+
+            // Close Modals
+            document.getElementById('close-payment-modal')?.addEventListener('click', closePaymentModal);
+            document.getElementById('cancel-payment-btn')?.addEventListener('click', closePaymentModal);
+
+            // Sidebar & Tabs
+            const sidebar = document.getElementById('sidebar');
+            document.getElementById('mobile-menu-btn')?.addEventListener('click', () => sidebar.classList.remove('hidden'));
+            document.getElementById('close-sidebar')?.addEventListener('click', () => sidebar.classList.add('hidden'));
+
+            if (tabActive) tabActive.addEventListener('click', () => { currentTab = 'active'; updateTabUI(); applyFilters(); });
+            if (tabDeleted) tabDeleted.addEventListener('click', () => { currentTab = 'deleted'; updateTabUI(); applyFilters(); });
+
+            function updateTabUI() {
+                if (currentTab === 'active') {
+                    tabActive.classList.replace('text-gray-600', 'text-indigo-700'); tabActive.classList.replace('hover:bg-gray-100', 'bg-indigo-100');
+                    tabDeleted.classList.replace('text-indigo-700', 'text-gray-600'); tabDeleted.classList.replace('bg-indigo-100', 'hover:bg-gray-100');
+                } else {
+                    tabDeleted.classList.replace('text-gray-600', 'text-indigo-700'); tabDeleted.classList.replace('hover:bg-gray-100', 'bg-indigo-100');
+                    tabActive.classList.replace('text-indigo-700', 'text-gray-600'); tabActive.classList.replace('bg-indigo-100', 'hover:bg-gray-100');
+                }
+            }
+
+            // Bulk Actions
+            if (selectAllCheckbox) selectAllCheckbox.addEventListener('change', e => {
+                tbody.querySelectorAll('.po-checkbox').forEach(cb => cb.checked = e.target.checked);
+                updateSelectionUI();
+            });
+
+            function updateSelectionUI() {
+                if (!bulkActionBar) return;
+                const count = tbody.querySelectorAll('.po-checkbox:checked').length;
+                if (count > 0) {
+                    bulkActionBar.classList.remove('hidden');
+                    if (bulkActionCount) bulkActionCount.textContent = count;
+                    if (currentTab === 'active') {
+                        bulkActionsActive?.classList.remove('hidden');
+                        bulkActionsDeleted?.classList.add('hidden');
+                    } else {
+                        bulkActionsActive?.classList.add('hidden');
+                        bulkActionsDeleted?.classList.remove('hidden');
+                    }
+                } else {
+                    bulkActionBar.classList.add('hidden');
+                }
+            }
+
+            document.getElementById('bulk-action-close')?.addEventListener('click', () => {
+                if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                tbody.querySelectorAll('.po-checkbox').forEach(cb => cb.checked = false);
+                updateSelectionUI();
+            });
+
+            // Filters
+            if (filterStatus) filterStatus.addEventListener('change', applyFilters);
+            if (filterVendor) filterVendor.addEventListener('change', applyFilters);
+            if (filterDate) filterDate.addEventListener('change', applyFilters);
+            if (filterSearch) filterSearch.addEventListener('input', applyFilters);
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', () => {
+                    if (filterSearch) filterSearch.value = '';
+                    if (filterStatus) filterStatus.value = 'All';
+                    if (filterVendor) filterVendor.value = 'All Vendors';
+                    if (filterDate) filterDate.value = '';
+                    applyFilters();
+                });
+            }
+
+            // Dropdowns
+            const setupDropdown = (btnId, contentId, iconId) => {
+                const btn = document.getElementById(btnId);
+                const content = document.getElementById(contentId);
+                const icon = document.getElementById(iconId);
+                if (btn) btn.addEventListener('click', () => { content.classList.toggle('hidden'); icon.classList.toggle('rotate-180'); });
+            };
+            setupDropdown('documents-dropdown-btn', 'documents-dropdown-content', 'dropdown-icon');
+            setupDropdown('purchases-dropdown-btn', 'purchases-dropdown-content', 'purchases-dropdown-icon');
+
+            // --- BULK DELETE PERMANENTLY LOGIC (ADDED HERE) ---
+            if (bulkActionDeletePerm) {
+                bulkActionDeletePerm.addEventListener('click', async () => {
+                    // 1. Get Selected IDs
+                    const selectedCheckboxes = document.querySelectorAll('.po-checkbox:checked');
+                    const idsToDelete = Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
+
+                    if (idsToDelete.length === 0) return;
+
+                    // 2. Confirmation
+                    if (!confirm(`Are you sure you want to permanently delete ${idsToDelete.length} orders? This cannot be undone.`)) {
+                        return;
+                    }
+
+                    // 3. UI Loading
+                    const originalText = bulkActionDeletePerm.innerHTML;
+                    bulkActionDeletePerm.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                    bulkActionDeletePerm.disabled = true;
+
+                    try {
+                        // 4. API Call
+                        const deletePromises = idsToDelete.map(id => 
+                            safeFetch(`${API_URL}/${id}`, { method: 'DELETE' })
+                        );
+
+                        await Promise.all(deletePromises);
+
+                        // 5. Success
+                        alert('Selected orders deleted permanently.');
+                        
+                        // Reset Selection
+                        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                        fetchOrders(); 
+                        
+                    } catch (error) {
+                        console.error("Bulk delete error:", error);
+                        alert('Failed to delete: ' + error.message);
+                    } finally {
+                        // 6. Reset UI
+                        bulkActionDeletePerm.innerHTML = originalText;
+                        bulkActionDeletePerm.disabled = false;
+                        updateSelectionUI(); 
+                    }
+                });
+            }
+
+            // --- EXECUTE ON LOAD ---
+            loadVendors();
+            // --- BULK ACTION HANDLERS ---
+            const bulkCancelBtn = document.getElementById('bulk-action-cancel');
+            const bulkDeletePermBtn = document.getElementById('bulk-action-delete-perm');
+
+            // 1. Active Tab - Soft Delete (Cancel Order)
+            if (bulkCancelBtn) {
+                bulkCancelBtn.addEventListener('click', async () => {
+                    const selected = Array.from(tbody.querySelectorAll('.po-checkbox:checked'));
+                    if (selected.length === 0) return;
+                    
+                    if (!confirm(`Are you sure you want to delete ${selected.length} orders?`)) return;
+
+                    // Loading Effect
+                    const originalText = bulkCancelBtn.innerHTML;
+                    bulkCancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    bulkCancelBtn.disabled = true;
+
+                    try {
+                        // Loop through and update status to Cancelled
+                        const promises = selected.map(cb => {
+                            const id = cb.dataset.id;
+                            return safeFetch(`${API_URL}/${id}/status`, {
+                                method: 'PUT',
+                                body: JSON.stringify({ status: 'Cancelled' })
+                            });
+                        });
+
+                        await Promise.all(promises);
+                        
+                        // Refresh & Reset
+                        await fetchOrders();
+                        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                        updateSelectionUI();
+                        
+                    } catch (err) {
+                        alert('Error processing action: ' + err.message);
+                    } finally {
+                        bulkCancelBtn.innerHTML = originalText;
+                        bulkCancelBtn.disabled = false;
+                    }
+                });
+            }
+
+            // 2. Deleted Tab - Hard Delete (Permanent)
+            if (bulkDeletePermBtn) {
+                bulkDeletePermBtn.addEventListener('click', async () => {
+                    const selected = Array.from(tbody.querySelectorAll('.po-checkbox:checked'));
+                    if (selected.length === 0) return;
+
+                    if (!confirm(`Permanently delete ${selected.length} orders? This cannot be undone.`)) return;
+
+                    const originalText = bulkDeletePermBtn.innerHTML;
+                    bulkDeletePermBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                    bulkDeletePermBtn.disabled = true;
+
+                    try {
+                        const promises = selected.map(cb => {
+                            const id = cb.dataset.id;
+                            return safeFetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                        });
+
+                        await Promise.all(promises);
+                        
+                        await fetchOrders();
+                        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                        updateSelectionUI();
+                        
+                    } catch (err) {
+                        alert('Error deleting: ' + err.message);
+                    } finally {
+                        bulkDeletePermBtn.innerHTML = originalText;
+                        bulkDeletePermBtn.disabled = false;
+                    }
+                });
+            }
+            fetchOrders();
+        });
+    </script>
+</body>
+
+</html>
