@@ -614,7 +614,7 @@
                                     </div>
 
                                     <div class="flex justify-between items-center">
-                                        <span class="text-green-600 font-medium">Paid Amount</span>
+                                        <span class="text-green-600 font-medium">Received Amount</span>
                                         <span class="font-semibold text-green-600" id="paid_amount">₹0.00</span>
                                     </div>
 
@@ -730,7 +730,7 @@
                                     <span id="pdf-total" style="font-weight: 600;"></span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; color: #059669;">
-                                    <span>Amount Paid</span>
+                                    <span>Amount Received</span>
                                     <span id="pdf-paid-amount"></span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; padding-top: 12px; margin-top: 8px; border-top: 2px solid #111827; font-weight: bold; font-size: 16px;">
@@ -1106,75 +1106,112 @@
             });
 
             // === Download PDF Handler ===
-            downloadPdfBtn?.addEventListener("click", async () => {
-                const pdfSection = document.getElementById("pdf-preview-section");
-                const element = document.getElementById("invoice-pdf-content");
+           // === Download PDF Handler - A4 Size ===
+downloadPdfBtn?.addEventListener("click", async () => {
+    const pdfSection = document.getElementById("pdf-preview-section");
+    const element = document.getElementById("invoice-pdf-content");
 
-                if (!element) {
-                    showAlert("Could not generate PDF.", "error");
-                    return;
-                }
+    if (!element) {
+        showAlert("Could not generate PDF.", "error");
+        return;
+    }
 
-                try {
-                    // Show the section temporarily for rendering
-                    pdfSection.classList.remove("hidden");
-                    pdfSection.style.position = "absolute";
-                    pdfSection.style.left = "-9999px";
-                    pdfSection.style.top = "0";
+    try {
+        // Show loading state
+        downloadPdfBtn.disabled = true;
+        downloadPdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating...';
 
-                    // Wait for images to load
-                    await new Promise(resolve => setTimeout(resolve, 500));
+        // Show the section temporarily for rendering
+        pdfSection.classList.remove("hidden");
+        pdfSection.style.position = "absolute";
+        pdfSection.style.left = "-9999px";
+        pdfSection.style.top = "0";
 
-                    const canvas = await html2canvas(element, {
-                        scale: 1.5,
-                        useCORS: true,
-                        backgroundColor: '#ffffff',
-                        logging: false
-                    });
+        // Set element to exact A4 width for proper scaling
+        // A4 = 210mm x 297mm, at 96 DPI = 794px x 1123px
+        const a4WidthPx = 794;
+        element.style.width = a4WidthPx + "px";
+        element.style.maxWidth = a4WidthPx + "px";
+        element.style.padding = "40px";
+        element.style.boxSizing = "border-box";
 
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF("p", "mm", "a4");
-                    const imgData = canvas.toDataURL("image/jpeg", 0.95);
+        // Wait for images to load and styles to apply
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-                    const pageWidth = pdf.internal.pageSize.getWidth();
-                    const pageHeight = pdf.internal.pageSize.getHeight();
-                    const imgProps = pdf.getImageProperties(imgData);
-                    const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+        // Capture at higher scale for better quality
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            width: a4WidthPx,
+            windowWidth: a4WidthPx
+        });
 
-                    // Handle multi-page if content is longer than one page
-                    let heightLeft = pdfHeight;
-                    let position = 0;
+        // A4 dimensions in mm
+        const a4Width = 210;
+        const a4Height = 297;
 
-                    pdf.addImage(imgData, "JPEG", 0, position, pageWidth, pdfHeight);
-                    heightLeft -= pageHeight;
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4"
+        });
 
-                    while (heightLeft > 0) {
-                        position = heightLeft - pdfHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, "JPEG", 0, position, pageWidth, pdfHeight);
-                        heightLeft -= pageHeight;
-                    }
+        const imgData = canvas.toDataURL("image/jpeg", 0.92);
 
-                    let clientName = invoiceData?.to?.client_name || "Client";
-                    clientName = clientName.replace(/[^a-zA-Z0-9-_ ]/g, "").trim().replace(/\s+/g, "_");
-                    const invNo = invoiceData?.invoice_no || "Invoice";
-                    const filename = `${clientName}_${invNo}.pdf`;
+        // Calculate dimensions to fit A4
+        const imgWidth = a4Width;
+        const imgHeight = (canvas.height * a4Width) / canvas.width;
 
-                    pdf.save(filename);
+        // Add image, handling multi-page if content is longer than A4
+        let heightLeft = imgHeight;
+        let position = 0;
+        let pageNumber = 1;
 
-                    // Hide the section again
-                    pdfSection.classList.add("hidden");
-                    pdfSection.style.position = "";
-                    pdfSection.style.left = "";
-                    pdfSection.style.top = "";
+        // First page
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, 'FAST');
+        heightLeft -= a4Height;
 
-                    showAlert("PDF downloaded successfully!", "success", 3000);
+        // Additional pages if needed
+        while (heightLeft > 0) {
+            position = -a4Height * pageNumber;
+            pdf.addPage();
+            pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, 'FAST');
+            heightLeft -= a4Height;
+            pageNumber++;
+        }
 
-                } catch (err) {
-                    console.error("PDF generation error:", err);
-                    showAlert("Error generating PDF: " + err.message, "error");
-                }
-            });
+        // Generate filename
+        let clientName = invoiceData?.to?.client_name || "Client";
+        clientName = clientName.replace(/[^a-zA-Z0-9-_ ]/g, "").trim().replace(/\s+/g, "_");
+        const invNo = invoiceData?.invoice_no || "Invoice";
+        const filename = `${clientName}_${invNo}.pdf`;
+
+        pdf.save(filename);
+
+        // Reset element styles
+        element.style.width = "";
+        element.style.maxWidth = "800px";
+
+        // Hide the section again
+        pdfSection.classList.add("hidden");
+        pdfSection.style.position = "";
+        pdfSection.style.left = "";
+        pdfSection.style.top = "";
+
+        showAlert("PDF downloaded successfully!", "success", 3000);
+
+    } catch (err) {
+        console.error("PDF generation error:", err);
+        showAlert("Error generating PDF: " + err.message, "error");
+    } finally {
+        // Reset button state
+        downloadPdfBtn.disabled = false;
+        downloadPdfBtn.innerHTML = '<i class="fas fa-download mr-2"></i> Download PDF';
+    }
+});
 
             // === Sidebar Dropdowns ===
             const dropdownBtn = document.getElementById("documents-dropdown-btn");

@@ -1400,59 +1400,91 @@
 
 
             /* loadCompany: same behavior as before but clearer on 401 */
-            async function loadCompany() {
-                try {
-                    const companies = await safeFetch(COMPANY_API_URL, { method: "GET" });
-                    if (Array.isArray(companies) && companies.length > 0) {
-                        const company = companies[0];
-                        COMPANY_ID = company._id || company.id || null;
-                        // ... (rest of loadCompany is fine) ...
-                        const bn = document.getElementById("businessName");
-                        const bc = document.getElementById("business_city");
-                        const bco = document.getElementById("business_country");
-                        if (bn) bn.value = company.company_name || "";
-                        if (bc) bc.value = company.address?.city || "";
-                        if (bco) bco.value = company.address?.country || "";
-                        if (company.logo) {
-                            if (businessLogoPreview) businessLogoPreview.src = company.logo;
-                            if (logoPreview) logoPreview.src = company.logo;
-                            if (logoPreviewContainer) logoPreviewContainer.classList.remove("hidden");
-                            if (logoPlaceholder) logoPlaceholder.classList.add("hidden");
-                        }
-                    } else {
-                        console.warn("No company found.");
-                        showAlert("No company found. Please create a company.", "error", 7000);
-                    }
-                } catch (err) {
-                    console.error("Error loading companies:", err);
-                    if (err.status === 401) {
-                        showAlert("Unauthorized. Please login.", "error", 7000);
-                    } else {
-                        showAlert("Could not load company. Check server.", "error", 6000);
-                    }
-                }
+           async function loadCompany() {
+    try {
+        console.log("Loading company data...");
+        const companies = await safeFetch(COMPANY_API_URL, { method: "GET" });
+        console.log("Companies response:", companies);
+        
+        if (Array.isArray(companies) && companies.length > 0) {
+            const company = companies[0];
+            COMPANY_ID = company._id || company.id || null;
+            console.log("Company ID set to:", COMPANY_ID);
+            
+            // Set business name
+            const bn = document.getElementById("businessName");
+            if (bn) {
+                bn.value = company.company_name || "";
+                console.log("Business name set:", bn.value);
             }
+            
+            // Set city - check multiple possible paths
+            const bc = document.getElementById("business_city");
+            if (bc) {
+                bc.value = company.address?.city || company.city || "";
+                console.log("Business city set:", bc.value);
+            }
+            
+            // Set country - check multiple possible paths
+            const bco = document.getElementById("business_country");
+            if (bco) {
+                bco.value = company.address?.country || company.country || "";
+                console.log("Business country set:", bco.value);
+            }
+            
+            // Set logo
+            if (company.logo) {
+                if (businessLogoPreview) businessLogoPreview.src = company.logo;
+                if (logoPreview) logoPreview.src = company.logo;
+                if (logoPreviewContainer) logoPreviewContainer.classList.remove("hidden");
+                if (logoPlaceholder) logoPlaceholder.classList.add("hidden");
+                console.log("Logo loaded");
+            }
+        } else {
+            console.warn("No company found in response");
+            showAlert("No company found. Please create a company in Settings.", "error", 7000);
+        }
+    } catch (err) {
+        console.error("Error loading companies:", err);
+        showAlert("Could not load company details. " + (err.message || ""), "error", 6000);
+    }
+}
             /* loadClients: handles 401 explicitly so user knows to authenticate */
             async function loadClients() {
-                try {
-                    const clients = await safeFetch(CLIENT_API_URL, { method: "GET" });
-                    if (!billedToSelect) return;
-                    billedToSelect.innerHTML = '<option value="">Select Client</option>';
-                    (clients || []).forEach((client) => {
-                        const opt = document.createElement("option");
-                        opt.value = client._id || client.id || "";
-                        opt.textContent = client.client_name || client.name || opt.value;
-                        billedToSelect.appendChild(opt);
-                    });
-                } catch (err) {
-                    console.error("Error loading clients:", err);
-                    if (err.status === 401) {
-                        showAlert("Unauthorized. Please login.", "error", 7000);
-                    } else {
-                        showAlert("Could not load clients.", "error", 4000);
-                    }
-                }
-            }
+    try {
+        console.log("Loading clients...");
+        const clients = await safeFetch(CLIENT_API_URL, { method: "GET" });
+        console.log("Clients response:", clients);
+        
+        if (!billedToSelect) {
+            console.error("billedToSelect element not found!");
+            return;
+        }
+        
+        billedToSelect.innerHTML = '<option value="">Select Client</option>';
+        
+        const clientsList = clients || [];
+        console.log(`Found ${clientsList.length} clients`);
+        
+        clientsList.forEach((client) => {
+            const opt = document.createElement("option");
+            opt.value = client._id || client.id || "";
+            opt.textContent = client.client_name || client.name || opt.value;
+            // Store full client data for later use
+            opt.dataset.client = JSON.stringify(client);
+            billedToSelect.appendChild(opt);
+        });
+        
+        console.log("Clients dropdown populated");
+        
+        // Dispatch event to signal clients are loaded
+        window.dispatchEvent(new CustomEvent('clientsLoaded', { detail: clientsList }));
+        
+    } catch (err) {
+        console.error("Error loading clients:", err);
+        showAlert("Could not load clients. " + (err.message || ""), "error", 4000);
+    }
+}
 
             // ✅ ADDED: Function to fetch bank details
             async function fetchBankDetails() {
@@ -2230,16 +2262,23 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
             });
 
             const dropdownBtn = document.getElementById("documents-dropdown-btn");
-            const dropdownContent = document.getElementById("documents-dropdown-content");
-            const dropdownIcon = document.getElementById("dropdown-icon");
-            dropdownBtn?.addEventListener("click", () => {
-                dropdownContent?.classList.toggle("hidden");
-                dropdownIcon?.classList.toggle("rotate-180");
-            });
-            document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
-                document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
-                document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
-            });
+const dropdownContent = document.getElementById("documents-dropdown-content");
+const dropdownIcon = document.getElementById("dropdown-icon");
+
+if (dropdownBtn) {
+    dropdownBtn.addEventListener("click", () => {
+        dropdownContent?.classList.toggle("hidden");
+        dropdownIcon?.classList.toggle("rotate-180");
+    });
+}
+
+const purchasesDropdownBtn = document.getElementById('purchases-dropdown-btn');
+if (purchasesDropdownBtn) {
+    purchasesDropdownBtn.addEventListener('click', () => {
+        document.getElementById('purchases-dropdown-content')?.classList.toggle('hidden');
+        document.getElementById('purchases-dropdown-icon')?.classList.toggle('rotate-180');
+    });
+}
 
             addItemBtn?.addEventListener("click", createItemRow);
             taxPercentageInput?.addEventListener("input", updateTotals);
@@ -2292,7 +2331,6 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
         return url.searchParams.get(name);
     }
 
-    // Helper function to get auth headers
     function getAuthHeaders() {
         const token = localStorage.getItem('token');
         if (token) {
@@ -2301,14 +2339,13 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
         return null;
     }
 
-    // Create our own fetch wrapper (same logic as safeFetch in the page)
     async function fetchWithAuth(url, opts = {}) {
         opts.headers = opts.headers || {};
         const authHeaders = getAuthHeaders();
         
         if (!authHeaders) {
             alert("Authentication token not found. Please log in.");
-            window.location.href = '/login.html';
+            window.location.href = '../index.html';
             throw new Error("Authentication token not found.");
         }
         
@@ -2322,264 +2359,173 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
         
         if (!response.ok) {
             if (response.status === 401) {
-                alert("Authentication error or session expired. Please log in again.");
+                alert("Session expired. Please log in again.");
                 localStorage.removeItem('token');
-                localStorage.removeItem('userId');
-                window.location.href = '/login.html';
+                window.location.href = '../index.html';
                 throw new Error("Session expired");
             }
-            const errorText = await response.text().catch(() => response.statusText);
-            throw new Error(`HTTP ${response.status}: ${errorText}`);
+            throw new Error(`HTTP ${response.status}`);
         }
         
         const contentType = response.headers.get('content-type') || '';
         return contentType.includes('application/json') ? response.json() : response.text();
     }
 
-    async function fetchSalesOrderById(soId) {
-        const url = `${API_BASE_URL}/sales-order/${encodeURIComponent(soId)}`;
-        console.log('Fetching Sales Order from:', url);
-        
-        try {
-            const json = await fetchWithAuth(url, { method: 'GET' });
-            console.log('Raw API Response:', json);
-            
-            // Handle different response structures
-            if (Array.isArray(json) && json.length) return json[0];
-            if (json && json.sales_order) return json.sales_order;
-            if (json && json._id) return json;
-            
-            return json;
-        } catch (err) {
-            console.error('Fetch error:', err);
-            throw err;
-        }
-    }
-
-    function setClientInDropdown(clientData) {
-        const billedSelect = document.getElementById('billed-to-select');
-        if (!billedSelect) {
-            console.warn('Client dropdown not found');
-            return;
-        }
-
-        let clientId = clientData?._id || clientData?.id;
-        let clientName = clientData?.client_name || clientData?.name;
-        
-        console.log('Setting client:', { clientId, clientName });
-
-        if (!clientId || !clientName) {
-            console.warn('Missing client ID or name');
-            return;
-        }
-
-        // Check if option exists
-        let existingOption = Array.from(billedSelect.options).find(opt => 
-            opt.value === clientId || opt.textContent === clientName
-        );
-
-        if (!existingOption) {
-            const newOption = document.createElement('option');
-            newOption.value = clientId;
-            newOption.textContent = clientName;
-            billedSelect.appendChild(newOption);
-            console.log('Created new option for client');
-        }
-
-        billedSelect.value = clientId;
-        console.log('Client selected in dropdown');
-    }
-
-    function populateItemRow(row, itemData) {
-        const nameEl = row.querySelector('.item-name');
-        const qtyEl = row.querySelector('.quantity');
-        const rateEl = row.querySelector('.rate');
-        const descEl = row.querySelector('.description');
-        const amtEl = row.querySelector('.amount');
-
-        if (nameEl) nameEl.value = itemData.item_name || itemData.name || '';
-        if (qtyEl) qtyEl.value = itemData.quantity || 1;
-        if (rateEl) rateEl.value = itemData.rate || itemData.unit_price || 0;
-        if (descEl) descEl.value = itemData.description || '';
-
-        const qty = parseFloat(qtyEl?.value || 0);
-        const rate = parseFloat(rateEl?.value || 0);
-        const amount = qty * rate;
-        
-        if (amtEl) amtEl.textContent = `₹${amount.toFixed(2)}`;
-        
-        console.log('Populated item:', itemData.item_name, '- Qty:', qty, 'Rate:', rate, 'Amount:', amount);
-    }
-
-    // Wait for page functions to be available
-    function waitForPageReady() {
+    // Wait for clients to be loaded
+    function waitForClients() {
         return new Promise((resolve) => {
-            let attempts = 0;
-            const maxAttempts = 20; // 2 seconds max
+            const billedSelect = document.getElementById('billed-to-select');
             
-            const checkReady = setInterval(() => {
-                attempts++;
-                
-                // Check if required elements and functions exist
-                const itemsContainer = document.getElementById('items-container');
-                const billedSelect = document.getElementById('billed-to-select');
-                const hasCreateItemRow = typeof window.INV_createItemRow === 'function' || 
-                                        typeof createItemRow === 'function';
-                
-                if (itemsContainer && billedSelect && hasCreateItemRow) {
-                    clearInterval(checkReady);
-                    console.log('✅ Page ready for auto-fill');
-                    resolve(true);
-                } else if (attempts >= maxAttempts) {
-                    clearInterval(checkReady);
-                    console.warn('⚠️ Page readiness timeout');
-                    resolve(false);
-                }
-            }, 100);
+            // Check if clients are already loaded
+            if (billedSelect && billedSelect.options.length > 1) {
+                console.log('Clients already loaded');
+                resolve(true);
+                return;
+            }
+            
+            // Wait for clientsLoaded event
+            const timeout = setTimeout(() => {
+                console.warn('Clients loading timeout');
+                resolve(false);
+            }, 5000);
+            
+            window.addEventListener('clientsLoaded', () => {
+                clearTimeout(timeout);
+                console.log('Clients loaded event received');
+                resolve(true);
+            }, { once: true });
         });
     }
 
-    // ===== MAIN EXECUTION =====
     const soId = getQueryParam('fromSalesOrder');
     
     if (!soId) {
-        console.log('No fromSalesOrder parameter found');
-        return;
+        return; // Not converting from sales order
     }
 
-    console.log('🔄 Converting Sales Order to Invoice, ID:', soId);
+    console.log('Converting Sales Order to Invoice, ID:', soId);
 
     try {
-        // Wait for page to be ready
-        const isReady = await waitForPageReady();
-        if (!isReady) {
-            throw new Error('Page initialization timeout');
-        }
+        // Wait for clients to load first
+        await waitForClients();
+        
+        // Small delay to ensure DOM is ready
+        await new Promise(r => setTimeout(r, 500));
 
         // Fetch the sales order
-        const salesOrder = await fetchSalesOrderById(soId);
+        const response = await fetchWithAuth(`${API_BASE_URL}/sales-order/${soId}`);
+        const salesOrder = Array.isArray(response) ? response[0] : response;
         
         if (!salesOrder) {
-            throw new Error('Sales Order not found or empty response');
+            throw new Error('Sales Order not found');
         }
 
-        console.log('✅ Sales Order loaded:', salesOrder);
+        console.log('Sales Order loaded:', salesOrder);
 
         // 1. SET CLIENT
-        if (salesOrder.to) {
-            setClientInDropdown(salesOrder.to);
-        } else if (salesOrder.to_client_id) {
-            const billedSelect = document.getElementById('billed-to-select');
-            if (billedSelect) billedSelect.value = salesOrder.to_client_id;
+        const billedSelect = document.getElementById('billed-to-select');
+        if (billedSelect && salesOrder.to) {
+            const clientId = salesOrder.to._id || salesOrder.to.id || salesOrder.to_client_id;
+            
+            // Try to find and select the client
+            let found = false;
+            for (let opt of billedSelect.options) {
+                if (opt.value === clientId) {
+                    billedSelect.value = clientId;
+                    found = true;
+                    break;
+                }
+            }
+            
+            // If not found, add it
+            if (!found && salesOrder.to.client_name) {
+                const newOpt = document.createElement('option');
+                newOpt.value = clientId || salesOrder.to.client_name;
+                newOpt.textContent = salesOrder.to.client_name;
+                billedSelect.appendChild(newOpt);
+                billedSelect.value = newOpt.value;
+            }
+            
+            console.log('Client set:', billedSelect.value);
         }
 
-        // 2. CLEAR EXISTING ITEMS
+        // 2. CLEAR AND ADD ITEMS
         const itemsContainer = document.getElementById('items-container');
         if (itemsContainer) {
             itemsContainer.innerHTML = '';
-            console.log('Cleared existing items');
         }
 
-        // 3. ADD ITEMS FROM SALES ORDER
-        const items = salesOrder.items || salesOrder.line_items || [];
+        const items = salesOrder.items || [];
         console.log(`Adding ${items.length} items...`);
 
-        items.forEach((item, index) => {
-            // Create a new row
+        for (const item of items) {
+            // Create new row
             if (typeof window.INV_createItemRow === 'function') {
                 window.INV_createItemRow();
-            } else if (typeof createItemRow === 'function') {
-                createItemRow();
             }
 
-            // Get the last added row
+            // Get the last row and populate it
             const rows = document.querySelectorAll('.item-row');
-            const newRow = rows[rows.length - 1];
+            const row = rows[rows.length - 1];
             
-            if (newRow) {
-                populateItemRow(newRow, item);
-            }
-        });
+            if (row) {
+                const nameEl = row.querySelector('.item-name');
+                const qtyEl = row.querySelector('.quantity');
+                const rateEl = row.querySelector('.rate');
+                const descEl = row.querySelector('.description');
 
-        // 4. SET TAX PERCENTAGE
-        const taxEl = document.getElementById('tax-percentage');
-        if (taxEl) {
-            const taxPercent = salesOrder.tax_percentage || salesOrder.tax_rate || 0;
-            taxEl.value = taxPercent;
-            console.log('Tax percentage set to:', taxPercent);
+                if (nameEl) nameEl.value = item.item_name || '';
+                if (qtyEl) qtyEl.value = item.quantity || 1;
+                if (rateEl) rateEl.value = item.rate || 0;
+                if (descEl) descEl.value = item.description || '';
+
+                // Update amount display
+                const amt = (item.quantity || 1) * (item.rate || 0);
+                const amtEl = row.querySelector('.amount');
+                if (amtEl) amtEl.textContent = `₹${amt.toFixed(2)}`;
+            }
         }
 
-        // 5. UPDATE TOTALS
+        // 3. SET TAX
+        const taxEl = document.getElementById('tax-percentage');
+        if (taxEl && salesOrder.tax_percentage) {
+            taxEl.value = salesOrder.tax_percentage;
+        }
+
+        // 4. UPDATE TOTALS
         if (typeof window.INV_updateTotals === 'function') {
             window.INV_updateTotals();
-        } else if (typeof updateTotals === 'function') {
-            updateTotals();
         }
-        console.log('Totals updated');
 
-        // 6. SET TERMS & CONDITIONS
-        if (salesOrder.terms_and_condition || salesOrder.terms) {
+        // 5. SET TERMS & NOTES
+        if (salesOrder.terms_and_condition) {
             const termsInput = document.getElementById('terms-input');
             const termsSection = document.getElementById('terms');
-            
-            if (termsInput) {
-                termsInput.value = salesOrder.terms_and_condition || salesOrder.terms;
-                if (termsSection) termsSection.classList.remove('hidden');
-            }
+            if (termsInput) termsInput.value = salesOrder.terms_and_condition;
+            if (termsSection) termsSection.classList.remove('hidden');
         }
 
-        // 7. SET NOTES
-        if (salesOrder.notes || salesOrder.note) {
+        if (salesOrder.notes) {
             const notesInput = document.getElementById('notes-input');
             const notesSection = document.getElementById('notes');
-            
-            if (notesInput) {
-                notesInput.value = salesOrder.notes || salesOrder.note;
-                if (notesSection) notesSection.classList.remove('hidden');
-            }
+            if (notesInput) notesInput.value = salesOrder.notes;
+            if (notesSection) notesSection.classList.remove('hidden');
         }
 
-        // 8. SET SIGNATURE
-        if (salesOrder.signatory) {
-            const signatorySelect = document.getElementById('signatory-select');
-            const signatureSection = document.getElementById('signature-box');
-            
-            if (signatorySelect && signatureSection) {
-                let optExists = Array.from(signatorySelect.options).find(opt => 
-                    opt.value === salesOrder.signatory
-                );
-                
-                if (optExists) {
-                    signatorySelect.value = salesOrder.signatory;
-                    signatureSection.classList.remove('hidden');
-                }
-            }
-        }
-
-        console.log('✅ Sales Order successfully converted to Invoice!');
+        console.log('Sales Order converted successfully!');
         
         // Show success message
         const alertContainer = document.getElementById('alert-container');
         if (alertContainer) {
-            alertContainer.innerHTML = '<div class="alert alert-success">✅ Sales Order data loaded successfully! Review and save as invoice.</div>';
+            alertContainer.innerHTML = '<div class="alert alert-success">Sales Order loaded! Review and save as invoice.</div>';
             setTimeout(() => { alertContainer.innerHTML = ''; }, 5000);
         }
 
-        // Log final state
-        console.log('📊 Final Invoice State:', {
-            client: document.getElementById('billed-to-select')?.value,
-            itemCount: document.querySelectorAll('.item-row').length,
-            tax: document.getElementById('tax-percentage')?.value,
-            subtotal: document.getElementById('sub_total')?.textContent,
-            total: document.getElementById('total')?.textContent
-        });
-
     } catch (err) {
-        console.error('❌ Error loading Sales Order:', err);
-        
+        console.error('Error loading Sales Order:', err);
         const alertContainer = document.getElementById('alert-container');
         if (alertContainer) {
-            alertContainer.innerHTML = `<div class="alert alert-error">❌ Error: ${err.message}</div>`;
+            alertContainer.innerHTML = `<div class="alert alert-error">Error: ${err.message}</div>`;
         }
     }
 })();

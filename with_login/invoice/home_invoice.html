@@ -286,7 +286,7 @@
 </script>
  
 
-        <div class="flex-1 overflow-y-auto p-8">
+       <div class="flex-1 overflow-y-auto p-8" style="margin-left: 260px;">
             <header class="mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <h1 class="text-3xl font-bold text-gray-800 flex items-center">Invoice </h1>
@@ -1118,21 +1118,27 @@ if (paymentModalOverlay) paymentModalOverlay.addEventListener('click', closePaym
 
 
         function init() {
+    // Old dropdown code - only run if elements exist
     const dropdownBtn = document.getElementById('documents-dropdown-btn');
     const dropdownContent = document.getElementById('documents-dropdown-content');
     const dropdownIcon = document.getElementById('dropdown-icon');
 
-    dropdownBtn.addEventListener('click', () => {
-        dropdownContent.classList.toggle('hidden');
-        dropdownIcon.classList.toggle('rotate-180');
-    });
+    if (dropdownBtn) {
+        dropdownBtn.addEventListener('click', () => {
+            dropdownContent?.classList.toggle('hidden');
+            dropdownIcon?.classList.toggle('rotate-180');
+        });
+    }
 
-    document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
-        document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
-        document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
-    });
+    const purchasesDropdownBtn = document.getElementById('purchases-dropdown-btn');
+    if (purchasesDropdownBtn) {
+        purchasesDropdownBtn.addEventListener('click', () => {
+            document.getElementById('purchases-dropdown-content')?.classList.toggle('hidden');
+            document.getElementById('purchases-dropdown-icon')?.classList.toggle('rotate-180');
+        });
+    }
 
-    // 🔥 ADD THESE TWO LINES ↓↓↓
+    // View switching buttons
     activeBtn.addEventListener('click', () => switchView('active'));
     deletedBtn.addEventListener('click', () => switchView('deleted'));
 
