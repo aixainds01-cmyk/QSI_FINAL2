@@ -549,7 +549,21 @@
     font-size: 0.875rem;
     text-align: center;
 }
+.recurring-options-visible {
+    display: block !important;
+}
 
+.recurring-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #4f46e5;
+    color: white;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
 .item-validation-error {
     color: #dc2626;
     font-size: 0.75rem;
@@ -616,11 +630,14 @@
             <span>Sales Orders</span>
         </a>
 
-        <a href="../invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
+        <a href="home_invoice.html" class="sidebar-link" data-page="invoice">
             <i class="fas fa-file-invoice"></i>
             <span>Invoices</span>
         </a>
-
+<a href="../receipt.html" class="sidebar-link" data-page="receipt">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Receipts</span>
+        </a>
         <a href="../credit_note.html" class="sidebar-link" data-page="creditnote">
             <i class="fas fa-receipt"></i>
             <span>Credit Notes</span>
@@ -631,22 +648,22 @@
             <div class="sidebar-section-title">PURCHASE DOCUMENTS</div>
         </div>
 
-        <a href="../parchase/vendor/vendor_leads.html" class="sidebar-link" data-page="vendor">
+        <a href="../parchase/vendor/vendors_leads.html" class="sidebar-link" data-page="vendor">
             <i class="fas fa-store"></i>
             <span>Vendors</span>
         </a>
 
-        <a href="../parchase/parchase_order/home_purchase_order.html" class="sidebar-link" data-page="purchaseorder">
+        <a href="../parchase/parchase_order/home_purchase_orders.html" class="sidebar-link" data-page="purchaseorder">
             <i class="fas fa-file-invoice-dollar"></i>
             <span>Purchase Orders</span>
         </a>
 
-        <a href="../parchase/bills.html" class="sidebar-link" data-page="bills">
+        <a href="../parchase/bill.html" class="sidebar-link" data-page="bills">
             <i class="fas fa-file-invoice"></i>
             <span>Bills</span>
         </a>
 
-        <a href="../parchase/debit_note/debit_note.html" class="sidebar-link" data-page="debitnote">
+        <a href="../parchase/debit notes/debit_notes.html" class="sidebar-link" data-page="debitnote">
             <i class="fas fa-sticky-note"></i>
             <span>Debit Notes</span>
         </a>
@@ -656,10 +673,7 @@
             <div class="sidebar-section-title">MANAGEMENT</div>
         </div>
 
-        <a href="../payout.html" class="sidebar-link" data-page="payout">
-            <i class="fas fa-money-bill-wave"></i>
-            <span>Payouts</span>
-        </a>
+        
 
         <a href="../manage-clients.html" class="sidebar-link" data-page="client">
             <i class="fas fa-users"></i>
@@ -670,7 +684,10 @@
             <i class="fas fa-cube"></i>
             <span>Items</span>
         </a>
-
+<a href="../report.html" class="sidebar-link" data-page="report">
+            <i class="fas fa-receipt"></i>
+            <span>Reports</span>
+        </a>
         <a href="../settings.html" class="sidebar-link" data-page="settings">
             <i class="fas fa-cog"></i>
             <span>Settings</span>
@@ -795,7 +812,7 @@
             sessionStorage.clear();
 
             // Redirect to login
-            window.location.href = '../index.html';
+            window.location.href = '../../index.html';
         }
     };
 })();
@@ -824,11 +841,9 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <div class="grid grid-cols-3 gap-2 items-center mb-2">
-                                            <label for="invoice-time" class="text-gray-600 text-sm">Invoice
-                                                Time</label>
-                                            <input type="text" id="invoice-time" class="input-field col-span-2"
-                                                readonly />
-                                        </div>
+    <label for="invoice-prefix" class="text-gray-600 text-sm">Invoice Prefix</label>
+    <input type="text" id="invoice-prefix" class="input-field col-span-2" value="INV" />
+</div>
 
                                         <div class="grid grid-cols-3 gap-2 items-center mb-2">
                                             <label for="invoice-date" class="text-gray-600 text-sm">Invoice Date</label>
@@ -954,12 +969,40 @@
                                     <div class="flex-1 space-y-4">
                                         <div class="w-full overflow-x-auto">
                                             
-                                            <div class="mb-2">
-                                                <label class="flex items-center gap-2 cursor-pointer">
-                                                    <input type="checkbox" id="recurring-invoice" class="form-checkbox h-4 w-4 text-indigo-600 rounded">
-                                                    <span class="text-sm text-gray-700 font-medium">Set as Recurring Invoice</span>
-                                                </label>
-                                            </div>
+                                            <!-- Recurring Invoice Checkbox - ADD THIS SECTION -->
+<div class="mb-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+    <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" id="recurring-invoice" class="form-checkbox h-5 w-5 text-indigo-600 rounded">
+        <span class="text-sm text-gray-700 font-medium">
+            <i class="fas fa-sync-alt text-indigo-600 mr-1"></i>
+            Set as Recurring Invoice (Auto-generate monthly)
+        </span>
+    </label>
+    
+    <!-- Recurring Options (hidden by default) -->
+    <div id="recurring-options" class="mt-3 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+                <select id="recurring-frequency" class="input-field">
+                    <option value="monthly">Monthly</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="bi-weekly">Bi-Weekly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <input type="date" id="recurring-start-date" class="input-field">
+            </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">
+            <i class="fas fa-info-circle mr-1"></i>
+            The system will automatically generate invoices based on the selected frequency.
+        </p>
+    </div>
+</div>
                                             <div class="mb-2">
                                                 <label class="flex items-center gap-2 cursor-pointer">
                                                     <input type="checkbox" id="show-bank-details" class="form-checkbox h-4 w-4 text-indigo-600 rounded">
@@ -1225,7 +1268,28 @@
         </div>
     </div>
     </div>
-
+<!-- Prefix Confirmation Modal -->
+<div id="prefix-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
+    <div class="absolute inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-md mx-4">
+        <div class="bg-white rounded-lg p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-gray-900">Change Invoice Prefix?</h2>
+                <button id="prefix-modal-close" class="text-gray-500 hover:text-gray-800">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="mb-6">
+                <p class="text-gray-700 mb-2">You're changing the invoice prefix from <strong id="old-prefix-text"></strong> to <strong id="new-prefix-text"></strong>.</p>
+                <p class="text-gray-600 text-sm">Do you want to apply this change?</p>
+            </div>
+            <div class="flex gap-3 justify-end">
+                <button id="prefix-once-btn" class="btn btn-secondary">Once</button>
+                <button id="prefix-always-btn" class="btn btn-primary">Always</button>
+            </div>
+        </div>
+    </div>
+</div>
     <script>
         (function () {
             const API_BASE_URL = "https://api.fornowauto.com/api";
@@ -1236,9 +1300,13 @@
             // ✅ ADDED: Bank API URL
             const BANK_API_URL = `${API_BASE_URL}/banks`;
             const SIGNATORY_STORAGE_KEY = 'qsi_saved_signatories';
+            const PREFIX_STORAGE_KEY = 'qsi_invoice_prefix';
             const SIGNATURE_IMAGE_STORAGE_KEY = 'qsi_saved_signature_image';
             let COMPANY_ID = null;
-
+            // Prefix management variables
+let originalPrefix = 'INV';
+let currentPrefix = 'INV';
+let prefixChangeMode = null;
             const invoiceForm = document.getElementById("invoice-form");
             const itemsContainer = document.getElementById("items-container");
             const addItemBtn = document.getElementById("add-item-btn");
@@ -1260,7 +1328,32 @@
     const menuToggle = document.getElementById("menu-toggle");
     const sidebar = document.getElementById("sidebar");
     const menuBackdrop = document.getElementById("menu-backdrop");
-    
+    const invoicePrefixInput = document.getElementById("invoice-prefix");
+
+// Prefix modal elements
+const prefixModal = document.getElementById("prefix-modal");
+const prefixModalClose = document.getElementById("prefix-modal-close");
+const prefixOnceBtn = document.getElementById("prefix-once-btn");
+const prefixAlwaysBtn = document.getElementById("prefix-always-btn");
+const oldPrefixText = document.getElementById("old-prefix-text");
+const newPrefixText = document.getElementById("new-prefix-text");
+const recurringCheckbox = document.getElementById("recurring-invoice");
+const recurringOptions = document.getElementById("recurring-options");
+const recurringFrequency = document.getElementById("recurring-frequency");
+const recurringStartDate = document.getElementById("recurring-start-date");
+
+// Recurring checkbox toggle
+recurringCheckbox?.addEventListener('change', function() {
+    if (this.checked) {
+        recurringOptions.classList.remove('hidden');
+        // Set default start date to next month
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        recurringStartDate.value = nextMonth.toISOString().slice(0, 10);
+    } else {
+        recurringOptions.classList.add('hidden');
+    }
+});
     if (menuToggle && sidebar && menuBackdrop) {
       menuToggle.addEventListener("click", () => {
         sidebar.classList.toggle("-translate-x-full");
@@ -1293,8 +1386,73 @@
                     alertDiv.remove();
                 }, duration);
             }
+// ===== PREFIX MANAGEMENT =====
+function loadSavedPrefix() {
+    const savedPrefix = localStorage.getItem(PREFIX_STORAGE_KEY);
+    if (savedPrefix) {
+        originalPrefix = savedPrefix;
+        currentPrefix = savedPrefix;
+        if (invoicePrefixInput) invoicePrefixInput.value = savedPrefix;
+    }
+}
 
-            /* Persist token so reloads keep auth */
+function openPrefixModal(oldPrefix, newPrefix) {
+    if (oldPrefixText) oldPrefixText.textContent = oldPrefix;
+    if (newPrefixText) newPrefixText.textContent = newPrefix;
+    prefixModal?.classList.remove('hidden');
+}
+
+function closePrefixModal() {
+    prefixModal?.classList.add('hidden');
+}
+
+function handlePrefixChange(mode) {
+    const newPrefix = invoicePrefixInput.value.trim().toUpperCase();
+    if (mode === 'always') {
+        localStorage.setItem(PREFIX_STORAGE_KEY, newPrefix);
+        originalPrefix = newPrefix;
+        showAlert(`Prefix changed to "${newPrefix}" for all future invoices.`, 'success', 3000);
+    } else if (mode === 'once') {
+        showAlert(`Using prefix "${newPrefix}" for this invoice only.`, 'success', 3000);
+    }
+    currentPrefix = newPrefix;
+    prefixChangeMode = mode;
+    closePrefixModal();
+}
+        // Prefix input event listeners
+if (invoicePrefixInput) {
+    invoicePrefixInput.addEventListener('blur', function () {
+        const newValue = this.value.trim().toUpperCase();
+        this.value = newValue;
+        if (newValue && newValue !== originalPrefix && newValue !== currentPrefix) {
+            openPrefixModal(originalPrefix, newValue);
+        }
+    });
+
+    invoicePrefixInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            this.blur();
+        }
+    });
+}
+
+// Prefix modal event listeners
+prefixModalClose?.addEventListener('click', () => {
+    invoicePrefixInput.value = currentPrefix;
+    closePrefixModal();
+});
+
+prefixOnceBtn?.addEventListener('click', () => handlePrefixChange('once'));
+prefixAlwaysBtn?.addEventListener('click', () => handlePrefixChange('always'));
+
+prefixModal?.addEventListener('click', (e) => {
+    if (e.target === prefixModal) {
+        invoicePrefixInput.value = currentPrefix;
+        closePrefixModal();
+    }
+});
+/* Persist token so reloads keep auth */
             function setAuthToken(token, scheme = "Bearer") {
                 try {
                     localStorage.setItem("auth_token", token);
@@ -1787,8 +1945,8 @@ function collectInvoiceData() {
     const totalBeforeRound = +(subTotal + tax);
     const totalRounded = Math.round(totalBeforeRound);
     const roundOff = totalRounded - totalBeforeRound;
-    
-    const signatoryType = document.querySelector('input[name="signatory_type"]:checked').value;
+
+    const signatoryType = document.querySelector('input[name="signatory_type"]:checked')?.value || 'text';
     let signatoryName = null;
     let signatoryImage = null;
 
@@ -1801,21 +1959,31 @@ function collectInvoiceData() {
         signatoryImage = localStorage.getItem(SIGNATURE_IMAGE_STORAGE_KEY);
     }
 
+    // ===== RECURRING INVOICE DATA =====
+    const isRecurring = recurringCheckbox?.checked || false;
+    const frequency = recurringFrequency?.value || 'monthly';
+    const startDate = recurringStartDate?.value || '';
+
     return {
+        prefix: currentPrefix,
         date: document.getElementById("invoice-date")?.value || new Date().toISOString().slice(0, 10),
         due_date: document.getElementById("due-date")?.value || "",
         items,
         sub_total: +subTotal.toFixed(2),
         tax: +tax.toFixed(2),
-        round_off: +roundOff.toFixed(2), // NEW FIELD
-        total: totalRounded, // Whole number
+        round_off: +roundOff.toFixed(2),
+        total: totalRounded,
         tax_percentage: taxP,
         from_company_id: COMPANY_ID,
         to_client_id: billedToSelect?.value || "",
-        terms_and_condition: (document.querySelector("#terms textarea")?.value || "").trim(),
-        notes: (document.querySelector("#notes textarea")?.value || "").trim(),
+        terms_and_condition: (document.getElementById("terms-input")?.value || "").trim(),
+        notes: (document.getElementById("notes-input")?.value || "").trim(),
         signatory: signatoryName,
         signatory_image: signatoryImage,
+        // ===== RECURRING FIELDS =====
+        is_recurring: isRecurring,
+        recurring_frequency: frequency,
+        recurring_start_date: startDate,
     };
 }
 
@@ -2061,7 +2229,12 @@ document.getElementById("preview-total").textContent = `₹${Math.round(savedDoc
                     createPage?.classList.add("hidden");
                     previewPage?.classList.remove("hidden");
 
-                    showAlert("Invoice saved successfully.", "success", 4000);
+                    // After preview is populated, show appropriate success message
+let successMsg = "Invoice saved successfully.";
+if (dataFromForm.is_recurring) {
+    successMsg = "Invoice saved & Recurring schedule created! Invoices will auto-generate " + dataFromForm.recurring_frequency + ".";
+}
+showAlert(successMsg, "success", 5000);
                 } catch (err) {
                     console.error("Save error:", err);
                     const msg = err?.message || "Failed to save invoice";
@@ -2284,6 +2457,19 @@ if (purchasesDropdownBtn) {
             taxPercentageInput?.addEventListener("input", updateTotals);
 
             (function init() {
+                // Check for recurring param in URL
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('recurring') === 'true') {
+    if (recurringCheckbox) {
+        recurringCheckbox.checked = true;
+        recurringOptions?.classList.remove('hidden');
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        if (recurringStartDate) {
+            recurringStartDate.value = nextMonth.toISOString().slice(0, 10);
+        }
+    }
+}
                 const dateInput = document.getElementById("invoice-date");
                 if (dateInput) dateInput.value = new Date().toISOString().slice(0, 10);
                 const dueInput = document.getElementById("due-date");
@@ -2293,8 +2479,7 @@ if (purchasesDropdownBtn) {
                     dueInput.value = due.toISOString().slice(0, 10);
                 }
 
-                const timeInput = document.getElementById("invoice-time");
-                if (timeInput) timeInput.value = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                loadSavedPrefix();
 
                 createItemRow();
 

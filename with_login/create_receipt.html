@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Receipt - QSI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%);
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo-text {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.05);
+            color: #f1f5f9;
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(90deg, rgba(16,185,129,0.2) 0%, transparent 100%);
+            color: #10b981;
+            border-left: 3px solid #10b981;
+        }
+
+        .sidebar-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-section-title {
+            padding: 1rem 1.5rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239,68,68,0.1);
+            color: #ef4444;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 1.5rem 2rem;
+            color: white;
+        }
+
+        .form-body {
+            padding: 2rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-label .required {
+            color: #ef4444;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(16,185,129,0.1);
+        }
+
+        .form-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.25rem;
+            padding-right: 3rem;
+        }
+
+        /* Input with Icon */
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon .icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .input-with-icon .form-input {
+            padding-left: 2.75rem;
+        }
+
+        /* Amount Input */
+        .amount-input-wrapper {
+            position: relative;
+        }
+
+        .amount-input-wrapper .currency {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .amount-input-wrapper .form-input {
+            padding-left: 2.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* Section Divider */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .section-divider span {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Category Cards */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .category-card {
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        .category-card:hover {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .category-card.selected {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #dcfce7, #d1fae5);
+            box-shadow: 0 0 0 4px rgba(16,185,129,0.1);
+        }
+
+        .category-card i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .category-card span {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .category-card.selected span {
+            color: #059669;
+        }
+
+        /* Category Colors */
+        .category-card[data-category="Sales"] i { color: #2563eb; }
+        .category-card[data-category="Service"] i { color: #9333ea; }
+        .category-card[data-category="Rental"] i { color: #d97706; }
+        .category-card[data-category="Investment"] i { color: #16a34a; }
+        .category-card[data-category="Refund"] i { color: #dc2626; }
+        .category-card[data-category="Commission"] i { color: #0891b2; }
+        .category-card[data-category="Other"] i { color: #64748b; }
+
+        /* Payment Method Cards */
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .payment-card {
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        .payment-card:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .payment-card.selected {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
+        }
+
+        .payment-card i {
+            font-size: 1.25rem;
+            margin-bottom: 0.375rem;
+            display: block;
+            color: #64748b;
+        }
+
+        .payment-card.selected i {
+            color: #2563eb;
+        }
+
+        .payment-card span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        /* Status Toggle */
+        .status-toggle {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.25rem;
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .status-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: #64748b;
+        }
+
+        .status-btn:hover {
+            color: #334155;
+        }
+
+        .status-btn.active {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .status-btn.active.received {
+            color: #16a34a;
+        }
+
+        .status-btn.active.pending {
+            color: #d97706;
+        }
+
+        .status-btn.active.cancelled {
+            color: #dc2626;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16,185,129,0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 2px solid #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-outline:hover {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        /* Preview Card */
+        .preview-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .preview-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #10b981;
+        }
+
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .preview-row .label {
+            color: #64748b;
+        }
+
+        .preview-row .value {
+            font-weight: 600;
+            color: #334155;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        /* Mobile */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .form-body {
+                padding: 1.25rem;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .payment-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-text">QSI</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="../dashboard_with_login.html" class="sidebar-link">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="sidebar-section-title">Sales Documents</div>
+
+            <a href="../quotation/home_quotation.html" class="sidebar-link">
+                <i class="fas fa-file-alt"></i>
+                <span>Quotations</span>
+            </a>
+
+            <a href="../saleorder/home_sales_order.html" class="sidebar-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Sales Orders</span>
+            </a>
+
+            <a href="../invoice/home_invoice.html" class="sidebar-link">
+                <i class="fas fa-file-invoice"></i>
+                <span>Invoices</span>
+            </a>
+
+            <a href="home_receipt.html" class="sidebar-link active">
+                <i class="fas fa-receipt"></i>
+                <span>Receipts</span>
+            </a>
+
+            <div class="sidebar-section-title">Purchase Documents</div>
+
+            <a href="../parchase/vendor/vendor_leads.html" class="sidebar-link">
+                <i class="fas fa-store"></i>
+                <span>Vendors</span>
+            </a>
+
+            <a href="../parchase/parchase_order/home_purchase_order.html" class="sidebar-link">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Purchase Orders</span>
+            </a>
+
+            <a href="../parchase/bills.html" class="sidebar-link">
+                <i class="fas fa-file-invoice"></i>
+                <span>Bills</span>
+            </a>
+
+            <div class="sidebar-section-title">Management</div>
+
+            <a href="../manage-clients.html" class="sidebar-link">
+                <i class="fas fa-users"></i>
+                <span>Clients</span>
+            </a>
+
+            <a href="../item_management.html" class="sidebar-link">
+                <i class="fas fa-cube"></i>
+                <span>Items</span>
+            </a>
+
+            <a href="../settings.html" class="sidebar-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-email" id="userEmail">user@qsi.com</div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50 lg:hidden">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button id="menuToggle" class="text-gray-600">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <span class="text-xl font-bold text-emerald-600">QSI</span>
+            <a href="home_receipt.html" class="text-gray-600">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-4">
+                <a href="home_receipt.html" class="hidden lg:flex w-10 h-10 items-center justify-center rounded-xl bg-white shadow-sm hover:shadow-md transition">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Create Receipt</h1>
+                    <p class="text-gray-500 mt-1">Record a new income transaction</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Form -->
+            <div class="lg:col-span-2">
+                <div class="form-card fade-in">
+                    <div class="form-header">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                                <i class="fas fa-receipt text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-bold">Receipt Details</h2>
+                                <p class="text-emerald-100 text-sm">Fill in the income information</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="receiptForm" class="form-body">
+                        <!-- Basic Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Receipt Number <span class="required">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="icon fas fa-hashtag"></i>
+                                    <input type="text" id="receiptNo" class="form-input" placeholder="RCP-0001" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Receipt Date <span class="required">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="icon fas fa-calendar"></i>
+                                    <input type="date" id="receiptDate" class="form-input" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Source / Payer -->
+                        <div class="form-group">
+                            <label class="form-label">Source / Payer Name <span class="required">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="icon fas fa-user"></i>
+                                <input type="text" id="sourceName" class="form-input" placeholder="Enter the name of the payer or income source" required>
+                            </div>
+                        </div>
+
+                        <!-- Category Selection -->
+                        <div class="section-divider">
+                            <span>Income Category</span>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="category-grid" id="categoryGrid">
+                                <div class="category-card" data-category="Sales">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span>Sales</span>
+                                </div>
+                                <div class="category-card" data-category="Service">
+                                    <i class="fas fa-tools"></i>
+                                    <span>Service</span>
+                                </div>
+                                <div class="category-card" data-category="Rental">
+                                    <i class="fas fa-home"></i>
+                                    <span>Rental</span>
+                                </div>
+                                <div class="category-card" data-category="Investment">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Investment</span>
+                                </div>
+                                <div class="category-card" data-category="Refund">
+                                    <i class="fas fa-undo"></i>
+                                    <span>Refund</span>
+                                </div>
+                                <div class="category-card" data-category="Commission">
+                                    <i class="fas fa-percentage"></i>
+                                    <span>Commission</span>
+                                </div>
+                                <div class="category-card" data-category="Other">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <span>Other</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="category" required>
+                        </div>
+
+                        <!-- Amount Section -->
+                        <div class="section-divider">
+                            <span>Amount Details</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Amount Received <span class="required">*</span></label>
+                                <div class="amount-input-wrapper">
+                                    <span class="currency">₹</span>
+                                    <input type="number" id="amount" class="form-input" placeholder="0.00" min="0" step="0.01" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">TDS / Tax Deducted</label>
+                                <div class="amount-input-wrapper">
+                                    <span class="currency">₹</span>
+                                    <input type="number" id="taxDeducted" class="form-input" placeholder="0.00" min="0" step="0.01" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="section-divider">
+                            <span>Payment Method</span>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="payment-grid" id="paymentGrid">
+                                <div class="payment-card" data-method="Cash">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Cash</span>
+                                </div>
+                                <div class="payment-card" data-method="Bank Transfer">
+                                    <i class="fas fa-university"></i>
+                                    <span>Bank</span>
+                                </div>
+                                <div class="payment-card" data-method="UPI">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <span>UPI</span>
+                                </div>
+                                <div class="payment-card" data-method="Cheque">
+                                    <i class="fas fa-money-check"></i>
+                                    <span>Cheque</span>
+                                </div>
+                                <div class="payment-card" data-method="Credit Card">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Card</span>
+                                </div>
+                                <div class="payment-card" data-method="Online">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Online</span>
+                                </div>
+                                <div class="payment-card" data-method="Other">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <span>Other</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="paymentMethod" required>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <div class="status-toggle">
+                                <button type="button" class="status-btn active received" data-status="Received">
+                                    <i class="fas fa-check-circle mr-1"></i> Received
+                                </button>
+                                <button type="button" class="status-btn pending" data-status="Pending">
+                                    <i class="fas fa-clock mr-1"></i> Pending
+                                </button>
+                                <button type="button" class="status-btn cancelled" data-status="Cancelled">
+                                    <i class="fas fa-times-circle mr-1"></i> Cancelled
+                                </button>
+                            </div>
+                            <input type="hidden" id="status" value="Received">
+                        </div>
+
+                        <!-- Additional Details -->
+                        <div class="section-divider">
+                            <span>Additional Details</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Reference Number</label>
+                                <div class="input-with-icon">
+                                    <i class="icon fas fa-barcode"></i>
+                                    <input type="text" id="referenceNo" class="form-input" placeholder="Transaction ID, Cheque No, etc.">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Link to Invoice (Optional)</label>
+                                <select id="linkedInvoice" class="form-select">
+                                    <option value="">-- Select Invoice --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Description / Notes</label>
+                            <textarea id="description" class="form-textarea" placeholder="Add any additional notes about this income..."></textarea>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                <i class="fas fa-redo"></i> Reset
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="saveAndNew()">
+                                <i class="fas fa-plus"></i> Save & Create New
+                            </button>
+                            <button type="submit" class="btn btn-primary flex-1">
+                                <i class="fas fa-save"></i> Save Receipt
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-6">
+                    <div class="preview-card fade-in" style="animation-delay: 0.2s">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-800">Preview</h3>
+                            <span class="text-xs text-gray-400">Live update</span>
+                        </div>
+
+                        <div class="preview-header">
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">RECEIPT</p>
+                                <p class="text-lg font-bold text-gray-800" id="previewReceiptNo">RCP-0001</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500 mb-1">DATE</p>
+                                <p class="font-semibold text-gray-700" id="previewDate">-</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center py-4 mb-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl">
+                            <p class="text-xs text-emerald-600 mb-1">AMOUNT RECEIVED</p>
+                            <p class="preview-amount" id="previewAmount">₹0</p>
+                            <p class="text-xs text-gray-500 mt-1" id="previewNetAmount"></p>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="preview-row">
+                                <span class="label">From</span>
+                                <span class="value" id="previewSource">-</span>
+                            </div>
+                            <div class="preview-row">
+                                <span class="label">Category</span>
+                                <span class="value" id="previewCategory">-</span>
+                            </div>
+                            <div class="preview-row">
+                                <span class="label">Payment</span>
+                                <span class="value" id="previewPayment">-</span>
+                            </div>
+                            <div class="preview-row">
+                                <span class="label">Status</span>
+                                <span class="value" id="previewStatus">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Received</span>
+                                </span>
+                            </div>
+                            <div class="preview-row" id="previewRefRow" style="display: none;">
+                                <span class="label">Reference</span>
+                                <span class="value" id="previewRef">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="mt-4 p-4 bg-white rounded-xl shadow-sm fade-in" style="animation-delay: 0.3s">
+                        <h4 class="font-semibold text-gray-800 mb-3">This Month</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Total Income</span>
+                                <span class="font-semibold text-emerald-600" id="monthTotalIncome">₹0</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Receipts</span>
+                                <span class="font-semibold text-gray-700" id="monthReceiptCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // =============================================
+        // Configuration
+        // =============================================
+        const API_BASE_URL = 'https://api.fornowauto.com/api';
+        let allInvoices = [];
+        let allReceipts = [];
+        let selectedCategory = '';
+        let selectedPaymentMethod = '';
+        let selectedStatus = 'Received';
+        let saveAndCreateNew = false;
+
+        // =============================================
+        // Authentication
+        // =============================================
+        function getAuthHeaders() {
+            const token = localStorage.getItem('token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            };
+        }
+
+        async function safeFetch(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: { ...getAuthHeaders(), ...options.headers }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        alert('Session expired. Please login again.');
+                        window.location.href = '../../index.html';
+                        return null;
+                    }
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('Fetch error:', error);
+                throw error;
+            }
+        }
+
+        // =============================================
+        // Sidebar & User Info
+        // =============================================
+        document.getElementById('menuToggle')?.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '../../index.html';
+            }
+        }
+
+        function loadUserInfo() {
+            const userName = localStorage.getItem('userName') || 'User';
+            const userEmail = localStorage.getItem('userEmail') || 'user@qsi.com';
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userEmail').textContent = userEmail;
+        }
+
+        // =============================================
+        // Initialize
+        // =============================================
+        async function init() {
+            loadUserInfo();
+            setDefaultDate();
+            await Promise.all([
+                generateReceiptNumber(),
+                loadInvoices(),
+                loadMonthlyStats()
+            ]);
+            setupEventListeners();
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('receiptDate').value = today;
+            updatePreview();
+        }
+
+        async function generateReceiptNumber() {
+            try {
+                // First load existing receipts to get next number
+                const receipts = await safeFetch(`${API_BASE_URL}/receipts`);
+                allReceipts = receipts || [];
+                
+                const prefix = 'RCP-';
+                let maxNum = 0;
+                
+                allReceipts.forEach(r => {
+                    const match = (r.receipt_no || '').match(/RCP-(\d+)/);
+                    if (match) {
+                        const num = parseInt(match[1]);
+                        if (num > maxNum) maxNum = num;
+                    }
+                });
+
+                document.getElementById('receiptNo').value = `${prefix}${String(maxNum + 1).padStart(4, '0')}`;
+                updatePreview();
+            } catch (error) {
+                console.error('Error generating receipt number:', error);
+                document.getElementById('receiptNo').value = 'RCP-0001';
+            }
+        }
+
+        async function loadInvoices() {
+            try {
+                const data = await safeFetch(`${API_BASE_URL}/invoic`);
+                allInvoices = data || [];
+                populateInvoiceDropdown();
+            } catch (error) {
+                console.error('Error loading invoices:', error);
+            }
+        }
+
+        function populateInvoiceDropdown() {
+            const select = document.getElementById('linkedInvoice');
+            select.innerHTML = '<option value="">-- Select Invoice --</option>';
+            
+            // Only show unpaid or partially paid invoices
+            const unpaidInvoices = allInvoices.filter(inv => 
+                inv.status === 'Unpaid' || inv.status === 'Partially Paid'
+            );
+
+            unpaidInvoices.forEach(invoice => {
+                const option = document.createElement('option');
+                option.value = invoice._id;
+                const pending = invoice.pending_amount || invoice.total;
+                option.textContent = `${invoice.invoice_no} - ${invoice.to?.client_name || 'Unknown'} (Pending: ₹${parseFloat(pending).toLocaleString('en-IN')})`;
+                select.appendChild(option);
+            });
+        }
+
+        async function loadMonthlyStats() {
+            try {
+                const now = new Date();
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                
+                let monthTotal = 0;
+                let monthCount = 0;
+
+                allReceipts.forEach(r => {
+                    const receiptDate = new Date(r.receipt_date);
+                    if (receiptDate >= monthStart && r.status === 'Received') {
+                        monthTotal += parseFloat(r.amount) || 0;
+                        monthCount++;
+                    }
+                });
+
+                document.getElementById('monthTotalIncome').textContent = `₹${monthTotal.toLocaleString('en-IN')}`;
+                document.getElementById('monthReceiptCount').textContent = monthCount;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // =============================================
+        // Event Listeners
+        // =============================================
+        function setupEventListeners() {
+            // Category selection
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    card.classList.add('pulse');
+                    setTimeout(() => card.classList.remove('pulse'), 300);
+                    
+                    selectedCategory = card.dataset.category;
+                    document.getElementById('category').value = selectedCategory;
+                    updatePreview();
+                });
+            });
+
+            // Payment method selection
+            document.querySelectorAll('.payment-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    card.classList.add('pulse');
+                    setTimeout(() => card.classList.remove('pulse'), 300);
+                    
+                    selectedPaymentMethod = card.dataset.method;
+                    document.getElementById('paymentMethod').value = selectedPaymentMethod;
+                    updatePreview();
+                });
+            });
+
+            // Status selection
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    selectedStatus = btn.dataset.status;
+                    document.getElementById('status').value = selectedStatus;
+                    updatePreview();
+                });
+            });
+
+            // Live preview updates
+            ['receiptNo', 'receiptDate', 'sourceName', 'amount', 'taxDeducted', 'referenceNo'].forEach(id => {
+                document.getElementById(id)?.addEventListener('input', updatePreview);
+            });
+
+            // Form submission
+            document.getElementById('receiptForm').addEventListener('submit', handleSubmit);
+        }
+
+        // =============================================
+        // Preview
+        // =============================================
+        function updatePreview() {
+            const receiptNo = document.getElementById('receiptNo').value || 'RCP-0001';
+            const receiptDate = document.getElementById('receiptDate').value;
+            const sourceName = document.getElementById('sourceName').value || '-';
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const taxDeducted = parseFloat(document.getElementById('taxDeducted').value) || 0;
+            const referenceNo = document.getElementById('referenceNo').value;
+            const netAmount = amount - taxDeducted;
+
+            document.getElementById('previewReceiptNo').textContent = receiptNo;
+            document.getElementById('previewDate').textContent = receiptDate ? formatDate(receiptDate) : '-';
+            document.getElementById('previewSource').textContent = sourceName;
+            document.getElementById('previewCategory').textContent = selectedCategory || '-';
+            document.getElementById('previewPayment').textContent = selectedPaymentMethod || '-';
+            document.getElementById('previewAmount').textContent = `₹${amount.toLocaleString('en-IN')}`;
+            
+            if (taxDeducted > 0) {
+                document.getElementById('previewNetAmount').textContent = `Net: ₹${netAmount.toLocaleString('en-IN')} (TDS: ₹${taxDeducted.toLocaleString('en-IN')})`;
+            } else {
+                document.getElementById('previewNetAmount').textContent = '';
+            }
+
+            // Reference
+            if (referenceNo) {
+                document.getElementById('previewRefRow').style.display = 'flex';
+                document.getElementById('previewRef').textContent = referenceNo;
+            } else {
+                document.getElementById('previewRefRow').style.display = 'none';
+            }
+
+            // Status badge
+            const statusColors = {
+                'Received': 'bg-green-100 text-green-800',
+                'Pending': 'bg-yellow-100 text-yellow-800',
+                'Cancelled': 'bg-red-100 text-red-800'
+            };
+            document.getElementById('previewStatus').innerHTML = `
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[selectedStatus] || statusColors['Received']}">
+                    ${selectedStatus}
+                </span>
+            `;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        // =============================================
+        // Form Handling
+        // =============================================
+        function validateForm() {
+            const errors = [];
+
+            if (!document.getElementById('receiptNo').value.trim()) {
+                errors.push('Receipt number is required');
+            }
+            if (!document.getElementById('receiptDate').value) {
+                errors.push('Receipt date is required');
+            }
+            if (!document.getElementById('sourceName').value.trim()) {
+                errors.push('Source/Payer name is required');
+            }
+            if (!selectedCategory) {
+                errors.push('Please select a category');
+            }
+            if (!document.getElementById('amount').value || parseFloat(document.getElementById('amount').value) <= 0) {
+                errors.push('Please enter a valid amount');
+            }
+            if (!selectedPaymentMethod) {
+                errors.push('Please select a payment method');
+            }
+
+            return errors;
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showAlert(errors.join('<br>'), 'error');
+                return;
+            }
+
+            const receiptData = {
+                receipt_no: document.getElementById('receiptNo').value.trim(),
+                receipt_date: document.getElementById('receiptDate').value,
+                source_name: document.getElementById('sourceName').value.trim(),
+                category: selectedCategory,
+                amount: parseFloat(document.getElementById('amount').value),
+                payment_method: selectedPaymentMethod,
+                status: selectedStatus,
+                reference_no: document.getElementById('referenceNo').value.trim(),
+                linked_invoice_id: document.getElementById('linkedInvoice').value || null,
+                tax_deducted: parseFloat(document.getElementById('taxDeducted').value) || 0,
+                description: document.getElementById('description').value.trim()
+            };
+
+            try {
+                const result = await safeFetch(`${API_BASE_URL}/receipts`, {
+                    method: 'POST',
+                    body: JSON.stringify(receiptData)
+                });
+
+                if (result) {
+                    showAlert('Receipt created successfully!', 'success');
+                    
+                    if (saveAndCreateNew) {
+                        saveAndCreateNew = false;
+                        resetForm();
+                        await generateReceiptNumber();
+                    } else {
+                        // Redirect to receipts list after short delay
+                        setTimeout(() => {
+                            window.location.href = 'home_receipt.html';
+                        }, 1500);
+                    }
+                }
+            } catch (error) {
+                showAlert(error.message || 'Failed to create receipt', 'error');
+            }
+        }
+
+        function saveAndNew() {
+            saveAndCreateNew = true;
+            document.getElementById('receiptForm').dispatchEvent(new Event('submit'));
+        }
+
+        function resetForm() {
+            document.getElementById('receiptForm').reset();
+            
+            // Reset selections
+            selectedCategory = '';
+            selectedPaymentMethod = '';
+            selectedStatus = 'Received';
+            
+            document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.status-btn[data-status="Received"]').classList.add('active');
+            
+            document.getElementById('category').value = '';
+            document.getElementById('paymentMethod').value = '';
+            document.getElementById('status').value = 'Received';
+            
+            setDefaultDate();
+            generateReceiptNumber();
+            updatePreview();
+        }
+
+        // =============================================
+        // Alerts
+        // =============================================
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'exclamation-triangle';
+            
+            container.innerHTML = `
+                <div class="alert alert-${type} fade-in">
+                    <i class="fas fa-${icon}"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.remove()" class="ml-auto text-current opacity-70 hover:opacity-100">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // =============================================
+        // Initialize on DOM ready
+        // =============================================
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

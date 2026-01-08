@@ -465,40 +465,48 @@
               const API_BASE_URL = 'https://api.fornowauto.com/api';
 
               // Generic fetch function with error handling
-              async function fetchAPI(url, options = {}) {
-                try {
-                  const token = localStorage.getItem('auth_token'); // Or your actual token key
-                  const headers = {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                  };
-                  if (token) {
-                    headers['Authorization'] = `Bearer ${token}`;
-                  }
+              // Generic fetch function with error handling
+async function fetchAPI(url, options = {}) {
+  try {
+    // Check for token - use 'token' to match other pages
+    const token = localStorage.getItem('token');
+    
+    // If no token, redirect to login
+    if (!token) {
+      console.warn('No authentication token found');
+      window.location.href = '../index.html';
+      return;
+    }
+    
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      ...options.headers
+    };
 
-                  const response = await fetch(url, {
-                    ...options,
-                    headers
-                  });
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
 
-                  if (response.status === 401) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('auth_token');
-                    window.location.href = '../index.html';
-                    throw new Error("Session expired");
-                  }
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      window.location.href = '../index.html';
+      throw new Error("Session expired");
+    }
 
-                  if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                  }
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
 
-                  return await response.json();
-                } catch (error) {
-                  console.error('API fetch error:', error);
-                  throw error;
-                }
-              }
+    return await response.json();
+  } catch (error) {
+    console.error('API fetch error:', error);
+    throw error;
+  }
+}
 
               // --- Sidebar toggle ---
               const sidebar = document.getElementById('sidebar');
@@ -700,14 +708,14 @@
 
                 // Final OK - perform logout
                 if (confirmOk) {
-                  confirmOk.addEventListener('click', () => {
-                    localStorage.removeItem('auth_token');
-                    localStorage.removeItem('auth_scheme');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userId');
-                    window.location.href = '../index.html';
-                  });
-                }
+  confirmOk.addEventListener('click', () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_scheme');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    window.location.href = '../index.html';
+  });
+}
 
                 // Live datetime update
                 function updateDateTime() {
