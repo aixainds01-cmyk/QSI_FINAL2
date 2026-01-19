@@ -1,350 +1,1171 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - QSI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
-    <link rel="stylesheet" href="js/qsi-styles.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link rel="stylesheet" href="js/fix-icons.css">
-    <link rel="stylesheet" href="js/theme-force.css">
-    <!-- Global Theme Manager -->
-    <script src="js/theme-manager.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipts - Other Income</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f9fafb;
+        }
 
-  </head>
-  <body class="min-h-screen flex items-center justify-center p-4">
-    <script>
-      // Facebook SDK
-      window.fbAsyncInit = function () {
-        FB.init({
-          appId: "1605405084177718",
-          cookie: true,
-          xfbml: true,
-          version: "v18.0",
-        });
-      };
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 260px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            overflow-y: auto;
+        }
 
-      (function (d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-      })(document, "script", "facebook-jssdk");
-    </script>
+        .sidebar-logo {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
 
-    <div class="qsi-container">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-900">QSI</h1>
-      </div>
+        .logo-text {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
 
-      <!-- Login Card -->
-      <div class="form-card">
-        <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">
-            Login in to your account
-          </h2>
-          <p class="text-sm text-gray-600">
-            Welcome back! Please enter your details.
-          </p>
+        .sidebar-search {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 0.5rem;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #9ca3af;
+            padding: 0 0.75rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.875rem;
+            border-radius: 0.5rem;
+            color: #4b5563;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-bottom: 0.125rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .sidebar-link.active {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .sidebar-link.active:hover {
+            background-color: #059669;
+        }
+
+        .sidebar-link i {
+            width: 1.125rem;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid #e5e7eb;
+            padding: 1rem;
+            background: #fafafa;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logout-btn {
+            color: #6b7280;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .logout-btn:hover {
+            color: #ef4444;
+            background-color: #fee2e2;
+        }
+
+        /* Main Content */
+        #main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Form Styles */
+        .input-field {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            outline: none;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            gap: 0.25rem;
+        }
+
+        .status-received {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Category badges */
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            gap: 0.25rem;
+        }
+
+        .category-interest {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .category-rental {
+            background-color: #fce7f3;
+            color: #9f1239;
+        }
+
+        .category-commission {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .category-dividend {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .category-grant {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .category-other {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background-color: #f9fafb;
+        }
+
+        .data-table th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #6b7280;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        /* Summary cards */
+        .summary-card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .summary-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .summary-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .summary-card .label {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            max-width: 700px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Utility Classes */
+        .grid {
+            display: grid;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-end {
+            justify-content: end;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-gray-500 {
+            color: #6b7280;
+        }
+
+        .text-gray-600 {
+            color: #4b5563;
+        }
+
+        .text-gray-800 {
+            color: #1f2937;
+        }
+
+        .text-green-600 {
+            color: #059669;
+        }
+
+        .bg-white {
+            background-color: white;
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .border {
+            border: 1px solid #e5e7eb;
+        }
+
+        .border-b {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .border-t {
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+
+        /* Remove number input arrows */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            #main-content {
+                margin-left: 0;
+            }
+
+            .grid-cols-4 {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+
+            .grid-cols-2 {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+        }
+
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #1f2937;
+            color: white;
+            padding: 1rem;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+
+            #main-content {
+                margin-top: 4rem;
+            }
+        }
+
+        .backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 45;
+        }
+
+        .backdrop.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <button class="mobile-toggle" id="mobileToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <span class="font-bold">QSI - Receipts</span>
+        <div style="width: 24px;"></div>
+    </div>
+
+    <!-- Backdrop -->
+    <div class="backdrop" id="backdrop"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <h1 class="logo-text">QSI</h1>
         </div>
 
-        <!-- Email/Password Form -->
-        <form id="login-form" class="space-y-4">
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="input-field"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div>
-            <div class="flex justify-between items-center mb-1.5">
-              <label for="password" class="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <a href="#" class="text-xs link-text">Forgot password?</a>
+        <div class="sidebar-search">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Search..." class="search-input" id="sidebarSearch">
             </div>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="input-field"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <button type="submit" class="qsi-btnbtn-primary mt-6">
-            Login
-          </button>
-        </form>
-
-        <!-- Divider -->
-        <div class="divider">
-          <span>OR CONTINUE WITH</span>
         </div>
 
-        <!-- Social Login Buttons -->
-        <div class="space-y-3">
-          <button type="button" id="google-login-btn" class="btn btn-outline">
-            <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-              <g fill="none" fill-rule="evenodd">
-                <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-              </g>
-            </svg>
-            Continue with Google
-          </button>
+        <nav class="sidebar-nav">
+            <a href="dashboard_with_login.html" class="sidebar-link">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
 
-          <button type="button" id="facebook-login-btn" class="btn btn-outline">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
-            Continue with Facebook
-          </button>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Sales Documents</div>
+            </div>
+
+            <a href="quotation/home_quotation.html" class="sidebar-link">
+                <i class="fas fa-file-alt"></i>
+                <span>Quotations</span>
+            </a>
+
+            <a href="saleorder/home_sales_order.html" class="sidebar-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Sales Orders</span>
+            </a>
+
+            <a href="invoice/home_invoice.html" class="sidebar-link">
+                <i class="fas fa-file-invoice"></i>
+                <span>Invoices</span>
+            </a>
+
+            <a href="receipt.html" class="sidebar-link active">
+                <i class="fas fa-receipt"></i>
+                <span>Receipts</span>
+            </a>
+
+            <a href="credit_note.html" class="sidebar-link">
+                <i class="fas fa-file-contract"></i>
+                <span>Credit Notes</span>
+            </a>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Purchase Documents</div>
+            </div>
+
+            <a href="purchase/vendor/vendors_leads.html" class="sidebar-link">
+                <i class="fas fa-store"></i>
+                <span>Vendors</span>
+            </a>
+
+            <a href="purchase/parchase_order/home_purchase_orders.html" class="sidebar-link">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Purchase Orders</span>
+            </a>
+
+            <a href="purchase/bill.html" class="sidebar-link">
+                <i class="fas fa-file-invoice"></i>
+                <span>Bills</span>
+            </a>
+
+            <a href="purchase/debit notes/debit_notes.html" class="sidebar-link">
+                <i class="fas fa-sticky-note"></i>
+                <span>Debit Notes</span>
+            </a>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Management</div>
+            </div>
+
+            <a href="manage-clients.html" class="sidebar-link">
+                <i class="fas fa-users"></i>
+                <span>Clients</span>
+            </a>
+
+            <a href="item_management.html" class="sidebar-link">
+                <i class="fas fa-cube"></i>
+                <span>Items</span>
+            </a>
+
+            <a href="report.html" class="sidebar-link">
+                <i class="fas fa-chart-bar"></i>
+                <span>Report</span>
+            </a>
+
+            <a href="settings.html" class="sidebar-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-email" id="userEmail">user@qsi.com</div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
         </div>
+    </aside>
 
-        <!-- Skip Link -->
-        <div class="text-center mt-6">
-          <a href="without_login/dashboard_without_login.html" class="text-sm link-text">
-            Or Skip for now
-          </a>
+    <!-- Main Content -->
+    <div id="main-content">
+        <div style="max-width: 1280px; margin: 0 auto; padding: 1.5rem;">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6" style="flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1 style="font-size: 1.875rem; font-weight: 700; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-money-bill-wave" style="color: #10b981;"></i>
+                        Receipts
+                    </h1>
+                    <p class="text-gray-500 mt-1">Track income from various sources</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="createBtn" class="btn btn-success">
+                        <i class="fas fa-plus"></i>Create Receipt
+                    </button>
+                    <button id="exportBtn" class="btn btn-secondary">
+                        <i class="fas fa-download"></i>Export
+                    </button>
+                </div>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="summary-card">
+                    <div class="flex items-center gap-4">
+                        <div class="icon" style="background-color: #d1fae5; color: #059669;">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div>
+                            <p class="value" id="totalReceipts">0</p>
+                            <p class="label">Total Receipts</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="flex items-center gap-4">
+                        <div class="icon" style="background-color: #dbeafe; color: #2563eb;">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div>
+                            <p class="value" id="totalAmount">₹0</p>
+                            <p class="label">Total Income</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="flex items-center gap-4">
+                        <div class="icon" style="background-color: #d1fae5; color: #059669;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <p class="value" id="totalReceived">₹0</p>
+                            <p class="label">Received</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="flex items-center gap-4">
+                        <div class="icon" style="background-color: #fef3c7; color: #f59e0b;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <p class="value" id="totalPending">₹0</p>
+                            <p class="label">Pending</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white rounded-lg shadow-sm border p-4 mb-6">
+                <div class="grid grid-cols-4 gap-4">
+                    <div>
+                        <label class="text-sm font-medium text-gray-600 mb-1" style="display: block;">Search</label>
+                        <div style="position: relative;">
+                            <input type="text" id="searchInput" class="input-field" placeholder="Receipt no, source..." style="padding-left: 2.5rem;">
+                            <i class="fas fa-search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-600 mb-1" style="display: block;">Status</label>
+                        <select id="statusFilter" class="input-field">
+                            <option value="">All Status</option>
+                            <option value="Received">Received</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-600 mb-1" style="display: block;">Category</label>
+                        <select id="categoryFilter" class="input-field">
+                            <option value="">All Categories</option>
+                            <option value="Interest Income">Interest Income</option>
+                            <option value="Rental Income">Rental Income</option>
+                            <option value="Commission">Commission</option>
+                            <option value="Dividend">Dividend</option>
+                            <option value="Grant/Subsidy">Grant/Subsidy</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-600 mb-1" style="display: block;">Date Range</label>
+                        <select id="dateFilter" class="input-field">
+                            <option value="">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="quarter">This Quarter</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Receipt No</th>
+                                <th>Source/Description</th>
+                                <th>Category</th>
+                                <th>Receipt Date</th>
+                                <th class="text-right">Amount</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Data populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="text-center" style="padding: 3rem;">
+                    <i class="fas fa-money-bill-wave" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.125rem; font-weight: 500; color: #4b5563;">No receipts found</h3>
+                    <p style="color: #9ca3af; margin-top: 0.25rem;">Create your first receipt to track other income sources</p>
+                    <button onclick="document.getElementById('createBtn').click()" class="btn btn-success mt-4">
+                        <i class="fas fa-plus"></i>Create Receipt
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="hidden text-center" style="padding: 3rem;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #10b981; margin-bottom: 1rem;"></i>
+                    <p class="text-gray-500">Loading receipts...</p>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-between mt-4">
+                <p class="text-sm text-gray-500" id="showingText">Showing 0 of 0 receipts</p>
+                <div class="flex gap-2">
+                    <button id="prevBtn" class="btn btn-secondary btn-sm" disabled>
+                        <i class="fas fa-chevron-left"></i>Previous
+                    </button>
+                    <button id="nextBtn" class="btn btn-secondary btn-sm" disabled>
+                        Next<i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <!-- Sign Up Link -->
-      <div class="text-center mt-6">
-        <p class="text-sm text-gray-600">
-          Don't have an account?
-          <a href="./signup/sign_up.html" class="link-text font-semibold">
-            Sign up
-          </a>
-        </p>
-      </div>
     </div>
 
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const loginForm = document.getElementById("login-form");
-  const submitButton = loginForm.querySelector('button[type="submit"]');
-  const googleBtn = document.getElementById("google-login-btn");
-  const facebookBtn = document.getElementById("facebook-login-btn");
+        // Mobile menu toggle
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
+        const mobileToggle = document.getElementById('mobileToggle');
 
-  const API_BASE = "https://api.fornowauto.com/api";
-
-  // ========================================
-  // EMAIL/PASSWORD LOGIN
-  // ========================================
-  loginForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    if (!email || !password) {
-      alert("Please enter both email and password.");
-      return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.textContent = "Verifying...";
-
-    try {
-      const response = await fetch(`${API_BASE}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Invalid credentials");
-      }
-
-      if (result.token && result.user && result.user._id) {
-        localStorage.setItem("token", result.token);
-        localStorage.setItem("userId", result.user._id);
-        localStorage.setItem("email", result.user.email || "");
-        localStorage.setItem("phone", result.user.phone || "");
-
-        alert("Login Successful!");
-
-        if (result.has_company_details) {
-          window.location.href = "with_login/dashboard_with_login.html";
-        } else {
-          window.location.href = "signup/businessDetails.html";
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('mobile-open');
+                backdrop.classList.toggle('show');
+            });
         }
-      } else {
-        throw new Error("Invalid server response");
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      alert(`Login Failed: ${err.message}`);
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = "Login";
-    }
-  });
 
-  // ========================================
-  // GOOGLE LOGIN
-  // ========================================
-  let googleTokenClient;
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('mobile-open');
+            backdrop.classList.remove('show');
+        });
 
-  function initializeGoogleLogin() {
-    if (typeof google === "undefined" || !google.accounts?.oauth2) {
-      setTimeout(initializeGoogleLogin, 200);
-      return;
-    }
+        // Sidebar search
+        document.getElementById('sidebarSearch')?.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                const text = link.textContent.toLowerCase();
+                link.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+        });
 
-    googleTokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: "345844221969-mtpp4nslbprtuu53f9bcsuh1kaaanjht.apps.googleusercontent.com",
-      scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
-      callback: async (tokenResponse) => {
-        if (tokenResponse?.access_token) {
-          try {
-            googleBtn.disabled = true;
-            googleBtn.innerHTML = '<span>Signing in...</span>';
+        // Load user info
+        const userName = localStorage.getItem('userName') || 'User';
+        const userEmail = localStorage.getItem('userEmail') || 'user@qsi.com';
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('userEmail').textContent = userEmail;
 
-            const googleUser = await fetch(
-              "https://www.googleapis.com/oauth2/v3/userinfo",
-              { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
-            ).then((res) => res.json());
-
-            await handleSocialLogin("Google", googleUser);
-          } catch (err) {
-            console.error("Google login failed:", err);
-            alert("Google login failed. Please try again.");
-            googleBtn.disabled = false;
-            googleBtn.innerHTML = `
-              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-                <g fill="none" fill-rule="evenodd">
-                  <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-                  <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-                </g>
-              </svg>
-              Continue with Google
-            `;
-          }
-        }
-      },
-    });
-
-    googleBtn.disabled = false;
-    googleBtn.addEventListener("click", () => {
-      googleTokenClient.requestAccessToken();
-    });
-  }
-
-  googleBtn.disabled = true;
-  initializeGoogleLogin();
-
-  // ========================================
-  // FACEBOOK LOGIN
-  // ========================================
-  facebookBtn.addEventListener("click", () => {
-    FB.login(
-      (response) => {
-        if (response.authResponse) {
-          facebookBtn.disabled = true;
-          facebookBtn.innerHTML = '<span>Signing in...</span>';
-
-          FB.api("/me", { fields: "name,email" }, async (fbUser) => {
-            try {
-              await handleSocialLogin("Facebook", fbUser);
-            } catch (err) {
-              console.error("Facebook login failed:", err);
-              alert("Facebook login failed. Please try again.");
-              facebookBtn.disabled = false;
-              facebookBtn.innerHTML = `
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-                Continue with Facebook
-              `;
+        // Logout
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'index.html';
             }
-          });
         }
-      },
-      { scope: "public_profile,email" }
-    );
-  });
 
-  // ========================================
-  // SOCIAL LOGIN HANDLER
-  // ========================================
-  async function handleSocialLogin(provider, userData) {
-    console.log(`${provider} login:`, userData);
-
-    const payload = {
-      email: userData.email,
-      username: userData.name,
-      provider,
-      providerId: userData.sub || userData.id,
-    };
-
-    if (!payload.email) {
-      alert("Could not retrieve email from social provider.");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_BASE}/google-login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Social login failed");
-      }
-
-      if (result.token && result.user && result.user._id) {
-        localStorage.setItem("token", result.token);
-        localStorage.setItem("userId", result.user._id);
-        localStorage.setItem("email", result.user.email || "");
-        localStorage.setItem("phone", result.user.phone || "");
-
-        if (result.has_company_details) {
-          window.location.href = "with_login/dashboard_with_login.html";
-        } else {
-          window.location.href = "signup/businessDetails.html";
+        // Check auth
+        const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+        if (!token) {
+            window.location.replace('index.html');
         }
-      } else {
-        throw new Error("Invalid server response");
-      }
-    } catch (err) {
-      console.error(`${provider} login error:`, err);
-      throw err;
-    }
-  }
-});
-</script>
-  </body>
+
+        // Alert
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>${message}`;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        // Sample data management
+        let receipts = [];
+        const API_URL = 'https://api.fornowauto.com/api/receipts';
+
+        async function loadReceipts() {
+            const loading = document.getElementById('loadingState');
+            const empty = document.getElementById('emptyState');
+            const tbody = document.getElementById('tableBody');
+
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+
+            try {
+                const response = await fetch(API_URL, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                receipts = Array.isArray(data) ? data : (data?.data || []);
+                
+                renderTable();
+                updateSummary();
+            } catch (error) {
+                console.error('Error loading receipts:', error);
+                showAlert('Failed to load receipts', 'error');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const empty = document.getElementById('emptyState');
+
+            if (receipts.length === 0) {
+                empty.classList.remove('hidden');
+                tbody.innerHTML = '';
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = receipts.map(r => `
+                <tr>
+                    <td><span class="font-semibold text-green-600">${r.receipt_no || 'N/A'}</span></td>
+                    <td>
+                        <div class="font-medium">${r.income_source || 'Unknown'}</div>
+                        ${r.description ? `<div class="text-xs text-gray-500 mt-1">${r.description.substring(0, 50)}...</div>` : ''}
+                    </td>
+                    <td><span class="category-badge category-${(r.category || '').toLowerCase().replace(' ', '-')}">${r.category || 'Other'}</span></td>
+                    <td>${formatDate(r.receipt_date)}</td>
+                    <td class="text-right font-semibold text-green-600">${formatCurrency(r.amount)}</td>
+                    <td>${r.payment_method || '-'}</td>
+                    <td><span class="status-badge status-${(r.status || '').toLowerCase()}">${r.status || 'Pending'}</span></td>
+                    <td class="text-center">
+                        <div class="flex justify-center gap-1">
+                            <button class="btn btn-secondary btn-sm" onclick="viewReceipt('${r._id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-primary btn-sm" onclick="editReceipt('${r._id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteReceipt('${r._id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateSummary() {
+            const total = receipts.length;
+            const totalAmt = receipts.reduce((sum, r) => sum + (r.amount || 0), 0);
+            const received = receipts.filter(r => r.status === 'Received').reduce((sum, r) => sum + (r.amount || 0), 0);
+            const pending = receipts.filter(r => r.status === 'Pending').reduce((sum, r) => sum + (r.amount || 0), 0);
+
+            document.getElementById('totalReceipts').textContent = total;
+            document.getElementById('totalAmount').textContent = formatCurrency(totalAmt);
+            document.getElementById('totalReceived').textContent = formatCurrency(received);
+            document.getElementById('totalPending').textContent = formatCurrency(pending);
+            document.getElementById('showingText').textContent = `Showing ${total} of ${total} receipts`;
+        }
+
+        function formatCurrency(amount) {
+            return `₹${(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function viewReceipt(id) {
+            showAlert('View receipt: ' + id);
+        }
+
+        function editReceipt(id) {
+            showAlert('Edit receipt: ' + id);
+        }
+
+        async function deleteReceipt(id) {
+            if (!confirm('Delete this receipt?')) return;
+            try {
+                await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                showAlert('Receipt deleted successfully');
+                loadReceipts();
+            } catch (error) {
+                showAlert('Failed to delete receipt', 'error');
+            }
+        }
+
+        document.getElementById('createBtn').addEventListener('click', () => {
+            showAlert('Create receipt modal would open here');
+        });
+
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            showAlert('Export functionality');
+        });
+
+        // Load data on page load
+        loadReceipts();
+    </script>
+</body>
 </html>

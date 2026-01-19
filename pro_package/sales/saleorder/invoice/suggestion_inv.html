@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Suggested Invoices</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        @media (max-width: 768px) {
+  #main-content {
+    margin-top: 64px; /* height of the fixed header */
+  }
+}
+        /* Add any specific styles for suggestion cards if needed */
+    </style>
+    <link rel="stylesheet" href="../../js/fix-icons.css">
+    <link rel="stylesheet" href="../../js/theme-force.css">
+    <link rel="stylesheet" href="../../js/professional-sidebar.css">
+    <!-- Global Theme Manager -->
+    <script src="../../js/theme-manager.js"></script>
+</head>
+
+<body>
+    <div class="flex">
+        <header class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+  <div class="flex items-center space-x-3">
+    <button id="menu-toggle" class="text-white focus:outline-none">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+    <span class="text-xl font-bold">QSI</span>
+  </div>
+</header>
+
+
+<!-- ✅ BACKDROP for mobile -->
+<div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+<!-- ✅ SIDEBAR -->
+<!-- UNIFIED PROFESSIONAL SIDEBAR - QSI Application -->
+<aside id="sidebar" class="sidebar">
+    <!-- Logo Section -->
+    <div class="sidebar-logo">
+        <h1 class="logo-text">QSI</h1>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="sidebar-search">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Search..." class="search-input" id="sidebarSearch">
+        </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+        <!-- Dashboard -->
+        <a href="../dashboard_with_login.html" class="sidebar-link" data-page="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <!-- Sales Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">SALES DOCUMENTS</div>
+        </div>
+
+        <a href="../quotation/home_quotation.html" class="sidebar-link" data-page="quotation">
+            <i class="fas fa-file-alt"></i>
+            <span>Quotations</span>
+        </a>
+
+        <a href="../saleorder/home_sales_order.html" class="sidebar-link" data-page="salesorder">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Sales Orders</span>
+        </a>
+
+        <a href="../invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
+            <i class="fas fa-file-invoice"></i>
+            <span>Invoices</span>
+        </a>
+
+        <a href="../credit_note.html" class="sidebar-link" data-page="creditnote">
+            <i class="fas fa-receipt"></i>
+            <span>Credit Notes</span>
+        </a>
+
+        <!-- Purchase Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">PURCHASE DOCUMENTS</div>
+        </div>
+
+        <a href="../parchase/vendor/vendor_leads.html" class="sidebar-link" data-page="vendor">
+            <i class="fas fa-store"></i>
+            <span>Vendors</span>
+        </a>
+
+        <a href="../parchase/parchase_order/home_purchase_order.html" class="sidebar-link" data-page="purchaseorder">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Purchase Orders</span>
+        </a>
+
+        <a href="../parchase/bills.html" class="sidebar-link" data-page="bills">
+            <i class="fas fa-file-invoice"></i>
+            <span>Bills</span>
+        </a>
+
+        <a href="../parchase/debit_note/debit_note.html" class="sidebar-link" data-page="debitnote">
+            <i class="fas fa-sticky-note"></i>
+            <span>Debit Notes</span>
+        </a>
+
+        <!-- Other Sections -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">MANAGEMENT</div>
+        </div>
+
+        <a href="../payout.html" class="sidebar-link" data-page="payout">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payouts</span>
+        </a>
+
+        <a href="../manage-clients.html" class="sidebar-link" data-page="client">
+            <i class="fas fa-users"></i>
+            <span>Clients</span>
+        </a>
+
+        <a href="../item_management.html" class="sidebar-link" data-page="items">
+            <i class="fas fa-cube"></i>
+            <span>Items</span>
+        </a>
+
+        <a href="../settings.html" class="sidebar-link" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <!-- User Profile Section -->
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">User</div>
+                <div class="user-email" id="sidebarUserEmail">user@qsi.com</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<!-- Sidebar Toggle Button (Mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Mobile Backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<script>
+// Sidebar functionality
+(function() {
+    'use strict';
+
+    // Set active link based on current page
+    function setActiveLink() {
+        const currentPath = window.location.pathname;
+        const links = document.querySelectorAll('.sidebar-link');
+
+        links.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+
+            // Check if current page matches link
+            if (href && (currentPath.includes(href.replace('../', '')) || currentPath.includes(href))) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // Mobile sidebar toggle
+    function initMobileToggle() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (!sidebar || !toggle || !backdrop) return;
+
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+            backdrop.classList.toggle('backdrop-active');
+            document.body.classList.toggle('sidebar-mobile-open');
+        });
+
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('sidebar-open');
+            backdrop.classList.remove('backdrop-active');
+            document.body.classList.remove('sidebar-mobile-open');
+        });
+    }
+
+    // Search functionality
+    function initSearch() {
+        const searchInput = document.getElementById('sidebarSearch');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const links = document.querySelectorAll('.sidebar-link');
+
+            links.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                const parent = link.closest('.sidebar-nav');
+
+                if (text.includes(query) || query === '') {
+                    link.style.display = 'flex';
+                } else {
+                    link.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Load user info
+    function loadUserInfo() {
+        const userNameEl = document.getElementById('sidebarUserName');
+        const userEmailEl = document.getElementById('sidebarUserEmail');
+
+        // Get from localStorage or session
+        const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || 'User';
+        const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || 'user@qsi.com';
+
+        if (userNameEl) userNameEl.textContent = userName;
+        if (userEmailEl) userEmailEl.textContent = userEmail;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        setActiveLink();
+        initMobileToggle();
+        initSearch();
+        loadUserInfo();
+    });
+
+    // Handle logout
+    window.handleLogout = function() {
+        if (confirm('Are you sure you want to logout?')) {
+            // Clear session data
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // Redirect to login
+            window.location.href = '../index.html';
+        }
+    };
+})();
+</script>
+
+
+        <div class="flex-1 overflow-y-auto p-8">
+            <header class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center">Invoice Action Center</h1>
+                    <a href="create_invoice.html"
+                        class="bg-pink-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-pink-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i> Create New Invoice
+                    </a>
+                </div>
+                <nav class="flex items-center space-x-6 border-b">
+                    <a href="home_invoice.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Overview</a>
+                    <a href="recurring_invoice.html" class="py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Recurring Invoice</a>
+                    <a href="suggestion_inv.html" class="py-2 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600">Suggested Invoice</a>
+                </nav>
+            </header>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">Actionable Suggestions</h2>
+                    <div class="flex items-center space-x-2">
+                        <button class="px-3 py-1.5 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-md">All</button>
+                        <button class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">Overdue</button>
+                        <button class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">Due Soon</button>
+                        <button class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-md">Partial Payments</button>
+                    </div>
+                </div>
+
+                <div id="suggestion-container" class="space-y-4">
+                    <p class="text-gray-500">Loading suggestions...</p>
+
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Sidebar dropdown logic (Copied from your code) ---
+            const dropdownBtn = document.getElementById('documents-dropdown-btn');
+            const dropdownContent = document.getElementById('documents-dropdown-content');
+            const dropdownIcon = document.getElementById('dropdown-icon');
+
+            // Auto-open the sales docs dropdown since we are on a child page
+            if (dropdownContent) dropdownContent.classList.remove('hidden');
+            if (dropdownIcon) dropdownIcon.classList.add('rotate-180');
+
+            if (dropdownBtn) {
+              dropdownBtn.addEventListener('click', () => {
+                dropdownContent.classList.toggle('hidden');
+                dropdownIcon.classList.toggle('rotate-180');
+              });
+            }
+            const purchasesBtn = document.getElementById('purchases-dropdown-btn');
+             if (purchasesBtn) {
+               purchasesBtn.addEventListener('click', () => {
+                 document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
+                 document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
+                });
+             }
+
+
+            // --- Elements & API Config ---
+            const container = document.getElementById('suggestion-container');
+            const API_BASE_URL = "https://api.fornowauto.com/api";
+            const INVOICE_API_URL = `${API_BASE_URL}/invoic`; // GET: /api/invoice
+
+            // -----------------------------------------------------------------
+            // --- 1. AUTHENTICATION & API FUNCTIONS (Copied from your code) ---
+            // -----------------------------------------------------------------
+const menuToggle = document.getElementById("menu-toggle");
+const sidebar = document.getElementById("sidebar");
+const menuBackdrop = document.getElementById("menu-backdrop");
+
+if (menuToggle && sidebar && menuBackdrop) {
+  menuToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("-translate-x-full");
+    menuBackdrop.classList.toggle("hidden");
+  });
+
+  menuBackdrop.addEventListener("click", () => {
+    sidebar.classList.add("-translate-x-full");
+    menuBackdrop.classList.add("hidden");
+  });
+}
+            function getAuthHeaders() {
+              const token = localStorage.getItem('token');
+              if (token) {
+                return { 'Authorization': `Bearer ${token}` };
+              }
+              return null;
+            }
+
+            async function fetchJsonAndParse(url, opts = {}) {
+              opts.headers = opts.headers || {};
+              const authHeaders = getAuthHeaders();
+              if (!authHeaders) {
+                alert("Authentication token not found. Please log in.");
+                window.location.href = '../../index.html'; // Adjust login path if needed
+                throw new Error("Authentication token not found.");
+              }
+              opts.headers = { ...opts.headers, ...authHeaders };
+
+              if (opts.body && typeof opts.body === 'string' && !opts.headers['Content-Type']) {
+                opts.headers['Content-Type'] = 'application/json';
+              }
+
+              const response = await fetch(url, opts);
+
+              if (!response.ok) {
+                if (response.status === 401) {
+                  alert("Authentication error or session expired. Please log in again.");
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('userId');
+                  window.location.href = '../../index.html';
+                  throw new Error("Session expired");
+                }
+                const errorText = await response.text().catch(() => response.statusText);
+                const error = new Error(`HTTP ${response.status}: ${errorText}`);
+                error.status = response.status;
+                throw error;
+              }
+
+              const contentType = response.headers.get('content-type') || '';
+              if (contentType.includes('application/json')) {
+                return response.json();
+              }
+              const text = await response.text();
+              try { return JSON.parse(text); } catch (e) { return text; }
+            }
+
+            // --- 2. SUGGESTION LOGIC (Adapted for Invoices) ---
+
+            /**
+             * Formats a number as INR currency.
+             */
+            const formatCurrency = (amount) => `₹${Number(amount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+             /**
+             * Calculates the difference in days between two dates. date2 - date1
+             */
+            function daysDifference(date1, date2) {
+                // Ensure dates are valid Date objects
+                const d1 = date1 instanceof Date ? date1 : new Date(date1);
+                const d2 = date2 instanceof Date ? date2 : new Date(date2);
+
+                // Set time to midnight to compare whole days
+                d1.setHours(0, 0, 0, 0);
+                d2.setHours(0, 0, 0, 0);
+
+                const diffTime = d2.getTime() - d1.getTime();
+                // Use Math.round for closer day count
+                return Math.round(diffTime / (1000 * 60 * 60 * 24));
+            }
+
+
+            /**
+             * Processes the raw invoice data and generates actionable suggestions.
+             * NOTE: Assumes API objects have `status`, `due_date`.
+             */
+            function generateSuggestions(invoices) {
+                const suggestions = [];
+                const today = new Date();
+
+                for (const invoice of invoices) {
+                    const status = (invoice.status || 'Draft').toLowerCase();
+                    const dueDate = invoice.due_date ? new Date(invoice.due_date) : null;
+
+                    // Skip if paid or no due date for relevant suggestions
+                    if (status === 'paid') continue;
+
+                    // Suggestion 1: Overdue Invoices
+                    if (dueDate && status !== 'draft' && dueDate < today) {
+                        const daysOverdue = daysDifference(dueDate, today);
+                        suggestions.push({
+                            type: 'overdue',
+                            icon: '❗️',
+                            title: 'Chase Overdue Invoice',
+                            suggestion: `This invoice is <strong>${daysOverdue} day(s) past due</strong>. Send a payment reminder.`,
+                            primaryAction: 'Send Reminder',
+                            invoice: invoice
+                        });
+                    }
+                    // Suggestion 2: Invoices Due Soon (e.g., within next 3 days)
+                    else if (dueDate && status !== 'draft' && dueDate >= today) {
+                         const daysUntilDue = daysDifference(today, dueDate);
+                         if (daysUntilDue <= 3) {
+                             suggestions.push({
+                                 type: 'due_soon',
+                                 icon: '🗓️',
+                                 title: 'Invoice Due Soon',
+                                 suggestion: `This invoice is <strong>due in ${daysUntilDue} day(s)</strong>. Consider sending a proactive reminder.`,
+                                 primaryAction: 'Send Proactive Reminder',
+                                 invoice: invoice
+                             });
+                         }
+                    }
+                    // Add other suggestions here (e.g., Draft invoices to send, Partial payments)
+                }
+                return suggestions;
+            }
+
+            /**
+             * Renders the suggestion cards to the DOM using Tailwind classes.
+             */
+            function renderSuggestions(suggestions) {
+                container.innerHTML = ''; // Clear loading message
+
+                if (suggestions.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500">No suggestions right now. You\'re all caught up!</p>';
+                    return;
+                }
+
+                // Define card styles based on type
+                const cardStyles = {
+                    overdue:  { border: 'border-red-500',   icon: '❗️', iconColor: 'text-red-600' },
+                    due_soon: { border: 'border-yellow-500', icon: '🗓️', iconColor: 'text-yellow-600' }
+                    // Add styles for other types like 'draft', 'partial'
+                };
+
+                // Loop through suggestions and build HTML
+                suggestions.forEach(s => {
+                    const style = cardStyles[s.type] || { border: 'border-gray-300', icon: '?', iconColor: 'text-gray-600' };
+                    const invoice = s.invoice;
+                    const invoiceNumber = invoice.invoice_no || 'N/A'; // Use invoice_no field
+
+                    const cardHTML = `
+                        <div class="flex bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden border-l-4 ${style.border}">
+                            <div class="text-2xl p-6 flex items-center justify-center bg-gray-50 ${style.iconColor}">${style.icon}</div>
+                            <div class="flex-grow p-5">
+                                <h3 class="text-lg font-semibold text-gray-800">${s.title}</h3>
+                                <div class="text-sm text-gray-600 leading-relaxed mt-1">
+                                    <strong>Invoice:</strong> ${invoiceNumber}<br>
+                                    <strong>Customer:</strong> ${invoice.to?.client_name || 'N/A'}<br>
+                                    <strong>Amount Due:</strong> ${formatCurrency(invoice.total)}
+                                </div>
+                                <div class="text-sm text-gray-900 mt-3">${s.suggestion}</div>
+                            </div>
+                            <div class="flex flex-col justify-center p-5 space-y-2">
+                                <button class="px-4 py-2 text-sm font-medium rounded-md text-center bg-purple-600 text-white hover:bg-purple-700 action-btn" data-id="${invoice._id}" data-type="${s.type}">${s.primaryAction}</button>
+                                <button class="px-4 py-2 text-sm font-medium rounded-md text-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 view-btn" data-id="${invoice._id}">View Invoice</button>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += cardHTML;
+                });
+
+                // Add event listeners for the new buttons
+                container.querySelectorAll('.action-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.dataset.id;
+                        const type = e.target.dataset.type;
+                        alert(`Action '${e.target.textContent}' clicked for Invoice ID: ${id}. Type: ${type}. (Implement action)`);
+                        // Example: Implement reminder sending logic or navigation
+                        // if (type === 'overdue' || type === 'due_soon') {
+                        //   sendReminder(id);
+                        // }
+                    });
+                });
+
+                container.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.dataset.id;
+                        // Redirect to the view/edit page for the invoice
+                         window.location.href = `view_data_invoice.html?id=${id}`;
+                    });
+                });
+            }
+
+            /**
+             * Main function to fetch data and run the process.
+             */
+            async function loadSuggestions() {
+                container.innerHTML = '<p class="text-gray-500">Loading suggestions...</p>'; // Show loading immediately
+                try {
+                    // Use the authenticated fetch wrapper
+                    const invoices = await fetchJsonAndParse(INVOICE_API_URL);
+                    if (!invoices) {
+                        container.innerHTML = '<p class="text-red-600">Error: Could not authenticate.</p>';
+                        return;
+                    }
+
+                    // 1. Process data to find suggestions
+                    const suggestions = generateSuggestions(Array.isArray(invoices) ? invoices : []);
+
+                    // 2. Render the suggestions to the page
+                    renderSuggestions(suggestions);
+
+                } catch (error) {
+                    console.error('Failed to load suggestions:', error);
+                    container.innerHTML =
+                        `<p class="text-red-600">Error: Could not load suggestions. ${error.message}</p>`;
+                }
+            }
+
+            // --- 3. Run the app ---
+            loadSuggestions();
+
+        });
+    </script>
+</body>
+
+</html>

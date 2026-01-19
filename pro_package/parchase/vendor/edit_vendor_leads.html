@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Vendor Lead - QSI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        @media (max-width: 768px) {
+            #main-content {
+                margin-top: 64px;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+    <link rel="stylesheet" href="../../../js/fix-icons.css">
+    <link rel="stylesheet" href="../../../js/theme-force.css">
+    <link rel="stylesheet" href="../../../js/professional-sidebar.css">
+    <!-- Global Theme Manager -->
+    <script src="../../../js/theme-manager.js"></script>
+</head>
+
+<body class="bg-gray-50">
+    <div class="flex">
+        <header
+            class="bg-gray-800 text-white flex items-center justify-between p-4 md:hidden fixed top-0 left-0 w-full z-50 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button id="menu-toggle" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <span class="text-xl font-bold">QSI</span>
+            </div>
+        </header>
+
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+        <!-- UNIFIED PROFESSIONAL SIDEBAR - QSI Application -->
+<aside id="sidebar" class="sidebar">
+    <!-- Logo Section -->
+    <div class="sidebar-logo">
+        <h1 class="logo-text">QSI</h1>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="sidebar-search">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Search..." class="search-input" id="sidebarSearch">
+        </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+        <!-- Dashboard -->
+        <a href="../../dashboard_with_login.html" class="sidebar-link" data-page="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <!-- Sales Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">SALES DOCUMENTS</div>
+        </div>
+
+        <a href="../../quotation/home_quotation.html" class="sidebar-link" data-page="quotation">
+            <i class="fas fa-file-alt"></i>
+            <span>Quotations</span>
+        </a>
+
+        <a href="../../saleorder/home_sales_order.html" class="sidebar-link" data-page="salesorder">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Sales Orders</span>
+        </a>
+
+        <a href="../../invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
+            <i class="fas fa-file-invoice"></i>
+            <span>Invoices</span>
+        </a>
+        <a href="../../receipt.html" class="sidebar-link" data-page="receipt">
+            <i class="fas fa-receipt"></i>
+            <span>Receipts</span>
+        <a href="../../credit_note.html" class="sidebar-link" data-page="creditnote">
+            <i class="fas fa-receipt"></i>
+            <span>Credit Notes</span>
+        </a>
+
+        <!-- Purchase Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">PURCHASE DOCUMENTS</div>
+        </div>
+
+        <a href="vendors_leads.html" class="sidebar-link" data-page="vendor">
+            <i class="fas fa-store"></i>
+            <span>Vendors</span>
+        </a>
+
+        <a href="../parchase_order/home_purchase_orders.html class="sidebar-link" data-page="purchaseorder">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Purchase Orders</span>
+        </a>
+
+        <a href="../bill.html" class="sidebar-link" data-page="bills">
+            <i class="fas fa-file-invoice"></i>
+            <span>Bills</span>
+        </a>
+
+        <a href="../debit notes/debit_notes.html" class="sidebar-link" data-page="debitnote">
+            <i class="fas fa-sticky-note"></i>
+            <span>Debit Notes</span>
+        </a>
+
+        <!-- Other Sections -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">MANAGEMENT</div>
+        </div>
+
+      
+
+        <a href="../../manage-clients.html" class="sidebar-link" data-page="client">
+            <i class="fas fa-users"></i>
+            <span>Clients</span>
+        </a>
+
+        <a href="../../item_management.html" class="sidebar-link" data-page="items">
+            <i class="fas fa-cube"></i>
+            <span>Items</span>
+        </a>
+
+        <a href="../../report.html" class="sidebar-link" data-page="report">
+            <i class="fas fa-receipt"></i>
+            <span>Report</span>
+        <a href="../../settings.html" class="sidebar-link" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <!-- User Profile Section -->
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">User</div>
+                <div class="user-email" id="sidebarUserEmail">user@qsi.com</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<!-- Sidebar Toggle Button (Mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Mobile Backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<script>
+// Sidebar functionality
+(function() {
+    'use strict';
+
+    // Set active link based on current page
+    function setActiveLink() {
+        const currentPath = window.location.pathname;
+        const links = document.querySelectorAll('.sidebar-link');
+
+        links.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+
+            // Check if current page matches link
+            if (href && (currentPath.includes(href.replace('../', '')) || currentPath.includes(href))) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // Mobile sidebar toggle
+    function initMobileToggle() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (!sidebar || !toggle || !backdrop) return;
+
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+            backdrop.classList.toggle('backdrop-active');
+            document.body.classList.toggle('sidebar-mobile-open');
+        });
+
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('sidebar-open');
+            backdrop.classList.remove('backdrop-active');
+            document.body.classList.remove('sidebar-mobile-open');
+        });
+    }
+
+    // Search functionality
+    function initSearch() {
+        const searchInput = document.getElementById('sidebarSearch');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const links = document.querySelectorAll('.sidebar-link');
+
+            links.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                const parent = link.closest('.sidebar-nav');
+
+                if (text.includes(query) || query === '') {
+                    link.style.display = 'flex';
+                } else {
+                    link.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Load user info
+    function loadUserInfo() {
+        const userNameEl = document.getElementById('sidebarUserName');
+        const userEmailEl = document.getElementById('sidebarUserEmail');
+
+        // Get from localStorage or session
+        const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || 'User';
+        const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || 'user@qsi.com';
+
+        if (userNameEl) userNameEl.textContent = userName;
+        if (userEmailEl) userEmailEl.textContent = userEmail;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        setActiveLink();
+        initMobileToggle();
+        initSearch();
+        loadUserInfo();
+    });
+
+    // Handle logout
+    window.handleLogout = function() {
+        if (confirm('Are you sure you want to logout?')) {
+            // Clear session data
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // Redirect to login
+            window.location.href = '../index.html';
+        }
+    };
+})();
+</script>
+
+
+        <div id="main-content" class="flex-1">
+            <header class="bg-white shadow-sm p-6 flex items-center space-x-4 border-b border-gray-200">
+                <a href="vendors_leads.html" class="text-gray-600 hover:text-gray-800 transition">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Edit Vendor Lead</h1>
+                    <p class="text-sm text-gray-500 mt-1">Update existing vendor information</p>
+                </div>
+            </header>
+
+            <main class="p-6 md:p-8">
+                <div id="page-loading" class="flex justify-center items-center py-20">
+                    <div class="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+                </div>
+
+                <form id="vendor-form" class="max-w-5xl mx-auto hidden">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                        <div class="flex items-center mb-6 pb-4 border-b border-gray-200">
+                            <div class="bg-purple-100 p-2 rounded-lg mr-3">
+                                <i class="fas fa-user-edit text-purple-600 text-lg"></i>
+                            </div>
+                            <h2 class="text-lg font-semibold text-gray-900">Edit Details</h2>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Vendor Name<span class="text-red-500 ml-1">*</span>
+                            </label>
+                            <input type="text" id="vendor-name" placeholder="Enter vendor full name" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <div class="flex">
+                                    <select id="country-code"
+                                        class="px-3 py-2.5 border border-r-0 border-gray-300 rounded-l-lg bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                        <option value="+91">🇮🇳 +91</option>
+                                        <option value="+1">🇺🇸 +1</option>
+                                        <option value="+44">🇬🇧 +44</option>
+                                    </select>
+                                    <input type="tel" id="phone" placeholder="Enter phone number"
+                                        class="flex-1 px-4 py-2.5 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                <input type="email" id="email" placeholder="vendor@example.com"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Country<span class="text-red-500 ml-1">*</span>
+                                </label>
+                                <select id="country" required
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="">Select Country</option>
+                                    <option value="India">India</option>
+                                    <option value="USA">USA</option>
+                                    <option value="UK">UK</option>
+                                    <option value="Canada">Canada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                                <select id="state"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="">Select State</option>
+                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                GSTIN <span class="text-gray-400 text-xs">(Optional)</span>
+                            </label>
+                            <input type="text" id="gstin" placeholder="Enter business GSTIN"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">PAN Number</label>
+                                <input type="text" id="pan" placeholder="ABCDE1234F"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Name as Per PAN</label>
+                                <input type="text" id="pan-name" placeholder="Name on PAN card"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                Vendor Type
+                                <i class="fas fa-info-circle text-gray-400 ml-1 cursor-help"
+                                    title="Select whether this is an individual or company"></i>
+                            </label>
+                            <div class="flex space-x-6">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="vendorType" id="vendor-individual" value="individual"
+                                        checked class="w-4 h-4 text-purple-600 focus:ring-purple-500">
+                                    <span class="ml-2 text-gray-700">Individual</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="vendorType" id="vendor-company" value="company"
+                                        class="w-4 h-4 text-purple-600 focus:ring-purple-500">
+                                    <span class="ml-2 text-gray-700">Company</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                <input type="text" id="city" placeholder="Enter city"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
+                                <input type="text" id="pincode" placeholder="Enter pincode"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                            <input type="text" id="street" placeholder="Enter street address"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                            <p class="text-sm text-gray-500 mb-2">Brief description of what they're looking for</p>
+                            <input type="text" id="subject"
+                                placeholder="E.g., Mobile App Development, Hardware Supplies"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <a href="vendors_leads.html"
+                            class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-200 font-medium">
+                            Cancel
+                        </a>
+                        <button type="submit" id="submit-btn"
+                            class="px-8 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 font-medium flex items-center space-x-2">
+                            <i class="fas fa-save"></i>
+                            <span>Update Vendor Lead</span>
+                        </button>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ===== 1. AUTHENTICATION & ID CHECK =====
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please log in to access this page');
+                window.location.href = '../../login.html';
+                return;
+            }
+
+            // Get Vendor ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const vendorId = urlParams.get('id');
+
+            if (!vendorId) {
+                alert('No vendor ID specified');
+                window.location.href = 'vendors_leads.html';
+                return;
+            }
+
+            // ===== 2. UI SETUP (Menu & Dropdowns) =====
+            const menuToggle = document.getElementById("menu-toggle");
+            const sidebar = document.getElementById("sidebar");
+            const menuBackdrop = document.getElementById("menu-backdrop");
+
+            if (menuToggle && sidebar && menuBackdrop) {
+                menuToggle.addEventListener("click", () => {
+                    sidebar.classList.toggle("-translate-x-full");
+                    menuBackdrop.classList.toggle("hidden");
+                });
+
+                menuBackdrop.addEventListener("click", () => {
+                    sidebar.classList.add("-translate-x-full");
+                    menuBackdrop.classList.add("hidden");
+                });
+            }
+
+            document.getElementById('documents-dropdown-btn').addEventListener('click', () => {
+                document.getElementById('documents-dropdown-content').classList.toggle('hidden');
+                document.getElementById('dropdown-icon').classList.toggle('rotate-180');
+            });
+
+            document.getElementById('purchases-dropdown-btn').addEventListener('click', () => {
+                document.getElementById('purchases-dropdown-content').classList.toggle('hidden');
+                document.getElementById('purchases-dropdown-icon').classList.toggle('rotate-180');
+            });
+
+            // ===== 3. API CONFIGURATION =====
+            const API_BASE_URL = 'https://api.fornowauto.com/api';
+            const VENDORS_API_URL = `${API_BASE_URL}/vend`;
+
+            function getAuthHeaders() {
+                return {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
+            }
+
+            // ===== 4. LOAD EXISTING VENDOR DATA =====
+            async function loadVendorDetails() {
+                try {
+                    const response = await fetch(`${VENDORS_API_URL}/${vendorId}`, {
+                        headers: getAuthHeaders()
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch vendor data');
+                    }
+
+                    const vendor = await response.json();
+                    
+                    // Populate Form Fields
+                    document.getElementById('vendor-name').value = vendor.vendor_name || '';
+                    document.getElementById('phone').value = vendor.phone || '';
+                    if(vendor.country_code) document.getElementById('country-code').value = vendor.country_code;
+                    document.getElementById('email').value = vendor.email || '';
+                    if(vendor.country) document.getElementById('country').value = vendor.country;
+                    if(vendor.state) document.getElementById('state').value = vendor.state;
+                    document.getElementById('gstin').value = vendor.gstin || '';
+                    document.getElementById('pan').value = vendor.pan || '';
+                    document.getElementById('pan-name').value = vendor.pan_name || '';
+                    document.getElementById('city').value = vendor.city || '';
+                    document.getElementById('pincode').value = vendor.pincode || '';
+                    document.getElementById('street').value = vendor.street || '';
+                    document.getElementById('subject').value = vendor.subject || '';
+
+                    // Handle Radio Buttons
+                    if (vendor.vendor_type === 'company') {
+                        document.getElementById('vendor-company').checked = true;
+                    } else {
+                        document.getElementById('vendor-individual').checked = true;
+                    }
+
+                    // Hide Loader, Show Form
+                    document.getElementById('page-loading').classList.add('hidden');
+                    document.getElementById('vendor-form').classList.remove('hidden');
+
+                } catch (error) {
+                    console.error('Error loading vendor:', error);
+                    alert('Error loading vendor details. Please try again.');
+                    window.location.href = 'vendors_leads.html';
+                }
+            }
+
+            // ===== 5. HANDLE FORM SUBMISSION (UPDATE) =====
+            const vendorForm = document.getElementById('vendor-form');
+            const submitBtn = document.getElementById('submit-btn');
+
+            vendorForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const headers = getAuthHeaders();
+                if (!headers) return;
+ 
+                const vendorData = {
+                    vendor_name: document.getElementById('vendor-name').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    country_code: document.getElementById('country-code').value,
+                    email: document.getElementById('email').value.trim(),
+                    country: document.getElementById('country').value,
+                    state: document.getElementById('state').value,
+                    gstin: document.getElementById('gstin').value.trim(),
+                    pan: document.getElementById('pan').value.trim().toUpperCase(),
+                    pan_name: document.getElementById('pan-name').value.trim(),
+                    vendor_type: document.querySelector('input[name="vendorType"]:checked').value,
+                    city: document.getElementById('city').value.trim(),
+                    pincode: document.getElementById('pincode').value.trim(),
+                    street: document.getElementById('street').value.trim(),
+                    subject: document.getElementById('subject').value.trim()
+                };
+
+                // Show loading state
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
+
+                try {
+                    // Send PUT Request
+                    const response = await fetch(`${VENDORS_API_URL}/${vendorId}`, {
+                        method: 'PUT',
+                        headers: headers,
+                        body: JSON.stringify(vendorData)
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        let errorMsg = 'Update failed';
+                        try {
+                            const errorJson = JSON.parse(errorText);
+                            errorMsg = errorJson.message || errorMsg;
+                        } catch(e) { errorMsg = errorText || errorMsg; }
+                        throw new Error(errorMsg);
+                    }
+
+                    alert('Vendor lead updated successfully!');
+                    window.location.href = 'vendors_leads.html';
+
+                } catch (error) {
+                    console.error('Error updating vendor:', error);
+                    alert(`Error updating vendor: ${error.message}`);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            });
+
+            // Start the loading process
+            loadVendorDetails();
+        });
+    </script>
+</body>
+
+</html>
