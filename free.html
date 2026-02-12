@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up | Let's Get Started</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- PayU Bolt JS -->
+  <script id="bolt" src="https://jssdk.payu.in/bolt/bolt.min.js" bolt-color="91040C"></script>
+  <!-- SHA-512 for client-side hash (DEMO ONLY - move to server for production) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha512/0.8.0/sha512.min.js"></script>
+
+  <style>
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-up { animation: fadeUp 0.6s ease-out forwards; }
+    input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px #23140C inset !important; -webkit-text-fill-color: white !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+    .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #23140C; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#91040C,#91040C); border-radius: 10px; border: 2px solid #23140C; }
+    .input-field { width:100%; padding:0.75rem 1rem; background:#23140C; border:1px solid rgba(208,186,152,0.3);
+      border-radius:0.5rem; color:white; outline:none; transition:all 0.2s; }
+    .input-field:focus { border-color:#91040C; box-shadow:0 0 0 1px #91040C; }
+    .input-field::placeholder { color:#6b7280; }
+    .plan-badge-free { background: linear-gradient(135deg,#D0BA98,#a8956e); color:#23140C; }
+    .plan-badge-standard { background: linear-gradient(135deg,#91040C,#c41020); color:white; }
+    .plan-badge-professional { background: linear-gradient(135deg,#D0BA98,#91040C); color:white; }
+    .order-card { background: linear-gradient(135deg,rgba(145,4,12,0.15),rgba(35,20,12,0.9)); border:1px solid rgba(145,4,12,0.4); }
+  </style>
+</head>
+
+<body class="bg-[#23140C] flex flex-col min-h-screen font-[Inter] relative overflow-y-auto overflow-x-hidden selection:bg-[#91040C] selection:text-white pt-24">
+
+  <!-- Fixed Navbar -->
+  <header class="fixed top-0 z-50 w-full bg-[#23140C]/90 backdrop-blur-md border-b border-[#D0BA98]/20 transition-all duration-300">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <a href="index.html" class="flex-shrink-0 flex items-center group">
+          <span class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#D0BA98] to-[#91040C]">ForNow</span>
+          <span class="text-2xl font-light text-gray-300 ml-2 group-hover:text-white transition-colors">Automation</span>
+        </a>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="index.html" class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors">Home</a>
+          <a href="products.html" class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors">Products</a>
+          <a href="payment.html" class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors">Pricing</a>
+          <a href="contact.html" class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors">Contact Us</a>
+        </div>
+        <div class="md:hidden flex items-center">
+          <button id="mobile-menu-btn" class="text-gray-300 hover:text-white focus:outline-none p-2">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+        </div>
+      </div>
+      <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+      <div id="mobile-menu" class="fixed top-0 right-0 h-screen w-64 bg-[#23140C]/95 backdrop-blur-3xl z-50 transform translate-x-full transition-transform duration-500 border-l border-gray-700/50 shadow-2xl flex flex-col pt-6 hidden">
+        <div class="px-6 flex justify-end mb-8">
+          <button id="close-menu-btn" class="p-2 text-gray-400 hover:text-white transition-colors focus:outline-none rounded-full hover:bg-white/10">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+        <div class="flex-1 px-8 space-y-6">
+          <a href="index.html" class="block text-xl font-medium text-gray-300 hover:text-[#D0BA98]">Home</a>
+          <a href="products.html" class="block text-xl font-medium text-gray-300 hover:text-[#D0BA98]">Products</a>
+          <a href="payment.html" class="block text-xl font-medium text-gray-300 hover:text-[#D0BA98]">Pricing</a>
+          <a href="contact.html" class="block text-xl font-medium text-gray-300 hover:text-[#D0BA98]">Contact Us</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Background Glows -->
+  <div class="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#91040C] rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-pulse pointer-events-none"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#91040C] rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-pulse pointer-events-none" style="animation-duration:4s;"></div>
+
+  <!-- Content Wrapper -->
+  <div class="flex-1 w-full flex flex-col items-center justify-center p-4 z-10">
+
+    <!-- ORDER SUMMARY -->
+    <div id="orderSummary" class="hidden w-full max-w-md mb-6 animate-fade-up">
+      <div class="order-card rounded-xl p-5 relative overflow-hidden">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <span id="planBadge" class="plan-badge-standard text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Standard</span>
+            <h3 class="text-white font-semibold text-base font-['Playfair_Display']">Order Summary</h3>
+          </div>
+          <a href="payment.html" class="text-xs text-[#D0BA98] hover:text-white underline decoration-dotted transition-colors flex items-center gap-1">
+            <i data-lucide="arrow-left" class="w-3 h-3"></i> Change Plan
+          </a>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between items-center">
+            <span class="text-[#D0BA98]">Plan</span>
+            <span id="summaryPlan" class="text-white font-semibold">Standard</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-[#D0BA98]">Billing Cycle</span>
+            <span id="summaryCycle" class="text-white font-medium">Monthly</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-[#D0BA98]">Auto-Renewal</span>
+            <span id="summaryAutopay" class="text-green-400 font-medium text-xs flex items-center gap-1">
+              <i data-lucide="refresh-cw" class="w-3 h-3"></i> Enabled
+            </span>
+          </div>
+          <div class="h-px bg-[#D0BA98]/15 my-2"></div>
+          <div class="flex justify-between items-center">
+            <span class="text-[#D0BA98] font-semibold">Total</span>
+            <span id="summaryAmount" class="text-white text-2xl font-bold">&#8377;199</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGNUP CONTAINER -->
+    <div id="signupContainer" class="glass-card p-8 md:p-10 rounded-2xl w-full max-w-md relative animate-fade-up">
+      <!-- Step Indicator -->
+      <div class="flex items-center justify-center gap-3 mb-6">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-[#91040C] text-white flex items-center justify-center text-sm font-bold">1</div>
+          <span class="text-white text-sm font-medium hidden sm:inline">Details</span>
+        </div>
+        <div class="w-8 h-px bg-[#D0BA98]/30" id="stepLine"></div>
+        <div class="flex items-center gap-2">
+          <div id="stepCircle2" class="w-8 h-8 rounded-full border border-[#D0BA98]/30 text-[#D0BA98] flex items-center justify-center text-sm font-bold">2</div>
+          <span id="stepLabel2" class="text-[#D0BA98]/50 text-sm font-medium hidden sm:inline">Payment</span>
+        </div>
+      </div>
+
+      <h1 class="text-3xl font-bold text-white mb-2 font-['Playfair_Display']">Let's get started<span class="text-[#91040C]">.</span></h1>
+      <p class="text-[#D0BA98] text-sm mb-8">Create your account to join the future.</p>
+
+      <form id="signupForm" class="space-y-5" onsubmit="return false;">
+        <!-- STEP 1 -->
+        <div id="step1" class="space-y-5 animate-fade-up">
+          <div class="grid grid-cols-2 gap-3">
+            <input type="text" id="firstName" class="input-field" placeholder="First Name" required>
+            <input type="text" id="lastName" class="input-field" placeholder="Last Name" required>
+          </div>
+          <div class="space-y-3">
+            <input type="text" id="address1" class="input-field" placeholder="Address Line 1" required>
+            <input type="text" id="address2" class="input-field" placeholder="Address Line 2 (Optional)">
+            <input type="text" id="landmark" class="input-field" placeholder="Landmark (Optional)">
+          </div>
+          <div class="relative group">
+            <p class="absolute -top-2 left-2 px-1 bg-[#23140C] text-xs text-[#D0BA98] z-10">PIN Code</p>
+            <input type="text" id="pinCode" class="input-field" placeholder="Enter PIN Code" maxlength="6" required>
+          </div>
+          <div class="space-y-3">
+            <div class="relative group">
+              <p class="absolute -top-2 left-2 px-1 bg-[#23140C] text-xs text-[#D0BA98] z-10">City, State</p>
+              <select id="cityState" class="input-field appearance-none cursor-pointer">
+                <option>Chennai, Tamil Nadu</option><option>Mumbai, Maharashtra</option><option>Delhi, New Delhi</option>
+              </select>
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"><i data-lucide="chevron-down" class="w-4 h-4 text-[#D0BA98]"></i></div>
+            </div>
+            <div class="relative group">
+              <p class="absolute -top-2 left-2 px-1 bg-[#23140C] text-xs text-[#D0BA98] z-10">Country</p>
+              <input type="text" value="India" readonly class="input-field cursor-not-allowed text-[#D0BA98]">
+            </div>
+          </div>
+          <div class="flex items-center gap-2 py-1">
+            <input type="checkbox" id="bizAddress" class="h-4 w-4 cursor-pointer rounded border border-gray-600 bg-[#23140C] accent-[#91040C]">
+            <label for="bizAddress" class="text-sm text-[#D0BA98]">This is a business address</label>
+          </div>
+          <h2 class="text-xl font-bold text-white font-['Playfair_Display'] pt-2">What's your contact information?</h2>
+          <input type="email" id="emailAddress" class="input-field" placeholder="Email Address" required>
+          <input type="tel" id="mobileNumber" class="input-field" placeholder="India Mobile Number" maxlength="10" required>
+          <div class="flex items-start gap-3 py-1">
+            <div class="relative flex items-start">
+              <input type="checkbox" id="termsStep1" required class="peer h-4 w-4 mt-1 cursor-pointer appearance-none rounded border border-gray-600 bg-[#23140C] checked:border-[#91040C] checked:bg-[#91040C] transition-all">
+              <svg class="absolute left-1/2 top-1/2 mt-0.5 -translate-x-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none hidden peer-checked:block text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <label for="termsStep1" class="text-xs text-[#D0BA98] leading-5">
+              I agree to the <a href="https://tc.fornowauto.com" class="text-[#91040C] hover:text-[#ff7eff] underline decoration-dotted">Terms of Service</a> and <a href="https://policy.fornowauto.com/" class="text-[#91040C] hover:text-[#ff7eff] underline decoration-dotted">Privacy Policy</a>.
+            </label>
+          </div>
+          <button type="button" id="continueToPaymentBtn" class="w-full bg-gradient-to-r from-[#91040C] to-[#91040C] hover:from-[#7D030A] hover:to-[#7D030A] text-white font-bold py-3.5 rounded-lg shadow-lg hover:shadow-[#91040C]/30 transform hover:-translate-y-0.5 transition-all duration-200 text-lg">Continue</button>
+        </div>
+
+        <!-- STEP 2: Review & Pay -->
+        <div id="step2" class="hidden space-y-5">
+          <button type="button" id="backToStep1Btn" class="flex items-center text-sm text-[#D0BA98] hover:text-white mb-2 transition-colors group">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform"></i> Back to Details
+          </button>
+          <!-- User Review -->
+          <div class="bg-[#23140C] border border-[#D0BA98]/20 rounded-lg p-4 space-y-1">
+            <p class="text-xs text-[#D0BA98] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="user" class="w-3 h-3"></i> Your Details</p>
+            <p id="reviewName" class="text-white font-medium"></p>
+            <p class="text-[#D0BA98] text-sm flex items-center gap-1"><i data-lucide="mail" class="w-3 h-3"></i> <span id="reviewEmailText"></span></p>
+            <p class="text-[#D0BA98] text-sm flex items-center gap-1"><i data-lucide="phone" class="w-3 h-3"></i> <span id="reviewPhoneText"></span></p>
+            <p class="text-[#D0BA98] text-sm flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> <span id="reviewAddress"></span></p>
+          </div>
+          <!-- Order Breakdown -->
+          <div class="bg-[#23140C] border border-[#91040C]/30 rounded-lg p-4">
+            <p class="text-xs text-[#D0BA98] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="receipt" class="w-3 h-3"></i> Subscription Details</p>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between"><span class="text-[#D0BA98]">Plan</span><span id="reviewPlan" class="text-white font-medium"></span></div>
+              <div class="flex justify-between"><span class="text-[#D0BA98]">Billing</span><span id="reviewCycle" class="text-white font-medium"></span></div>
+              <div class="flex justify-between"><span class="text-[#D0BA98]">Auto-Renewal</span><span id="reviewAutopay" class="text-green-400 font-medium flex items-center gap-1"><i data-lucide="refresh-cw" class="w-3 h-3"></i></span></div>
+              <div class="flex justify-between"><span class="text-[#D0BA98]">Next Charge</span><span id="reviewNextCharge" class="text-[#D0BA98] font-medium"></span></div>
+              <div class="h-px bg-[#D0BA98]/15 my-2"></div>
+              <div class="flex justify-between items-center">
+                <span class="text-white font-semibold">Amount to Pay Now</span>
+                <span id="reviewAmount" class="text-white text-2xl font-bold"></span>
+              </div>
+            </div>
+          </div>
+          <!-- Autopay Notice -->
+          <div class="bg-[#23140C] border border-[#D0BA98]/10 rounded-lg p-3 flex items-start gap-3">
+            <i data-lucide="info" class="w-4 h-4 text-[#D0BA98] mt-0.5 flex-shrink-0"></i>
+            <p id="autopayNotice" class="text-xs text-[#D0BA98]/80 leading-relaxed"></p>
+          </div>
+          <!-- Terms -->
+          <div class="flex items-start gap-3 py-1">
+            <div class="relative flex items-start">
+              <input type="checkbox" id="termsStep2" required class="peer h-4 w-4 mt-1 cursor-pointer appearance-none rounded border border-gray-600 bg-[#23140C] checked:border-[#91040C] checked:bg-[#91040C] transition-all">
+              <svg class="absolute left-1/2 top-1/2 mt-0.5 -translate-x-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none hidden peer-checked:block text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <label for="termsStep2" class="text-xs text-[#D0BA98] leading-5">
+              I agree to the <a href="https://tc.fornowauto.com" class="text-[#91040C] hover:text-[#ff7eff] underline decoration-dotted">Terms of Service</a>, <a href="https://policy.fornowauto.com/" class="text-[#91040C] hover:text-[#ff7eff] underline decoration-dotted">Privacy Policy</a>, and authorize recurring charges as described above.
+            </label>
+          </div>
+          <!-- Pay Now -->
+          <button type="button" id="payNowBtn" class="w-full bg-gradient-to-r from-[#91040C] to-[#91040C] hover:from-[#7D030A] hover:to-[#7D030A] text-white font-bold py-3.5 rounded-lg shadow-lg hover:shadow-[#91040C]/30 transform hover:-translate-y-0.5 transition-all duration-200 text-lg flex items-center justify-center gap-2">
+            <i data-lucide="lock" class="w-4 h-4"></i><span id="payBtnText">Pay Now</span>
+          </button>
+          <div class="flex items-center justify-center gap-2 text-xs text-[#D0BA98]/50">
+            <i data-lucide="shield-check" class="w-4 h-4"></i><span>Secured by PayU | 256-bit SSL Encryption</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-[#23140C] mt-auto">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-center">
+        <p class="text-center text-sm text-[#D0BA98]">&copy; 2025-2026 ForNow Automation. All rights reserved. ForNow Automation is an officially affiliated subsidiary of Aixain Digital Solution. Pvt Ltd.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    // ============================================================
+    // PAYU CONFIG
+    // ⚠️ CRITICAL: Move hash generation to server-side for production!
+    // ============================================================
+    const PAYU_CONFIG = {
+      merchantKey: 'Yhu6tq',
+      salt: 'VX17EvwRwBzhwfGFuV94QhLXP0pXWr0L',
+      successUrl: 'success.html',
+      failureUrl: 'free.html?status=failed',
+    };
+
+    // ============================================================
+    // READ PLAN FROM URL
+    // ============================================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedPlan = urlParams.get('plan') || 'free';
+    const selectedCycle = urlParams.get('cycle') || 'monthly';
+    const selectedAmount = parseFloat(urlParams.get('amount')) || 0;
+
+    console.log('[ForNow] Plan:', selectedPlan, '| Cycle:', selectedCycle, '| Amount:', selectedAmount);
+
+    // ============================================================
+    // AUTOPAY / SI CONFIGURATION
+    // Maps billing cycle to PayU Standing Instruction parameters
+    // billingCycle: MONTHLY, billingInterval: how many months between charges
+    // ============================================================
+    function getSIDetails(cycle, amount) {
+      const today = new Date();
+      const startDate = new Date(today);
+      startDate.setDate(startDate.getDate() + 1); // Start from tomorrow
+
+      // End date: 5 years from now (adjust as needed)
+      const endDate = new Date(today);
+      endDate.setFullYear(endDate.getFullYear() + 5);
+
+      function formatDate(d) {
+        return d.getFullYear() + '-' +
+          String(d.getMonth() + 1).padStart(2, '0') + '-' +
+          String(d.getDate()).padStart(2, '0');
+      }
+
+      // PayU SI uses billingCycle + billingInterval
+      // Monthly = MONTHLY, interval 1 → charged every 1 month
+      // Quarterly = MONTHLY, interval 3 → charged every 3 months
+      // Yearly = YEARLY, interval 1 → charged every 1 year
+      let billingCycle, billingInterval, nextChargeDate;
+
+      if (cycle === 'monthly') {
+        billingCycle = 'MONTHLY';
+        billingInterval = 1;
+        nextChargeDate = new Date(today);
+        nextChargeDate.setMonth(nextChargeDate.getMonth() + 1);
+      } else if (cycle === 'quarterly') {
+        billingCycle = 'MONTHLY';
+        billingInterval = 3;
+        nextChargeDate = new Date(today);
+        nextChargeDate.setMonth(nextChargeDate.getMonth() + 3);
+      } else if (cycle === 'yearly') {
+        billingCycle = 'YEARLY';
+        billingInterval = 1;
+        nextChargeDate = new Date(today);
+        nextChargeDate.setFullYear(nextChargeDate.getFullYear() + 1);
+      } else {
+        // Default monthly
+        billingCycle = 'MONTHLY';
+        billingInterval = 1;
+        nextChargeDate = new Date(today);
+        nextChargeDate.setMonth(nextChargeDate.getMonth() + 1);
+      }
+
+      return {
+        siDetails: JSON.stringify({
+          billingAmount: amount.toFixed(2),
+          billingCurrency: 'INR',
+          billingCycle: billingCycle,
+          billingInterval: billingInterval,
+          paymentStartDate: formatDate(startDate),
+          paymentEndDate: formatDate(endDate)
+        }),
+        nextChargeDate: nextChargeDate,
+        billingCycleLabel: cycle === 'monthly' ? 'Every month' :
+                           cycle === 'quarterly' ? 'Every 3 months' :
+                           'Every year'
+      };
+    }
+
+    // ============================================================
+    // POPULATE ORDER SUMMARY
+    // ============================================================
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+    function formatDateDisplay(d) {
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    const orderSummary = document.getElementById('orderSummary');
+    const planBadge = document.getElementById('planBadge');
+    const payBtnTextEl = document.getElementById('payBtnText');
+
+    orderSummary.classList.remove('hidden');
+
+    const planName = capitalize(selectedPlan);
+    document.getElementById('summaryPlan').textContent = planName;
+    planBadge.textContent = planName;
+
+    planBadge.className = 'text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider';
+    if (selectedPlan === 'free') planBadge.classList.add('plan-badge-free');
+    else if (selectedPlan === 'standard') planBadge.classList.add('plan-badge-standard');
+    else planBadge.classList.add('plan-badge-professional');
+
+    document.getElementById('summaryCycle').textContent = capitalize(selectedCycle);
+
+    // Get SI info for display
+    const siInfo = getSIDetails(selectedCycle, selectedAmount);
+
+    if (selectedAmount > 0) {
+      document.getElementById('summaryAmount').textContent = '\u20B9' + selectedAmount.toLocaleString('en-IN');
+      payBtnTextEl.textContent = 'Pay \u20B9' + selectedAmount.toLocaleString('en-IN');
+      document.getElementById('summaryAutopay').innerHTML = '<i data-lucide="refresh-cw" class="w-3 h-3"></i> ' + siInfo.billingCycleLabel;
+    } else {
+      document.getElementById('summaryAmount').textContent = 'FREE';
+      payBtnTextEl.textContent = 'Subscribe Free';
+      document.getElementById('summaryAutopay').textContent = 'N/A';
+      document.getElementById('summaryAutopay').classList.remove('text-green-400');
+      document.getElementById('summaryAutopay').classList.add('text-[#D0BA98]/50');
+    }
+    lucide.createIcons();
+
+    if (urlParams.get('status') === 'failed') {
+      setTimeout(() => alert('Payment failed. Please try again.'), 500);
+    }
+
+    // ============================================================
+    // STEP NAVIGATION
+    // ============================================================
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+
+    function activateStep2() {
+      document.getElementById('stepCircle2').classList.remove('border-[#D0BA98]/30','text-[#D0BA98]');
+      document.getElementById('stepCircle2').classList.add('bg-[#91040C]','text-white','border-[#91040C]');
+      document.getElementById('stepLabel2').classList.remove('text-[#D0BA98]/50');
+      document.getElementById('stepLabel2').classList.add('text-white');
+      document.getElementById('stepLine').classList.remove('bg-[#D0BA98]/30');
+      document.getElementById('stepLine').classList.add('bg-[#91040C]');
+    }
+    function deactivateStep2() {
+      document.getElementById('stepCircle2').classList.add('border-[#D0BA98]/30','text-[#D0BA98]');
+      document.getElementById('stepCircle2').classList.remove('bg-[#91040C]','text-white','border-[#91040C]');
+      document.getElementById('stepLabel2').classList.add('text-[#D0BA98]/50');
+      document.getElementById('stepLabel2').classList.remove('text-white');
+      document.getElementById('stepLine').classList.add('bg-[#D0BA98]/30');
+      document.getElementById('stepLine').classList.remove('bg-[#91040C]');
+    }
+
+    document.getElementById('continueToPaymentBtn').addEventListener('click', function () {
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const address1 = document.getElementById('address1').value.trim();
+      const pinCode = document.getElementById('pinCode').value.trim();
+      const email = document.getElementById('emailAddress').value.trim();
+      const mobile = document.getElementById('mobileNumber').value.trim();
+      const cityState = document.getElementById('cityState').value;
+
+      if (!firstName || !lastName) { alert('Please enter your full name.'); return; }
+      if (!address1) { alert('Please enter your address.'); return; }
+      if (!pinCode || pinCode.length < 6) { alert('Please enter a valid 6-digit PIN code.'); return; }
+      if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
+      if (!mobile || mobile.length < 10) { alert('Please enter a valid 10-digit mobile number.'); return; }
+      if (!document.getElementById('termsStep1').checked) { alert('Please agree to the Terms of Service and Privacy Policy.'); return; }
+
+      if (selectedPlan === 'free' && selectedAmount === 0) {
+        window.location.href = 'success.html?plan=free&cycle=' + selectedCycle + '&status=success';
+        return;
+      }
+
+      // Populate review
+      document.getElementById('reviewName').textContent = firstName + ' ' + lastName;
+      document.getElementById('reviewEmailText').textContent = email;
+      document.getElementById('reviewPhoneText').textContent = '+91 ' + mobile;
+      document.getElementById('reviewAddress').textContent = address1 + ', ' + cityState + ' - ' + pinCode;
+      document.getElementById('reviewPlan').textContent = planName;
+      document.getElementById('reviewCycle').textContent = siInfo.billingCycleLabel;
+      document.getElementById('reviewAutopay').innerHTML = '<i data-lucide="refresh-cw" class="w-3 h-3"></i> Auto-renews ' + siInfo.billingCycleLabel.toLowerCase();
+      document.getElementById('reviewNextCharge').textContent = formatDateDisplay(siInfo.nextChargeDate);
+      document.getElementById('reviewAmount').textContent = '\u20B9' + selectedAmount.toLocaleString('en-IN');
+
+      // Autopay notice text
+      const cycleText = selectedCycle === 'monthly' ? 'month' : selectedCycle === 'quarterly' ? '3 months' : 'year';
+      document.getElementById('autopayNotice').textContent =
+        'By proceeding, you authorize ForNow Automation to automatically charge \u20B9' +
+        selectedAmount.toLocaleString('en-IN') + ' every ' + cycleText +
+        ' to your payment method. Your next charge will be on ' +
+        formatDateDisplay(siInfo.nextChargeDate) +
+        '. You can cancel anytime from your dashboard.';
+
+      step1.classList.add('hidden');
+      step2.classList.remove('hidden');
+      step2.classList.remove('animate-fade-up');
+      void step2.offsetWidth;
+      step2.classList.add('animate-fade-up');
+      activateStep2();
+      lucide.createIcons();
+      document.getElementById('signupContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.getElementById('backToStep1Btn').addEventListener('click', function () {
+      step2.classList.add('hidden');
+      step1.classList.remove('hidden');
+      step1.classList.remove('animate-fade-up');
+      void step1.offsetWidth;
+      step1.classList.add('animate-fade-up');
+      deactivateStep2();
+    });
+
+    // ============================================================
+    // PAYU BOLT PAYMENT WITH STANDING INSTRUCTIONS (SI)
+    // ============================================================
+    function generateTxnId() {
+      return 'TXN' + Date.now() + Math.random().toString(36).substr(2, 6).toUpperCase();
+    }
+
+    // SI Hash formula (different from normal payment!):
+    // SHA512(key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||si_details|SALT)
+    function generateSIHash(key, txnid, amount, productinfo, firstname, email, siDetailsStr, salt) {
+      const hashString = key + '|' + txnid + '|' + amount + '|' + productinfo + '|' + firstname + '|' + email + '|||||||||||' + siDetailsStr + '|' + salt;
+      console.log('[ForNow] SI Hash string:', hashString);
+      return sha512(hashString);
+    }
+
+    document.getElementById('payNowBtn').addEventListener('click', function () {
+      if (!document.getElementById('termsStep2').checked) {
+        alert('Please agree to the Terms, Privacy Policy, and authorize recurring charges.');
+        return;
+      }
+
+      if (selectedPlan === 'free' && selectedAmount === 0) {
+        window.location.href = 'success.html?plan=free&cycle=' + selectedCycle + '&status=success';
+        return;
+      }
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const email = document.getElementById('emailAddress').value.trim();
+      const mobile = document.getElementById('mobileNumber').value.trim();
+      const txnid = generateTxnId();
+      const amount = selectedAmount.toFixed(2);
+      const productinfo = selectedPlan.toUpperCase() + ' Plan - ' + capitalize(selectedCycle);
+
+      // Get SI details JSON string
+      const siDetailsStr = siInfo.siDetails;
+
+      // Generate SI-specific hash
+      const hash = generateSIHash(
+        PAYU_CONFIG.merchantKey, txnid, amount, productinfo, firstName, email, siDetailsStr, PAYU_CONFIG.salt
+      );
+
+      // PayU payment data WITH Standing Instructions
+      const paymentData = {
+        key: PAYU_CONFIG.merchantKey,
+        txnid: txnid,
+        hash: hash,
+        amount: amount,
+        firstname: firstName,
+        email: email,
+        phone: mobile,
+        productinfo: productinfo,
+        surl: window.location.origin + '/' + PAYU_CONFIG.successUrl + '?plan=' + selectedPlan + '&cycle=' + selectedCycle + '&txnid=' + txnid + '&amount=' + amount + '&status=success',
+        furl: window.location.origin + '/' + PAYU_CONFIG.failureUrl,
+        // ── STANDING INSTRUCTIONS (AUTOPAY) PARAMS ──
+        si: '1',                    // Enable SI registration
+        si_details: siDetailsStr,   // Billing cycle, amount, dates
+        api_version: '7',           // Required for SI
+      };
+
+      console.log('[ForNow] Payment data:', paymentData);
+      console.log('[ForNow] SI Details:', siDetailsStr);
+
+      const payBtn = this;
+      payBtn.disabled = true;
+      payBtnTextEl.innerHTML = '<svg class="w-5 h-5 animate-spin inline-block mr-2" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="30 70" stroke-linecap="round"/></svg> Launching PayU...';
+
+      try {
+        if (typeof bolt !== 'undefined') {
+          bolt.launch(paymentData, {
+            responseHandler: function (response) {
+              payBtn.disabled = false;
+              console.log('[ForNow] PayU Response:', response);
+              if (response.response.txnStatus === 'SUCCESS') {
+                window.location.href = PAYU_CONFIG.successUrl +
+                  '?plan=' + selectedPlan +
+                  '&cycle=' + selectedCycle +
+                  '&txnid=' + response.response.txnid +
+                  '&amount=' + amount +
+                  '&autopay=true' +
+                  '&status=success';
+              } else {
+                payBtnTextEl.textContent = 'Pay \u20B9' + selectedAmount.toLocaleString('en-IN');
+                alert('Payment ' + (response.response.txnStatus || 'failed') + '. Please try again.');
+              }
+            },
+            catchException: function (response) {
+              payBtn.disabled = false;
+              payBtnTextEl.textContent = 'Pay \u20B9' + selectedAmount.toLocaleString('en-IN');
+              alert('Payment could not be processed. Error: ' + (response.message || 'Unknown error'));
+            }
+          });
+        } else {
+          payBtn.disabled = false;
+          payBtnTextEl.textContent = 'Pay \u20B9' + selectedAmount.toLocaleString('en-IN');
+          alert('Payment gateway is loading. Please try again in a moment.');
+        }
+      } catch (e) {
+        payBtn.disabled = false;
+        payBtnTextEl.textContent = 'Pay \u20B9' + selectedAmount.toLocaleString('en-IN');
+        alert('Error initiating payment: ' + e.message);
+      }
+    });
+
+    // ============================================================
+    // MOBILE MENU
+    // ============================================================
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+    const closeMenuBtn = document.getElementById('close-menu-btn');
+    function toggleMenu() {
+      const isHidden = mobileMenu.classList.contains('hidden');
+      if (isHidden) {
+        mobileMenu.classList.remove('hidden'); mobileMenuOverlay.classList.remove('hidden');
+        setTimeout(() => { mobileMenu.classList.remove('translate-x-full'); mobileMenuOverlay.classList.remove('opacity-0'); }, 10);
+      } else {
+        mobileMenu.classList.add('translate-x-full'); mobileMenuOverlay.classList.add('opacity-0');
+        setTimeout(() => { mobileMenu.classList.add('hidden'); mobileMenuOverlay.classList.add('hidden'); }, 300);
+      }
+    }
+    if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleMenu);
+    if (closeMenuBtn) closeMenuBtn.addEventListener('click', toggleMenu);
+    if (mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', toggleMenu);
+  </script>
+</body>
+</html>

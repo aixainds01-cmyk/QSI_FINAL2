@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>QSI Pricing</title>
+</head>
+
+<body class="bg-gray-50">
+ <section class="text-center py-12 bg-blue-600 text-white">
+        <h1 class="text-4xl font-bold">QSI Pricing Plans</h1>
+        <p class="mt-2 text-lg opacity-90">The perfect balance of features and affordability</p>
+    </section>
+    <!-- Toggle Section -->
+    <div class="flex justify-center items-center mt-8 space-x-4">
+        <span id="monthlyLabel" class="font-medium text-gray-700">Monthly</span>
+
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="toggleBilling" class="sr-only peer">
+            <div class="w-16 h-8 bg-gray-300 rounded-full peer-checked:bg-blue-600 transition-all duration-300">
+                <div class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow 
+                            transition-all duration-300 peer-checked:translate-x-8"></div>
+            </div>
+        </label>
+
+        <span id="yearlyLabel" class="font-medium text-gray-700">
+            Yearly <span class="text-green-600">(Save 20%)</span>
+        </span>
+    </div>
+
+    <!-- Pricing Cards -->
+    <section class="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- FREE PLAN -->
+        <div id="freeCard" 
+            class="pricing-card bg-white shadow-md rounded-xl p-6 border 
+                   hover:shadow-lg transition cursor-pointer">
+            <h2 class="text-center text-lg font-semibold text-gray-700">FREE</h2>
+            <p class="mt-4 text-center text-4xl font-bold text-gray-900" id="priceFree">₹0</p>
+            <p class="text-center text-gray-600" id="priceFreeText">Per Month</p>
+            <ul class="mt-6 space-y-3 text-gray-700">
+                <li>✔ Create & manage invoices (20/month)</li>
+                <li>✔ Basic customer & vendor management</li>
+                <li>✔ Simple product/service catalog</li>
+                <li>✔ Email support</li>
+                <li>✔ Dashboard overview</li>
+            </ul>
+            <button class="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                <a href="trail_package/QSI.html">Get Started</a>
+                 Start Free Trial
+            </button>
+        </div>
+
+        <!-- STANDARD PLAN -->
+        <div id="standardCard"
+            class="pricing-card bg-white shadow-md rounded-xl p-6 border 
+                   hover:shadow-lg transition cursor-pointer">
+            <h2 class="text-center text-lg font-semibold text-blue-600">STANDARD</h2>
+            <p class="mt-4 text-center text-4xl font-bold text-gray-900" id="priceStandard">₹499</p>
+            <p class="text-center text-gray-600" id="priceStandardText">Per Month</p>
+            <ul class="mt-6 space-y-3 text-gray-700">
+                <li>✔ Everything in Free</li>
+                <li>✔ Unlimited invoices & quotations</li>
+                <li>✔ Expense tracking</li>
+                <li>✔ Basic inventory</li>
+                <li>✔ Multi-user access (3 users)</li>
+                <li>✔ Payment reminders</li>
+                <li>✔ PDF customization</li>
+                <li>✔ Priority email support</li>
+            </ul>
+            <button class="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                <a href="elite_package/dashboard_with_login.html">Get Started</a>
+                Start Standard Trial
+            </button>
+        </div>
+
+        <!-- PRO PLAN -->
+        <div id="proCard"
+            class="pricing-card bg-white shadow-md rounded-xl p-6 border 
+                   hover:shadow-lg transition cursor-pointer">
+            <h2 class="text-center text-lg font-semibold text-gray-700">PROFESSIONAL</h2>
+            <p class="mt-4 text-center text-4xl font-bold text-gray-900" id="pricePro">₹999</p>
+            <p class="text-center text-gray-600" id="priceProText">Per Month</p>
+            <ul class="mt-6 space-y-3 text-gray-700">
+                <li>✔ Everything in Standard</li>
+                <li>✔ Advanced inventory management</li>
+                <li>✔ Purchase orders & vendor billing</li>
+                <li>✔ Project & job costing</li>
+                <li>✔ Recurring invoices & auto-billing</li>
+                <li>✔ User roles & permissions</li>
+                <li>✔ Financial & business reports</li>
+                <li>✔ Email + phone support</li>
+            </ul>
+            <button class="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                <a href="pro_package/dashboard_with_login.html">Get Started</a>
+                Start Professional Trial
+            </button>
+        </div>
+
+    </section>
+
+    <!-- Script -->
+    <script>
+        const toggle = document.getElementById('toggleBilling');
+
+        const cards = {
+            free: document.getElementById("freeCard"),
+            standard: document.getElementById("standardCard"),
+            pro: document.getElementById("proCard")
+        };
+
+        // 🔵 Highlight selected card
+        function selectCard(card) {
+            Object.values(cards).forEach(c => {
+                c.classList.remove("border-blue-600", "border-2", "shadow-xl");
+            });
+
+            card.classList.add("border-blue-600", "border-2", "shadow-xl");
+        }
+
+        // default selected
+        selectCard(cards.standard);
+
+        // click events
+        cards.free.onclick = () => selectCard(cards.free);
+        cards.standard.onclick = () => selectCard(cards.standard);
+        cards.pro.onclick = () => selectCard(cards.pro);
+
+        // Toggle monthly/yearly prices
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                // yearly
+                document.getElementById("priceFree").innerText = "₹0";
+                document.getElementById("priceFreeText").innerText = "Per Year";
+
+                document.getElementById("priceStandard").innerText = "₹4,999";
+                document.getElementById("priceStandardText").innerText = "Per Year";
+
+                document.getElementById("pricePro").innerText = "₹9,999";
+                document.getElementById("priceProText").innerText = "Per Year";
+            } else {
+                // monthly
+                document.getElementById("priceFree").innerText = "₹0";
+                document.getElementById("priceFreeText").innerText = "Per Month";
+
+                document.getElementById("priceStandard").innerText = "₹499";
+                document.getElementById("priceStandardText").innerText = "Per Month";
+
+                document.getElementById("pricePro").innerText = "₹999";
+                document.getElementById("priceProText").innerText = "Per Month";
+            }
+        });
+    </script>
+
+</body>
+</html>

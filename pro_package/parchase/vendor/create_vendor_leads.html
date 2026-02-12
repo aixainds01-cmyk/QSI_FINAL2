@@ -258,47 +258,90 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="../../dashboard_with_login.html" class="sidebar-link">
-                <i class="fas fa-th-large"></i><span>Dashboard</span>
-            </a>
+        <!-- Dashboard -->
+        <a href="../../dashboard_with_login.html" class="sidebar-link" data-page="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
 
-            <div class="sidebar-section-title">Sales Documents</div>
-            <a href="../../quotation/home_quotation.html" class="sidebar-link">
-                <i class="fas fa-file-alt"></i><span>Quotations</span>
-            </a>
-            <a href="../../saleorder/home_sales_order.html" class="sidebar-link">
-                <i class="fas fa-shopping-cart"></i><span>Sales Orders</span>
-            </a>
-            <a href="../../invoice/home_invoice.html" class="sidebar-link">
-                <i class="fas fa-file-invoice"></i><span>Invoices</span>
-            </a>
-            <a href="../../receipt/home_receipt.html" class="sidebar-link">
-                <i class="fas fa-receipt"></i><span>Receipts</span>
-            </a>
+        <!-- Sales Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">SALES DOCUMENTS</div>
+        </div>
 
-            <div class="sidebar-section-title">Purchase Documents</div>
-            <a href="vendors_leads.html" class="sidebar-link active">
-                <i class="fas fa-store"></i><span>Vendors</span>
-            </a>
-            <a href="../parchase_order/home_purchase_orders.html" class="sidebar-link">
-                <i class="fas fa-file-invoice-dollar"></i><span>Purchase Orders</span>
-            </a>
-            <a href="../bill.html" class="sidebar-link">
-                <i class="fas fa-file-invoice"></i><span>Bills</span>
-            </a>
+        <a href="../../sales/quotation/home_quotation.html" class="sidebar-link" data-page="quotation">
+            <i class="fas fa-file-alt"></i>
+            <span>Quotations</span>
+        </a>
 
-            <div class="sidebar-section-title">Management</div>
-            <a href="../../manage-clients.html" class="sidebar-link">
-                <i class="fas fa-users"></i><span>Clients</span>
-            </a>
-            <a href="../../item_management.html" class="sidebar-link">
-                <i class="fas fa-cube"></i><span>Items</span>
-            </a>
-            <a href="../../settings.html" class="sidebar-link">
-                <i class="fas fa-cog"></i><span>Settings</span>
-            </a>
-        </nav>
+        <a href="../../sales/saleorder/home_sales_order.html" class="sidebar-link" data-page="salesorder">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Sales Orders</span>
+        </a>
 
+        <a href="../../sales/invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
+            <i class="fas fa-file-invoice"></i>
+            <span>Invoices</span>
+        </a>
+        <a href="../../sales/receipt.html" class="sidebar-link" data-page="receipt">
+            <i class="fas fa-receipt"></i>
+            <span>Receipts</span>
+        </a>
+        <a href="../../sales/credit_note.html" class="sidebar-link" data-page="creditnote">
+            <i class="fas fa-receipt"></i>
+            <span>Credit Notes</span>
+        </a>
+
+        <!-- Purchase Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">PURCHASE DOCUMENTS</div>
+        </div>
+
+        <a href="vendors_leads.html" class="sidebar-link" data-page="vendor">
+            <i class="fas fa-store"></i>
+            <span>Vendors</span>
+        </a>
+
+        <a href="../parchase_order/home_purchase_orders.html" class="sidebar-link" data-page="purchaseorder">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Purchase Orders</span>
+        </a>
+
+        <a href="../bill.html" class="sidebar-link" data-page="bills">
+            <i class="fas fa-file-invoice"></i>
+            <span>Bills</span>
+        </a>
+
+        <a href="../debit notes/debit_notes.html" class="sidebar-link" data-page="debitnote">
+            <i class="fas fa-sticky-note"></i>
+            <span>Debit Notes</span>
+        </a>
+
+        <!-- Other Sections -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">MANAGEMENT</div>
+        </div>
+
+      
+
+        <a href="../../management/manage-clients.html" class="sidebar-link" data-page="client">
+            <i class="fas fa-users"></i>
+            <span>Clients</span>
+        </a>
+
+        <a href="../../management/item_management.html" class="sidebar-link" data-page="items">
+            <i class="fas fa-cube"></i>
+            <span>Items</span>
+        </a>
+ <a href="../../management/report.html" class="sidebar-link" data-page="report">
+            <i class="fas fa-receipt"></i>
+            <span>Report</span>
+        </a>
+        <a href="../../management/settings.html" class="sidebar-link" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
         <div class="sidebar-footer">
             <div class="user-profile">
                 <div class="user-avatar"><i class="fas fa-user"></i></div>

@@ -7,10 +7,10 @@
   <title>Settings - QSI</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="../js/qsi-styles.css">
-  <link rel="stylesheet" href="../js/fix-icons.css">
-  <link rel="stylesheet" href="../js/theme-force.css">
-    <link rel="stylesheet" href="../js/professional-sidebar.css">
+  <link rel="stylesheet" href="../../js/qsi-styles.css">
+  <link rel="stylesheet" href="../../js/fix-icons.css">
+  <link rel="stylesheet" href="../../js/theme-force.css">
+    <link rel="stylesheet" href="../../js/professional-sidebar.css">
   <style>
     .settings-container {
       max-width: 900px;
@@ -408,7 +408,7 @@
       display: none;
     }
   </style>
-    <link rel="stylesheet" href="../js/fix-icons.css">
+    <link rel="stylesheet" href="../../js/fix-icons.css">
 </head>
 
 <body class="theme-light">
@@ -441,7 +441,7 @@
     <!-- Navigation Menu -->
     <nav class="sidebar-nav">
         <!-- Dashboard -->
-        <a href="dashboard_with_login.html" class="sidebar-link" data-page="dashboard">
+        <a href="../dashboard_with_login.html" class="sidebar-link" data-page="dashboard">
             <i class="fas fa-th-large"></i>
             <span>Dashboard</span>
         </a>
@@ -451,25 +451,22 @@
             <div class="sidebar-section-title">SALES DOCUMENTS</div>
         </div>
 
-        <a href="quotation/home_quotation.html" class="sidebar-link" data-page="quotation">
+        <a href="../sales/quotation/home_quotation.html" class="sidebar-link" data-page="quotation">
             <i class="fas fa-file-alt"></i>
             <span>Quotations</span>
         </a>
 
-        <a href="saleorder/home_sales_order.html" class="sidebar-link" data-page="salesorder">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Sales Orders</span>
-        </a>
+        
 
-        <a href="invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
+        <a href="../sales/invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
             <i class="fas fa-file-invoice"></i>
             <span>Invoices</span>
         </a>
-         <a href="receipt.html" class="sidebar-link active" data-page="receipt">
+         <a href="../sales/receipt.html" class="sidebar-link active" data-page="receipt">
                     <i class="fas fa-chart-bar"></i>
                     <span>Receipts</span>
                 </a>
-        <a href="credit_note.html" class="sidebar-link" data-page="creditnote">
+        <a href="../sales/credit_note.html" class="sidebar-link" data-page="creditnote">
             <i class="fas fa-receipt"></i>
             <span>Credit Notes</span>
         </a>
@@ -479,22 +476,22 @@
             <div class="sidebar-section-title">PURCHASE DOCUMENTS</div>
         </div>
 
-        <a href="parchase/vendor/vendors_leads.html" class="sidebar-link" data-page="vendor">
+        <a href="../parchase/vendor/vendors_leads.html" class="sidebar-link" data-page="vendor">
             <i class="fas fa-store"></i>
             <span>Vendors</span>
         </a>
 
-        <a href="parchase/parchase_order/home_purchase_orders.html" class="sidebar-link" data-page="purchaseorder">
+        <a href="../parchase/parchase_order/home_purchase_orders.html" class="sidebar-link" data-page="purchaseorder">
             <i class="fas fa-file-invoice-dollar"></i>
             <span>Purchase Orders</span>
         </a>
 
-        <a href="parchase/bill.html" class="sidebar-link" data-page="bills">
+        <a href="../parchase/bill.html" class="sidebar-link" data-page="bills">
             <i class="fas fa-file-invoice"></i>
             <span>Bills</span>
         </a>
 
-        <a href="parchase/debit notes/debit_notes.html" class="sidebar-link" data-page="debitnote">
+        <a href="../parchase/debit notes/debit_notes.html" class="sidebar-link" data-page="debitnote">
             <i class="fas fa-sticky-note"></i>
             <span>Debit Notes</span>
         </a>
@@ -643,7 +640,7 @@
             sessionStorage.clear();
 
             // Redirect to login
-            window.location.href = '../index.html';
+            window.location.href = '../../index.html';
         }
     };
 })();
@@ -1326,7 +1323,7 @@
             const res = await fetch(`${API_BASE}/register/schedule-deletion/${getUserId()}`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } });
             if (!res.ok) throw new Error('Failed');
             showToast('Account scheduled for deletion');
-            setTimeout(() => { localStorage.clear(); window.location.href = 'index.html'; }, 2000);
+            setTimeout(() => { localStorage.clear(); window.location.href = '../../index.html'; }, 2000);
           } else {
             const res = await fetch(`${API_BASE}/banks/${deleteTarget}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
             if (!res.ok) throw new Error('Failed');

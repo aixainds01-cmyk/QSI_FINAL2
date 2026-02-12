@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QSI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="../js/qsi-styles.css">
+    <link rel="stylesheet" href="../js/fix-icons.css">
+    <link rel="stylesheet" href="../js/theme-force.css">
+    <link rel="stylesheet" href="../js/professional-sidebar.css">
+    <!-- Global Theme Manager -->
+    <script src="../js/theme-manager.js"></script>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-400">Loading...</p>
+        </div>
+    </div>
+
+    <div id="main-app" class="flex min-h-screen hidden">
+        <!-- Mobile Header -->
+       
+
+        <!-- BACKDROP for mobile -->
+        <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden md:hidden z-40"></div>
+
+        <!-- SIDEBAR -->
+        <!-- UNIFIED PROFESSIONAL SIDEBAR - QSI Application -->
+<aside id="sidebar" class="sidebar">
+    <!-- Logo Section -->
+    <div class="sidebar-logo">
+        <h1 class="logo-text">QSI</h1>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="sidebar-search">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Search..." class="search-input" id="sidebarSearch">
+        </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+        <!-- Dashboard -->
+        <a href="dashboard_with_login.html" class="sidebar-link" data-page="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <!-- Sales Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">SALES DOCUMENTS</div>
+        </div>
+
+        <a href="sales/quotation/home_quotation.html" class="sidebar-link" data-page="quotation">
+            <i class="fas fa-file-alt"></i>
+            <span>Quotations</span>
+        </a>
+
+        <a href="sales/saleorder/home_sales_order.html" class="sidebar-link" data-page="salesorder">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Sales Orders</span>
+        </a>
+
+        <a href="sales/invoice/home_invoice.html" class="sidebar-link" data-page="invoice">
+            <i class="fas fa-file-invoice"></i>
+            <span>Invoices</span>
+        </a>
+         <a href="sales/receipt.html" class="sidebar-link" data-page="receipt">
+            <i class="fas fa-receipt"></i>
+            <span>Receipts</span>
+        </a>
+
+        </a>
+        <a href="sales/credit_note.html" class="sidebar-link" data-page="creditnote">
+            <i class="fas fa-receipt"></i>
+            <span>Credit Notes</span>
+        </a>
+
+        <!-- Purchase Documents -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">PURCHASE DOCUMENTS</div>
+        </div>
+
+        <a href="parchase/vendor/vendors_leads.html" class="sidebar-link" data-page="vendor">
+            <i class="fas fa-store"></i>
+            <span>Vendors</span>
+        </a>
+
+        <a href="parchase/parchase_order/home_purchase_orders.html" class="sidebar-link" data-page="purchaseorder">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Purchase Orders</span>
+        </a>
+
+        <a href="parchase/bill.html" class="sidebar-link" data-page="bills">
+            <i class="fas fa-file-invoice"></i>
+            <span>Bills</span>
+        </a>
+
+        <a href="parchase/debit notes/debit_notes.html" class="sidebar-link" data-page="debitnote">
+            <i class="fas fa-sticky-note"></i>
+            <span>Debit Notes</span>
+        </a>
+
+        <!-- Other Sections -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">MANAGEMENT</div>
+        </div>
+
+       
+
+        <a href="manage-clients.html" class="sidebar-link" data-page="client">
+            <i class="fas fa-users"></i>
+            <span>Clients</span>
+        </a>
+
+        <a href="management/item_management.html" class="sidebar-link" data-page="items">
+            <i class="fas fa-cube"></i>
+            <span>Items</span>
+        </a>
+        <a href="management/report.html" class="sidebar-link" data-page="report">
+            <i class="fas fa-receipt"></i>
+            <span>Report</span>
+        </a>
+
+        <a href="management/settings.html" class="sidebar-link" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <!-- User Profile Section -->
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">User</div>
+                <div class="user-email" id="sidebarUserEmail">user@qsi.com</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<!-- Sidebar Toggle Button (Mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Mobile Backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<script>
+// Sidebar functionality
+(function() {
+    'use strict';
+
+    // Set active link based on current page
+    function setActiveLink() {
+        const currentPath = window.location.pathname;
+        const links = document.querySelectorAll('.sidebar-link');
+
+        links.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+
+            // Check if current page matches link
+            if (href && (currentPath.includes(href.replace('../', '')) || currentPath.includes(href))) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // Mobile sidebar toggle
+    function initMobileToggle() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (!sidebar || !toggle || !backdrop) return;
+
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+            backdrop.classList.toggle('backdrop-active');
+            document.body.classList.toggle('sidebar-mobile-open');
+        });
+
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('sidebar-open');
+            backdrop.classList.remove('backdrop-active');
+            document.body.classList.remove('sidebar-mobile-open');
+        });
+    }
+
+    // Search functionality
+    function initSearch() {
+        const searchInput = document.getElementById('sidebarSearch');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const links = document.querySelectorAll('.sidebar-link');
+
+            links.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                const parent = link.closest('.sidebar-nav');
+
+                if (text.includes(query) || query === '') {
+                    link.style.display = 'flex';
+                } else {
+                    link.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Load user info
+    function loadUserInfo() {
+        const userNameEl = document.getElementById('sidebarUserName');
+        const userEmailEl = document.getElementById('sidebarUserEmail');
+
+        // Get from localStorage or session
+        const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || 'User';
+        const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || 'user@qsi.com';
+
+        if (userNameEl) userNameEl.textContent = userName;
+        if (userEmailEl) userEmailEl.textContent = userEmail;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        setActiveLink();
+        initMobileToggle();
+        initSearch();
+        loadUserInfo();
+    });
+
+    // Handle logout
+    window.handleLogout = function() {
+        if (confirm('Are you sure you want to logout?')) {
+            // Clear session data
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // Redirect to login
+            window.location.href = '../index.html';
+        }
+    };
+})();
+</script>
+
+
+        <!-- Main Content -->
+        <div id="main-content" class="flex-1 overflow-y-auto">
+            <main class="p-6">
+                <!-- Top Row: Receivables & Payables -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Total Receivables -->
+                    <div class="dashboard-card p-5">
+                        <h2 class="text-lg font-semibold text-white mb-4">Total Receivables</h2>
+                        <p class="text-sm text-gray-400 mb-3">Total Unpaid Invoices <span id="total-unpaid-invoices" class="text-white">₹0.00</span></p>
+                        
+                        <div class="progress-bar-bg mb-4">
+                            <div id="receivables-progress" class="progress-bar-fill progress-green" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-xs text-green-400 mb-1">Current</p>
+                                <p id="receivables-current" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-orange-400 mb-1 flex items-center justify-end gap-1">
+                                    Overdue <i class="fas fa-chevron-down text-[10px]"></i>
+                                </p>
+                                <p id="receivables-overdue" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Payables -->
+                    <div class="dashboard-card p-5">
+                        <h2 class="text-lg font-semibold text-white mb-4">Total Payables</h2>
+                        <p class="text-sm text-gray-400 mb-3">Total Unpaid Bills <span id="total-unpaid-bills" class="text-white">₹0.00</span></p>
+                        
+                        <div class="progress-bar-bg mb-4">
+                            <div id="payables-progress" class="progress-bar-fill progress-orange" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-xs text-green-400 mb-1">Current</p>
+                                <p id="payables-current" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-orange-400 mb-1 flex items-center justify-end gap-1">
+                                    Overdue <i class="fas fa-chevron-down text-[10px]"></i>
+                                </p>
+                                <p id="payables-overdue" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cash Flow Chart -->
+                <div class="chart-container p-5 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-white">Cash Flow</h2>
+                        <span class="fiscal-badge flex items-center gap-1">
+                            This Fiscal Year <i class="fas fa-info-circle text-gray-500"></i>
+                        </span>
+                    </div>
+                    
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <div class="flex-1" style="min-height: 250px;">
+                            <canvas id="cashFlowChart"></canvas>
+                        </div>
+                        <div class="lg:w-48 space-y-4">
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Cash as on <span id="cash-start-date">01/04/2025</span></p>
+                                <p id="cash-start" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-green-400 mb-1">Incoming</p>
+                                <p id="cash-incoming" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-orange-400 mb-1">Outgoing</p>
+                                <p id="cash-outgoing" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Cash as on <span id="cash-end-date">31/03/2026</span></p>
+                                <p id="cash-end" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row: Income & Expense + Top Expenses -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Income & Expense -->
+                    <div class="chart-container p-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-white">Income & Expense</h2>
+                            <span class="fiscal-badge flex items-center gap-1">
+                                This Fiscal Year <span class="text-xs text-gray-500 ml-1">Accrual</span> <i class="fas fa-info-circle text-gray-500"></i>
+                            </span>
+                        </div>
+                        
+                        <div style="min-height: 220px;">
+                            <canvas id="incomeExpenseChart"></canvas>
+                        </div>
+                        
+                        <div class="flex justify-between mt-4 pt-4 border-t border-[#2d3a5c]">
+                            <div>
+                                <p class="text-xs text-green-400 mb-1">Total Income</p>
+                                <p id="total-income" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-red-400 mb-1">Total Expense</p>
+                                <p id="total-expense" class="text-xl font-bold text-white">₹0.00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Expenses -->
+                    <div class="chart-container p-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-white">Top Expenses</h2>
+                            <span class="fiscal-badge flex items-center gap-1">
+                                This Fiscal Year <i class="fas fa-info-circle text-gray-500"></i>
+                            </span>
+                        </div>
+                        
+                        <div id="top-expenses-container" class="flex items-center justify-center" style="min-height: 220px;">
+                            <div class="text-center text-gray-500">
+                                <i class="fas fa-receipt text-4xl mb-3 opacity-50"></i>
+                                <p>No Expense recorded for this fiscal year</p>
+                            </div>
+                        </div>
+                        
+                        <div id="top-expenses-list" class="hidden space-y-3">
+                            <!-- Expenses will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Row -->
+                <div class="mt-6">
+                    <h2 class="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <a href="invoice/create_invoice.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
+                            <i class="fas fa-plus-circle text-2xl text-blue-400 mb-2"></i>
+                            <p class="text-sm text-gray-300">New Invoice</p>
+                        </a>
+                        <a href="quotation/create_quotation.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
+                            <i class="fas fa-file-alt text-2xl text-green-400 mb-2"></i>
+                            <p class="text-sm text-gray-300">New Quote</p>
+                        </a>
+                        <a href="invoice/payment_receipt.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
+                            <i class="fas fa-hand-holding-usd text-2xl text-emerald-400 mb-2"></i>
+                            <p class="text-sm text-gray-300">Record Payment</p>
+                        </a>
+                        <a href="parchase/parchase_order/home_purchase_orders.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
+                            <i class="fas fa-shopping-bag text-2xl text-yellow-400 mb-2"></i>
+                            <p class="text-sm text-gray-300">New PO</p>
+                        </a>
+                        <a href="parchase/home_bills.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
+                            <i class="fas fa-file-invoice-dollar text-2xl text-orange-400 mb-2"></i>
+                            <p class="text-sm text-gray-300">New Bill</p>
+                        </a>
+                        <a href="manage-clients.html" class="dashboard-card p-4 text-center hover:bg-[#2d3a5c] transition-colors">
+                            <i class="fas fa-user-plus text-2xl text-purple-400 mb-2"></i>
+                            <p class="text-sm text-gray-300">Add Customer</p>
+                        </a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div id="logout-modal" class="fixed hidden z-50 bg-[#1e2a4a] rounded-lg shadow-xl border border-[#2d3a5c] p-4" style="bottom: 70px; left: 16px; width: 220px;">
+        <div class="flex items-center gap-3 mb-3 pb-3 border-b border-[#2d3a5c]">
+            <img id="modal-avatar" src="https://placehold.co/40x40/3b82f6/ffffff?text=U" class="w-10 h-10 rounded-full" alt="User">
+            <div class="flex-1 min-w-0">
+                <p id="modal-name" class="text-sm font-medium text-white truncate">User</p>
+                <p id="modal-email" class="text-xs text-gray-400 truncate">user@email.com</p>
+            </div>
+        </div>
+        <button id="logout-btn" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors">
+            <i class="fas fa-sign-out-alt mr-2"></i>Log out
+        </button>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-60">
+        <div class="bg-[#1e2a4a] rounded-lg shadow-xl border border-[#2d3a5c] max-w-sm w-full p-6 mx-4">
+            <h3 class="text-lg font-semibold text-white mb-2">Confirm Sign Out</h3>
+            <p class="text-sm text-gray-400 mb-4">Are you sure you want to log out?</p>
+            <div class="flex justify-end gap-3">
+                <button id="confirm-cancel" class="px-4 py-2 bg-[#2d3a5c] hover:bg-[#3d4a6c] text-white rounded-md text-sm transition-colors">Cancel</button>
+                <button id="confirm-ok" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm transition-colors">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ======================================
+    // 🔐 AUTHENTICATION CHECK
+    // ======================================
+    (function checkAuth() {
+        const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+        
+        if (!token) {
+            window.location.replace('../index.html');
+            return;
+        }
+
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, null, window.location.href);
+            window.addEventListener('popstate', function(event) {
+                const currentToken = localStorage.getItem('token') || localStorage.getItem('auth_token');
+                if (currentToken) {
+                    window.history.pushState(null, null, window.location.href);
+                } else {
+                    window.location.replace('../index.html');
+                }
+            });
+        }
+
+        document.getElementById('loading-overlay').style.display = 'none';
+        document.getElementById('main-app').classList.remove('hidden');
+    })();
+
+    // ======================================
+    // 📊 DASHBOARD DATA & CHARTS
+    // ======================================
+    const API_BASE_URL = "https://api.fornowauto.com/api";
+
+    function getAuthHeaders() {
+        const token = localStorage.getItem("token") || localStorage.getItem("auth_token");
+        return token ? { 'Authorization': `Bearer ${token}` } : null;
+    }
+
+    async function safeFetch(url, opts = {}) {
+        const headers = Object.assign({}, opts.headers || {});
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders) throw new Error("No auth token");
+        Object.assign(headers, authHeaders);
+        if (opts.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
+        
+        const res = await fetch(url, { ...opts, headers });
+        const text = await res.text();
+        let data;
+        try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+        if (!res.ok) throw new Error(data?.message || res.statusText);
+        return data;
+    }
+
+    function formatCurrency(amount) {
+        return `₹${(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    // Initialize Charts
+    let cashFlowChart, incomeExpenseChart;
+
+    function initCharts() {
+        // Cash Flow Chart
+        const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+        cashFlowChart = new Chart(cashFlowCtx, {
+            type: 'line',
+            data: {
+                labels: ['Apr 2025', 'May 2025', 'Jun 2025', 'Jul 2025', 'Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025', 'Jan 2026', 'Feb 2026', 'Mar 2026'],
+                datasets: [{
+                    label: 'Cash Flow',
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#fff',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#2d3a5c' },
+                        ticks: { color: '#9ca3af', font: { size: 10 } }
+                    },
+                    y: {
+                        grid: { color: '#2d3a5c' },
+                        ticks: { 
+                            color: '#9ca3af',
+                            font: { size: 10 },
+                            callback: function(value) {
+                                if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
+                                return value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Income & Expense Chart
+        const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+        incomeExpenseChart = new Chart(incomeExpenseCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Apr 2025', 'Jun 2025', 'Aug 2025', 'Oct 2025', 'Dec 2025', 'Feb 2026'],
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Expense',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: '#ef4444',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9ca3af', font: { size: 10 } }
+                    },
+                    y: {
+                        grid: { color: '#2d3a5c' },
+                        ticks: { 
+                            color: '#9ca3af',
+                            font: { size: 10 },
+                            callback: function(value) {
+                                if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
+                                return value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Load Dashboard Data
+    async function loadDashboardData() {
+        try {
+            // Load Invoices for Receivables
+            const invoices = await safeFetch(`${API_BASE_URL}/invoic`, { method: "GET" });
+            const invoiceList = Array.isArray(invoices) ? invoices : [];
+            
+            let totalUnpaid = 0;
+            let currentReceivables = 0;
+            let overdueReceivables = 0;
+            let totalIncome = 0;
+            const today = new Date();
+
+            invoiceList.forEach(inv => {
+                const total = inv.total || 0;
+                const paid = inv.paid_amount || 0;
+                const balance = total - paid;
+                totalIncome += paid;
+
+                if (balance > 0) {
+                    totalUnpaid += balance;
+                    const dueDate = new Date(inv.due_date);
+                    if (dueDate < today) {
+                        overdueReceivables += balance;
+                    } else {
+                        currentReceivables += balance;
+                    }
+                }
+            });
+
+            document.getElementById('total-unpaid-invoices').textContent = formatCurrency(totalUnpaid);
+            document.getElementById('receivables-current').textContent = formatCurrency(currentReceivables);
+            document.getElementById('receivables-overdue').textContent = formatCurrency(overdueReceivables);
+            
+            const receivablesPercent = totalUnpaid > 0 ? (currentReceivables / totalUnpaid) * 100 : 0;
+            document.getElementById('receivables-progress').style.width = `${receivablesPercent}%`;
+
+            document.getElementById('total-income').textContent = formatCurrency(totalIncome);
+            document.getElementById('cash-incoming').textContent = formatCurrency(totalIncome);
+
+        } catch (err) {
+            console.error("Error loading invoices:", err);
+        }
+
+        try {
+            // Load Bills for Payables
+            const bills = await safeFetch(`${API_BASE_URL}/bills`, { method: "GET" });
+            const billList = Array.isArray(bills) ? bills : [];
+            
+            let totalUnpaidBills = 0;
+            let currentPayables = 0;
+            let overduePayables = 0;
+            let totalExpense = 0;
+            const today = new Date();
+
+            billList.forEach(bill => {
+                const total = bill.total || 0;
+                const paid = bill.paid_amount || 0;
+                const balance = total - paid;
+                totalExpense += paid;
+
+                if (balance > 0) {
+                    totalUnpaidBills += balance;
+                    const dueDate = new Date(bill.due_date);
+                    if (dueDate < today) {
+                        overduePayables += balance;
+                    } else {
+                        currentPayables += balance;
+                    }
+                }
+            });
+
+            document.getElementById('total-unpaid-bills').textContent = formatCurrency(totalUnpaidBills);
+            document.getElementById('payables-current').textContent = formatCurrency(currentPayables);
+            document.getElementById('payables-overdue').textContent = formatCurrency(overduePayables);
+            
+            const payablesPercent = totalUnpaidBills > 0 ? (currentPayables / totalUnpaidBills) * 100 : 0;
+            document.getElementById('payables-progress').style.width = `${payablesPercent}%`;
+
+            document.getElementById('total-expense').textContent = formatCurrency(totalExpense);
+            document.getElementById('cash-outgoing').textContent = formatCurrency(totalExpense);
+
+        } catch (err) {
+            console.error("Error loading bills:", err);
+        }
+
+        // Load Company Info for User Profile
+        try {
+            const companies = await safeFetch(`${API_BASE_URL}/companies`, { method: "GET" });
+            const companyList = Array.isArray(companies) ? companies : [];
+            
+            if (companyList.length > 0) {
+                const company = companyList[0];
+                const name = company.company_name || company.name || 'User';
+                const email = company.email || '';
+                const logo = company.logo || '';
+
+                document.getElementById('user-name').textContent = name;
+                document.getElementById('user-email').textContent = email;
+                document.getElementById('modal-name').textContent = name;
+                document.getElementById('modal-email').textContent = email;
+
+                if (logo) {
+                    document.getElementById('user-avatar').src = logo;
+                    document.getElementById('modal-avatar').src = logo;
+                }
+            }
+        } catch (err) {
+            console.error("Error loading company:", err);
+        }
+    }
+
+    // ======================================
+    // 📌 MOBILE SIDEBAR TOGGLE
+    // ======================================
+    const menuToggle = document.getElementById("menu-toggle");
+    const sidebar = document.getElementById("sidebar");
+    const backdrop = document.getElementById("menu-backdrop");
+
+    menuToggle?.addEventListener("click", () => {
+        sidebar.classList.toggle("-translate-x-full");
+        backdrop.classList.toggle("hidden");
+    });
+
+    backdrop?.addEventListener("click", () => {
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
+    });
+
+    // ======================================
+    // 📌 USER PROFILE & LOGOUT
+    // ======================================
+    const userProfileBtn = document.getElementById('user-profile-btn');
+    const logoutModal = document.getElementById('logout-modal');
+    const logoutBtn = document.getElementById('logout-btn');
+    const logoutConfirmModal = document.getElementById('logout-confirm-modal');
+    const confirmCancel = document.getElementById('confirm-cancel');
+    const confirmOk = document.getElementById('confirm-ok');
+
+    userProfileBtn?.addEventListener('click', () => {
+        logoutModal.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!logoutModal.classList.contains('hidden') && 
+            !logoutModal.contains(e.target) && 
+            !userProfileBtn.contains(e.target)) {
+            logoutModal.classList.add('hidden');
+        }
+    });
+
+    logoutBtn?.addEventListener('click', () => {
+        logoutModal.classList.add('hidden');
+        logoutConfirmModal.classList.remove('hidden');
+        logoutConfirmModal.classList.add('flex');
+    });
+
+    confirmCancel?.addEventListener('click', () => {
+        logoutConfirmModal.classList.add('hidden');
+        logoutConfirmModal.classList.remove('flex');
+    });
+
+    confirmOk?.addEventListener('click', () => {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        sessionStorage.clear();
+        window.location.replace('../index.html');
+    });
+
+    // ======================================
+    // 🔐 AUTH CHECKS
+    // ======================================
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+            if (!token) window.location.replace('../index.html');
+        }
+    });
+
+    window.addEventListener('storage', function(event) {
+        if ((event.key === 'token' || event.key === 'auth_token') && !event.newValue) {
+            window.location.replace('../index.html');
+        }
+    });
+
+    // ======================================
+    // 🚀 INITIALIZE
+    // ======================================
+    document.addEventListener('DOMContentLoaded', function() {
+        initCharts();
+        loadDashboardData();
+    });
+    </script>
+</body>
+
+</html>

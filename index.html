@@ -1,350 +1,612 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - QSI</title>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForNow Automation - Automation? Simplified.</title>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
-    <link rel="stylesheet" href="js/qsi-styles.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link rel="stylesheet" href="js/fix-icons.css">
-    <link rel="stylesheet" href="js/theme-force.css">
-    <!-- Global Theme Manager -->
-    <script src="js/theme-manager.js"></script>
 
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
-  </head>
-  <body class="min-h-screen flex items-center justify-center p-4">
-    <script>
-      // Facebook SDK
-      window.fbAsyncInit = function () {
-        FB.init({
-          appId: "1605405084177718",
-          cookie: true,
-          xfbml: true,
-          version: "v18.0",
-        });
-      };
-
-      (function (d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-      })(document, "script", "facebook-jssdk");
-    </script>
-
-    <div class="qsi-container">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-900">QSI</h1>
-      </div>
-
-      <!-- Login Card -->
-      <div class="form-card">
-        <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">
-            Login in to your account
-          </h2>
-          <p class="text-sm text-gray-600">
-            Welcome back! Please enter your details.
-          </p>
-        </div>
-
-        <!-- Email/Password Form -->
-        <form id="login-form" class="space-y-4">
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="input-field"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div>
-            <div class="flex justify-between items-center mb-1.5">
-              <label for="password" class="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <a href="#" class="text-xs link-text">Forgot password?</a>
-            </div>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="input-field"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <button type="submit" class="qsi-btnbtn-primary mt-6">
-            Login
-          </button>
-        </form>
-
-        <!-- Divider -->
-        <div class="divider">
-          <span>OR CONTINUE WITH</span>
-        </div>
-
-        <!-- Social Login Buttons -->
-        <div class="space-y-3">
-          <button type="button" id="google-login-btn" class="btn btn-outline">
-            <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-              <g fill="none" fill-rule="evenodd">
-                <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-              </g>
-            </svg>
-            Continue with Google
-          </button>
-
-          <button type="button" id="facebook-login-btn" class="btn btn-outline">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
-            Continue with Facebook
-          </button>
-        </div>
-
-        <!-- Skip Link -->
-        <div class="text-center mt-6">
-          <a href="without_login/dashboard_without_login.html" class="text-sm link-text">
-            Or Skip for now
-          </a>
-        </div>
-      </div>
-
-      <!-- Sign Up Link -->
-      <div class="text-center mt-6">
-        <p class="text-sm text-gray-600">
-          Don't have an account?
-          <a href="./signup/sign_up.html" class="link-text font-semibold">
-            Sign up
-          </a>
-        </p>
-      </div>
-    </div>
-
-    <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const loginForm = document.getElementById("login-form");
-  const submitButton = loginForm.querySelector('button[type="submit"]');
-  const googleBtn = document.getElementById("google-login-btn");
-  const facebookBtn = document.getElementById("facebook-login-btn");
-
-  const API_BASE = "https://api.fornowauto.com/api";
-
-  // ========================================
-  // EMAIL/PASSWORD LOGIN
-  // ========================================
-  loginForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    if (!email || !password) {
-      alert("Please enter both email and password.");
-      return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.textContent = "Verifying...";
-
-    try {
-      const response = await fetch(`${API_BASE}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Invalid credentials");
-      }
-
-      if (result.token && result.user && result.user._id) {
-        localStorage.setItem("token", result.token);
-        localStorage.setItem("userId", result.user._id);
-        localStorage.setItem("email", result.user.email || "");
-        localStorage.setItem("phone", result.user.phone || "");
-
-        alert("Login Successful!");
-
-        if (result.has_company_details) {
-          window.location.href = "with_login/dashboard_with_login.html";
-        } else {
-          window.location.href = "signup/businessDetails.html";
+    <style>
+        /* Base font */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-      } else {
-        throw new Error("Invalid server response");
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      alert(`Login Failed: ${err.message}`);
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = "Login";
-    }
-  });
 
-  // ========================================
-  // GOOGLE LOGIN
-  // ========================================
-  let googleTokenClient;
-
-  function initializeGoogleLogin() {
-    if (typeof google === "undefined" || !google.accounts?.oauth2) {
-      setTimeout(initializeGoogleLogin, 200);
-      return;
-    }
-
-    googleTokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: "345844221969-mtpp4nslbprtuu53f9bcsuh1kaaanjht.apps.googleusercontent.com",
-      scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
-      callback: async (tokenResponse) => {
-        if (tokenResponse?.access_token) {
-          try {
-            googleBtn.disabled = true;
-            googleBtn.innerHTML = '<span>Signing in...</span>';
-
-            const googleUser = await fetch(
-              "https://www.googleapis.com/oauth2/v3/userinfo",
-              { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
-            ).then((res) => res.json());
-
-            await handleSocialLogin("Google", googleUser);
-          } catch (err) {
-            console.error("Google login failed:", err);
-            alert("Google login failed. Please try again.");
-            googleBtn.disabled = false;
-            googleBtn.innerHTML = `
-              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-                <g fill="none" fill-rule="evenodd">
-                  <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-                  <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-                </g>
-              </svg>
-              Continue with Google
-            `;
-          }
+        /* Subtle fade-in animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-      },
-    });
 
-    googleBtn.disabled = false;
-    googleBtn.addEventListener("click", () => {
-      googleTokenClient.requestAccessToken();
-    });
-  }
+        .is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-  googleBtn.disabled = true;
-  initializeGoogleLogin();
+        /* --- LIQUID GLASS EFFECTS --- */
 
-  // ========================================
-  // FACEBOOK LOGIN
-  // ========================================
-  facebookBtn.addEventListener("click", () => {
-    FB.login(
-      (response) => {
-        if (response.authResponse) {
-          facebookBtn.disabled = true;
-          facebookBtn.innerHTML = '<span>Signing in...</span>';
+        /* 1. Flowing Liquid Background */
+        .hero-background {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.3;
+            background: linear-gradient(125deg,
+                    rgba(145, 4, 12, 0.2),
+                    rgba(145, 4, 12, 0.2),
+                    rgba(35, 20, 12, 0.2));
+            animation: liquidFlow 20s ease-in-out infinite alternate;
+            background-size: 400% 400%;
+            /* iOS performance fix */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
 
-          FB.api("/me", { fields: "name,email" }, async (fbUser) => {
-            try {
-              await handleSocialLogin("Facebook", fbUser);
-            } catch (err) {
-              console.error("Facebook login failed:", err);
-              alert("Facebook login failed. Please try again.");
-              facebookBtn.disabled = false;
-              facebookBtn.innerHTML = `
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-                Continue with Facebook
-              `;
+        @keyframes liquidFlow {
+            0% {
+                background-position: 0% 0%;
             }
-          });
+
+            100% {
+                background-position: 100% 100%;
+            }
         }
-      },
-      { scope: "public_profile,email" }
-    );
-  });
 
-  // ========================================
-  // SOCIAL LOGIN HANDLER
-  // ========================================
-  async function handleSocialLogin(provider, userData) {
-    console.log(`${provider} login:`, userData);
-
-    const payload = {
-      email: userData.email,
-      username: userData.name,
-      provider,
-      providerId: userData.sub || userData.id,
-    };
-
-    if (!payload.email) {
-      alert("Could not retrieve email from social provider.");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_BASE}/google-login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Social login failed");
-      }
-
-      if (result.token && result.user && result.user._id) {
-        localStorage.setItem("token", result.token);
-        localStorage.setItem("userId", result.user._id);
-        localStorage.setItem("email", result.user.email || "");
-        localStorage.setItem("phone", result.user.phone || "");
-
-        if (result.has_company_details) {
-          window.location.href = "with_login/dashboard_with_login.html";
-        } else {
-          window.location.href = "signup/businessDetails.html";
+        /* 2. SVG Illustration */
+        .illustration-svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150%;
+            height: 150%;
+            transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+            filter: blur(40px);
+            -webkit-filter: blur(40px);
+            opacity: 0.7;
+            overflow: visible;
+            /* iOS performance fix */
+            -webkit-transform: translateZ(0) translate(-50%, -50%);
         }
-      } else {
-        throw new Error("Invalid server response");
-      }
-    } catch (err) {
-      console.error(`${provider} login error:`, err);
-      throw err;
-    }
-  }
-});
-</script>
-  </body>
+
+        .path-primary {
+            stroke: url(#gradPath);
+            stroke-width: 5;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dashDraw 18s linear infinite;
+        }
+
+        .path-secondary {
+            stroke: url(#gradPathLight);
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 800;
+            stroke-dashoffset: 800;
+            animation: dashDraw 18s linear infinite reverse;
+        }
+
+        @keyframes dashDraw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .circle-node {
+            fill: url(#gradNode);
+            opacity: 0.9;
+            animation: nodePulse 4s infinite alternate;
+            transform-origin: center center;
+        }
+
+        @keyframes nodePulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        /* 3. Text Shimmer Effect - iOS Compatible */
+        .logo-shimmer {
+            background: linear-gradient(90deg, #D0BA98, #91040C, #91040C, #91040C, #D0BA98);
+            background-size: 200% auto;
+            color: #000;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textShimmer 4s linear infinite;
+            /* iOS fix - force hardware acceleration */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
+        @keyframes textShimmer {
+            to {
+                background-position: -200% center;
+            }
+        }
+
+        /* 4. Glassy CTA Button - iOS Compatible */
+        .hero-cta-button {
+            transition: all 0.3s ease-in-out;
+            background-color: rgba(145, 4, 12, 0.7);
+            /* iOS requires -webkit- prefix */
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(145, 4, 12, 0.5);
+            color: white;
+            /* iOS performance fix */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
+        .hero-cta-button:hover {
+            transform: translateY(-3px) scale(1.03);
+            -webkit-transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(145, 4, 12, 0.35);
+            background-color: rgba(145, 4, 12, 0.9);
+        }
+
+        /* 5. Glassy Form Elements - iOS Compatible */
+        .glass-input {
+            background-color: rgba(255, 255, 255, 0.05);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .glass-input:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(145, 4, 12, 0.7);
+            outline: none;
+        }
+
+        /* 6. Motto Glimmer Effect */
+        .motto-glimmer {
+            animation: mottoGlimmer 3s ease-in-out infinite alternate;
+            display: inline-block;
+        }
+
+        @keyframes mottoGlimmer {
+            0% {
+                text-shadow: 0 0 5px rgba(145, 4, 12, 0.5), 0 0 10px rgba(145, 4, 12, 0.4);
+                opacity: 0.8;
+            }
+
+            100% {
+                text-shadow: 0 0 10px rgba(145, 4, 12, 0.9), 0 0 20px rgba(145, 4, 12, 0.7);
+                opacity: 1;
+            }
+        }
+
+        /* 7. Scroll-to-Top Button */
+        .scroll-to-top {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            opacity: 0;
+            transform: translateY(20px);
+            -webkit-transform: translateY(20px);
+        }
+
+        .scroll-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+            -webkit-transform: translateY(0);
+        }
+
+        /* Header backdrop blur - iOS Compatible */
+        header {
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+        }
+
+        /* Scroll to top button backdrop - iOS Compatible */
+        #scroll-to-top {
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Success Message Animation */
+        @keyframes successPop {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-anim {
+            animation: successPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .boost-message {
+            background: linear-gradient(135deg, #D0BA98, #D0BA98);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        /* Notify Button Shine Effect */
+        @keyframes shine {
+            0% {
+                left: -100%;
+            }
+
+            20% {
+                left: 100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: skewX(-25deg);
+            animation: shine 6s infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-[#23140C] text-white antialiased">
+
+    <!-- Header -->
+    <!-- Header -->
+    <header
+        class="fixed top-0 z-50 w-full bg-[#23140C]/90 backdrop-blur-md border-b border-[#D0BA98]/20 transition-all duration-300">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="index.html" class="flex-shrink-0 flex items-center group">
+                    <span class="logo-shimmer text-2xl font-bold">ForNow</span>
+                    <span
+                        class="text-2xl font-light text-gray-300 ml-2 group-hover:text-white transition-colors">Automation</span>
+                </a>
+
+                <!-- Navigation Links (Desktop) -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html"
+                        class="text-sm font-medium text-[#D0BA98] transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-0.5 after:bg-[#91040C]">Home</a>
+                    <a href="products.html"
+                        class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-[#91040C] after:transition-all hover:after:w-full">Products</a>
+                    <a href="payment.html"
+                        class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-[#91040C] after:transition-all hover:after:w-full">Pricing</a>
+                    <a href="contact.html"
+                        class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-[#91040C] after:transition-all hover:after:w-full">Contact
+                        Us</a>
+                </div>
+
+
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white focus:outline-none p-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Overlay -->
+            <div id="mobile-menu-overlay"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 pointer-events-none">
+            </div>
+
+            <!-- Mobile Menu Drawer -->
+            <div id="mobile-menu"
+                class="fixed top-0 right-0 h-screen w-64 bg-[#23140C]/95 backdrop-blur-3xl z-50 transform translate-x-full transition-transform duration-500 cubic-bezier(0.16, 1, 0.3, 1) border-l border-gray-700/50 shadow-2xl flex flex-col pt-6 hidden">
+
+                <!-- Close Button -->
+                <div class="px-6 flex justify-end mb-8">
+                    <button id="close-menu-btn"
+                        class="p-2 text-gray-400 hover:text-white transition-colors focus:outline-none rounded-full hover:bg-white/10">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Menu Links -->
+                <div class="flex-1 px-8 space-y-6">
+                    <a href="index.html"
+                        class="block text-xl font-medium text-gray-300 hover:text-[#D0BA98] transition-all duration-500 translate-x-8 opacity-0 fade-in-menu"
+                        style="transition-delay: 100ms;">Home</a>
+                    <a href="products.html"
+                        class="block text-xl font-medium text-gray-300 hover:text-[#D0BA98] transition-all duration-500 translate-x-8 opacity-0 fade-in-menu"
+                        style="transition-delay: 200ms;">Products</a>
+                    <a href="payment.html"
+                        class="block text-xl font-medium text-gray-300 hover:text-[#D0BA98] transition-all duration-500 translate-x-8 opacity-0 fade-in-menu"
+                        style="transition-delay: 300ms;">Pricing</a>
+                    <a href="contact.html"
+                        class="block text-xl font-medium text-gray-300 hover:text-[#D0BA98] transition-all duration-500 translate-x-8 opacity-0 fade-in-menu"
+                        style="transition-delay: 400ms;">Contact Us</a>
+
+                </div>
+
+                <!-- Footer in Menu -->
+                <div class="px-8 pb-8 mt-auto border-t border-gray-700/30 pt-6">
+                    <p class="text-xs text-gray-500">© 2026 ForNow Automation</p>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- Hero Section -->
+        <section
+            class="hero-section relative min-h-screen flex items-center justify-center text-center overflow-hidden pt-28 pb-16">
+            <!-- Background Illustration Layer -->
+            <div class="hero-background">
+                <svg class="illustration-svg" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="gradPath" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#91040C" stop-opacity="0.8" />
+                            <stop offset="100%" stop-color="#D0BA98" stop-opacity="1" />
+                        </linearGradient>
+                        <linearGradient id="gradPathLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#D0BA98" stop-opacity="0.6" />
+                            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.8" />
+                        </linearGradient>
+                        <radialGradient id="gradNode" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                            <stop offset="0%" stop-color="#D0BA98" stop-opacity="1" />
+                            <stop offset="100%" stop-color="#91040C" stop-opacity="0.8" />
+                        </radialGradient>
+                    </defs>
+
+                    <!-- Primary Flowing Paths -->
+                    <path class="path-primary"
+                        d="M100 200 C 300 0, 700 0, 900 200 S 1100 400, 900 600 C 700 800, 300 800, 100 600 S -100 400, 100 200 Z" />
+                    <path class="path-secondary"
+                        d="M50 300 C 250 100, 650 100, 850 300 S 1050 500, 850 700 C 650 900, 250 900, 50 700 S -150 500, 50 300 Z" />
+
+                    <!-- Interconnected Nodes -->
+                    <circle class="circle-node" cx="200" cy="200" r="25" style="animation-delay: 0.5s;" />
+                    <circle class="circle-node" cx="800" cy="200" r="25" style="animation-delay: 1.0s;" />
+                    <circle class="circle-node" cx="200" cy="800" r="25" style="animation-delay: 1.5s;" />
+                    <circle class="circle-node" cx="800" cy="800" r="25" style="animation-delay: 0.2s;" />
+                    <circle class="circle-node" cx="500" cy="500" r="35" style="animation-delay: 0.8s;" />
+                </svg>
+            </div>
+
+            <div class="relative z-20 p-4 max-w-4xl mx-auto">
+                <h1 class="fade-in text-4xl tracking-tight font-extrabold text-white sm:text-6xl md:text-7xl">
+                    <span class="block xl:inline">Automation is</span>
+                    <span class="block text-[#D0BA98] xl:inline">about to get simple.</span>
+                </h1>
+                <p class="fade-in mt-6 text-3xl text-gray-300 sm:text-4xl max-w-2xl mx-auto font-light"
+                    style="transition-delay: 200ms;">
+                    Automation? <span class="font-medium motto-glimmer">Simplified.</span>
+                </p>
+                <p class="fade-in mt-8 text-lg text-gray-400 sm:text-xl sm:max-w-xl sm:mx-auto"
+                    style="transition-delay: 400ms;">
+                    Stop fighting with complicated tools. The cost-efficient, easy-to-use automation platform you've
+                    been waiting for is almost here.
+                </p>
+        
+            </div>
+        </section>
+
+        <!-- QSI Section
+        <section class="py-24 bg-[#23140C]">
+            <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+                <h2 class="fade-in text-3xl font-extrabold text-white sm:text-4xl">
+                    Create Quotations, Sales Orders & Invoices
+                </h2>
+                <p class="fade-in mt-4 text-lg text-gray-400 max-w-2xl mx-auto" style="transition-delay: 100ms;">
+                    Streamline your sales workflow with our QSI tool. Generate professional documents in seconds, track
+                    your sales pipeline, and close deals faster than ever before.
+                </p>
+
+                <div class="fade-in mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center"
+                    style="transition-delay: 200ms;">
+                    <a href="payment.html"
+                        class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-[#91040C] hover:bg-[#91040C] shadow-lg transition-all">
+                        Try our QSI
+                    </a>
+                    <a href="about.html"
+                        class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-[#91040C] text-base font-medium rounded-lg text-[#D0BA98] bg-transparent hover:bg-[#91040C]/10 transition-all">
+                        More about QSI
+                    </a>
+                </div>
+            </div>
+        </section> -->
+
+
+
+    </main>
+
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" title="Back to top"
+        class="scroll-to-top fixed z-50 bottom-10 right-10 w-12 h-12 rounded-full bg-[#91040C]/70 border border-[#91040C]/50 text-white flex items-center justify-center hover:bg-[#91040C]/90 shadow-lg"
+        style="-webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
+    <!-- Footer -->
+    <footer class="bg-[#23140C]">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-center">
+                <p class="text-center text-sm text-[#D0BA98]">
+                    &copy; 2025-2026 ForNow Automation. All rights reserved.
+                    ForNow Automation is an officially affiliated subsidiary of Aixain Digital Solution. Pvt Ltd.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle (Tesla Style Drawer)
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            const closeMenuBtn = document.getElementById('close-menu-btn');
+            const menuLinks = document.querySelectorAll('.fade-in-menu');
+
+            function openMenu() {
+                if (!mobileMenu || !mobileMenuOverlay) return;
+
+                // Show elements first
+                mobileMenu.classList.remove('hidden');
+                mobileMenuOverlay.classList.remove('hidden');
+                mobileMenuOverlay.style.pointerEvents = 'auto'; // Enable clicking on overlay
+
+                // Trigger animations after a small delay to ensure display:block applies
+                setTimeout(() => {
+                    mobileMenuOverlay.classList.remove('opacity-0');
+                    mobileMenu.classList.remove('translate-x-full');
+
+                    // Staggered link animations
+                    menuLinks.forEach((link, index) => {
+                        setTimeout(() => {
+                            link.classList.remove('translate-x-8', 'opacity-0');
+                        }, 100 + (index * 100));
+                    });
+                }, 10);
+            }
+
+            function closeMenu() {
+                if (!mobileMenu || !mobileMenuOverlay) return;
+
+                // Animate out
+                mobileMenuOverlay.classList.add('opacity-0');
+                mobileMenuOverlay.style.pointerEvents = 'none';
+                mobileMenu.classList.add('translate-x-full');
+
+                // Reset links
+                menuLinks.forEach(link => {
+                    link.classList.add('translate-x-8', 'opacity-0');
+                });
+
+                // Hide after transition
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuOverlay.classList.add('hidden');
+                }, 500); // 500ms matches duration-500
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', openMenu);
+            }
+
+            if (closeMenuBtn) {
+                closeMenuBtn.addEventListener('click', closeMenu);
+            }
+
+            if (mobileMenuOverlay) {
+                mobileMenuOverlay.addEventListener('click', closeMenu);
+            }
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    if (this.getAttribute('href') === '#') return;
+
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+
+                    if (targetElement) {
+                        // Calculate offset for sticky header
+                        const headerOffset = document.querySelector('header').offsetHeight;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth"
+                        });
+                    }
+                });
+            });
+
+            // Fade-in animations on scroll/load
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                rootMargin: '0px',
+                threshold: 0.1
+            });
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+
+
+
+            // Scroll to Top Button Logic
+            const scrollToTopBtn = document.getElementById('scroll-to-top');
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 400) {
+                    scrollToTopBtn.classList.add('visible');
+                } else {
+                    scrollToTopBtn.classList.remove('visible');
+                }
+            });
+
+            scrollToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+
 </html>

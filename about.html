@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QSI | All-in-One Business Platform</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Smooth Gradient Animation */
+        @keyframes flow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .animate-flow {
+            background-size: 300% 300%;
+            animation: flow 20s ease infinite;
+        }
+
+        /* Improved Scroll Reveal */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .scroll-animate.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(35, 20, 12, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(208, 186, 152, 0.1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(208, 186, 152, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #D0BA98, #91040C, #D0BA98);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: flow 5s linear infinite;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(145, 4, 12, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(60px);
+            transform: translateZ(0);
+            /* Hardware acceleration */
+            will-change: transform;
+        }
+    </style>
+</head>
+
+<body class="bg-[#23140C] text-gray-100 antialiased selection:bg-[#91040C] selection:text-white overflow-x-hidden">
+
+    <header class="fixed top-0 z-50 w-full bg-[#23140C]/80 backdrop-blur-xl border-b border-[#D0BA98]/10">
+        <nav class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-20">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <span
+                        class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-[#D0BA98] to-[#91040C]">FORNOW</span>
+                    <span class="text-xl font-light text-gray-400 group-hover:text-white transition-colors"></span>
+                </a>
+
+                <div class="hidden md:flex items-center space-x-10">
+                    <a href="index.html"
+                        class="text-sm font-semibold text-gray-300 hover:text-[#D0BA98] transition-all">Home</a>
+                    <a href="products.html"
+                        class="text-sm font-semibold text-gray-300 hover:text-[#D0BA98] transition-all">Products</a>
+                    <a href="payment.html"
+                        class="text-sm font-semibold text-gray-300 hover:text-[#D0BA98] transition-all">Pricing</a>
+                    <a href="contact.html"
+                        class="text-sm font-semibold text-gray-300 hover:text-[#D0BA98] transition-all">Contact Us</a>
+                </div>
+
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="p-2 text-[#D0BA98]">
+                        <i data-lucide="menu" class="w-7 h-7"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div id="mobile-menu"
+        class="fixed inset-0 z-[60] transform translate-x-full transition-transform duration-500 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" id="mobile-menu-overlay"></div>
+        <div class="absolute right-0 top-0 h-full w-72 bg-[#23140C] border-l border-[#D0BA98]/20 p-8 flex flex-col">
+            <button id="close-menu-btn" class="self-end p-2 text-gray-400"><i data-lucide="x"
+                    class="w-8 h-8"></i></button>
+            <div class="mt-12 space-y-8">
+                <a href="index.html" class="block text-2xl font-bold">Home</a>
+                <a href="products.html" class="block text-2xl font-bold">Products</a>
+                <a href="payment.html" class="block text-2xl font-bold">Pricing</a>
+                <a href="contact.html" class="block text-2xl font-bold">Contact</a>
+                <a href="free.html" class="inline-block px-6 py-3 bg-[#91040C] rounded-lg font-bold">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <main class="relative pt-20">
+        <div class="hero-glow top-[-10%] left-[-10%]"></div>
+        <div class="hero-glow bottom-0 right-0"></div>
+
+        <section class="relative pt-32 pb-24 px-6">
+            <div class="max-w-5xl mx-auto text-center">
+                <div
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#91040C]/10 border border-[#91040C]/30 text-[#D0BA98] text-xs font-bold uppercase tracking-widest mb-8 animate-pulse">
+                    QSI
+                </div>
+                <h1 class="text-5xl md:text-8xl font-black tracking-tight leading-[1.1] mb-8">
+                    The Future of Business <br />
+                    <span class="gradient-text">Is Now</span>
+                </h1>
+                <p class="text-lg md:text-xl text-[#D0BA98]/80 max-w-2xl mx-auto leading-relaxed mb-12">
+                    QSI is Now. Get ready for an all-in-one platform to manage invoicing, accounting,
+                    expenses, and team collaboration.
+                </p>
+
+                
+            </div>
+        </section>
+
+        <section class="py-24 px-6">
+            <div class="max-w-7xl mx-auto space-y-24">
+
+                <div class="grid md:grid-cols-2 gap-16 items-center scroll-animate">
+                    <div>
+                        <span class="text-[#91040C] font-black uppercase text-sm tracking-widest">Efficiency</span>
+                        <h2 class="text-4xl font-extrabold mt-4 mb-6">Powerful Invoicing & Billing</h2>
+                        <p class="text-[#D0BA98] text-lg mb-8">Create every document your business needs, from
+                            quotations to invoices, and get paid faster.</p>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="flex items-center gap-3 text-sm text-gray-300">
+                                <i data-lucide="shield-check" class="text-[#D0BA98] w-5 h-5"></i>
+                                Invoices, quotations, sales orders, & more.
+                            </div>
+                            <div class="flex items-center gap-3 text-sm text-gray-300">
+                                <i data-lucide="repeat" class="text-[#D0BA98] w-5 h-5"></i>
+                                Recurring invoices for subscriptions.
+                            </div>
+                            <div class="flex items-center gap-3 text-sm text-gray-300">
+                                <i data-lucide="zap" class="text-[#D0BA98] w-5 h-5"></i>
+                                Convert quotations in one click.
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="glass-card rounded-3xl p-8 transform rotate-2 hover:rotate-0 transition-all duration-500">
+                        <div class="flex justify-between items-center mb-8">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+                            </div>
+                            <span class="text-xs font-bold text-[#D0BA98] opacity-50">NEW INVOICE #001</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div
+                                class="h-12 bg-white/5 rounded-xl border border-white/5 flex items-center px-4 justify-between">
+                                <span class="text-xs">Client: TechCorp Inc.</span>
+                                <span class="text-[#D0BA98] text-xs">$5,000.00</span>
+                            </div>
+                            <div
+                                class="h-24 bg-[#91040C]/10 rounded-xl border border-[#91040C]/20 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-[#D0BA98] font-black text-xl">Awaiting Payment</div>
+                                    <div class="text-[10px] opacity-60">SENT VIA WHATSAPP</div>
+                                </div>
+                            </div>
+                            <div
+                                class="h-12 bg-[#D0BA98] rounded-xl flex items-center justify-center text-[#23140C] font-bold text-sm">
+                                Send Now
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-16 items-center scroll-animate">
+                    <div class="md:order-last">
+                        <span class="text-[#91040C] font-black uppercase text-sm tracking-widest">Reports</span>
+                        <h2 class="text-4xl font-extrabold mt-4 mb-6">Accounting & Compliance</h2>
+                        <p class="text-[#D0BA98] text-lg mb-8">Stay on top of your finances with automated reports and
+                            built-in tax compliance.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-center gap-4 text-gray-300"><i data-lucide="check"
+                                    class="text-green-500"></i> P&L, Balance Sheets, Trial Balance</li>
+                            <li class="flex items-center gap-4 text-gray-300"><i data-lucide="check"
+                                    class="text-green-500"></i> Full GST & e-invoicing support</li>
+                            <li class="flex items-center gap-4 text-gray-300"><i data-lucide="check"
+                                    class="text-green-500"></i> Automated payment reminders</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card rounded-3xl p-8 border-l-4 border-l-[#91040C]">
+                        <h3 class="font-bold mb-6 flex items-center gap-2"><i data-lucide="pie-chart"
+                                class="w-5 h-5 text-[#91040C]"></i> Profit & Loss</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between py-2 border-b border-white/5"><span
+                                    class="opacity-60">Revenue</span><span class="text-green-400">+$150k</span></div>
+                            <div class="flex justify-between py-2 border-b border-white/5"><span
+                                    class="opacity-60">Expenses</span><span class="text-red-400">-$70k</span></div>
+                            <div class="flex justify-between py-4 mt-2"><span class="font-bold">Net Profit</span><span
+                                    class="text-2xl font-black text-[#D0BA98]">$80,000</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-16 items-center scroll-animate">
+                    <div>
+                        <span class="text-[#91040C] font-black uppercase text-sm tracking-widest">Storage</span>
+                        <h2 class="text-4xl font-extrabold mt-4 mb-6">Effortless Document Management</h2>
+                        <p class="text-[#D0BA98] text-lg mb-8">Never lose a file again. Find, filter, and manage all
+                            your business documents in one place.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="glass-card p-6 rounded-2xl text-center">
+                            <i data-lucide="search" class="w-8 h-8 mx-auto mb-4 text-[#D0BA98]"></i>
+                            <div class="text-xs font-bold uppercase tracking-widest">Instant Search</div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl text-center">
+                            <i data-lucide="filter" class="w-8 h-8 mx-auto mb-4 text-[#D0BA98]"></i>
+                            <div class="text-xs font-bold uppercase tracking-widest">Smart Filters</div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl text-center col-span-2">
+                            <i data-lucide="history" class="w-8 h-8 mx-auto mb-4 text-[#91040C]"></i>
+                            <div class="text-xs font-bold uppercase tracking-widest">Audit Trail & Recovery</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="py-24 px-6 border-t border-white/5">
+            <div class="max-w-4xl mx-auto glass-card rounded-[40px] p-12 text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-[#91040C]/20 blur-3xl"></div>
+                <h2 class="text-4xl font-black mb-6">Control Your Expenses & Purchases</h2>
+                <p class="text-[#D0BA98] mb-10 text-lg">Get a crystal-clear view of where your money is going with our
+                    unified dashboard.</p>
+                <div class="flex flex-wrap justify-center gap-8">
+                    <div class="flex flex-col items-center"><span class="text-3xl font-black">65%</span><span
+                            class="text-[10px] opacity-50 uppercase tracking-tighter">Salaries</span></div>
+                    <div class="flex flex-col items-center"><span
+                            class="text-3xl font-black text-[#91040C]">15%</span><span
+                            class="text-[10px] opacity-50 uppercase tracking-tighter">Rent</span></div>
+                    <div class="flex flex-col items-center"><span class="text-3xl font-black">20%</span><span
+                            class="text-[10px] opacity-50 uppercase tracking-tighter">Utilities</span></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#23140C]">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-center">
+                <p class="text-center text-sm text-[#D0BA98]">
+                    &copy; 2025-2026 ForNow Automation. All rights reserved.
+                    ForNow Automation is an officially affiliated subsidiary of Aixain Digital Solution. Pvt Ltd.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Scroll Reveal
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-animate').forEach(el => observer.observe(el));
+
+        // Mobile Menu
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+        const close = document.getElementById('close-menu-btn');
+
+        function toggleMenu() {
+            menu.classList.toggle('hidden');
+            setTimeout(() => {
+                menu.classList.toggle('translate-x-full');
+            }, 10);
+        }
+
+        btn.addEventListener('click', toggleMenu);
+        close.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+</body>
+
+</html>

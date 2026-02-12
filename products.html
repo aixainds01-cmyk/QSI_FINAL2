@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FOR NOW - Automation Solutions</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --col-red: #91040C;
+      --col-purple: #D0BA98;
+      --col-blue-bright: #91040C;
+      --col-blue-dark: #23140C;
+      --bg-gradient: linear-gradient(135deg, var(--col-blue-dark), #1a0f09);
+      --text-main: #f8fafc;
+      --accent-gold: #D0BA98;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background Elements */
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background-image:
+        linear-gradient(to right, rgba(208, 186, 152, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(208, 186, 152, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .glow-sphere {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(145, 4, 12, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: -1;
+      filter: blur(50px);
+    }
+
+    /* Typography */
+    .title-gradient {
+      background: linear-gradient(to right, #fff, var(--accent-gold), var(--col-red));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+
+    /* Modern Card UI */
+    .product-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(208, 186, 152, 0.1);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(12px);
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card:hover {
+      border-color: rgba(208, 186, 152, 0.4);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(208, 186, 152, 0.05), transparent);
+      transform: translateX(-100%);
+      transition: 0.6s;
+    }
+
+    .product-card:hover::before {
+      transform: translateX(100%);
+    }
+
+    .price-tag {
+      font-family: 'Mono', monospace;
+      color: var(--accent-gold);
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--col-red);
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(145, 4, 12, 0.4);
+      filter: brightness(1.2);
+    }
+
+    .btn-outline {
+      border: 1px solid var(--accent-gold);
+      padding: 10px 24px;
+      border-radius: 12px;
+      color: var(--accent-gold);
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline:hover {
+      background: var(--accent-gold);
+      color: var(--col-blue-dark);
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 8, 5, 0.9);
+      display: none;
+      place-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-overlay.active {
+      display: grid;
+    }
+
+    .modal-box {
+      background: var(--col-blue-dark);
+      border: 1px solid rgba(208, 186, 152, 0.2);
+      padding: 40px;
+      border-radius: 20px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .filter-badge {
+      padding: 6px 16px;
+      background: rgba(208, 186, 152, 0.1);
+      border: 1px solid rgba(208, 186, 152, 0.2);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      color: var(--accent-gold);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow-sphere" style="top: 10%; right: -5%;"></div>
+  <div class="glow-sphere" style="bottom: 10%; left: -5%;"></div>
+
+  <header
+    class="fixed top-0 z-50 w-full bg-[#23140C]/90 backdrop-blur-md border-b border-[#D0BA98]/20 transition-all duration-300">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <!-- Logo -->
+        <a href="index.html" class="flex-shrink-0 flex items-center group">
+          <span
+            class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#D0BA98] to-[#91040C]">ForNow</span>
+          <span
+            class="text-2xl font-light text-gray-300 ml-2 group-hover:text-white transition-colors">Automation</span>
+        </a>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="index.html"
+            class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-[#91040C] after:transition-all hover:after:w-full">Home</a>
+          <a href="products.html"
+            class="text-sm font-medium text-[#D0BA98] transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-0.5 after:bg-[#91040C]">Products</a>
+          <a href="payment.html"
+            class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-[#91040C] after:transition-all hover:after:w-full">Pricing</a>
+          <a href="contact.html"
+            class="text-sm font-medium text-gray-300 hover:text-[#D0BA98] transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-[#91040C] after:transition-all hover:after:w-full">Contact
+            Us</a>
+        </div>
+    </nav>
+  </header>
+
+  <main class="pt-40 pb-20 px-6 max-w-7xl mx-auto">
+    <div class="text-center mb-24">
+      <h1 class="title-reveal text-5xl md:text-7xl mb-6 title-gradient">Automation Solutions</h1>
+      <p class="text-gray-400 max-w-2xl mx-auto text-lg">Deploying high-efficiency internal tools and workflow
+        integrations designed for the modern digital landscape.</p>
+
+      <div class="flex justify-center gap-3 mt-8 opacity-0 filter-container">
+        <span class="filter-badge">Active Deployment</span>
+        <span class="filter-badge">Upcoming Architecture</span>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8" id="primary-grid">
+      <div class="product-card">
+        <div class="flex flex-col h-full">
+          <div class="mb-8">
+            <img src="https://cdn-icons-png.flaticon.com/512/3643/3643948.png" alt="QSI" class="w-16 h-16 levitate">
+          </div>
+          <div class="price-tag mb-2">Automation Tools</div>
+          <h2 class="text-3xl font-bold mb-4">QSI Automation</h2>
+          <p class="text-gray-400 mb-8 flex-grow">Advanced queue-based system integration for seamless data processing
+            and automated reporting.</p>
+          <div>
+            <a href="about.html" class="btn-primary">View QSI</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="flex flex-col h-full">
+          <div class="mb-8">
+            <img src="https://cdn-icons-png.flaticon.com/512/3222/3222625.png" alt="Drone" class="w-16 h-16 levitate">
+          </div>
+          <div class="price-tag mb-2">Development Tools</div>
+          <h2 class="text-3xl font-bold mb-4">Pipeline Simplification</h2>
+          <p class="text-gray-400 mb-8 flex-grow">A new suite of automation tools focused on reducing operational
+            friction for digital agencies.</p>
+          <div>
+            <button id="notifyBtn" class="btn-outline w-full md:w-auto text-center">Notify Me On Launch</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="hidden-products" class="hidden opacity-0 mt-12">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold title-gradient">Unlocked Integrations</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="product-card">
+          <img src="collabee.png" alt="Collabee" class="w-12 h-12 mb-6">
+          <h3 class="text-2xl font-bold mb-2">Collabee</h3>
+          <p class="text-gray-400 mb-6">Real-time team synchronization and resource sharing module.</p>
+          <button id="slackBtn" class="text-[#D0BA98] font-bold hover:underline">Launch Integration →</button>
+        </div>
+        <div class="product-card">
+          <img src="https://cdn-icons-png.flaticon.com/512/1055/1055666.png" alt="CMS" class="w-12 h-12 mb-6">
+          <h3 class="text-2xl font-bold mb-2">CMS</h3>
+          <p class="text-gray-400 mb-6">The proprietary content management bridge for Digital Solution clients.</p>
+          <button id="cmsBtn" class="text-[#D0BA98] font-bold hover:underline">Access Console →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+
+  <div class="modal-overlay" id="waitlistModal">
+    <div class="modal-box text-center"
+      style="max-width: 400px; padding: 40px; background: #1a0f09; border: 1px solid rgba(208, 186, 152, 0.1);">
+      <h3 class="text-3xl font-bold mb-2 text-white">Join the Waitlist</h3>
+      <p class="text-gray-400 mb-6 text-sm">Be the first to know when our new automation modules go live.</p>
+
+      <div class="mb-6">
+        <input type="email" placeholder="email@address.com"
+          class="w-full bg-[#23140C] border border-[#D0BA98]/20 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-[#D0BA98]/50 placeholder-gray-500">
+      </div>
+
+      <button id="subscribeBtn"
+        class="w-full bg-[#91040C] text-white font-bold py-3 px-4 rounded-lg hover:bg-[#7a030a] transition-colors mb-6 shadow-lg shadow-red-900/20">
+        Subscribe Now
+      </button>
+
+      <button class="text-gray-500 text-sm hover:text-gray-300 close-waitlist transition-colors">Close</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="infoModal">
+    <div class="modal-box text-left">
+      <h3 id="infoTitle" class="text-2xl font-bold mb-4 text-[#D0BA98]"></h3>
+      <p id="infoText" class="text-gray-300 leading-relaxed"></p>
+      <button class="btn-outline mt-8 w-full close-trigger">Understood</button>
+    </div>
+  </div>
+
+  <footer class="bg-[#23140C]">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-center">
+        <p class="text-center text-sm text-[#D0BA98]">
+          &copy; 2025-2026 ForNow Automation. All rights reserved.
+          ForNow Automation is an officially affiliated subsidiary of Aixain Digital Solution. Pvt Ltd.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Animations
+    const tl = gsap.timeline();
+    tl.from(".title-reveal", { y: 40, opacity: 0, duration: 1, ease: "expo.out" })
+      .to(".filter-container", { opacity: 1, duration: 1 }, "-=0.5")
+      .from(".product-card", { scale: 0.95, opacity: 0, stagger: 0.2, duration: 0.8, ease: "power2.out" }, "-=0.5");
+
+    gsap.to(".levitate", { y: -10, duration: 2, repeat: -1, yoyo: true, ease: "sine.inOut" });
+
+    // 3D Tilt Logic
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        gsap.to(card, { rotationY: x * 10, rotationX: -y * 10, ease: "power2.out", duration: 0.5 });
+      });
+      card.addEventListener('mouseleave', () => {
+        gsap.to(card, { rotationY: 0, rotationX: 0, ease: "power2.out", duration: 0.5 });
+      });
+    });
+
+    // Notify Logic & Unlocking Hidden Products
+    const notifyBtn = document.getElementById('notifyBtn');
+    const waitlistModal = document.getElementById('waitlistModal');
+    const subscribeBtn = document.getElementById('subscribeBtn');
+    const closeWaitlistBtn = document.querySelector('.close-waitlist');
+    const waitlistInput = waitlistModal.querySelector('input');
+
+    notifyBtn.onclick = () => {
+      waitlistModal.classList.add('active');
+    };
+
+    closeWaitlistBtn.onclick = () => {
+      waitlistModal.classList.remove('active');
+      waitlistInput.value = ''; // Reset input
+      waitlistInput.classList.remove('border-red-500');
+    };
+
+    subscribeBtn.onclick = () => {
+      if (waitlistInput.value.trim() !== '') {
+        waitlistModal.classList.remove('active');
+
+        // Transition to hidden products
+        const hiddenSection = document.getElementById('hidden-products');
+        hiddenSection.classList.remove('hidden');
+
+        gsap.to("#primary-grid", { opacity: 0, y: -20, display: 'none', duration: 0.5 });
+        gsap.to(hiddenSection, { opacity: 1, duration: 1, delay: 0.5 });
+
+        // Smooth scroll to unlock section
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          // Or align specifically to the hidden section if prefered
+          hiddenSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 600);
+
+      } else {
+        waitlistInput.classList.add('border-red-500');
+        // Add shake animation eventually if desired, but simple border red is good feedback
+      }
+    };
+
+    document.querySelectorAll('.close-trigger').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+      };
+    });
+
+    // Info Modals
+    const infoModal = document.getElementById('infoModal');
+    const infoTitle = document.getElementById('infoTitle');
+    const infoText = document.getElementById('infoText');
+
+    function showInfo(title, text) {
+      infoTitle.innerText = title;
+      infoText.innerHTML = text;
+      infoModal.classList.add('active');
+    }
+
+    document.getElementById('slackBtn').onclick = () => showInfo('Collabee Integration', 'Collabee is our proprietary real-time synchronization engine. It bridges the gap between client briefs and production teams with zero latency.');
+    document.getElementById('cmsBtn').onclick = () => showInfo('Aixain CMS', 'A headless content management system built specifically for high-performance websites. It allows for instant content updates without redeploying code.');
+  </script>
+</body>
+
+</html>
